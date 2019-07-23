@@ -1,0 +1,25 @@
+---
+title: "Finding cas9 sites that target TF binding flanks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{finding_tb_flank_cas9s}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+    library(cas9tbflanks)
+    bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+    tbdt <- read_bed(bedfile)
+
+```
+
+
+

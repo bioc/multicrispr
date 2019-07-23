@@ -1,0 +1,25 @@
+Package: cas9tbflanks
+Title: Find cas9sites to target TF binding site flanks
+Version: 0.0.1
+Authors@R: 
+    person(given = "Aditya",
+           family = "Bhagwat",
+           role = c("aut", "cre"),
+           email = "aditya.bhagwat@mpi-bn.mpg.de")
+Description: Find cas9sites to target TF binding site flanks.
+License: GPL
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Imports:
+    BSgenome,
+    data.table,
+    GenomeInfoDb,
+    GenomicRanges,
+    IRanges,
+    magrittr
+Suggests: 
+    BSgenome.Mmusculus.UCSC.mm10,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
