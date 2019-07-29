@@ -3,7 +3,11 @@
 \name{dt2gr}
 \alias{dt2gr}
 \alias{gr2dt}
+<<<<<<< HEAD
 \title{Switch between data.table and GenomicRanges::GRanges representation}
+=======
+\title{Convert data.table to IRanges}
+>>>>>>> 98ea718d0db705cc5f915d0635d5c327da17e58a
 \usage{
 dt2gr(dt)
 
@@ -18,7 +22,11 @@ gr2dt(gr)
 IRanges
 }
 \description{
+<<<<<<< HEAD
 Switch between data.table and GenomicRanges::GRanges representation
+=======
+Convert data.table to IRanges
+>>>>>>> 98ea718d0db705cc5f915d0635d5c327da17e58a
 }
 \examples{
 require(magrittr) 
@@ -30,4 +38,8 @@ dt <- data.table::data.table(
 )
 dt \%>\% dt2gr()
 dt \%>\% dt2gr() \%>\% gr2dt()
+<<<<<<< HEAD
+=======
+ggnio::ggbioplotRanges(gr)
+>>>>>>> 98ea718d0db705cc5f915d0635d5c327da17e58a
 }
