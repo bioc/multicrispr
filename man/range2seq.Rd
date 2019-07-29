@@ -17,6 +17,9 @@ range2seq(chr, start, end, strand, bsgenome)
 
 \item{bsgenome}{BSgenome object}
 }
+\value{
+character vector
+}
 \description{
 Convert range to sequence
 }

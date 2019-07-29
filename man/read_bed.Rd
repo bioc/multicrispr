@@ -13,6 +13,9 @@ read_bed(bedfile, verbose = TRUE, rm_duplicates = TRUE)
 
 \item{rm_duplicates}{logical(1)}
 }
+\value{
+data.table(chr, start, end, strand)
+}
 \description{
 Read bedfile as data.table
 }

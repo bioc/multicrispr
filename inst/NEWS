@@ -1,0 +1,5 @@
+This new BioC package makes the design of CRISPR-APEX experiments easier.
+Serving to the specifics of such experiments, these functions:
+1. Find a CRISPR set to target a genomic set.
+2. Allow to target the flanks of genomic loci rather than the loci themselves.
+3. Are efficient, relying on data.table and Biostrings.

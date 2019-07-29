@@ -2,6 +2,7 @@
 #' @param bedfile        file path
 #' @param verbose        logical(1)
 #' @param rm_duplicates  logical(1)
+#' @return data.table(chr, start, end, strand) 
 #' @examples
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
 #' ranges <- read_bed(bedfile)
@@ -20,7 +21,7 @@ read_bed <- function(
     if (verbose) cmessage('\tRead %s', bedfile)
     dt <- data.table::fread(
             bedfile,
-            select    = c(1:3, 6),
+            select    = c(seq_len(3), 6),
             col.names = c('chr', 'start', 'end', 'strand'))
     dt %>% data.table::setorderv(c('chr', 'start', 'end', 'strand'))
     if (verbose) cmessage('\t%d ranges on %d chromosomes', 
@@ -39,7 +40,7 @@ read_bed <- function(
     # Report width & gap statistics
     if (verbose){
         dt [ , width := end-start+1]
-        dt [ , gap := c(start[2:.N]-end[1:(.N-1)], Inf), by = chr ]
+        dt [ , gap := c(start[2:.N]-end[seq_len(.N-1)], Inf), by = chr ]
         cmessage('\t\t%s NT wide', num2scalarstr(dt$width))
         cmessage('\t\t%s NT apart', num2scalarstr(dt$gap))
         dt [ , c('gap', 'width') := NULL]
@@ -76,11 +77,11 @@ left_flank <- function(
                     extract()
     
     cmessage('\t\t%d left  flanks : [start%s%d, start%s%d]', 
-             nrow(flankranges),
-             csign(startoffset), 
-             abs(startoffset), 
-             csign(endoffset),
-             abs(endoffset))
+            nrow(flankranges),
+            csign(startoffset), 
+            abs(startoffset), 
+            csign(endoffset),
+            abs(endoffset))
     
     return(flankranges)
 }
@@ -113,11 +114,11 @@ right_flank <- function(
                     extract()
     
     cmessage('\t\t%d right flanks : [end%s%d, end%s%d]', 
-             nrow(flankranges),
-             csign(startoffset), 
-             abs(startoffset), 
-             csign(endoffset), 
-             abs(endoffset))
+            nrow(flankranges),
+            csign(startoffset), 
+            abs(startoffset), 
+            csign(endoffset), 
+            abs(endoffset))
     
     return(flankranges)
 }
@@ -178,7 +179,6 @@ reduce <- IRanges::reduce
 #' reduce(ranges)
 #' @export
 setMethod("reduce", signature(x = "data.table"), 
-          
     function(x, verbose = TRUE){
         reduced_ranges <-   dt2gr(x) %>% 
                             GenomicRanges::reduce() %>% 
@@ -211,7 +211,7 @@ complement <- function(ranges, verbose = TRUE){
                     extract()
     
     if (verbose) cmessage('\t\t%d strand-complementary ranges', 
-                          nrow(complstrand))
+                            nrow(complstrand))
     return(complstrand)
 
 }
@@ -252,13 +252,14 @@ flank_fourways <- function(
                                     startoffset = rightstartoffset,
                                     endoffset   = rightendoffset,
                                     verbose = verbose) )
-    if (verbose) cmessage('\t\t%d ranges combined (left + right)', nrow(flankranges))
+    if (verbose) cmessage('\t\t%d ranges combined (left + right)', 
+                            nrow(flankranges))
     
     # Complement
     flankranges %<>% rbind(complement(., verbose = FALSE))
     flankranges %>% data.table::setorderv(c('chr', 'start', 'end'))
     if (verbose) cmessage('\t\t%d ranges after adding strand-complements', 
-                          nrow(flankranges))
+                            nrow(flankranges))
 
     # Reduce        
     flankranges %>% reduce(verbose = verbose) 

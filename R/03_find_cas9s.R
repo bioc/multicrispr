@@ -5,6 +5,7 @@
 #' @param end     vector end position vector
 #' @param strand  '+|-' vector
 #' @param bsgenome  BSgenome object
+#' @return character vector
 #' @examples
 #' range2seq(
 #'     chr      = c('chr2', 'chr1', 'chr17'),
@@ -43,16 +44,15 @@ findcas9s <- function(ranges, bsgenome, verbose = TRUE){
     chr <- start <- end <- strand <- NULL
     substart <- subend <- cas9start <- cas9end <- cas9seq <- NULL
     
-    
     # Find cas9sites
     if (verbose) message('\tFind N{20}NGG cas9 sites in provided ranges')
     ranges [ , seq := range2seq(chr, start, end, strand, bsgenome) ] 
     res <- ranges$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
     ranges [ , substart := vapply(  res, 
-                                    function(y) y[, 1] %>% paste0(collapse=';'), 
+                                    function(y) y[, 1] %>% paste0(collapse=';'),
                                     character(1)) ]
     ranges [ , subend   := vapply(  res,
-                                    function(y) y[, 2] %>% paste0(collapse=';'), 
+                                    function(y) y[, 2] %>% paste0(collapse=';'),
                                     character(1)) ]
     
     # Rm cas9-free ranges
@@ -61,7 +61,7 @@ findcas9s <- function(ranges, bsgenome, verbose = TRUE){
         if (verbose)  cmessage('\t\tRm %d ranges with no cas9sites', sum(idx)) 
         ranges %<>% extract(idx)
     }
- 
+
     # Calculate cas9 ranges
     cas9dt <-   ranges %>% 
                 tidyr::separate_rows(substart, subend) %>%
@@ -105,12 +105,12 @@ rm_taboo_cas9s <- function(targetcas9s, taboocas9s, verbose = TRUE){
     cas9dt <- rbind(cbind(targetcas9s, region = 'target'), 
                     cbind(taboocas9s,  region = 'taboo'))
     cmessage('\t\t%d cas9 seqs across %d ranges', 
-             length(unique(cas9dt$cas9seq)), nrow(cas9dt))
+                length(unique(cas9dt$cas9seq)), nrow(cas9dt))
     cas9dt [ , ncenter := sum(region == 'center'), by = 'cas9seq' ]
     cas9dt %<>% extract(ncenter == 0)
     cas9dt [ , c('ncenter', 'region') := NULL ]
     cmessage('\t\t%d cas9 seqs across %d ranges', 
-             length(unique(cas9dt$cas9seq)), nrow(cas9dt))
+                length(unique(cas9dt$cas9seq)), nrow(cas9dt))
     cas9dt
 }
 
