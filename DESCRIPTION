@@ -1,9 +1,14 @@
 Package: crisprapex
 Title: Find crispr set to target a set of loci for CRISPR-APEX experiments
 Version: 0.0.1
-Authors@R: 
-    person("Aditya", "Bhagwat", role = c("aut", "cre"),
-           email = c("aditya.bhagwat@mpi-bn.mpg.de"))
+Authors@R: c(person("Aditya", "Bhagwat", role = c("aut", "cre"), 
+                    email = "aditya.bhagwat@mpi-bn.mpg.de"), 
+            person("Mette", "Bentsen", role = "ctb", 
+                    email = "mette.bentsen@mpi-bn.mpg.de"), 
+            person("Mario", "Looso", role = "ctb", 
+                    email = "mario.looso@mpi-bn.mpg.de"), 
+            person("Johannes", "Graumann", role = "ctb", 
+                    email = 'johannes.graumann@mpi-bn.mpg.de'))
 Description: Contains functions to find a crispr set to target a set of genomic 
  loci for CRISPR-APEX experiments. Targeting flanks of genomic loci rather than 
  loci themselves is made easy. Functions have been made efficient, benefiting 
@@ -27,6 +32,7 @@ Suggests:
     BiocStyle,
     BSgenome.Mmusculus.UCSC.mm10,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
 biocViews: CRISPR
