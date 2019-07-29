@@ -12,17 +12,14 @@ read_bed(bedfile, verbose = TRUE, rm_duplicates = TRUE)
 \item{verbose}{logical(1)}
 
 \item{rm_duplicates}{logical(1)}
-<<<<<<< HEAD
 }
 \value{
 data.table(chr, start, end, strand)
-=======
->>>>>>> 98ea718d0db705cc5f915d0635d5c327da17e58a
 }
 \description{
 Read bedfile as data.table
 }
 \examples{
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 ranges <- read_bed(bedfile)
 }

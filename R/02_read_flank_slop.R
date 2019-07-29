@@ -4,7 +4,7 @@
 #' @param rm_duplicates  logical(1)
 #' @return data.table(chr, start, end, strand) 
 #' @examples
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' @importFrom  data.table  :=
 #' @export
@@ -60,7 +60,7 @@ read_bed <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' ranges %>% head(1)
 #' ranges %>% head(1) %>% left_flank()
@@ -96,7 +96,7 @@ left_flank <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' ranges %>% head(1)
 #' ranges %>% head(1) %>% right_flank()
@@ -133,7 +133,7 @@ right_flank <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' ranges %>% head(1)
 #' ranges %>% head(1) %>% slop()
@@ -198,7 +198,7 @@ setMethod("reduce", signature(x = "data.table"),
 #' @param verbose logical(1)
 #' @return data.table(chr, start, end, strand)
 #' @examples
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks') 
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex') 
 #' ranges <- read_bed(bedfile)
 #' complement(ranges) 
 #' @export
@@ -227,7 +227,7 @@ complement <- function(ranges, verbose = TRUE){
 #' @param verbose           logical(1): report?
 #' @return data.table(chr, start, end, strand)
 #' @examples 
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' flank_fourways(ranges)
 ##' @export
@@ -273,7 +273,7 @@ flank_fourways <- function(
 #' @param verbose     logical(1)
 #' @return data.table(chr, start, end, strand)
 #' @examples
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' slop_fourways(ranges)
 #' @export

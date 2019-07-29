@@ -23,7 +23,7 @@ Slop (i.e. extend left/right)
 }
 \examples{
 require(magrittr)
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 ranges <- read_bed(bedfile)
 ranges \%>\% head(1)
 ranges \%>\% head(1) \%>\% slop()

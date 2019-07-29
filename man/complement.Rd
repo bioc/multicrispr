@@ -18,7 +18,7 @@ data.table(chr, start, end, strand)
 Complement ranges
 }
 \examples{
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks') 
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex') 
 ranges <- read_bed(bedfile)
 complement(ranges) 
 }

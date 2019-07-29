@@ -23,7 +23,7 @@ data.table(chr, start, end, strand)
 Slop ranges for both strands, merging overlaps
 }
 \examples{
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'cas9tbflanks')
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 ranges <- read_bed(bedfile)
 slop_fourways(ranges)
 }

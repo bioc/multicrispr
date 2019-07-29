@@ -35,7 +35,7 @@ range2seq <- function(chr, start, end, strand, bsgenome){
 #' @examples
 #' require(magrittr)
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' bedfile  <- system.file('extdata/SRF_sites.bed', package='cas9tbflanks')
+#' bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
 #' read_bed(bedfile) %>% slop_fourways() %>% findcas9s(bsgenome)
 #' @export 
 findcas9s <- function(ranges, bsgenome, verbose = TRUE){
@@ -91,7 +91,7 @@ findcas9s <- function(ranges, bsgenome, verbose = TRUE){
 #' @examples
 #' require(magrittr)
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' bedfile <- system.file('extdata/SRF_sites.bed', package='cas9tbflanks')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package='crisprapex')
 #' tbranges <- read_bed(bedfile)
 #' flankcas9s  <- tbranges %>% flank_fourways() %>% findcas9s(bsgenome)
 #' centercas9s <- tbranges %>% slop_fourways()  %>% findcas9s(bsgenome)
