@@ -1,8 +1,12 @@
 # Introduction
 
-crisprapex makes the design of CRISPR-APEX experiments easier.
-Serving to the specifics of such experiments, these functions:
+This package is designed to make the design of CRISPR-APEX experiments easier.
+\newline
+Such These experiments often require:
 
-* Find a CRISPR **set** to target a genomic **set**.
-* Allow to target the **flanks** of genomic loci rather than loci themselves.
-* Are **efficient**, building on top of data.table and Biostrings.
+* finding a CRISPR **set** to target a genomic **set**.
+* targeting the **flanks** of genomic loci rather than loci themselves.
+* **efficient** functions, which are provided by building on top of 
+    data.table and Biostrings.
+
+# Example use
