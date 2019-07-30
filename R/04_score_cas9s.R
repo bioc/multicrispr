@@ -9,8 +9,11 @@
 #'     calc_ontargetscore(contextseqs)
 #' }
 calc_ontargetscore <- function(contextseqs){
+    azimuth <<- reticulate::import("azimuth", delay_load = TRUE)
+    numpy   <<- reticulate::import("numpy",   delay_load = TRUE)
     azimuth$model_comparison$predict(numpy$array(contextseqs))
 }
+
 
 #' Add cas9 ontarget scores
 #' @param cas9dt data.table(chr, cas9start, cas9end, strand)
