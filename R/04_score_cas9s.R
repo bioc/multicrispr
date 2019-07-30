@@ -88,7 +88,7 @@ score_cas9ranges <- function(
                 contextify_end(  chr, end,   strand), 
                 strand, 
                 bsgenome) %>% 
-    score_contextseqs(contextseqs, verbose)
+    score_contextseqs(verbose)
 
 }
 
