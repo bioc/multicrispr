@@ -36,9 +36,9 @@ range2seq <- function(chr, start, end, strand, bsgenome){
 #' require(magrittr)
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
-#' read_bed(bedfile) %>% slop_fourways() %>% findcas9s(bsgenome)
+#' read_bed(bedfile) %>% slop_fourways() %>% find_cas9s(bsgenome)
 #' @export 
-findcas9s <- function(ranges, bsgenome, verbose = TRUE){
+find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
     
     # Comply
     chr <- start <- end <- strand <- NULL
@@ -93,8 +93,8 @@ findcas9s <- function(ranges, bsgenome, verbose = TRUE){
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package='crisprapex')
 #' tbranges <- read_bed(bedfile)
-#' flankcas9s  <- tbranges %>% flank_fourways() %>% findcas9s(bsgenome)
-#' centercas9s <- tbranges %>% slop_fourways()  %>% findcas9s(bsgenome)
+#' flankcas9s  <- tbranges %>% flank_fourways() %>% find_cas9s(bsgenome)
+#' centercas9s <- tbranges %>% slop_fourways()  %>% find_cas9s(bsgenome)
 #' flankcas9s %>% rm_taboo_cas9s(centercas9s)
 #'
 #' @return subset of taboocas9s
@@ -113,9 +113,3 @@ rm_taboo_cas9s <- function(targetcas9s, taboocas9s, verbose = TRUE){
                 length(unique(cas9dt$cas9seq)), nrow(cas9dt))
     cas9dt
 }
-
-
-
-
-
-

@@ -24,8 +24,8 @@ require(magrittr)
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile <- system.file('extdata/SRF_sites.bed', package='crisprapex')
 tbranges <- read_bed(bedfile)
-flankcas9s  <- tbranges \%>\% flank_fourways() \%>\% findcas9s(bsgenome)
-centercas9s <- tbranges \%>\% slop_fourways()  \%>\% findcas9s(bsgenome)
+flankcas9s  <- tbranges \%>\% flank_fourways() \%>\% find_cas9s(bsgenome)
+centercas9s <- tbranges \%>\% slop_fourways()  \%>\% find_cas9s(bsgenome)
 flankcas9s \%>\% rm_taboo_cas9s(centercas9s)
 
 }
