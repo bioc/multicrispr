@@ -18,9 +18,11 @@ data.table(chr, cas9start, cas9end, strand)
 Add cas9 ontarget scores
 }
 \examples{
-require(magrittr)
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-cas9dt <- read_bed(bedfile) \%>\% slop_fourways() \%>\% find_cas9s(bsgenome)
-cas9dt \%>\% add_contextseq()
+if (reticulate::py_module_available('azimuth')){
+    require(magrittr)
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+    bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+    cas9dt <- read_bed(bedfile) \%>\% slop_fourways() \%>\% find_cas9s(bsgenome)
+    cas9dt \%>\% add_ontargetscores()
+}
 }

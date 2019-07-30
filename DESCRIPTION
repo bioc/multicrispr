@@ -26,6 +26,7 @@ Imports:
     IRanges,
     magrittr,
     methods,
+    reticulate,
     stringi, 
     tidyr
 Suggests: 
