@@ -17,7 +17,6 @@ add_ontargetscores <- function(cas9dt, bsgenome){
     cas9dt [ !is.na(cas9start) & strand=='-', contextend   := cas9end  +4,                                               ]
     cas9dt [ !is.na(cas9start)              , contextseq   := range2seq(chr, contextstart, contextend, strand, bsgenome) ]
     cas9dt [                                , c('contextstart', 'contextend') := NULL                                    ]
-    cas9dt[]
     scoredt <- cas9dt [!is.na(cas9start) , .(contextseq = unique(contextseq))  ]
     scoredt [, ontargetscore := azimuth$model_comparison$predict(numpy$array(scoredt$contextseq)) ]
     cas9dt %<>% merge(scoredt, by = 'contextseq', all.x = TRUE)
