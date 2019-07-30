@@ -67,7 +67,10 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#'     cas9dt <- read_bed(bedfile) %>% head(3) %>% slop_fourways() %>% find_cas9s(bsgenome)
+#'     cas9dt <-   read_bed(bedfile)    %>% 
+#'                 head(3)              %>% 
+#'                 slop_fourways()      %>% 
+#'                 find_cas9s(bsgenome)
 #'     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
 #'     cas9dt %>% add_ontargetscores(chr, cas9start, cas9end, strand, bsgenome)
 #' }
