@@ -5,9 +5,9 @@
 \alias{contextify_end}
 \title{Contextify start/stop}
 \usage{
-contextify_start(chr, start, strand)
+contextify_start(chr, start, strand, bsgenome)
 
-contextify_end(chr, end, strand)
+contextify_end(chr, end, strand, bsgenome)
 }
 \arguments{
 \item{chr}{character vector: chromosome values}
@@ -15,6 +15,8 @@ contextify_end(chr, end, strand)
 \item{start}{numeric vector: start positions}
 
 \item{strand}{character vector: '+' or '-' values}
+
+\item{bsgenome}{BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 
 \item{end}{numeric vector: end positions}
 }
@@ -25,11 +27,7 @@ numeric vector
 Contextify start/stop
 }
 \examples{
-ranges <- data.table::data.table(
-            chr    = c('chr1', 'chr1'), 
-            start  = c(200, 300), 
-            end    = c(220, 330), 
-            strand = c('-', '+'))
-ranges [ , contextstart := contextify_start(chr, start, end, strand) ][]
-ranges [ , contextend   := contextify_end(  chr, start, end, strand) ][]
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+contextify_start('chr1', 200,  '+', bsgenome)
+contextify_end(  'chr1', 200,  '-', bsgenome)
 }

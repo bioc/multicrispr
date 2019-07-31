@@ -13,6 +13,10 @@ read_bed <- function(
     verbose       = TRUE, 
     rm_duplicates = TRUE
 ){
+    # Assert
+    assertive.files::assert_all_are_existing_files(bedfile)
+    assertive.types::assert_is_a_bool(verbose)
+    assertive.types::assert_is_a_bool(rm_duplicates)
 
     # Comply
     chr <- start <- end <- strand <- .N <- gap <- width <- NULL
@@ -56,34 +60,50 @@ read_bed <- function(
 #' @param startoffset flank start relative to range start
 #' @param endoffset   flank end   relative to range start
 #' @param verbose     logical(1)
+#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @return data.table
 #' @export
 #' @examples 
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
-#' ranges %>% head(1)
-#' ranges %>% head(1) %>% left_flank()
+#' ranges %>% head(3)
+#' ranges %>% head(3) %>% left_flank()
 left_flank <- function(
     ranges, 
     startoffset = -200, 
     endoffset   = -1, 
-    verbose     = TRUE
+    verbose     = TRUE, 
+    bsgenome
 ){
+    # Assert
+    assertive.types::assert_is_data.table(ranges)
+    assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
+    assertive.types::assert_is_a_number(startoffset)
+    assertive.types::assert_is_a_number(endoffset)
+    assertive.types::assert_is_a_bool(verbose)
+    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    
+    # Flank
     start <- end <- NULL
-    flankranges <-  data.table::copy(ranges) %>% 
+    newranges <-  data.table::copy(ranges) %>% 
                     extract(, end   := start + endoffset)   %>%  # dont switch
                     extract(, start := start + startoffset) %>%  # lines!
                     extract()
-    
+    newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
+    tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
+    tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
+    newranges[, 'chrlength' := NULL]
+
+    # Return
     cmessage('\t\t%d left  flanks : [start%s%d, start%s%d]', 
-            nrow(flankranges),
+            nrow(newranges),
             csign(startoffset), 
             abs(startoffset), 
             csign(endoffset),
             abs(endoffset))
 
-    return(flankranges)
+    return(newranges)
 }
 
 
@@ -107,20 +127,33 @@ right_flank <- function(
     endoffset   = 200, 
     verbose     = TRUE
 ){
+    # Assert
+    assertive.types::assert_is_data.table(ranges)
+    assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
+    assertive.types::assert_is_a_number(startoffset)
+    assertive.types::assert_is_a_number(endoffset)
+    assertive.types::assert_is_a_bool(verbose)
+    
+    # Flank
     start <- end <- NULL
-    flankranges <-  data.table::copy(ranges)               %>% 
+    newranges  <-   data.table::copy(ranges)               %>% 
                     extract(, start := end + startoffset)  %>% 
                     extract(, end   := end + endoffset)    %>% 
                     extract()
-    
+    newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
+    tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
+    tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
+    newranges[, 'chrlength' := NULL]
+   
+    # Return
     cmessage('\t\t%d right flanks : [end%s%d, end%s%d]', 
-            nrow(flankranges),
+            nrow(newranges),
             csign(startoffset), 
             abs(startoffset), 
             csign(endoffset), 
             abs(endoffset))
 
-    return(flankranges)
+    return(newranges)
 }
 
 
@@ -145,22 +178,33 @@ slop <- function(
     verbose     = TRUE
 ){
 
-    start <- end <- NULL
+    # Assert
+    assertive.types::assert_is_data.table(ranges)
+    assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
+    assertive.types::assert_is_a_number(startoffset)
+    assertive.types::assert_is_a_number(endoffset)
+    assertive.types::assert_is_a_bool(verbose)
     
-    expandedranges <-   data.table::copy(ranges)                 %>% 
-                        extract(, start := start + startoffset)  %>%  
-                        extract(, end   := end   + endoffset)    %>% 
-                        extract()
+    # Slop
+    start <- end <- NULL
+    newranges  <-  data.table::copy(ranges)                 %>% 
+                   extract(, start := start + startoffset)  %>%  
+                   extract(, end   := end   + endoffset)    %>% 
+                   extract()
+    newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
+    tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
+    tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
+    newranges[, 'chrlength' := NULL]
 
+    # Return
     if (verbose) cmessage(
                     '\t\t%d slopped ranges: [start%s%d, end%s%d]', 
-                    nrow(expandedranges),
+                    nrow(newranges),
                     csign(startoffset), 
                     abs(startoffset), 
                     csign(endoffset), 
                     abs(endoffset))
-    
-    return(expandedranges)
+    return(newranges)
     
 }
 
@@ -203,22 +247,29 @@ setMethod("reduce", signature(x = "data.table"),
 #' complement(ranges) 
 #' @export
 complement <- function(ranges, verbose = TRUE){
+
+    # Assert
+    assertive.types::assert_is_data.table(ranges)
+    assertive.sets::assert_is_subset(
+        c('chr', 'start', 'end', 'strand'), names(ranges))
+    
+    # Complement
     strand <- NULL
     assertive.sets::assert_is_subset(unique(ranges$strand), c('-', '+'))
 
-    complstrand <-  data.table::copy(ranges) %>% 
+    newranges <-    data.table::copy(ranges) %>% 
                     extract(, strand := ifelse(strand=='+', '-', '+')) %>% 
                     extract()
     
+    # Return
     if (verbose) cmessage('\t\t%d strand-complementary ranges', 
-                            nrow(complstrand))
-    return(complstrand)
+                            nrow(newranges))
+    return(newranges)
 
 }
 
 
 #' Flank left/right ranges for both strands, merging overlaps
-#' 
 #' @param ranges            data.table(chr, start, end, strand)
 #' @param leftstartoffset   numeric(1)
 #' @param leftendoffset     numeric(1)
@@ -244,7 +295,7 @@ flank_fourways <- function(
     
     # Flank
     if (verbose) cmessage('\tFlank fourways')
-    flankranges <- rbind(left_flank(ranges, 
+    newranges <- rbind(left_flank(ranges, 
                                     startoffset = leftstartoffset, 
                                     endoffset   = leftendoffset, 
                                     verbose     = verbose),
@@ -253,16 +304,16 @@ flank_fourways <- function(
                                     endoffset   = rightendoffset,
                                     verbose = verbose) )
     if (verbose) cmessage('\t\t%d ranges combined (left + right)', 
-                            nrow(flankranges))
+                            nrow(newranges))
 
     # Complement
-    flankranges %<>% rbind(complement(., verbose = FALSE))
-    flankranges %>% data.table::setorderv(c('chr', 'start', 'end'))
+    newranges %<>% rbind(complement(., verbose = FALSE))
+    newranges %>% data.table::setorderv(c('chr', 'start', 'end'))
     if (verbose) cmessage('\t\t%d ranges after adding strand-complements', 
-                            nrow(flankranges))
+                            nrow(newranges))
 
     # Reduce        
-    flankranges %>% reduce(verbose = verbose) 
+    newranges %>% reduce(verbose = verbose) 
 }
 
 
@@ -287,21 +338,19 @@ slop_fourways <- function(
     . <- NULL
     
     # Slop
-    if (verbose)   cmessage('\tSlop fourways')
-    sloppedranges  <-   ranges %>% 
-                        slop(
-                            startoffset = startoffset, 
-                            endoffset   = endoffset, 
-                            verbose     = verbose
-                        )
+    if (verbose) cmessage('\tSlop fourways')
+    newranges <-    ranges %>% 
+                    slop(startoffset = startoffset, 
+                         endoffset   = endoffset, 
+                         verbose     = verbose)
     
     # Complement
-    sloppedranges %<>% rbind(complement(., verbose = FALSE))
+    newranges %<>% rbind(complement(., verbose = FALSE))
     if (verbose)   cmessage('\t\t%d ranges after adding strand-complements', 
-                            nrow(sloppedranges))
+                            nrow(newranges))
     
     # Reduce
-    sloppedranges %>% reduce(verbose = verbose)
+    newranges %>% reduce(verbose = verbose)
 }
 
 

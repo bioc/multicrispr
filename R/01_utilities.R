@@ -31,6 +31,13 @@ csign <- function(x) if (sign(x)==-1) '-' else '+'
 #' dt %>% dt2gr() %>% gr2dt()
 #' @export
 dt2gr <- function(dt){
+    
+    # Assert
+    assertive.types::is_data.table(dt)
+    assertive.sets::assert_is_subset(
+        c('chr', 'start', 'end', 'strand'), names(dt))
+    
+    # Convert
     GenomicRanges::GRanges(
         seqnames = dt$chr, 
         ranges   = IRanges::IRanges(start = dt$start, end = dt$end), 
@@ -42,6 +49,11 @@ dt2gr <- function(dt){
 #' @rdname dt2gr
 #' @export
 gr2dt <- function(gr){
+    
+    # Assert
+    assertive.base::assert_is_identical_to_true(is(gr, 'GRanges'))
+    
+    # Convert
     data.table::data.table(
         chr    = gr %>% GenomicRanges::seqnames()  %>%  as.vector(), 
         start  = gr %>% GenomicRanges::start(),

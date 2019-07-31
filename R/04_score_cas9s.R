@@ -3,36 +3,60 @@
 #' @param start numeric vector: start positions
 #' @param end   numeric vector: end positions
 #' @param strand character vector: '+' or '-' values
+#' @param bsgenome BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @return numeric vector
 #' @examples
-#' ranges <- data.table::data.table(
-#'             chr    = c('chr1', 'chr1'), 
-#'             start  = c(200, 300), 
-#'             end    = c(220, 330), 
-#'             strand = c('-', '+'))
-#' ranges [ , contextstart := contextify_start(chr, start, end, strand) ][]
-#' ranges [ , contextend   := contextify_end(  chr, start, end, strand) ][]
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' contextify_start('chr1', 200,  '+', bsgenome)
+#' contextify_end(  'chr1', 200,  '-', bsgenome)
 #' @export
-contextify_start <- function(chr, start, strand){
+contextify_start <- function(chr, start, strand, bsgenome){
+    
+    # Assert
+    assertive.types::assert_is_character(chr)
+    assertive.types::assert_is_numeric(start)
+    assertive.types::assert_is_character(strand)
+    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
     tmp <- Reduce( assertive.properties::assert_are_same_length, 
                    list(chr, start, strand))
-    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
+    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
     
-    ifelse(strand == '+', start - 4, start - 3)
+    # Contextify
+    contextstart <- ifelse(strand == '+', start - 4, start - 3)
+    contextstart %>% assertive.numbers::assert_all_are_in_closed_range(
+                        1, 
+                        GenomeInfoDb::seqlengths(bsgenome)[[chr]])
+    
+    # Return
+    return(contextstart)
 }
 
 
 #' @rdname contextify_start
 #' @export
-contextify_end <- function(chr, end, strand){
+contextify_end <- function(chr, end, strand, bsgenome){
+
+    # Assert
+    assertive.types::assert_is_character(chr)
+    assertive.types::assert_is_numeric(end)
+    assertive.types::assert_is_character(strand)
+    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
     tmp <- Reduce( assertive.properties::assert_are_same_length, 
                    list(chr, end, strand))
-    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    ifelse(strand == '+', end + 3,   end + 4)
+    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    
+    # Contextify
+    contextend <- ifelse(strand == '+', end + 3,   end + 4)
+    contextend %>% assertive.numbers::assert_all_are_in_closed_range(
+                        1, 
+                        GenomeInfoDb::seqlengths(bsgenome)[[chr]])
+    
+    # Return
+    return(contextend)
 }
 
 
-#' Calculate azimuth ontargetscores
+#' Score contextseqs
 #' @param contextseqs character vector
 #' @param verbose logical(1)
 #' @return numeric vector
@@ -45,6 +69,12 @@ contextify_end <- function(chr, end, strand){
 #' }
 #' @export
 score_contextseqs <- function(contextseqs, verbose = TRUE){
+    
+    # Assert
+    tmp <- Reduce(assertive.base::assert_are_identical, nchar(contextseqs))
+    assertive.types::assert_is_a_bool(verbose)
+    
+    # Score
     seqdt   <- data.table::data.table(contextseq = contextseqs)
     scoredt <- data.table::data.table(contextseq = unique(contextseqs))
     if (verbose)  message(  '\tScore cas9 sites ', 

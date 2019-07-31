@@ -7,18 +7,18 @@
 range2seq(chr, start, end, strand, bsgenome)
 }
 \arguments{
-\item{chr}{chromosome vector}
+\item{chr}{character vector: c('chr1', 'chr1', ...)}
 
-\item{start}{start position vector}
+\item{start}{numeric vector: start positions}
 
-\item{end}{vector end position vector}
+\item{end}{numeric vector: end positions}
 
-\item{strand}{'+|-' vector}
+\item{strand}{character vector: +/- values}
 
 \item{bsgenome}{BSgenome object}
 }
 \value{
-character vector
+character vector: sequences
 }
 \description{
 Convert range to sequence

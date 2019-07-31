@@ -2,7 +2,7 @@
 % Please edit documentation in R/04_score_cas9s.R
 \name{score_contextseqs}
 \alias{score_contextseqs}
-\title{Calculate azimuth ontargetscores}
+\title{Score contextseqs}
 \usage{
 score_contextseqs(contextseqs, verbose = TRUE)
 }
@@ -15,7 +15,7 @@ score_contextseqs(contextseqs, verbose = TRUE)
 numeric vector
 }
 \description{
-Calculate azimuth ontargetscores
+Score contextseqs
 }
 \examples{
 if (reticulate::py_module_available('azimuth')){

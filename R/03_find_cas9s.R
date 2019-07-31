@@ -1,11 +1,11 @@
 
 #' Convert range to sequence
-#' @param chr     chromosome vector
-#' @param start   start position vector
-#' @param end     vector end position vector
-#' @param strand  '+|-' vector
+#' @param chr     character vector: c('chr1', 'chr1', ...)
+#' @param start   numeric vector: start positions
+#' @param end     numeric vector: end positions
+#' @param strand  character vector: +/- values
 #' @param bsgenome  BSgenome object
-#' @return character vector
+#' @return character vector: sequences
 #' @examples
 #' range2seq(
 #'     chr      = c('chr2', 'chr1', 'chr17'),
@@ -15,6 +15,18 @@
 #'     bsgenome = BSgenome.Mmusculus.UCSC.mm10::Mmusculus)
 #' @export
 range2seq <- function(chr, start, end, strand, bsgenome){
+    
+    # Assert
+    assertive.types::assert_is_character(chr)
+    assertive.types::assert_is_numeric(start)
+    assertive.types::assert_is_numeric(end)
+    assertive.types::assert_is_character(strand)
+    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
+    tmp <- Reduce( assertive.properties::assert_are_same_length, 
+                   list(chr, start, strand))
+    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    
+    # Return
     . <- NULL
     GenomicRanges::GRanges(
         seqnames = chr,
@@ -84,9 +96,9 @@ find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
 }
 
 
-#' Rm taboo cas9s
-#' @param targetcas9s data.table(cas9seq, ...)
-#' @param taboocas9s  data.table(cas9seq, ...)
+#' Rm center cas9s
+#' @param flank_cas9s   data.table(cas9seq, ...)
+#' @param center_cas9s  data.table(cas9seq, ...)
 #' @param verbose logical(1)
 #' @examples
 #' require(magrittr)
@@ -95,21 +107,31 @@ find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
 #' tbranges <- read_bed(bedfile)
 #' flankcas9s  <- tbranges %>% flank_fourways() %>% find_cas9s(bsgenome)
 #' centercas9s <- tbranges %>% slop_fourways()  %>% find_cas9s(bsgenome)
-#' flankcas9s %>% rm_taboo_cas9s(centercas9s)
+#' flankcas9s %>% rm_center_cas9s(centercas9s)
 #'
-#' @return subset of taboocas9s
+#' @return subset of flank_cas9s
 #' @export
-rm_taboo_cas9s <- function(targetcas9s, taboocas9s, verbose = TRUE){
+rm_center_cas9s <- function(flank_cas9s, center_cas9s, verbose = TRUE){
     
+    # Assert
+    assertive.types::assert_is_data.table(flank_cas9s)
+    assertive.types::assert_is_data.table(center_cas9s)
+    assertive.types::assert_is_a_bool(verbose)
+    
+    # Remove
     region <- ncenter <- NULL
-    cas9dt <- rbind(cbind(targetcas9s, region = 'target'), 
-                    cbind(taboocas9s,  region = 'taboo'))
-    cmessage('\t\t%d cas9 seqs across %d ranges', 
-                length(unique(cas9dt$cas9seq)), nrow(cas9dt))
+    cas9dt <- rbind(cbind(flank_cas9s, region = 'target'), 
+                    cbind(center_cas9s,  region = 'taboo'))
+    if (verbose)   cmessage(
+                    '\t\t%d cas9 seqs across %d ranges', 
+                    length(unique(cas9dt$cas9seq)), nrow(cas9dt))
     cas9dt [ , ncenter := sum(region == 'center'), by = 'cas9seq' ]
     cas9dt %<>% extract(ncenter == 0)
     cas9dt [ , c('ncenter', 'region') := NULL ]
-    cmessage('\t\t%d cas9 seqs across %d ranges', 
-                length(unique(cas9dt$cas9seq)), nrow(cas9dt))
+    
+    # Return
+    if (verbose)   cmessage(
+                    '\t\t%d cas9 seqs across %d ranges', 
+                    length(unique(cas9dt$cas9seq)), nrow(cas9dt))
     cas9dt
 }
