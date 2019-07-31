@@ -37,6 +37,5 @@ if (do_run){
                 slop_fourways(bsgenome)  \%>\% 
                 find_cas9s(bsgenome)
     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
-    cas9dt \%>\% score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome)
 }
 }
