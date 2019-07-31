@@ -102,7 +102,7 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
 #'                 slop_fourways()      %>% 
 #'                 find_cas9s(bsgenome)
 #'     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
-#'     cas9dt %>% add_ontargetscores(chr, cas9start, cas9end, strand, bsgenome)
+#'     cas9dt %>% score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome)
 #' }
 #' @export
 score_cas9ranges <- function(
