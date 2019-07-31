@@ -4,19 +4,19 @@
 \alias{left_flank}
 \title{Left flank}
 \usage{
-left_flank(ranges, startoffset = -200, endoffset = -1,
-  verbose = TRUE, bsgenome)
+left_flank(ranges, bsgenome, startoffset = -200, endoffset = -1,
+  verbose = TRUE)
 }
 \arguments{
 \item{ranges}{data.table(chr, start, end)}
+
+\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 
 \item{startoffset}{flank start relative to range start}
 
 \item{endoffset}{flank end   relative to range start}
 
 \item{verbose}{logical(1)}
-
-\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 }
 \value{
 data.table
@@ -26,8 +26,9 @@ Left flank
 }
 \examples{
 require(magrittr)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 ranges <- read_bed(bedfile)
 ranges \%>\% head(3)
-ranges \%>\% head(3) \%>\% left_flank()
+ranges \%>\% head(3) \%>\% left_flank(bsgenome)
 }
