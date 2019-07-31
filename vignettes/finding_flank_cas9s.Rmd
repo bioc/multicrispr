@@ -8,6 +8,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 # Introduction
 
 crisprapex makes the design of CRISPR-APEX experiments easier.
@@ -23,18 +24,39 @@ knitr::opts_chunk$set(
   comment = "    #"
 )
 ```
-
-# Finding cas9 sites to target TF binding flanks
-
 ```{r setup}
 library(magrittr)
 library(crisprapex)
+```
+
+
+# Find cas9 sites that target TF binding flanks
+
+```{r}
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 tbranges <- read_bed(bedfile, verbose = FALSE) %>% extract(1:30)
 
-flank9s  <- tbranges %>% flank_fourways(bsgenome) %>% find_cas9s(bsgenome)
-center9s <- tbranges %>% slop_fourways(bsgenome)  %>% find_cas9s(bsgenome)
+flank9s  <- tbranges %>% flank_fourways(bsgenome)  %>% find_cas9s(bsgenome)
+center9s <- tbranges %>% slop_fourways( bsgenome)  %>% find_cas9s(bsgenome)
 cas9dt   <- flank9s  %>% rm_center_cas9s(center9s)
 ```
+
+
+# Focus on good quality cas9 sites 
+
+```{r}
+do_score <- assertive.reflection::is_unix() & 
+            reticulate::py_module_available('azimuth')
+if (do_score){
+  reticulate::use_condaenv('default')
+  cas9dt [ !is.na(cas9start), ontargetscore := score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
+  message('\tFilter for scores > 0.4')
+  cas9dt %<>% extract( ontargetscore>0.4 )
+  message(sprintf('\t\t%d cas9 seqs across %d ranges', cas9dt[, length(unique(cas9seq))], nrow(cas9dt)))
+}
+```
+
+# Limit to sites with no offtargets
+
