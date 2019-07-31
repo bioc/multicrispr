@@ -7,8 +7,8 @@
 #' @return numeric vector
 #' @examples
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' contextify_start('chr1', 200,  '+', bsgenome)
-#' contextify_end(  'chr1', 200,  '-', bsgenome)
+#' contextify_start(c('chr1', 'chr1'), c(200, 200),  c('+', '-'), bsgenome)
+#' contextify_end(  c('chr1', 'chr1'), c(200, 200),  c('+', '-'), bsgenome)
 #' @export
 contextify_start <- function(chr, start, strand, bsgenome){
     
@@ -24,9 +24,7 @@ contextify_start <- function(chr, start, strand, bsgenome){
     
     # Contextify
     contextstart <- ifelse(strand == '+', start - 4, start - 3)
-    contextstart %>% assertive.numbers::assert_all_are_in_closed_range(
-                        1, 
-                        GenomeInfoDb::seqlengths(bsgenome)[[chr]])
+    assertive.numbers::assert_all_are_greater_than_or_equal_to(contextstart, 1)
     
     # Return
     return(contextstart)
@@ -49,9 +47,8 @@ contextify_end <- function(chr, end, strand, bsgenome){
     
     # Contextify
     contextend <- ifelse(strand == '+', end + 3,   end + 4)
-    contextend %>% assertive.numbers::assert_all_are_in_closed_range(
-                        1, 
-                        GenomeInfoDb::seqlengths(bsgenome)[[chr]])
+    assertive.base::assert_all_are_true(
+        contextend <= GenomeInfoDb::seqlengths(bsgenome)[chr])
     
     # Return
     return(contextend)
@@ -63,13 +60,13 @@ contextify_end <- function(chr, end, strand, bsgenome){
 #' @param verbose logical(1)
 #' @return numeric vector
 #' @examples
-#' \dontrun{
-#' if (reticulate::py_module_available('azimuth')){
+#' do_run <-   assertive.reflection::is_unix() &
+#'             reticulate::py_module_available('azimuth')
+#' if (do_run){
 #'     contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
 #'                      'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
 #'                      'CCAAATATTGTCAAGTTGACAACCAGGAAT')
 #'     score_contextseqs(contextseqs)
-#' }
 #' }
 #' @export
 score_contextseqs <- function(contextseqs, verbose = TRUE){
@@ -102,18 +99,18 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
 #' @param verbose   logical(1)
 #' @return numeric vector
 #' @examples
-#' \dontrun{
-#' if (reticulate::py_module_available('azimuth')){
+#' do_run <-   assertive.reflection::is_unix() &
+#'             reticulate::py_module_available('azimuth')
+#' if (do_run){
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#'     cas9dt <-   read_bed(bedfile)    %>% 
-#'                 head(3)              %>% 
-#'                 slop_fourways()      %>% 
+#'     cas9dt <-   read_bed(bedfile)        %>% 
+#'                 head(3)                  %>% 
+#'                 slop_fourways(bsgenome)  %>% 
 #'                 find_cas9s(bsgenome)
 #'     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
 #'     cas9dt %>% score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome)
-#' }
 #' }
 #' @export
 score_cas9ranges <- function(

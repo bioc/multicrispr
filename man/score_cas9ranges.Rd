@@ -26,17 +26,17 @@ numeric vector
 Score cas9ranges
 }
 \examples{
-\dontrun{
-if (reticulate::py_module_available('azimuth')){
+do_run <-   assertive.reflection::is_unix() &
+            reticulate::py_module_available('azimuth')
+if (do_run){
     require(magrittr)
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-    cas9dt <-   read_bed(bedfile)    \%>\% 
-                head(3)              \%>\% 
-                slop_fourways()      \%>\% 
+    cas9dt <-   read_bed(bedfile)        \%>\% 
+                head(3)                  \%>\% 
+                slop_fourways(bsgenome)  \%>\% 
                 find_cas9s(bsgenome)
     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
     cas9dt \%>\% score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome)
-}
 }
 }

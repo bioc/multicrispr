@@ -28,6 +28,6 @@ Contextify start/stop
 }
 \examples{
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-contextify_start('chr1', 200,  '+', bsgenome)
-contextify_end(  'chr1', 200,  '-', bsgenome)
+contextify_start(c('chr1', 'chr1'), c(200, 200),  c('+', '-'), bsgenome)
+contextify_end(  c('chr1', 'chr1'), c(200, 200),  c('+', '-'), bsgenome)
 }

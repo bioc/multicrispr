@@ -18,12 +18,12 @@ numeric vector
 Score contextseqs
 }
 \examples{
-\dontrun{
-if (reticulate::py_module_available('azimuth')){
+do_run <-   assertive.reflection::is_unix() &
+            reticulate::py_module_available('azimuth')
+if (do_run){
     contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
                      'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
                      'CCAAATATTGTCAAGTTGACAACCAGGAAT')
     score_contextseqs(contextseqs)
-}
 }
 }
