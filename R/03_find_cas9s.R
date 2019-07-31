@@ -24,7 +24,7 @@ range2seq <- function(chr, start, end, strand, bsgenome){
     assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
     tmp <- Reduce( assertive.properties::assert_are_same_length, 
                    list(chr, start, strand))
-    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(methods::is(bsgenome, 'BSgenome'))
     
     # Return
     . <- NULL
@@ -48,7 +48,7 @@ range2seq <- function(chr, start, end, strand, bsgenome){
 #' require(magrittr)
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
-#' read_bed(bedfile) %>% slop_fourways() %>% find_cas9s(bsgenome)
+#' read_bed(bedfile) %>% slop_fourways(bsgenome) %>% find_cas9s(bsgenome)
 #' @export 
 find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
     
@@ -105,9 +105,9 @@ find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package='crisprapex')
 #' tbranges <- read_bed(bedfile)
-#' flankcas9s  <- tbranges %>% flank_fourways() %>% find_cas9s(bsgenome)
-#' centercas9s <- tbranges %>% slop_fourways()  %>% find_cas9s(bsgenome)
-#' flankcas9s %>% rm_center_cas9s(centercas9s)
+#' flank9s  <- tbranges %>% flank_fourways(bsgenome) %>% find_cas9s(bsgenome)
+#' center9s <- tbranges %>% slop_fourways(bsgenome)  %>% find_cas9s(bsgenome)
+#' flank9s %>% rm_center_cas9s(center9s)
 #'
 #' @return subset of flank_cas9s
 #' @export

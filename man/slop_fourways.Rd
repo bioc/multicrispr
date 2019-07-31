@@ -4,11 +4,13 @@
 \alias{slop_fourways}
 \title{Slop ranges for both strands, merging overlaps}
 \usage{
-slop_fourways(ranges, startoffset = -22, endoffset = 22,
+slop_fourways(ranges, bsgenome, startoffset = -22, endoffset = 22,
   verbose = TRUE)
 }
 \arguments{
 \item{ranges}{data.table(chr, start, end, strand)}
+
+\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 
 \item{startoffset}{numeric(1)}
 
@@ -23,7 +25,8 @@ data.table(chr, start, end, strand)
 Slop ranges for both strands, merging overlaps
 }
 \examples{
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 ranges <- read_bed(bedfile)
-slop_fourways(ranges)
+slop_fourways(ranges, bsgenome)
 }

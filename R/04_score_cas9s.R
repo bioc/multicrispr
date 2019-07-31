@@ -19,7 +19,8 @@ contextify_start <- function(chr, start, strand, bsgenome){
     assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
     tmp <- Reduce( assertive.properties::assert_are_same_length, 
                    list(chr, start, strand))
-    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(bsgenome, 'BSgenome'))
     
     # Contextify
     contextstart <- ifelse(strand == '+', start - 4, start - 3)
@@ -43,7 +44,8 @@ contextify_end <- function(chr, end, strand, bsgenome){
     assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
     tmp <- Reduce( assertive.properties::assert_are_same_length, 
                    list(chr, end, strand))
-    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(bsgenome, 'BSgenome'))
     
     # Contextify
     contextend <- ifelse(strand == '+', end + 3,   end + 4)
@@ -61,11 +63,13 @@ contextify_end <- function(chr, end, strand, bsgenome){
 #' @param verbose logical(1)
 #' @return numeric vector
 #' @examples
+#' \dontrun{
 #' if (reticulate::py_module_available('azimuth')){
 #'     contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
 #'                      'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
 #'                      'CCAAATATTGTCAAGTTGACAACCAGGAAT')
-#'     calc_ontargetscore(contextseqs)
+#'     score_contextseqs(contextseqs)
+#' }
 #' }
 #' @export
 score_contextseqs <- function(contextseqs, verbose = TRUE){
@@ -75,6 +79,7 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
     assertive.types::assert_is_a_bool(verbose)
     
     # Score
+    score <- contextseq <- NULL
     seqdt   <- data.table::data.table(contextseq = contextseqs)
     scoredt <- data.table::data.table(contextseq = unique(contextseqs))
     if (verbose)  message(  '\tScore cas9 sites ', 
@@ -88,11 +93,16 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
 }
 
 
-#' Calc cas9 ontargetscores
-#' @param cas9dt data.table(chr, cas9start, cas9end, strand)
-#' @param bsgenome BSGenome object, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @return data.table(chr, cas9start, cas9end, strand)
+#' Score cas9ranges
+#' @param chr       character vector: chromosome values
+#' @param start     numeric vector: start positions
+#' @param end       numeric vector: end positions
+#' @param strand    character vector: '+' or '-' values
+#' @param bsgenome  BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param verbose   logical(1)
+#' @return numeric vector
 #' @examples
+#' \dontrun{
 #' if (reticulate::py_module_available('azimuth')){
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
@@ -104,6 +114,7 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
 #'     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
 #'     cas9dt %>% score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome)
 #' }
+#' }
 #' @export
 score_cas9ranges <- function(
     chr, 
@@ -114,8 +125,8 @@ score_cas9ranges <- function(
     verbose = TRUE
 ){
     range2seq(  chr, 
-                contextify_start(chr, start, strand), 
-                contextify_end(  chr, end,   strand), 
+                contextify_start(chr, start, strand, bsgenome), 
+                contextify_end(  chr, end,   strand, bsgenome), 
                 strand, 
                 bsgenome) %>% 
     score_contextseqs(verbose)

@@ -24,5 +24,5 @@ Find cas9 sites in given ranges
 require(magrittr)
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
-read_bed(bedfile) \%>\% slop_fourways() \%>\% find_cas9s(bsgenome)
+read_bed(bedfile) \%>\% slop_fourways(bsgenome) \%>\% find_cas9s(bsgenome)
 }

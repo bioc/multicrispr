@@ -57,24 +57,25 @@ read_bed <- function(
 
 #' Left flank 
 #' @param ranges      data.table(chr, start, end)
+#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param startoffset flank start relative to range start
 #' @param endoffset   flank end   relative to range start
 #' @param verbose     logical(1)
-#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @return data.table
 #' @export
 #' @examples 
 #' require(magrittr)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' ranges %>% head(3)
-#' ranges %>% head(3) %>% left_flank()
+#' ranges %>% head(3) %>% left_flank(bsgenome)
 left_flank <- function(
     ranges, 
+    bsgenome,
     startoffset = -200, 
     endoffset   = -1, 
-    verbose     = TRUE, 
-    bsgenome
+    verbose     = TRUE
 ){
     # Assert
     assertive.types::assert_is_data.table(ranges)
@@ -82,10 +83,10 @@ left_flank <- function(
     assertive.types::assert_is_a_number(startoffset)
     assertive.types::assert_is_a_number(endoffset)
     assertive.types::assert_is_a_bool(verbose)
-    assertive.base::assert_is_identical_to_true(is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(methods::is(bsgenome, 'BSgenome'))
     
     # Flank
-    start <- end <- NULL
+    chr <- start <- end <- chrlength <- NULL
     newranges <-  data.table::copy(ranges) %>% 
                     extract(, end   := start + endoffset)   %>%  # dont switch
                     extract(, start := start + startoffset) %>%  # lines!
@@ -109,6 +110,7 @@ left_flank <- function(
 
 #' Right flank 
 #' @param ranges      data.table(chr, start, end)
+#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param startoffset flank start relative to range start
 #' @param endoffset   flank end   relative to range start
 #' @param verbose     logical(1)
@@ -116,13 +118,15 @@ left_flank <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' ranges %>% head(1)
-#' ranges %>% head(1) %>% right_flank()
+#' ranges %>% head(1) %>% right_flank(bsgenome)
 #' @export
 right_flank <- function(
-    ranges, 
+    ranges,
+    bsgenome,
     startoffset = 1, 
     endoffset   = 200, 
     verbose     = TRUE
@@ -135,7 +139,7 @@ right_flank <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Flank
-    start <- end <- NULL
+    chr <- start <- end <- chrlength <- NULL
     newranges  <-   data.table::copy(ranges)               %>% 
                     extract(, start := end + startoffset)  %>% 
                     extract(, end   := end + endoffset)    %>% 
@@ -159,6 +163,7 @@ right_flank <- function(
 
 #' Slop (i.e. extend left/right)
 #' @param ranges      data.table(chr, start, end)
+#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param startoffset flank start relative to range start
 #' @param endoffset   flank end   relative to range start
 #' @param verbose     logical(1)
@@ -166,13 +171,15 @@ right_flank <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
 #' ranges %>% head(1)
-#' ranges %>% head(1) %>% slop()
+#' ranges %>% head(1) %>% slop(bsgenome)
 #' @export
 slop <- function(
     ranges, 
+    bsgenome,
     startoffset = -22, 
     endoffset   =  22, 
     verbose     = TRUE
@@ -186,7 +193,7 @@ slop <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Slop
-    start <- end <- NULL
+    chr <- start <- end <- chrlength <- NULL
     newranges  <-  data.table::copy(ranges)                 %>% 
                    extract(, start := start + startoffset)  %>%  
                    extract(, end   := end   + endoffset)    %>% 
@@ -271,6 +278,7 @@ complement <- function(ranges, verbose = TRUE){
 
 #' Flank left/right ranges for both strands, merging overlaps
 #' @param ranges            data.table(chr, start, end, strand)
+#' @param bsgenome          BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param leftstartoffset   numeric(1)
 #' @param leftendoffset     numeric(1)
 #' @param rightstartoffset  numeric(1)
@@ -278,12 +286,14 @@ complement <- function(ranges, verbose = TRUE){
 #' @param verbose           logical(1): report?
 #' @return data.table(chr, start, end, strand)
 #' @examples 
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
-#' flank_fourways(ranges)
+#' flank_fourways(ranges, bsgenome)
 ##' @export
 flank_fourways <- function(
     ranges,
+    bsgenome,
     leftstartoffset  = -200, 
     leftendoffset    =   -1, 
     rightstartoffset =    1, 
@@ -295,14 +305,21 @@ flank_fourways <- function(
     
     # Flank
     if (verbose) cmessage('\tFlank fourways')
-    newranges <- rbind(left_flank(ranges, 
-                                    startoffset = leftstartoffset, 
-                                    endoffset   = leftendoffset, 
-                                    verbose     = verbose),
-                        right_flank(ranges,
-                                    startoffset = rightstartoffset,
-                                    endoffset   = rightendoffset,
-                                    verbose = verbose) )
+    newranges <- rbind(left_flank(
+                            ranges,
+                            bsgenome    = bsgenome, 
+                            startoffset = leftstartoffset, 
+                            endoffset   = leftendoffset, 
+                            verbose     = verbose
+                        ),
+                        right_flank(
+                            ranges,
+                            bsgenome    = bsgenome,
+                            startoffset = rightstartoffset,
+                            endoffset   = rightendoffset,
+                            verbose     = verbose
+                        )
+                )
     if (verbose) cmessage('\t\t%d ranges combined (left + right)', 
                             nrow(newranges))
 
@@ -318,18 +335,21 @@ flank_fourways <- function(
 
 
 #' Slop ranges for both strands, merging overlaps
-#' @param ranges data.table(chr, start, end, strand)
+#' @param ranges      data.table(chr, start, end, strand)
+#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param startoffset numeric(1)
 #' @param endoffset   numeric(1)
 #' @param verbose     logical(1)
 #' @return data.table(chr, start, end, strand)
 #' @examples
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' ranges <- read_bed(bedfile)
-#' slop_fourways(ranges)
+#' slop_fourways(ranges, bsgenome)
 #' @export
 slop_fourways <- function(
     ranges,
+    bsgenome,
     startoffset = -22, 
     endoffset   = 22, 
     verbose     = TRUE
@@ -340,9 +360,12 @@ slop_fourways <- function(
     # Slop
     if (verbose) cmessage('\tSlop fourways')
     newranges <-    ranges %>% 
-                    slop(startoffset = startoffset, 
-                         endoffset   = endoffset, 
-                         verbose     = verbose)
+                    slop(
+                        bsgenome    = bsgenome,
+                        startoffset = startoffset, 
+                        endoffset   = endoffset, 
+                        verbose     = verbose
+                    )
     
     # Complement
     newranges %<>% rbind(complement(., verbose = FALSE))

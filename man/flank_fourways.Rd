@@ -4,11 +4,14 @@
 \alias{flank_fourways}
 \title{Flank left/right ranges for both strands, merging overlaps}
 \usage{
-flank_fourways(ranges, leftstartoffset = -200, leftendoffset = -1,
-  rightstartoffset = 1, rightendoffset = 200, verbose = TRUE)
+flank_fourways(ranges, bsgenome, leftstartoffset = -200,
+  leftendoffset = -1, rightstartoffset = 1, rightendoffset = 200,
+  verbose = TRUE)
 }
 \arguments{
 \item{ranges}{data.table(chr, start, end, strand)}
+
+\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 
 \item{leftstartoffset}{numeric(1)}
 
@@ -27,7 +30,8 @@ data.table(chr, start, end, strand)
 Flank left/right ranges for both strands, merging overlaps
 }
 \examples{
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 ranges <- read_bed(bedfile)
-flank_fourways(ranges)
+flank_fourways(ranges, bsgenome)
 }

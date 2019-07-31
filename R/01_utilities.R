@@ -51,7 +51,7 @@ dt2gr <- function(dt){
 gr2dt <- function(gr){
     
     # Assert
-    assertive.base::assert_is_identical_to_true(is(gr, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(methods::is(gr, 'GRanges'))
     
     # Convert
     data.table::data.table(

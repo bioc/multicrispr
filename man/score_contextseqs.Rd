@@ -18,10 +18,12 @@ numeric vector
 Score contextseqs
 }
 \examples{
+\dontrun{
 if (reticulate::py_module_available('azimuth')){
     contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
                      'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
                      'CCAAATATTGTCAAGTTGACAACCAGGAAT')
-    calc_ontargetscore(contextseqs)
+    score_contextseqs(contextseqs)
+}
 }
 }

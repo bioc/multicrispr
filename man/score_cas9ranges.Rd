@@ -2,22 +2,31 @@
 % Please edit documentation in R/04_score_cas9s.R
 \name{score_cas9ranges}
 \alias{score_cas9ranges}
-\title{Calc cas9 ontargetscores}
+\title{Score cas9ranges}
 \usage{
 score_cas9ranges(chr, start, end, strand, bsgenome, verbose = TRUE)
 }
 \arguments{
-\item{bsgenome}{BSGenome object, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
+\item{chr}{character vector: chromosome values}
 
-\item{cas9dt}{data.table(chr, cas9start, cas9end, strand)}
+\item{start}{numeric vector: start positions}
+
+\item{end}{numeric vector: end positions}
+
+\item{strand}{character vector: '+' or '-' values}
+
+\item{bsgenome}{BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
+
+\item{verbose}{logical(1)}
 }
 \value{
-data.table(chr, cas9start, cas9end, strand)
+numeric vector
 }
 \description{
-Calc cas9 ontargetscores
+Score cas9ranges
 }
 \examples{
+\dontrun{
 if (reticulate::py_module_available('azimuth')){
     require(magrittr)
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
@@ -28,5 +37,6 @@ if (reticulate::py_module_available('azimuth')){
                 find_cas9s(bsgenome)
     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
     cas9dt \%>\% score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome)
+}
 }
 }
