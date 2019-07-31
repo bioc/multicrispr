@@ -22,9 +22,10 @@ range2seq <- function(chr, start, end, strand, bsgenome){
     assertive.types::assert_is_numeric(end)
     assertive.types::assert_is_character(strand)
     assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    tmp <- Reduce( assertive.properties::assert_are_same_length, 
-                   list(chr, start, strand))
-    assertive.base::assert_is_identical_to_true(methods::is(bsgenome, 'BSgenome'))
+    tmp <- Reduce(  assertive.properties::assert_are_same_length, 
+                    list(chr, start, strand))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(bsgenome, 'BSgenome'))
     
     # Return
     . <- NULL

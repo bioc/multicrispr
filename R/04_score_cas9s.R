@@ -17,8 +17,8 @@ contextify_start <- function(chr, start, strand, bsgenome){
     assertive.types::assert_is_numeric(start)
     assertive.types::assert_is_character(strand)
     assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    tmp <- Reduce( assertive.properties::assert_are_same_length, 
-                   list(chr, start, strand))
+    tmp <- Reduce(  assertive.properties::assert_are_same_length, 
+                    list(chr, start, strand))
     assertive.base::assert_is_identical_to_true(
         methods::is(bsgenome, 'BSgenome'))
     
@@ -42,8 +42,8 @@ contextify_end <- function(chr, end, strand, bsgenome){
     assertive.types::assert_is_numeric(end)
     assertive.types::assert_is_character(strand)
     assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    tmp <- Reduce( assertive.properties::assert_are_same_length, 
-                   list(chr, end, strand))
+    tmp <- Reduce(  assertive.properties::assert_are_same_length, 
+                    list(chr, end, strand))
     assertive.base::assert_is_identical_to_true(
         methods::is(bsgenome, 'BSgenome'))
     

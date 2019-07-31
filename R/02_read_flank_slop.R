@@ -73,8 +73,8 @@ read_bed <- function(
 left_flank <- function(
     ranges, 
     bsgenome,
-    startoffset = -200, 
-    endoffset   = -1, 
+    startoffset = -200,
+    endoffset   = -1,
     verbose     = TRUE
 ){
     # Assert
@@ -83,7 +83,8 @@ left_flank <- function(
     assertive.types::assert_is_a_number(startoffset)
     assertive.types::assert_is_a_number(endoffset)
     assertive.types::assert_is_a_bool(verbose)
-    assertive.base::assert_is_identical_to_true(methods::is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(bsgenome, 'BSgenome'))
     
     # Flank
     chr <- start <- end <- chrlength <- NULL
@@ -148,7 +149,7 @@ right_flank <- function(
     tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
     tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
     newranges[, 'chrlength' := NULL]
-   
+
     # Return
     cmessage('\t\t%d right flanks : [end%s%d, end%s%d]', 
             nrow(newranges),
@@ -194,10 +195,10 @@ slop <- function(
     
     # Slop
     chr <- start <- end <- chrlength <- NULL
-    newranges  <-  data.table::copy(ranges)                 %>% 
-                   extract(, start := start + startoffset)  %>%  
-                   extract(, end   := end   + endoffset)    %>% 
-                   extract()
+    newranges  <-   data.table::copy(ranges)                 %>% 
+                    extract(, start := start + startoffset)  %>%  
+                    extract(, end   := end   + endoffset)    %>% 
+                    extract()
     newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
     tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
     tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
@@ -278,7 +279,7 @@ complement <- function(ranges, verbose = TRUE){
 
 #' Flank left/right ranges for both strands, merging overlaps
 #' @param ranges            data.table(chr, start, end, strand)
-#' @param bsgenome          BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param bsgenome  BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param leftstartoffset   numeric(1)
 #' @param leftendoffset     numeric(1)
 #' @param rightstartoffset  numeric(1)
@@ -294,10 +295,10 @@ complement <- function(ranges, verbose = TRUE){
 flank_fourways <- function(
     ranges,
     bsgenome,
-    leftstartoffset  = -200, 
-    leftendoffset    =   -1, 
-    rightstartoffset =    1, 
-    rightendoffset   =  200, 
+    leftstartoffset  = -200,
+    leftendoffset    =   -1,
+    rightstartoffset =    1,
+    rightendoffset   =  200,
     verbose          = TRUE
 ){
     # Comply
