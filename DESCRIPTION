@@ -22,6 +22,7 @@ Imports:
     assertive.files,
     assertive.numbers,
     assertive.properties,
+    assertive.reflection,
     assertive.sets,
     assertive.types,
     BSgenome,
