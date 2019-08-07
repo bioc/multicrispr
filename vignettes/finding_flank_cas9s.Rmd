@@ -33,15 +33,18 @@ library(crisprapex)
 # Find cas9 sites that target TF binding flanks
 
 ```{r}
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-tbranges <- read_bed(bedfile, verbose = FALSE) %>% extract(1:30)
-
-flank9s  <- tbranges %>% flank_fourways(bsgenome)  %>% find_cas9s(bsgenome)
-center9s <- tbranges %>% slop_fourways( bsgenome)  %>% find_cas9s(bsgenome)
-cas9dt   <- flank9s  %>% rm_center_cas9s(center9s)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+cas9dt <- find_flankonly_cas9s(bedfile, bsgenome)
 ```
+
+# Limit to sites with no offtargets
+```{r}
+      cas9seqdt <- cas9dt [ , .(n0 = .N), by = cas9seq ]                            # Scan flanks
+
+```
+
+
 
 
 # Focus on good quality cas9 sites 
@@ -57,6 +60,4 @@ if (do_score){
   message(sprintf('\t\t%d cas9 seqs across %d ranges', cas9dt[, length(unique(cas9seq))], nrow(cas9dt)))
 }
 ```
-
-# Limit to sites with no offtargets
 

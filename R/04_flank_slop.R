@@ -1,65 +1,10 @@
-#' Read bedfile as data.table
-#' @param bedfile        file path
-#' @param verbose        logical(1)
-#' @param rm_duplicates  logical(1)
-#' @return data.table(chr, start, end, strand) 
-#' @examples
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' ranges <- read_bed(bedfile)
-#' @importFrom  data.table  :=
-#' @export
-read_bed <- function(
-    bedfile, 
-    verbose       = TRUE, 
-    rm_duplicates = TRUE
-){
-    # Assert
-    assertive.files::assert_all_are_existing_files(bedfile)
-    assertive.types::assert_is_a_bool(verbose)
-    assertive.types::assert_is_a_bool(rm_duplicates)
-
-    # Comply
-    chr <- start <- end <- strand <- .N <- gap <- width <- NULL
-
-    # Read
-    if (verbose) cmessage('\tRead %s', bedfile)
-    dt <- data.table::fread(
-            bedfile,
-            select    = c(seq_len(3), 6),
-            col.names = c('chr', 'start', 'end', 'strand'))
-    dt %>% data.table::setorderv(c('chr', 'start', 'end', 'strand'))
-    if (verbose) cmessage('\t%d ranges on %d chromosomes', 
-                            nrow(dt), length(unique(dt$chr)))
-    
-    # Drop duplicates
-    if (rm_duplicates){
-        is_duplicated <- cduplicated(dt)
-        if (any(is_duplicated)){
-            if (verbose) cmessage('\t\t%d after removing duplicates')
-            dt %<>% extract(!duplicated)
-        }
-    }
-        
-    
-    # Report width & gap statistics
-    if (verbose){
-        dt [ , width := end-start+1]
-        dt [ , gap := c(start[2:.N]-end[seq_len(.N-1)], Inf), by = chr ]
-        cmessage('\t\t%s NT wide', num2scalarstr(dt$width))
-        cmessage('\t\t%s NT apart', num2scalarstr(dt$gap))
-        dt [ , c('gap', 'width') := NULL]
-    }
-    
-    # Return
-    return(dt[])
-}
 
 
 #' Left flank 
-#' @param ranges      data.table(chr, start, end)
+#' @param ranges      data.table(chr, start, end, strand)
 #' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param startoffset flank start relative to range start
-#' @param endoffset   flank end   relative to range start
+#' @param leftstart   left flank start (relative to range start)
+#' @param leftend     left flank end   (relative to range start)
 #' @param verbose     logical(1)
 #' @return data.table
 #' @export
@@ -73,15 +18,15 @@ read_bed <- function(
 left_flank <- function(
     ranges, 
     bsgenome,
-    startoffset = -200,
-    endoffset   = -1,
-    verbose     = TRUE
+    leftstart = -200,
+    leftend   = -1,
+    verbose   = TRUE
 ){
     # Assert
     assertive.types::assert_is_data.table(ranges)
     assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
-    assertive.types::assert_is_a_number(startoffset)
-    assertive.types::assert_is_a_number(endoffset)
+    assertive.types::assert_is_a_number(leftstart)
+    assertive.types::assert_is_a_number(leftend)
     assertive.types::assert_is_a_bool(verbose)
     assertive.base::assert_is_identical_to_true(
         methods::is(bsgenome, 'BSgenome'))
@@ -89,8 +34,8 @@ left_flank <- function(
     # Flank
     chr <- start <- end <- chrlength <- NULL
     newranges <-  data.table::copy(ranges) %>% 
-                    extract(, end   := start + endoffset)   %>%  # dont switch
-                    extract(, start := start + startoffset) %>%  # lines!
+                    extract(, end   := start + leftend)   %>%  # dont switch
+                    extract(, start := start + leftstart) %>%  # lines!
                     extract()
     newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
     tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
@@ -100,20 +45,20 @@ left_flank <- function(
     # Return
     cmessage('\t\t%d left  flanks : [start%s%d, start%s%d]', 
             nrow(newranges),
-            csign(startoffset), 
-            abs(startoffset), 
-            csign(endoffset),
-            abs(endoffset))
+            csign(leftstart), 
+            abs(leftstart), 
+            csign(leftend),
+            abs(leftend))
 
-    return(newranges)
+    newranges[]
 }
 
 
 #' Right flank 
 #' @param ranges      data.table(chr, start, end)
 #' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param startoffset flank start relative to range start
-#' @param endoffset   flank end   relative to range start
+#' @param rightstart flank start relative to range start
+#' @param leftend   flank end   relative to range start
 #' @param verbose     logical(1)
 #' @return data.table
 #' @export
@@ -128,22 +73,22 @@ left_flank <- function(
 right_flank <- function(
     ranges,
     bsgenome,
-    startoffset = 1, 
-    endoffset   = 200, 
+    rightstart = 1, 
+    rightend   = 200, 
     verbose     = TRUE
 ){
     # Assert
     assertive.types::assert_is_data.table(ranges)
     assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
-    assertive.types::assert_is_a_number(startoffset)
-    assertive.types::assert_is_a_number(endoffset)
+    assertive.types::assert_is_a_number(rightstart)
+    assertive.types::assert_is_a_number(rightend)
     assertive.types::assert_is_a_bool(verbose)
     
     # Flank
     chr <- start <- end <- chrlength <- NULL
     newranges  <-   data.table::copy(ranges)               %>% 
-                    extract(, start := end + startoffset)  %>% 
-                    extract(, end   := end + endoffset)    %>% 
+                    extract(, start := end + rightstart)  %>% 
+                    extract(, end   := end + rightend)    %>% 
                     extract()
     newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
     tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
@@ -153,20 +98,20 @@ right_flank <- function(
     # Return
     cmessage('\t\t%d right flanks : [end%s%d, end%s%d]', 
             nrow(newranges),
-            csign(startoffset), 
-            abs(startoffset), 
-            csign(endoffset), 
-            abs(endoffset))
+            csign(rightstart), 
+            abs(rightstart), 
+            csign(rightend), 
+            abs(rightend))
 
-    return(newranges)
+    newranges[]
 }
 
 
 #' Slop (i.e. extend left/right)
 #' @param ranges      data.table(chr, start, end)
 #' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param startoffset flank start relative to range start
-#' @param endoffset   flank end   relative to range start
+#' @param leftstart flank start relative to range start
+#' @param rightend   flank end   relative to range start
 #' @param verbose     logical(1)
 #' @return data.table
 #' @export
@@ -181,23 +126,23 @@ right_flank <- function(
 slop <- function(
     ranges, 
     bsgenome,
-    startoffset = -22, 
-    endoffset   =  22, 
+    leftstart = -22, 
+    rightend   =  22, 
     verbose     = TRUE
 ){
 
     # Assert
     assertive.types::assert_is_data.table(ranges)
     assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
-    assertive.types::assert_is_a_number(startoffset)
-    assertive.types::assert_is_a_number(endoffset)
+    assertive.types::assert_is_a_number(leftstart)
+    assertive.types::assert_is_a_number(rightend)
     assertive.types::assert_is_a_bool(verbose)
     
     # Slop
     chr <- start <- end <- chrlength <- NULL
     newranges  <-   data.table::copy(ranges)                 %>% 
-                    extract(, start := start + startoffset)  %>%  
-                    extract(, end   := end   + endoffset)    %>% 
+                    extract(, start := start + leftstart)  %>%  
+                    extract(, end   := end   + rightend)    %>% 
                     extract()
     newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
     tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
@@ -208,41 +153,40 @@ slop <- function(
     if (verbose) cmessage(
                     '\t\t%d slopped ranges: [start%s%d, end%s%d]', 
                     nrow(newranges),
-                    csign(startoffset), 
-                    abs(startoffset), 
-                    csign(endoffset), 
-                    abs(endoffset))
-    return(newranges)
+                    csign(leftstart), 
+                    abs(leftstart), 
+                    csign(rightend), 
+                    abs(rightend))
+    newranges[]
     
 }
 
-reduce <- IRanges::reduce
-
-#' Range merge overlaps
+#' Merge overlaps
 #' @param x   data.table(chr, start, end, strand)
+#' @param bsgenome BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param verbose  logical(1)
 #' @return data.table(chr, start, end)
 #' @examples 
-#' (ranges <- data.table::data.table(
+#' require(magrittr)
+#' (rangesdt <- data.table::data.table(
 #'             chr    = rep('chr1', 4), 
 #'             start  = c(1,    5,   5,  20), 
 #'             end    = c(10,  15,  15,  30), 
 #'             strand = c('+', '+', '-', '-')))
-#' reduce(ranges)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' rangesdt %>% merge_overlaps(bsgenome)
 #' @export
-setMethod("reduce", signature(x = "data.table"), 
-    function(x, verbose = TRUE){
-        reduced_ranges <-   dt2gr(x) %>% 
-                            GenomicRanges::reduce() %>% 
-                            gr2dt()
-        if (verbose)  cmessage('\t\t%d ranges after merging overlaps', 
-                                nrow(reduced_ranges))
-        return(reduced_ranges)
-    
-    # Alternative data.table solution:    
-    # https://stackoverflow.com/a/41748171
-    }
-)
+merge_overlaps <- function(x, bsgenome, verbose = TRUE){
+    reduced_ranges <-   as.granges(x, bsgenome) %>% 
+                        GenomicRanges::reduce() %>% 
+                        as.data.table()
+    if (verbose)  cmessage('\t\t%d ranges after merging overlaps', 
+                            nrow(reduced_ranges))
+    reduced_ranges[]
+
+# Alternative data.table solution:    
+# https://stackoverflow.com/a/41748171
+}
 
 
 #' Complement ranges
@@ -272,19 +216,21 @@ complement <- function(ranges, verbose = TRUE){
     # Return
     if (verbose) cmessage('\t\t%d strand-complementary ranges', 
                             nrow(newranges))
-    return(newranges)
+    newranges[]
 
 }
 
 
-#' Flank left/right ranges for both strands, merging overlaps
-#' @param ranges            data.table(chr, start, end, strand)
-#' @param bsgenome  BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param leftstartoffset   numeric(1)
-#' @param leftendoffset     numeric(1)
-#' @param rightstartoffset  numeric(1)
-#' @param rightendoffset    numeric(1)
-#' @param verbose           logical(1): report?
+#' Flank fourways
+#' 
+#' Flank left and right, for both strands, and merge overlaps
+#' @param ranges      data.table(chr, start, end, strand)
+#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param leftstart   numeric(1): left flank start  (from range start)
+#' @param leftend     numeric(1): left flank  end   (from range start)
+#' @param rightstart  numeric(1): right flank start (from range end)
+#' @param rightend    numeric(1): right flank end   (from range end)
+#' @param verbose     logical(1): report?
 #' @return data.table(chr, start, end, strand)
 #' @examples 
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
@@ -295,11 +241,11 @@ complement <- function(ranges, verbose = TRUE){
 flank_fourways <- function(
     ranges,
     bsgenome,
-    leftstartoffset  = -200,
-    leftendoffset    =   -1,
-    rightstartoffset =    1,
-    rightendoffset   =  200,
-    verbose          = TRUE
+    leftstart  = -200,
+    leftend    =   -1,
+    rightstart =    1,
+    rightend   =  200,
+    verbose    = TRUE
 ){
     # Comply
     . <- NULL
@@ -308,17 +254,17 @@ flank_fourways <- function(
     if (verbose) cmessage('\tFlank fourways')
     newranges <- rbind(left_flank(
                             ranges,
-                            bsgenome    = bsgenome, 
-                            startoffset = leftstartoffset, 
-                            endoffset   = leftendoffset, 
-                            verbose     = verbose
+                            bsgenome   = bsgenome, 
+                            leftstart  = leftstart, 
+                            leftend    = leftend, 
+                            verbose    = verbose
                         ),
                         right_flank(
                             ranges,
-                            bsgenome    = bsgenome,
-                            startoffset = rightstartoffset,
-                            endoffset   = rightendoffset,
-                            verbose     = verbose
+                            bsgenome   = bsgenome,
+                            rightstart = rightstart,
+                            rightend   = rightend,
+                            verbose    = verbose
                         )
                 )
     if (verbose) cmessage('\t\t%d ranges combined (left + right)', 
@@ -330,16 +276,16 @@ flank_fourways <- function(
     if (verbose) cmessage('\t\t%d ranges after adding strand-complements', 
                             nrow(newranges))
 
-    # Reduce        
-    newranges %>% reduce(verbose = verbose) 
+    # Merge overlaps
+    newranges %>% merge_overlaps(bsgenome = bsgenome, verbose = verbose) 
 }
 
 
 #' Slop ranges for both strands, merging overlaps
 #' @param ranges      data.table(chr, start, end, strand)
 #' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param startoffset numeric(1)
-#' @param endoffset   numeric(1)
+#' @param leftstart numeric(1)
+#' @param rightend   numeric(1)
 #' @param verbose     logical(1)
 #' @return data.table(chr, start, end, strand)
 #' @examples
@@ -351,8 +297,8 @@ flank_fourways <- function(
 slop_fourways <- function(
     ranges,
     bsgenome,
-    startoffset = -22, 
-    endoffset   = 22, 
+    leftstart = -22, 
+    rightend   = 22, 
     verbose     = TRUE
 ){
     # Comply
@@ -362,10 +308,10 @@ slop_fourways <- function(
     if (verbose) cmessage('\tSlop fourways')
     newranges <-    ranges %>% 
                     slop(
-                        bsgenome    = bsgenome,
-                        startoffset = startoffset, 
-                        endoffset   = endoffset, 
-                        verbose     = verbose
+                        bsgenome  = bsgenome,
+                        leftstart = leftstart, 
+                        rightend  = rightend, 
+                        verbose   = verbose
                     )
     
     # Complement
@@ -373,8 +319,8 @@ slop_fourways <- function(
     if (verbose)   cmessage('\t\t%d ranges after adding strand-complements', 
                             nrow(newranges))
     
-    # Reduce
-    newranges %>% reduce(verbose = verbose)
+    # Merge overlaps
+    newranges %>% merge_overlaps(bsgenome = bsgenome, verbose = verbose)
 }
 
 

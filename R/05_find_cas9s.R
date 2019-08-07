@@ -109,7 +109,6 @@ find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
 #' flank9s  <- tbranges %>% flank_fourways(bsgenome) %>% find_cas9s(bsgenome)
 #' center9s <- tbranges %>% slop_fourways(bsgenome)  %>% find_cas9s(bsgenome)
 #' flank9s %>% rm_center_cas9s(center9s)
-#'
 #' @return subset of flank_cas9s
 #' @export
 rm_center_cas9s <- function(flank_cas9s, center_cas9s, verbose = TRUE){
@@ -121,8 +120,8 @@ rm_center_cas9s <- function(flank_cas9s, center_cas9s, verbose = TRUE){
     
     # Remove
     region <- ncenter <- NULL
-    cas9dt <- rbind(cbind(flank_cas9s, region = 'target'), 
-                    cbind(center_cas9s,  region = 'taboo'))
+    cas9dt <- rbind(cbind(flank_cas9s,  region = 'flank'), 
+                    cbind(center_cas9s, region = 'center'))
     if (verbose)   cmessage(
                     '\t\t%d cas9 seqs across %d ranges', 
                     length(unique(cas9dt$cas9seq)), nrow(cas9dt))
@@ -134,5 +133,55 @@ rm_center_cas9s <- function(flank_cas9s, center_cas9s, verbose = TRUE){
     if (verbose)   cmessage(
                     '\t\t%d cas9 seqs across %d ranges', 
                     length(unique(cas9dt$cas9seq)), nrow(cas9dt))
-    cas9dt
+    cas9dt[]
+}
+
+
+#' Find flank-only cas9s
+#' @param bedfile    character(1): bed file with target sites
+#' @param bsgenome   BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param leftstart  numeric(1): left flank start  (rel. to range start)
+#' @param leftend    numeric(1): left flank end    (rel. to range start)
+#' @param rightstart numeric(1): right flank start (rel. to range end)
+#' @param rightend   numeric(1): right flank end   (rel. to range end)
+#' @param bsgenome   BSgenome object
+#' @param verbose    logical(1)
+#' @examples
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' find_flankonly_cas9s(bedfile, bsgenome)
+#' @export
+find_flankonly_cas9s <- function(
+    bedfile, 
+    bsgenome, 
+    leftstart  = -200,
+    leftend    = -1, 
+    rightstart =  1, 
+    rightend   =  200,
+    verbose    = TRUE
+){
+    
+    # Find     
+    tbranges <- read_bed(bedfile, verbose = FALSE)
+    
+    flank9s  <- tbranges %>% flank_fourways(
+                                bsgenome, 
+                                leftstart  = leftstart,
+                                leftend    = leftend, 
+                                rightstart = rightstart, 
+                                rightend   = rightend, 
+                                verbose    = verbose)  %>% 
+                            find_cas9s(bsgenome, verbose = verbose)
+    
+    center9s <- tbranges %>% slop_fourways(
+                                bsgenome, 
+                                leftstart = -22, 
+                                rightend  = 22, 
+                                verbose     = verbose)  %>% 
+                            find_cas9s(bsgenome, verbose = verbose)
+    
+    cas9dt   <- flank9s  %>% rm_center_cas9s(center9s, verbose = verbose)
+    
+    # Return
+    return(cas9dt)
 }

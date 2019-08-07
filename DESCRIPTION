@@ -25,6 +25,7 @@ Imports:
     assertive.reflection,
     assertive.sets,
     assertive.types,
+    Biostrings,
     BSgenome,
     data.table,
     GenomeInfoDb,
