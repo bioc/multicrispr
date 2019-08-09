@@ -20,7 +20,7 @@ Convert data.table into GenomicRanges::GRanges
 \examples{
 require(magrittr)
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-x <- read_bed(bedfile)
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-x \%>\% as.granges(bsgenome = bsgenome)
+x <- read_bed(bedfile, bsgenome)
+x \%>\% data.table::as.data.table() \%>\% as.granges(bsgenome = bsgenome)
 }

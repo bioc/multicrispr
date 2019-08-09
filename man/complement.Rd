@@ -2,23 +2,25 @@
 % Please edit documentation in R/04_flank_slop.R
 \name{complement}
 \alias{complement}
-\title{Complement ranges}
+\title{Complement granges}
 \usage{
-complement(ranges, verbose = TRUE)
+complement(granges, verbose = TRUE)
 }
 \arguments{
-\item{ranges}{data.table(chr, start, end, strand)}
+\item{granges}{GenomicRanges::GRanges}
 
 \item{verbose}{logical(1)}
 }
 \value{
-data.table(chr, start, end, strand)
+GenomicRanges::GRanges
 }
 \description{
-Complement ranges
+Complement granges
 }
 \examples{
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex') 
-ranges <- read_bed(bedfile)
-complement(ranges) 
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+granges <- read_bed(bedfile, bsgenome)
+granges
+complement(granges) 
 }

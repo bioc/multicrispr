@@ -18,7 +18,9 @@ invisible(x)
 Assert that object is a genomic ranges datatable
 }
 \examples{
-x <- read_bed(system.file('extdata/SRF_sites.bed', package = 'crisprapex'))
+require(magrittr)
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+x <- read_bed(bedfile, bsgenome) \%>\% data.table::as.data.table()
 assert_is_granges_datatable(x, bsgenome)
 }

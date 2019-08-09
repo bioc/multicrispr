@@ -4,13 +4,10 @@
 \alias{slop}
 \title{Slop (i.e. extend left/right)}
 \usage{
-slop(ranges, bsgenome, leftstart = -22, rightend = 22,
-  verbose = TRUE)
+slop(granges, leftstart = -22, rightend = 22, verbose = TRUE)
 }
 \arguments{
-\item{ranges}{data.table(chr, start, end)}
-
-\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
+\item{granges}{GenomicRanges::GRanges}
 
 \item{leftstart}{flank start relative to range start}
 
@@ -19,16 +16,16 @@ slop(ranges, bsgenome, leftstart = -22, rightend = 22,
 \item{verbose}{logical(1)}
 }
 \value{
-data.table
+GenomicRanges::GRanges
 }
 \description{
 Slop (i.e. extend left/right)
 }
 \examples{
 require(magrittr)
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-ranges <- read_bed(bedfile)
-ranges \%>\% head(1)
-ranges \%>\% head(1) \%>\% slop(bsgenome)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+granges <- read_bed(bedfile, bsgenome)
+granges \%>\% head(1)
+granges \%>\% head(1) \%>\% slop()
 }

@@ -4,13 +4,10 @@
 \alias{right_flank}
 \title{Right flank}
 \usage{
-right_flank(ranges, bsgenome, rightstart = 1, rightend = 200,
-  verbose = TRUE)
+right_flank(granges, rightstart = 1, rightend = 200, verbose = TRUE)
 }
 \arguments{
-\item{ranges}{data.table(chr, start, end)}
-
-\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
+\item{granges}{data.table(chr, start, end)}
 
 \item{rightstart}{flank start relative to range start}
 
@@ -19,16 +16,16 @@ right_flank(ranges, bsgenome, rightstart = 1, rightend = 200,
 \item{leftend}{flank end   relative to range start}
 }
 \value{
-data.table
+GenomicRanges::GRanges
 }
 \description{
 Right flank
 }
 \examples{
 require(magrittr)
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-ranges <- read_bed(bedfile)
-ranges \%>\% head(1)
-ranges \%>\% head(1) \%>\% right_flank(bsgenome)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+granges <- read_bed(bedfile, bsgenome)
+granges \%>\% head(1)
+granges \%>\% head(1) \%>\% right_flank()
 }

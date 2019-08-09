@@ -4,10 +4,12 @@
 \alias{read_bed}
 \title{Read bedfile as data.table}
 \usage{
-read_bed(bedfile, verbose = TRUE, rm_duplicates = TRUE)
+read_bed(bedfile, bsgenome, verbose = TRUE, rm_duplicates = TRUE)
 }
 \arguments{
 \item{bedfile}{file path}
+
+\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 
 \item{verbose}{logical(1)}
 
@@ -21,5 +23,6 @@ Read bedfile as data.table
 }
 \examples{
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-read_bed(bedfile)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+read_bed(bedfile, bsgenome)
 }

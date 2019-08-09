@@ -1,222 +1,168 @@
 
 
 #' Left flank 
-#' @param ranges      data.table(chr, start, end, strand)
-#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param leftstart   left flank start (relative to range start)
-#' @param leftend     left flank end   (relative to range start)
-#' @param verbose     logical(1)
-#' @return data.table
+#' @param granges   GenomicRanges::GRanges
+#' @param leftstart left flank start (relative to range start)
+#' @param leftend   left flank end   (relative to range start)
+#' @param verbose   logical(1)
+#' @return GenomicRanges::GRanges
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' ranges <- read_bed(bedfile)
-#' ranges %>% head(3)
-#' ranges %>% head(3) %>% left_flank(bsgenome)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges %>% head(3)
+#' granges %>% head(3) %>% left_flank()
 left_flank <- function(
-    ranges, 
-    bsgenome,
+    granges, 
     leftstart = -200,
     leftend   = -1,
     verbose   = TRUE
 ){
     # Assert
-    assertive.types::assert_is_data.table(ranges)
-    assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     assertive.types::assert_is_a_number(leftstart)
     assertive.types::assert_is_a_number(leftend)
     assertive.types::assert_is_a_bool(verbose)
-    assertive.base::assert_is_identical_to_true(
-        methods::is(bsgenome, 'BSgenome'))
     
     # Flank
-    chr <- start <- end <- chrlength <- NULL
-    newranges <-  data.table::copy(ranges) %>% 
-                    extract(, end   := start + leftend)   %>%  # dont switch
-                    extract(, start := start + leftstart) %>%  # lines!
-                    extract()
-    newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
-    tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
-    tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
-    newranges[, 'chrlength' := NULL]
+    GenomicRanges::end(granges)   <- GenomicRanges::start(granges) + leftend
+    GenomicRanges::start(granges) <- GenomicRanges::start(granges) + leftstart
+    
+    # TODO: Check that they remain within-range!
 
     # Return
     cmessage('\t\t%d left  flanks : [start%s%d, start%s%d]', 
-            nrow(newranges),
+            length(granges),
             csign(leftstart), 
             abs(leftstart), 
             csign(leftend),
             abs(leftend))
 
-    newranges[]
+    granges
 }
 
 
 #' Right flank 
-#' @param ranges      data.table(chr, start, end)
-#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param granges      data.table(chr, start, end)
 #' @param rightstart flank start relative to range start
 #' @param leftend   flank end   relative to range start
 #' @param verbose     logical(1)
-#' @return data.table
+#' @return GenomicRanges::GRanges
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' ranges <- read_bed(bedfile)
-#' ranges %>% head(1)
-#' ranges %>% head(1) %>% right_flank(bsgenome)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges %>% head(1)
+#' granges %>% head(1) %>% right_flank()
 #' @export
 right_flank <- function(
-    ranges,
-    bsgenome,
+    granges,
     rightstart = 1, 
     rightend   = 200, 
     verbose     = TRUE
 ){
     # Assert
-    assertive.types::assert_is_data.table(ranges)
-    assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     assertive.types::assert_is_a_number(rightstart)
     assertive.types::assert_is_a_number(rightend)
     assertive.types::assert_is_a_bool(verbose)
     
     # Flank
-    chr <- start <- end <- chrlength <- NULL
-    newranges  <-   data.table::copy(ranges)               %>% 
-                    extract(, start := end + rightstart)  %>% 
-                    extract(, end   := end + rightend)    %>% 
-                    extract()
-    newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
-    tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
-    tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
-    newranges[, 'chrlength' := NULL]
+    GenomicRanges::start(granges) <- GenomicRanges::end(granges) + rightstart
+    GenomicRanges::end(granges)   <- GenomicRanges::end(granges) + rightend
+    
+    # TODO: check consistency
 
     # Return
     cmessage('\t\t%d right flanks : [end%s%d, end%s%d]', 
-            nrow(newranges),
+            length(granges),
             csign(rightstart), 
             abs(rightstart), 
             csign(rightend), 
             abs(rightend))
 
-    newranges[]
+    granges
 }
 
 
 #' Slop (i.e. extend left/right)
-#' @param ranges      data.table(chr, start, end)
-#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param granges   GenomicRanges::GRanges
 #' @param leftstart flank start relative to range start
-#' @param rightend   flank end   relative to range start
-#' @param verbose     logical(1)
-#' @return data.table
+#' @param rightend  flank end   relative to range start
+#' @param verbose   logical(1)
+#' @return GenomicRanges::GRanges
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' ranges <- read_bed(bedfile)
-#' ranges %>% head(1)
-#' ranges %>% head(1) %>% slop(bsgenome)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges %>% head(1)
+#' granges %>% head(1) %>% slop()
 #' @export
 slop <- function(
-    ranges, 
-    bsgenome,
+    granges, 
     leftstart = -22, 
     rightend   =  22, 
     verbose     = TRUE
 ){
 
     # Assert
-    assertive.types::assert_is_data.table(ranges)
-    assertive.sets::assert_is_subset(c('chr', 'start', 'end'), names(ranges))
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     assertive.types::assert_is_a_number(leftstart)
     assertive.types::assert_is_a_number(rightend)
     assertive.types::assert_is_a_bool(verbose)
     
     # Slop
-    chr <- start <- end <- chrlength <- NULL
-    newranges  <-   data.table::copy(ranges)                 %>% 
-                    extract(, start := start + leftstart)  %>%  
-                    extract(, end   := end   + rightend)    %>% 
-                    extract()
-    newranges [ , chrlength  := GenomeInfoDb::seqlengths(bsgenome)[chr] ]
-    tmp <- newranges [, assertive.base::assert_all_are_true(start >= 1)      ]
-    tmp <- newranges [, assertive.base::assert_all_are_true(end <= chrlength)]
-    newranges[, 'chrlength' := NULL]
+    GenomicRanges::start(granges) <- GenomicRanges::start(granges) + leftstart
+    GenomicRanges::end(granges)   <- GenomicRanges::end(granges)   + rightend
+    
+    # TODO check consistency
 
     # Return
     if (verbose) cmessage(
-                    '\t\t%d slopped ranges: [start%s%d, end%s%d]', 
-                    nrow(newranges),
+                    '\t\t%d slopped granges: [start%s%d, end%s%d]', 
+                    length(granges),
                     csign(leftstart), 
                     abs(leftstart), 
                     csign(rightend), 
                     abs(rightend))
-    newranges[]
+    granges
     
 }
 
-#' Merge overlaps
-#' @param x   data.table(chr, start, end, strand)
-#' @param bsgenome BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param verbose  logical(1)
-#' @return data.table(chr, start, end)
-#' @examples 
-#' require(magrittr)
-#' (rangesdt <- data.table::data.table(
-#'             chr    = rep('chr1', 4), 
-#'             start  = c(1,    5,   5,  20), 
-#'             end    = c(10,  15,  15,  30), 
-#'             strand = c('+', '+', '-', '-')))
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' rangesdt %>% merge_overlaps(bsgenome)
-#' @export
-merge_overlaps <- function(x, bsgenome, verbose = TRUE){
-    reduced_ranges <-   as.granges(x, bsgenome) %>% 
-                        GenomicRanges::reduce() %>% 
-                        as.data.table()
-    if (verbose)  cmessage('\t\t%d ranges after merging overlaps', 
-                            nrow(reduced_ranges))
-    reduced_ranges[]
 
-# Alternative data.table solution:    
-# https://stackoverflow.com/a/41748171
-}
-
-
-#' Complement ranges
-#' @param ranges data.table(chr, start, end, strand)
+#' Complement granges
+#' @param granges GenomicRanges::GRanges
 #' @param verbose logical(1)
-#' @return data.table(chr, start, end, strand)
+#' @return GenomicRanges::GRanges
 #' @examples
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex') 
-#' ranges <- read_bed(bedfile)
-#' complement(ranges) 
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges
+#' complement(granges) 
 #' @export
-complement <- function(ranges, verbose = TRUE){
+complement <- function(granges, verbose = TRUE){
 
     # Assert
-    assertive.types::assert_is_data.table(ranges)
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     assertive.sets::assert_is_subset(
-        c('chr', 'start', 'end', 'strand'), names(ranges))
-    
-    # Complement
-    strand <- NULL
-    assertive.sets::assert_is_subset(unique(ranges$strand), c('-', '+'))
+        unique(S4Vectors::runValue(GenomicRanges::strand(granges))), 
+        c('-', '+'))
 
-    newranges <-    data.table::copy(ranges) %>% 
-                    extract(, strand := ifelse(strand=='+', '-', '+')) %>% 
-                    extract()
-    
-    # Return
-    if (verbose) cmessage('\t\t%d strand-complementary ranges', 
-                            nrow(newranges))
-    newranges[]
+    # Complement
+    complranges <- granges
+    GenomicRanges::strand(complranges) %<>% (function(y) ifelse(y== '+', '-', '+'))
+
+    # Return    
+    if (verbose) cmessage('\t\t%d strand-complementary granges', 
+                            length(complranges))
+    complranges
 
 }
 
@@ -224,23 +170,23 @@ complement <- function(ranges, verbose = TRUE){
 #' Flank fourways
 #' 
 #' Flank left and right, for both strands, and merge overlaps
-#' @param ranges      data.table(chr, start, end, strand)
-#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @param granges     GenomicRanges::GRanges
 #' @param leftstart   numeric(1): left flank start  (from range start)
 #' @param leftend     numeric(1): left flank  end   (from range start)
 #' @param rightstart  numeric(1): right flank start (from range end)
 #' @param rightend    numeric(1): right flank end   (from range end)
 #' @param verbose     logical(1): report?
 #' @return data.table(chr, start, end, strand)
-#' @examples 
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' @examples
+#' require(magrittr)
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' ranges <- read_bed(bedfile)
-#' flank_fourways(ranges, bsgenome)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges
+#' granges %>% flank_fourways()
 ##' @export
 flank_fourways <- function(
-    ranges,
-    bsgenome,
+    granges,
     leftstart  = -200,
     leftend    =   -1,
     rightstart =    1,
@@ -252,53 +198,50 @@ flank_fourways <- function(
     
     # Flank
     if (verbose) cmessage('\tFlank fourways')
-    newranges <- rbind(left_flank(
-                            ranges,
-                            bsgenome   = bsgenome, 
-                            leftstart  = leftstart, 
-                            leftend    = leftend, 
-                            verbose    = verbose
-                        ),
-                        right_flank(
-                            ranges,
-                            bsgenome   = bsgenome,
-                            rightstart = rightstart,
-                            rightend   = rightend,
-                            verbose    = verbose
-                        )
-                )
-    if (verbose) cmessage('\t\t%d ranges combined (left + right)', 
-                            nrow(newranges))
+    newranges <- c( left_flank(  granges,
+                                leftstart  = leftstart, 
+                                leftend    = leftend, 
+                                verbose    = verbose),
+                    right_flank(granges,
+                                rightstart = rightstart,
+                                rightend   = rightend,
+                                verbose    = verbose))
+    if (verbose) cmessage('\t\t%d combined (left + right)', 
+                            length(newranges))
 
     # Complement
-    newranges %<>% rbind(complement(., verbose = FALSE))
-    newranges %>% data.table::setorderv(c('chr', 'start', 'end'))
-    if (verbose) cmessage('\t\t%d ranges after adding strand-complements', 
-                            nrow(newranges))
+    newranges %<>% c(complement(., verbose = FALSE))
+    if (verbose) cmessage('\t\t%d after adding strand-complements', 
+                            length(newranges))
 
     # Merge overlaps
-    newranges %>% merge_overlaps(bsgenome = bsgenome, verbose = verbose) 
+    newranges %<>% GenomicRanges::reduce()
+    if (verbose) cmessage('\t\t%d after merging overlaps', 
+                            length(newranges))
+    
+    # Return
+    newranges
 }
 
 
-#' Slop ranges for both strands, merging overlaps
-#' @param ranges      data.table(chr, start, end, strand)
-#' @param bsgenome    BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' Slop granges for both strands, merging overlaps
+#' @param granges   GenomicRanges::GRanges
 #' @param leftstart numeric(1)
-#' @param rightend   numeric(1)
-#' @param verbose     logical(1)
-#' @return data.table(chr, start, end, strand)
+#' @param rightend  numeric(1)
+#' @param verbose   logical(1)
+#' @return GenomicRanges::GRanges
 #' @examples
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' require(magrittr)
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' ranges <- read_bed(bedfile)
-#' slop_fourways(ranges, bsgenome)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges
+#' granges %>% slop_fourways()
 #' @export
 slop_fourways <- function(
-    ranges,
-    bsgenome,
-    leftstart = -22, 
-    rightend   = 22, 
+    granges,
+    leftstart = -22,
+    rightend   = 22,
     verbose     = TRUE
 ){
     # Comply
@@ -306,21 +249,23 @@ slop_fourways <- function(
     
     # Slop
     if (verbose) cmessage('\tSlop fourways')
-    newranges <-    ranges %>% 
-                    slop(
-                        bsgenome  = bsgenome,
-                        leftstart = leftstart, 
-                        rightend  = rightend, 
-                        verbose   = verbose
-                    )
+    newranges  <-   granges %>% 
+                    slop(   leftstart = leftstart, 
+                            rightend  = rightend, 
+                            verbose   = verbose)
     
     # Complement
-    newranges %<>% rbind(complement(., verbose = FALSE))
-    if (verbose)   cmessage('\t\t%d ranges after adding strand-complements', 
-                            nrow(newranges))
+    newranges %<>% c(complement(., verbose = FALSE))
+    if (verbose)   cmessage('\t\t%d after adding strand-complements', 
+                            length(newranges))
     
     # Merge overlaps
-    newranges %>% merge_overlaps(bsgenome = bsgenome, verbose = verbose)
+    newranges %<>% GenomicRanges::reduce()
+    if (verbose) cmessage('\t\t%d after merging overlaps', 
+                            length(newranges))
+    
+    # Return
+    newranges
 }
 
 

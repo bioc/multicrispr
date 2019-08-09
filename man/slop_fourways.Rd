@@ -2,15 +2,13 @@
 % Please edit documentation in R/04_flank_slop.R
 \name{slop_fourways}
 \alias{slop_fourways}
-\title{Slop ranges for both strands, merging overlaps}
+\title{Slop granges for both strands, merging overlaps}
 \usage{
-slop_fourways(ranges, bsgenome, leftstart = -22, rightend = 22,
+slop_fourways(granges, leftstart = -22, rightend = 22,
   verbose = TRUE)
 }
 \arguments{
-\item{ranges}{data.table(chr, start, end, strand)}
-
-\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
+\item{granges}{GenomicRanges::GRanges}
 
 \item{leftstart}{numeric(1)}
 
@@ -19,14 +17,16 @@ slop_fourways(ranges, bsgenome, leftstart = -22, rightend = 22,
 \item{verbose}{logical(1)}
 }
 \value{
-data.table(chr, start, end, strand)
+GenomicRanges::GRanges
 }
 \description{
-Slop ranges for both strands, merging overlaps
+Slop granges for both strands, merging overlaps
 }
 \examples{
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+require(magrittr)
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-ranges <- read_bed(bedfile)
-slop_fourways(ranges, bsgenome)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+granges <- read_bed(bedfile, bsgenome)
+granges
+granges \%>\% slop_fourways()
 }

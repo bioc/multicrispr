@@ -1,187 +1,216 @@
+#==============================================================================
+# Get sequences
+#==============================================================================
 
-#' Convert range to sequence
-#' @param chr     character vector: c('chr1', 'chr1', ...)
-#' @param start   numeric vector: start positions
-#' @param end     numeric vector: end positions
-#' @param strand  character vector: +/- values
-#' @param bsgenome  BSgenome object
-#' @return character vector: sequences
-#' @examples
-#' range2seq(
-#'     chr      = c('chr2', 'chr1', 'chr17'),
-#'     start    = c(83972889, 85603908, 70963622),
-#'     end      = c(83972905, 85603924, 70963638),
-#'     strand   = c('+', '-', '-'),
-#'     bsgenome = BSgenome.Mmusculus.UCSC.mm10::Mmusculus)
+GRanges      <- methods::getClassDef('GRanges',      package = 'GenomicRanges')
+DNAStringSet <- methods::getClassDef('DNAStringSet', package = 'Biostrings')
+
+#' Get/set sequence values
+#' @param object GenomicRanges::GRanges
+#' @param value character vector or DNAStringSet
+#' @return DNAStringSet (get) or GRanges (set)
+#' @examples 
+#' bedfile  <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' granges <- read_bed(bedfile, bsgenome)
+#' 
+#' sequence(granges)                       # sequence retrieved from bsgenome
+#' sequence(granges) <- sequence(granges)  # sequence stored in granges
+#' sequence(granges)                       # sequence retrieved from granges
 #' @export
-range2seq <- function(chr, start, end, strand, bsgenome){
-    
-    # Assert
-    assertive.types::assert_is_character(chr)
-    assertive.types::assert_is_numeric(start)
-    assertive.types::assert_is_numeric(end)
-    assertive.types::assert_is_character(strand)
-    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    tmp <- Reduce(  assertive.properties::assert_are_same_length, 
-                    list(chr, start, strand))
-    assertive.base::assert_is_identical_to_true(
-        methods::is(bsgenome, 'BSgenome'))
-    
-    # Return
-    . <- NULL
-    GenomicRanges::GRanges(
-        seqnames = chr,
-        ranges   = IRanges::IRanges(start = start, end = end),
-        strand   = strand,
-        seqinfo  = GenomeInfoDb::seqinfo(bsgenome)) %>%
-    BSgenome::getSeq(bsgenome, .) %>%
-    as.character()
-}
+setGeneric("sequence",  
+            function(object) standardGeneric("sequence"))
+
+#' @rdname sequence
+setMethod( "sequence",   
+            signature("GRanges"), 
+            function(object){ 
+                if ('sequence' %in% names(S4Vectors::mcols(object))){
+                    S4Vectors::mcols(object)$sequence
+                } else {
+                    BSgenome::getSeq(get_bsgenome(object), object)
+                }
+            })
+
+#' @rdname sequence
+#' @export
+setGeneric("sequence<-",
+            function(object, value)  standardGeneric("sequence<-"))
+
+#' @rdname sequence
+setReplaceMethod(
+            "sequence", 
+            signature("GRanges", "character"), 
+            function(object, value){
+                S4Vectors::mcols(object)$sequence <- value
+                object
+            })
+
+#' @rdname sequence
+setReplaceMethod(
+            "sequence", 
+            signature("GRanges", "DNAStringSet"), 
+            function(object, value){
+                S4Vectors::mcols(object)$sequence <- value
+                object
+            })
+
+#' Add sequence to granges mcols
+#' @param granges GenomicRanges::GRanges
+#' @return GenomicRanges::GRanges
+#' @export
+add_sequence <- function(granges){
+                    sequence(granges) <- sequence(granges)
+                    granges
+                }
 
 
-#' Find cas9 sites in given ranges
-#' @param ranges data.table(chr, start, end, strand)
-#' @param bsgenome BSgenome object (eg BSgenome.Mmusculus.UCSC.mm10::Mmusculus)
-#' @param verbose logical(1)
-#' @return data.table(chr, start, end, strand, cas9seq, cas9start, cas9end). \cr
-#'         One row per cas9 site
+#=============================================================================
+# Find cas9sites
+#=============================================================================
+
+#' Find cas9sites in targetranges
+#' @param targetranges  GenomicRanges::GRanges
+#' @param specific      logical(1)
+#' @param verbose       logical(1)
+#' @return GenomicRanges::GRanges
 #' @examples
 #' require(magrittr)
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
-#' read_bed(bedfile) %>% slop_fourways(bsgenome) %>% find_cas9s(bsgenome)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+#' find_cas9s(targetranges)
 #' @export 
-find_cas9s <- function(ranges, bsgenome, verbose = TRUE){
+find_cas9s <- function(
+    targetranges, 
+    verbose = TRUE
+){
+    # Assert
+    assertive.base::assert_is_identical_to_true(is(targetranges, 'GRanges'))
+    assertive.types::assert_is_a_bool(verbose)
     
-    # Comply
-    chr <- start <- end <- strand <- NULL
-    substart <- subend <- cas9start <- cas9end <- cas9seq <- NULL
+    # Find cas9s in targetranges
+    if (verbose) message('\tFind N{20}NGG cas9sites')
+    targetdt <- data.table::as.data.table(targetranges)
+    targetdt [ , seq := sequence(targetranges) %>% as.character() ]
+    res <- targetdt$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
+    cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
+    cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
+    targetdt [ , substart := vapply( res, cextract1, character(1)) ]
+    targetdt [ , subend   := vapply( res, cextract2, character(1)) ]
     
-    # Find cas9sites
-    if (verbose) message('\tFind N{20}NGG cas9 sites in provided ranges')
-    ranges [ , seq := range2seq(chr, start, end, strand, bsgenome) ] 
-    res <- ranges$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
-    ranges [ , substart := vapply(  res, 
-                                    function(y) y[, 1] %>% paste0(collapse=';'),
-                                    character(1)) ]
-    ranges [ , subend   := vapply(  res,
-                                    function(y) y[, 2] %>% paste0(collapse=';'),
-                                    character(1)) ]
-    
-    # Rm cas9-free ranges
-    idx <- ranges[, substart != 'NA']
+    # Rm cas9-free targetranges
+    idx <- targetdt[, substart == 'NA']
     if (sum(idx)>0){
-        if (verbose)  cmessage('\t\tRm %d ranges with no cas9sites', sum(idx)) 
-        ranges %<>% extract(idx)
+        if (verbose)  cmessage('\t\tRm %d targetranges with no cas9sites', sum(idx)) 
+        targetdt %<>% extract(!idx)
     }
 
-    # Calculate cas9 ranges
-    cas9dt <-   ranges %>% 
+    # Transform into cas9ranges
+    cas9dt <-   targetdt %>% 
                 tidyr::separate_rows(substart, subend) %>%
                 data.table::data.table() %>% 
                 extract(, substart := as.numeric(substart)) %>% 
                 extract(, subend   := as.numeric(subend))
-    
     cas9dt [ , cas9seq   := substr(seq, substart, subend)    ]
     cas9dt [ , seq := NULL ]
     cas9dt [ strand=='+', cas9start := start + substart - 1  ]
     cas9dt [ strand=='+', cas9end   := start + subend   - 1  ]
     cas9dt [ strand=='-', cas9start := end   - subend   + 1  ]
     cas9dt [ strand=='-', cas9end   := end   - substart + 1  ]
-    cas9dt [ , c('substart', 'subend') := NULL]
     
+    cas9ranges  <-  cas9dt [ , list(seqnames = seqnames, 
+                                    start    = cas9start, 
+                                    end      = cas9end, 
+                                    strand   = strand) ] %>% 
+                    unique() %>% 
+                    as.granges(get_bsgenome(targetranges))
     # Return
-    if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
-                            cas9dt[, length(unique(cas9seq))], nrow(cas9dt))
-    return(cas9dt)
+    if (verbose)   cmessage('\t\t%d cas9 seqs across %d targetranges', 
+                            length(unique(sequence(cas9ranges))), 
+                            length(cas9ranges))
+    return(cas9ranges)
+}
+
+#============================================================================
+
+count_target_matches <- function(cas9seqs, targetseqs, mismatch, verbose){
+    
+    starttime <- Sys.time()
+    if (verbose)  cmessage('\tCount target matches (allow %d mismatches)', 
+                            mismatch)
+    matches  <- Biostrings::vcountPDict(
+                    Biostrings::DNAStringSet(cas9seqs),
+                    Biostrings::DNAStringSet(targetseqs),
+                    min.mismatch = mismatch,
+                    max.mismatch = mismatch) %>% 
+                rowSums()
+    if (verbose) cmessage( '\t\tdone in %s', 
+                            format(signif(Sys.time() - starttime, 2)))
+    matches
 }
 
 
-#' Rm center cas9s
-#' @param flank_cas9s   data.table(cas9seq, ...)
-#' @param center_cas9s  data.table(cas9seq, ...)
-#' @param verbose logical(1)
+count_genome_matches <- function(cas9seqs, bsgenome, mismatch, verbose){
+    
+    starttime <- Sys.time()
+    if (verbose)  cmessage('\tCount genome matches (allow %d mismatches)', 
+                            mismatch)
+    matches   <-    Biostrings::vcountPDict(
+                        Biostrings::DNAStringSet(cas9seqs),
+                        bsgenome,
+                        min.mismatch = mismatch,
+                        max.mismatch = mismatch) %>% 
+                    data.table::as.data.table() %>% 
+                    extract(, .(n = sum(count)), by ='index') %>%
+                    extract2('n') 
+    if (verbose) cmessage('\t\tdone in %s', format(signif(Sys.time() - starttime, 2)))
+    matches
+}
+
+#' Find cas9sites specfic for targetranges
+#' @param targetranges GenomicRanges::GRanges
+#' @param verbose      logical(1)
+#' @return GenomicRanges::GRanges
+#' @export
 #' @examples
 #' require(magrittr)
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' bedfile <- system.file('extdata/SRF_sites.bed', package='crisprapex')
-#' tbranges <- read_bed(bedfile)
-#' flank9s  <- tbranges %>% flank_fourways(bsgenome) %>% find_cas9s(bsgenome)
-#' center9s <- tbranges %>% slop_fourways(bsgenome)  %>% find_cas9s(bsgenome)
-#' flank9s %>% rm_center_cas9s(center9s)
-#' @return subset of flank_cas9s
-#' @export
-rm_center_cas9s <- function(flank_cas9s, center_cas9s, verbose = TRUE){
-    
-    # Assert
-    assertive.types::assert_is_data.table(flank_cas9s)
-    assertive.types::assert_is_data.table(center_cas9s)
-    assertive.types::assert_is_a_bool(verbose)
-    
-    # Remove
-    region <- ncenter <- NULL
-    cas9dt <- rbind(cbind(flank_cas9s,  region = 'flank'), 
-                    cbind(center_cas9s, region = 'center'))
-    if (verbose)   cmessage(
-                    '\t\t%d cas9 seqs across %d ranges', 
-                    length(unique(cas9dt$cas9seq)), nrow(cas9dt))
-    cas9dt [ , ncenter := sum(region == 'center'), by = 'cas9seq' ]
-    cas9dt %<>% extract(ncenter == 0)
-    cas9dt [ , c('ncenter', 'region') := NULL ]
-    
-    # Return
-    if (verbose)   cmessage(
-                    '\t\t%d cas9 seqs across %d ranges', 
-                    length(unique(cas9dt$cas9seq)), nrow(cas9dt))
-    cas9dt[]
-}
-
-
-#' Find flank-only cas9s
-#' @param bedfile    character(1): bed file with target sites
-#' @param bsgenome   BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param leftstart  numeric(1): left flank start  (rel. to range start)
-#' @param leftend    numeric(1): left flank end    (rel. to range start)
-#' @param rightstart numeric(1): right flank start (rel. to range end)
-#' @param rightend   numeric(1): right flank end   (rel. to range end)
-#' @param bsgenome   BSgenome object
-#' @param verbose    logical(1)
-#' @examples
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' find_flankonly_cas9s(bedfile, bsgenome)
-#' @export
-find_flankonly_cas9s <- function(
-    bedfile, 
-    bsgenome, 
-    leftstart  = -200,
-    leftend    = -1, 
-    rightstart =  1, 
-    rightend   =  200,
-    verbose    = TRUE
-){
+#' targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+find_specific_cas9s <- function(targetranges, verbose = TRUE){
+
+    bsgenome   <- get_bsgenome(targetranges)
+    targetseqs <- sequence(targetranges)
+    cas9ranges  <-  targetranges %>% 
+                    find_cas9s(verbose = verbose) %>% 
+                    add_sequence()
+    cas9seqdt  <- data.table::data.table(
+                    cas9seq = as.character(unique(sequence(cas9ranges))))
     
-    # Find     
-    tbranges <- read_bed(bedfile, verbose = FALSE)
+    for (mismatch in c(0,1,2)){
+        # Count
+        target_matches  <-  
+        cas9seqdt [ ,   count_target_matches(
+                            cas9seq, targetseqs, mismatch, verbose) ]
+        genome_matches  <-  
+        cas9seqdt [ ,   count_genome_matches(
+                            cas9seq, bsgenome,   mismatch, verbose) ]
+        # Store
+        cas9seqdt [ , (sprintf('matches%d', mismatch)) := target_matches ]
+        
+        # Filter
+        assertive.base::assert_all_are_false(genome_matches < target_matches)
+        idx <- genome_matches == target_matches
+        if (verbose){
+            cmessage('\tKeep %d/%d cas9seqs with no (%d-mismatch) off-targets',
+                     sum(idx), length(idx), mismatch)
+        }
+        cas9seqdt %<>% extract(idx)
+    }
     
-    flank9s  <- tbranges %>% flank_fourways(
-                                bsgenome, 
-                                leftstart  = leftstart,
-                                leftend    = leftend, 
-                                rightstart = rightstart, 
-                                rightend   = rightend, 
-                                verbose    = verbose)  %>% 
-                            find_cas9s(bsgenome, verbose = verbose)
+    cas9seqdt %>% merge(data.table::as.data.table(cas9ranges), 
+                        by.x = 'cas9seq', 
+                        by.y = 'sequence')
     
-    center9s <- tbranges %>% slop_fourways(
-                                bsgenome, 
-                                leftstart = -22, 
-                                rightend  = 22, 
-                                verbose     = verbose)  %>% 
-                            find_cas9s(bsgenome, verbose = verbose)
-    
-    cas9dt   <- flank9s  %>% rm_center_cas9s(center9s, verbose = verbose)
-    
-    # Return
-    return(cas9dt)
 }

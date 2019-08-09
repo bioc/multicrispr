@@ -1,5 +1,9 @@
 cduplicated <- function(x)  duplicated(x) | duplicated(x, fromLast = TRUE)
 
+#' Message with sprintf syntax
+#' @param ... passed to message(sprintf(...))
+#' @return NULL
+#' @export
 cmessage <- function(...) message(sprintf(...))
 
 
