@@ -151,8 +151,9 @@ find_specific_cas9s <- function(targetranges, verbose = TRUE){
     bsgenome   <- get_bsgenome(targetranges)
     targetseqs <- sequence(targetranges)
     cas9ranges <- targetranges %>% find_cas9s(verbose = verbose)
+    S4Vectors::mcols(cas9ranges)$cas9seq <- sequence(cas9ranges)
     cas9seqdt  <- data.table::data.table(
-                    cas9seq = as.character(unique(sequence(cas9ranges))))
+                    cas9seq = unique(as.character(cas9ranges$cas9seq)))
     
     # Count-store-filter for 0-2 mismatches
     if (verbose) message('\tFind cas9seq hits')
@@ -183,8 +184,5 @@ find_specific_cas9s <- function(targetranges, verbose = TRUE){
     }
     
     # Return
-    cas9seqdt  %>%  
-    merge(  data.table::as.data.table(cas9ranges), 
-            by.x = 'cas9seq', 
-            by.y = 'sequence')
+    cas9seqdt %>% merge(data.table::as.data.table(cas9ranges), by = 'cas9seq')
 }
