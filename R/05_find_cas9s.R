@@ -5,64 +5,21 @@
 GRanges      <- methods::getClassDef('GRanges',      package = 'GenomicRanges')
 DNAStringSet <- methods::getClassDef('DNAStringSet', package = 'Biostrings')
 
+
 #' Get/set sequence values
-#' @param object GenomicRanges::GRanges
+#' @param granges GenomicRanges::GRanges
 #' @param value character vector or DNAStringSet
 #' @return DNAStringSet (get) or GRanges (set)
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
-#' 
-#' sequence(granges)                       # sequence retrieved from bsgenome
-#' sequence(granges) <- sequence(granges)  # sequence stored in granges
-#' sequence(granges)                       # sequence retrieved from granges
+#' sequence(granges)
 #' @export
-setGeneric("sequence",  
-            function(object) standardGeneric("sequence"))
-
-#' @rdname sequence
-setMethod( "sequence",   
-            signature("GRanges"), 
-            function(object){ 
-                if ('sequence' %in% names(S4Vectors::mcols(object))){
-                    S4Vectors::mcols(object)$sequence
-                } else {
-                    BSgenome::getSeq(get_bsgenome(object), object)
-                }
-            })
-
-#' @rdname sequence
-#' @export
-setGeneric("sequence<-",
-            function(object, value)  standardGeneric("sequence<-"))
-
-#' @rdname sequence
-setReplaceMethod(
-            "sequence", 
-            signature("GRanges", "character"), 
-            function(object, value){
-                S4Vectors::mcols(object)$sequence <- value
-                object
-            })
-
-#' @rdname sequence
-setReplaceMethod(
-            "sequence", 
-            signature("GRanges", "DNAStringSet"), 
-            function(object, value){
-                S4Vectors::mcols(object)$sequence <- value
-                object
-            })
-
-#' Add sequence to granges mcols
-#' @param granges GenomicRanges::GRanges
-#' @return GenomicRanges::GRanges
-#' @export
-add_sequence <- function(granges){
-                    sequence(granges) <- sequence(granges)
-                    granges
-                }
+sequence <- function(granges){
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    BSgenome::getSeq(get_bsgenome(granges), granges)
+}
 
 
 #=============================================================================
@@ -90,7 +47,7 @@ find_cas9s <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Find cas9s in targetranges
-    if (verbose) message('\tFind N{20}NGG cas9sites')
+    if (verbose) message('\tFind N{20}NGG cas9seqs')
     targetdt <- data.table::as.data.table(targetranges)
     targetdt [ , seq := sequence(targetranges) %>% as.character() ]
     res <- targetdt$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
@@ -137,15 +94,14 @@ find_cas9s <- function(
 count_target_matches <- function(cas9seqs, targetseqs, mismatch, verbose){
     
     starttime <- Sys.time()
-    if (verbose)  cmessage('\tCount target matches (allow %d mismatches)', 
-                            mismatch)
     matches  <- Biostrings::vcountPDict(
                     Biostrings::DNAStringSet(cas9seqs),
                     Biostrings::DNAStringSet(targetseqs),
                     min.mismatch = mismatch,
                     max.mismatch = mismatch) %>% 
                 rowSums()
-    if (verbose) cmessage( '\t\tdone in %s', 
+    if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in targetranges: %s',
+                            mismatch,
                             format(signif(Sys.time() - starttime, 2)))
     matches
 }
@@ -154,8 +110,6 @@ count_target_matches <- function(cas9seqs, targetseqs, mismatch, verbose){
 count_genome_matches <- function(cas9seqs, bsgenome, mismatch, verbose){
     
     starttime <- Sys.time()
-    if (verbose)  cmessage('\tCount genome matches (allow %d mismatches)', 
-                            mismatch)
     matches   <-    Biostrings::vcountPDict(
                         Biostrings::DNAStringSet(cas9seqs),
                         bsgenome,
@@ -164,38 +118,57 @@ count_genome_matches <- function(cas9seqs, bsgenome, mismatch, verbose){
                     data.table::as.data.table() %>% 
                     extract(, .(n = sum(count)), by ='index') %>%
                     extract2('n') 
-    if (verbose) cmessage('\t\tdone in %s', format(signif(Sys.time() - starttime, 2)))
+    if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',
+                            mismatch,
+                            format(signif(Sys.time() - starttime, 2)))
     matches
 }
 
-#' Find cas9sites specfic for targetranges
+#' Find target-specific cas9seqs
 #' @param targetranges GenomicRanges::GRanges
 #' @param verbose      logical(1)
-#' @return GenomicRanges::GRanges
-#' @export
+#' @return data.table(cas9seq, 
+#'                    matches0, 
+#'                    matches1, 
+#'                    matches2, 
+#'                    seqnames, 
+#'                    start, 
+#'                    end, 
+#'                    width, 
+#'                    strand)
 #' @examples
-#' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+#' \donrun{
+#'    require(magrittr)
+#'    bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#'    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#'    targetranges <- read_bed(bedfile, bsgenome)[1:10] %>% flank_fourways()
+#'    targetranges %>% find_specific_cas9s()
+#' }
+#' @export
 find_specific_cas9s <- function(targetranges, verbose = TRUE){
 
+    # Prepare
     bsgenome   <- get_bsgenome(targetranges)
     targetseqs <- sequence(targetranges)
-    cas9ranges  <-  targetranges %>% 
-                    find_cas9s(verbose = verbose) %>% 
-                    add_sequence()
+    cas9ranges <- targetranges %>% find_cas9s(verbose = verbose)
     cas9seqdt  <- data.table::data.table(
                     cas9seq = as.character(unique(sequence(cas9ranges))))
     
+    # Count-store-filter for 0-2 mismatches
+    if (verbose) message('\tFind cas9seq hits')
     for (mismatch in c(0,1,2)){
+        if (verbose) cmessage('\t\twith %d mismatch(es)', mismatch)
         # Count
-        target_matches  <-  
-        cas9seqdt [ ,   count_target_matches(
-                            cas9seq, targetseqs, mismatch, verbose) ]
-        genome_matches  <-  
-        cas9seqdt [ ,   count_genome_matches(
-                            cas9seq, bsgenome,   mismatch, verbose) ]
+        target_matches  <-  cas9seqdt [ ,   count_target_matches(
+                                                cas9seq, 
+                                                targetseqs, 
+                                                mismatch, 
+                                                verbose) ]
+        genome_matches  <-  cas9seqdt [ ,   count_genome_matches(
+                                                cas9seq, 
+                                                bsgenome,   
+                                                mismatch, 
+                                                verbose) ]
         # Store
         cas9seqdt [ , (sprintf('matches%d', mismatch)) := target_matches ]
         
@@ -203,14 +176,15 @@ find_specific_cas9s <- function(targetranges, verbose = TRUE){
         assertive.base::assert_all_are_false(genome_matches < target_matches)
         idx <- genome_matches == target_matches
         if (verbose){
-            cmessage('\tKeep %d/%d cas9seqs with no (%d-mismatch) off-targets',
+            cmessage('\t\t\tKeep %d/%d target-specific cas9seqs', 
                      sum(idx), length(idx), mismatch)
         }
         cas9seqdt %<>% extract(idx)
     }
     
-    cas9seqdt %>% merge(data.table::as.data.table(cas9ranges), 
-                        by.x = 'cas9seq', 
-                        by.y = 'sequence')
-    
+    # Return
+    cas9seqdt  %>%  
+    merge(  data.table::as.data.table(cas9ranges), 
+            by.x = 'cas9seq', 
+            by.y = 'sequence')
 }

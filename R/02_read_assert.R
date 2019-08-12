@@ -111,7 +111,7 @@ read_bed <- function(
             select    = c(seq_len(3), 6),
             col.names = c('seqnames', 'start', 'end', 'strand'))
     dt %>% data.table::setorderv(c('seqnames', 'start', 'end', 'strand'))
-    if (verbose) cmessage('\t%d ranges on %d chromosomes', 
+    if (verbose) cmessage('\t\t%d ranges on %d chromosomes', 
                             nrow(dt), length(unique(dt$seqnames)))
     
     # Drop duplicates
@@ -137,22 +137,3 @@ read_bed <- function(
     dt %>% as.granges(bsgenome)
      
 }
-
-# Get sequence values
-# @param granges GenomicRanges::GRanges
-# @param as_character logical(1)
-# @return DNAStringSet or character vector
-# @examples
-# bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-# bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-# granges <- read_bed(bedfile, bsgenome)
-# sequence(granges)
-# sequence(granges, as_character = FALSE)
-# @export
-# sequence <- function(granges, as_character = FALSE){
-#     dnastringset <- BSgenome::getSeq(get_bsgenome(granges), granges)
-#     if (as_character) return(as.character(dnastringset))
-#     return(dnastringset)
-# }
-
-

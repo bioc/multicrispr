@@ -30,24 +30,15 @@ library(crisprapex)
 ```
 
 
-# Find cas9 sites that target TF binding flanks
+# Find cas9 sites specific for TBS flanks
 
 ```{r}
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-cas9dt <- find_flankonly_cas9s(bedfile, bsgenome)
+bedfile      <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+cas9dt       <- find_specific_cas9s(targetranges)
 ```
-
-# Limit to sites with no offtargets
-```{r}
-      cas9seqdt <- cas9dt [ , .(n0 = .N), by = cas9seq ]                            # Scan flanks
-
-```
-
-
-
-
-# Focus on good quality cas9 sites 
+# Keep well-binding cas9sites
 
 ```{r}
 do_score <- assertive.reflection::is_unix() & 

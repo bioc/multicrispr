@@ -2,7 +2,7 @@
 % Please edit documentation in R/05_find_cas9s.R
 \name{find_specific_cas9s}
 \alias{find_specific_cas9s}
-\title{Find cas9sites specfic for targetranges}
+\title{Find target-specific cas9seqs}
 \usage{
 find_specific_cas9s(targetranges, verbose = TRUE)
 }
@@ -12,14 +12,25 @@ find_specific_cas9s(targetranges, verbose = TRUE)
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+data.table(cas9seq, 
+                   matches0, 
+                   matches1, 
+                   matches2, 
+                   seqnames, 
+                   start, 
+                   end, 
+                   width, 
+                   strand)
 }
 \description{
-Find cas9sites specfic for targetranges
+Find target-specific cas9seqs
 }
 \examples{
-require(magrittr)
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-targetranges <- read_bed(bedfile, bsgenome) \%>\% flank_fourways()
+\\donrun{
+   require(magrittr)
+   bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+   bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+   targetranges <- read_bed(bedfile, bsgenome)[1:10] \%>\% flank_fourways()
+   targetranges \%>\% find_specific_cas9s()
+}
 }
