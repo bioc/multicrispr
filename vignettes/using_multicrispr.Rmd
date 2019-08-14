@@ -1,0 +1,84 @@
+---
+title: "Using multicrispr"
+author: A. M. Bhagwat, M. Bentsen, J. Graumann, M. Looso, 
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{finding_flank_cas9s}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+The `multicrispr` package facilitates the design of a multi-locus
+crispr/cas9 library, offering a set of intuitive functions:
+
+* `read_bed`: read bedfile into [GenomicRanges::GRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) object
+* `flank_fourways    `: obtain flank ranges (if they are to be targeted)
+* `find_specfic_cas9s`: find offtarget-free cas9 sequences (and ranges)
+* `score_cas9s       `: score cas9 sequences for binding efficiency.
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "    #", 
+  cache = TRUE
+)
+```
+
+
+# Workflow
+
+## Read target ranges
+
+```{r read}
+library(magrittr)
+library(multicrispr)
+bedfile      <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+```
+
+
+## Find offtarget-free cas9s
+
+```{r findcas9s}
+cas9ranges <- find_specific_cas9ranges(targetranges, mismatch = 0)
+```
+
+
+## Score cas9s
+
+Doench et al. (2014)'s "ruleset1" for scoring cas9 sequences is readily available:
+
+```{r score_rs1}
+cas9ranges$score_rs1 <- score_cas9ranges(cas9ranges, ruleset = 1)
+```
+
+The improved "ruleset2" (Doench, 2016) is also accessible, but requires for they python module  [azimuth](https://github.com/MicrosoftResearch/Azimuth]) to be installed and accessible as a python binary, virtual environment, or conda environment. The code chunk below shows how to score using ruleset 2 if azimuth was installed in the condaenv "default". It also shows the common operation of filtering for rulset2 score values above 0.4.
+
+
+```{r score_rs2}
+python_available <- assertive.reflection::is_unix() & 
+                    reticulate::py_module_available('azimuth')
+if (python_available){
+  cas9ranges$score_rs2 <- score_cas9s(
+                            cas9ranges, ruleset = 2, condaenv = 'default')
+  
+  message('\tFilter for scores > 0.4')
+  cas9ranges %<>% extract(cas9ranges$score > 0.4)
+  cmessage('\t\t%d cas9 seqs across %d ranges', 
+            length(unique(cas9ranges$seqs)), 
+            length(cas9ranges))
+}
+```
+
+# References
+
+Doench et al. (2014). Rational design of highly active sgRNAs for CRISPR-Cas9-mediated gene 
+inactivation. Nature Biotechnology, 32(12), doi:10.1038/nbt.3026
+
+
+Doench et al. (2016). Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9. Nature Biotechnology, 34(7), doi:10.1038/nbt.3437
+

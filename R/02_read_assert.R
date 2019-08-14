@@ -10,7 +10,7 @@
 #' @return BSgenome
 #' @examples 
 #' require(magrittr)
-#' bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
+#' bedfile  <- system.file('extdata/SRF_sites.bed', package='multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
 #' granges %>% get_bsgenome()
@@ -20,6 +20,12 @@ get_bsgenome <- function(granges){
     assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     genome <- GenomeInfoDb::genome(granges) %>% unname() %>% unique()
     assertive.types::assert_is_a_string(genome)
+    
+    paste0('BSgenomex.UCSC..')
+    
+    BSgenome::available.genomes() %>% 
+    extract(stringi::stri_detect_fixed(., genome)) %>% 
+    extract(stringi::stri_detect_fixed(., 'masked'))
     
     bsname <- BSgenome:::.getInstalledPkgnameFromProviderVersion(genome)
     bsgenome <- utils::getFromNamespace(bsname, bsname)
@@ -32,7 +38,7 @@ get_bsgenome <- function(granges){
 #' @return invisible(x)
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' x <- read_bed(bedfile, bsgenome) %>% data.table::as.data.table()
 #' assert_is_granges_datatable(x, bsgenome)
@@ -58,7 +64,7 @@ assert_is_granges_datatable <- function (x, bsgenome){
 #' @return GenomicRanges::GRanges
 #' @examples
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges$seqs <- seqs(granges)
@@ -94,7 +100,7 @@ as.granges <- function(x, bsgenome){
 #' @param rm_duplicates  logical(1)
 #' @return data.table(chr, start, end, strand) 
 #' @examples
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' read_bed(bedfile, bsgenome)
 #' @importFrom  data.table  :=

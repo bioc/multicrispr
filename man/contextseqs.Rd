@@ -14,10 +14,11 @@ Get [-3, +3] contextseqs for given cas9ranges
 }
 \examples{
 require(magrittr)
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 cas9ranges  <-  read_bed(bedfile, bsgenome) \%>\% 
                 flank_fourways() \%>\% 
-                find_cas9s()
-cas9ranges[1:10] \%>\% contextseqs()
+                find_cas9ranges()
+cas9ranges[1:3] \%>\% seqs()
+cas9ranges[1:3] \%>\% contextseqs()
 }

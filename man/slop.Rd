@@ -23,7 +23,7 @@ Slop (i.e. extend left/right)
 }
 \examples{
 require(magrittr)
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 granges <- read_bed(bedfile, bsgenome)
 granges \%>\% head(1)

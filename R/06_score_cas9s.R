@@ -31,7 +31,13 @@ contextify_end <- function(granges){
 }
 
 
-score_contextseqs_rs1 <- function(contextseqs, verbose){
+score_contextseqs_rs1 <- function(
+    contextseqs,
+    verbose,
+    python     = python,
+    virtualenv = virtualenv,
+    condaenv   = NULL
+){
     
     # Assert
     assertive.types::assert_is_character(contextseqs)
@@ -53,7 +59,18 @@ score_contextseqs_rs1 <- function(contextseqs, verbose){
 }
 
 
-score_contextseqs_rs2 <- function(contextseqs, verbose = TRUE){
+score_contextseqs_rs2 <- function(
+    contextseqs, 
+    verbose    = TRUE, 
+    python     = NULL, 
+    virtualenv = NULL, 
+    condaenv   = NULL
+){
+    
+    # Set python environment
+    if (!is.null(python))       reticulate::use_python(python)
+    if (!is.null(virtualenv))   reticulate::use_virtualenv(virtualenv)
+    if (!is.null(condaenv))     reticulate::use_condaenv(condaenv)
     
     # Assert
     assertive.reflection::assert_is_unix() & 
@@ -80,41 +97,32 @@ score_contextseqs_rs2 <- function(contextseqs, verbose = TRUE){
 }
 
 
-#' Score contextualized cas9seqs
-#' 
-#' Score contextualized cas9seqs using ruleset1 (Doench2014) or
-#' ruleset2 (Doench2016)
-#' 
-#' @param contextseqs  30-char string vector: 4-23-3 (flank-cas9-flank)
-#' @param ruleset      1 (Doench 2014 - CRISPRseek) or 
-#'                     2 (Doench 2016 - github/MicrosoftResearch/azimuth)
-#' @param verbose      logical(1)
-#' @return numeric vector
-#' @examples
-#' require(magrittr)
-#' contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
-#'                  'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
-#'                  'CCAAATATTGTCAAGTTGACAACCAGGAAT')
-#' contextseqs %>% score_contextseqs()
-#' @references 
-#' Doench 2014, Rational design of highly active sgRNAs for 
-#' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
-#' doi: 10.1038/nbt.3026
-#' 
-#' Doench 2016, Optimized sgRNA design to maximize activity and minimize 
-#' off-target effects of CRISPR-Cas9. Nature Biotechnology, 
-#' doi: 10.1038/nbt.3437
+#' @rdname score_cas9ranges
 #' @export
-score_contextseqs <- function(contextseqs, ruleset = 1, verbose = TRUE){
+score_contextseqs <- function(
+    contextseqs, 
+    ruleset    = 1, 
+    verbose    = TRUE, 
+    python     = NULL, 
+    virtualenv = NULL, 
+    condaenv   = NULL
+){
     
     # Assert
     assertive.types::assert_is_a_number(ruleset)
     assertive.sets::assert_is_subset(ruleset, c('1', '2'))
+    is.null()
     
     # Score
     scorefun <- switch(ruleset, `1` = score_contextseqs_rs1, 
                                 `2` = score_contextseqs_rs2)
-    scorefun(contextseqs, verbose)
+    scorefun(
+        contextseqs, 
+        verbose, 
+        python     = python, 
+        virtualenv = virtualenv, 
+        condaenv   = condaenv
+    )
     
 }
 
@@ -125,7 +133,7 @@ score_contextseqs <- function(contextseqs, ruleset = 1, verbose = TRUE){
 #' @param cas9ranges GenomicRanges::GRanges
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' cas9ranges  <-  read_bed(bedfile, bsgenome) %>% 
 #'                 flank_fourways() %>% 
@@ -146,19 +154,26 @@ contextseqs <- function(cas9ranges){
 #' 
 #' Score cas9ranges using ruleset1 (Doench 2014) or ruleset2 (Doench 2016)
 #' 
-#' For ruleset1, the CRISPRseek implementation is used.
-#' For ruleset2, azimuth (github/MicrosoftResearch/azimuth) is used.
+#' ruleset1 is readily available. ruleset2 is accessible after installing 
+#' the python module [azimuth](https://github.com/MicrosoftResearch/Azimuth), 
+#' and specifying a value for either 'python' (python binary path), 
+#' 'virtualenv' (python virtual environment dir) or 
+#' 'condaenv' (python conda environment).
 #' 
-#' @param cas9ranges   GenomicRanges::GRanges
-#' @param ruleset      1 (default) or 2 (only if python module 
-#'                     github/MicrosoftResearch/azimuth is installed)
-#' @param verbose logical(1)
+#' @param cas9ranges GenomicRanges::GRanges
+#' @param contextseqs character vector with 4-23-3 contextseqs
+#' @param ruleset    1 (default) or 2 (only if python module 
+#'                   github/MicrosoftResearch/azimuth is installed)
+#' @param verbose    logical(1)
+#' @param python     NULL (ruleset=1) or path to a python binary (ruleset=2). See details.
+#' @param virtualenv NULL (ruleset=1) or directory containing python virtualenv (ruleset=2). See details.
+#' @param condaenv   NULL (ruleset=1) or name of condaenv (ruleset=2). See details.
 #' @return numeric vector
 #' @examples
 #' 
 #' # Get cas9ranges
 #'     require(magrittr)
-#'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #'     targetranges <- read_bed(bedfile, bsgenome) %>% 
 #'                     flank_fourways() %>% 
@@ -178,8 +193,11 @@ contextseqs <- function(cas9ranges){
 #' @export
 score_cas9ranges <- function(
     cas9ranges,
-    ruleset = 1,
-    verbose = TRUE
+    ruleset    = 1,
+    verbose    = TRUE,
+    python     = NULL,
+    virtualenv = NULL,
+    condaenv   = NULL
 ){
     # Assert
     assertive.base::assert_is_identical_to_true(is(cas9ranges, 'GRanges'))
@@ -187,6 +205,11 @@ score_cas9ranges <- function(
     # Score
     cas9ranges %>% 
     contextseqs() %>%  
-    score_contextseqs(ruleset=ruleset, verbose=verbose)
+    score_contextseqs(
+        ruleset    = ruleset, 
+        verbose    = verbose, 
+        python     = python, 
+        virtualenv = virtualenv, 
+        condaenv   = condaenv)
 
 }

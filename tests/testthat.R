@@ -1,4 +1,4 @@
 library(testthat)
-library(crisprapex)
+library(multicrispr)
 
-test_check("crisprapex")
+test_check("multicrispr")

@@ -11,7 +11,7 @@ DNAStringSet <- methods::getClassDef('DNAStringSet', package = 'Biostrings')
 #' @param value character vector or DNAStringSet
 #' @return DNAStringSet (get) or GRanges (set)
 #' @examples 
-#' bedfile  <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bedfile  <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' seqs(granges)
@@ -34,7 +34,7 @@ seqs <- function(granges){
 #' @return GenomicRanges::GRanges
 #' @examples
 #' require(magrittr)
-#' bedfile  <- system.file('extdata/SRF_sites.bed', package='crisprapex')
+#' bedfile  <- system.file('extdata/SRF_sites.bed', package='multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
 #' find_cas9ranges(targetranges)
@@ -137,7 +137,7 @@ count_genome_matches <- function(cas9seqs, bsgenome, mismatch, verbose){
 #' @examples
 #' \donrun{
 #'    require(magrittr)
-#'    bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#'    bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #'    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #'    targetranges <- read_bed(bedfile, bsgenome)[1:10] %>% flank_fourways()
 #'    targetranges %>% find_specific_cas9ranges(mismatch=0)

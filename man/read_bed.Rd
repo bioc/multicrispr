@@ -22,7 +22,7 @@ data.table(chr, start, end, strand)
 Read bedfile as data.table
 }
 \examples{
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 read_bed(bedfile, bsgenome)
 }
