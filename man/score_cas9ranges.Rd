@@ -4,18 +4,13 @@
 \alias{score_cas9ranges}
 \title{Score cas9ranges}
 \usage{
-score_cas9ranges(chr, start, end, strand, bsgenome, verbose = TRUE)
+score_cas9ranges(cas9ranges, ruleset = 1, verbose = TRUE)
 }
 \arguments{
-\item{chr}{character vector: chromosome values}
+\item{cas9ranges}{GenomicRanges::GRanges}
 
-\item{start}{numeric vector: start positions}
-
-\item{end}{numeric vector: end positions}
-
-\item{strand}{character vector: '+' or '-' values}
-
-\item{bsgenome}{BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
+\item{ruleset}{1 (default) or 2 (only if python module 
+github/MicrosoftResearch/azimuth is installed)}
 
 \item{verbose}{logical(1)}
 }
@@ -23,19 +18,32 @@ score_cas9ranges(chr, start, end, strand, bsgenome, verbose = TRUE)
 numeric vector
 }
 \description{
-Score cas9ranges
+Score cas9ranges using ruleset1 (Doench 2014) or ruleset2 (Doench 2016)
+}
+\details{
+For ruleset1, the CRISPRseek implementation is used.
+For ruleset2, azimuth (github/MicrosoftResearch/azimuth) is used.
 }
 \examples{
-do_run <-   assertive.reflection::is_unix() &
-            reticulate::py_module_available('azimuth')
-if (do_run){
+
+# Get cas9ranges
     require(magrittr)
-    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-    cas9dt <-   read_bed(bedfile)        \%>\% 
-                head(3)                  \%>\% 
-                slop_fourways(bsgenome)  \%>\% 
-                find_cas9s(bsgenome)
-    cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+    targetranges <- read_bed(bedfile, bsgenome) \%>\% 
+                    flank_fourways() \%>\% 
+                    find_cas9s()
+# Score
+    cas9ranges[1:10] \%>\% score_cas9ranges()
+    cas9ranges[1:10] \%>\% contextseqs() \%>\% score_contextseqs()
+
 }
+\references{
+Doench 2014, Rational design of highly active sgRNAs for 
+CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
+doi: 10.1038/nbt.3026
+
+Doench 2016, Optimized sgRNA design to maximize activity and minimize 
+off-target effects of CRISPR-Cas9. Nature Biotechnology, 
+doi: 10.1038/nbt.3437
 }

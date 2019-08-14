@@ -1,86 +1,76 @@
-#' Contextify start/stop
-#' @param chr   character vector: chromosome values
-#' @param start numeric vector: start positions
-#' @param end   numeric vector: end positions
-#' @param strand character vector: '+' or '-' values
-#' @param bsgenome BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @return numeric vector
-#' @examples
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' contextify_start(c('chr1', 'chr1'), c(200, 200),  c('+', '-'), bsgenome)
-#' contextify_end(  c('chr1', 'chr1'), c(200, 200),  c('+', '-'), bsgenome)
-#' @export
-contextify_start <- function(chr, start, strand, bsgenome){
+contextify_start <- function(granges){
     
     # Assert
-    assertive.types::assert_is_character(chr)
-    assertive.types::assert_is_numeric(start)
-    assertive.types::assert_is_character(strand)
-    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    tmp <- Reduce(  assertive.properties::assert_are_same_length, 
-                    list(chr, start, strand))
-    assertive.base::assert_is_identical_to_true(
-        methods::is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     
     # Contextify
-    contextstart <- ifelse(strand == '+', start - 4, start - 3)
-    assertive.numbers::assert_all_are_greater_than_or_equal_to(contextstart, 1)
+    GenomicRanges::start(granges) %<>% 
+        subtract(ifelse(GenomicRanges::strand(granges)=='+', 4, 3))
+    assertive.numbers::assert_all_are_greater_than_or_equal_to(
+        start(granges), 1)
     
     # Return
-    return(contextstart)
+    return(granges)
 }
 
 
-#' @rdname contextify_start
-#' @export
-contextify_end <- function(chr, end, strand, bsgenome){
+contextify_end <- function(granges){
 
     # Assert
-    assertive.types::assert_is_character(chr)
-    assertive.types::assert_is_numeric(end)
-    assertive.types::assert_is_character(strand)
-    assertive.sets::assert_is_subset(unique(strand), c('+', '-'))
-    tmp <- Reduce(  assertive.properties::assert_are_same_length, 
-                    list(chr, end, strand))
-    assertive.base::assert_is_identical_to_true(
-        methods::is(bsgenome, 'BSgenome'))
+    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     
     # Contextify
-    contextend <- ifelse(strand == '+', end + 3,   end + 4)
-    assertive.base::assert_all_are_true(
-        contextend <= GenomeInfoDb::seqlengths(bsgenome)[chr])
+    GenomicRanges::end(granges) %<>% 
+        add(ifelse(GenomicRanges::strand(granges) == '+', 3, 4))
+    chrlengths  <-  GenomeInfoDb::seqlengths(get_bsgenome(granges)) %>% 
+                    extract(as.character(BSgenome::seqnames(granges)))
+    assertive.base::assert_all_are_true(granges$contextend < chrlengths)
     
     # Return
-    return(contextend)
+    return(granges)
 }
 
 
-#' Score contextseqs
-#' @param contextseqs character vector
-#' @param verbose logical(1)
-#' @return numeric vector
-#' @examples
-#' do_run <-   assertive.reflection::is_unix() &
-#'             reticulate::py_module_available('azimuth')
-#' if (do_run){
-#'     contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
-#'                      'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
-#'                      'CCAAATATTGTCAAGTTGACAACCAGGAAT')
-#'     score_contextseqs(contextseqs)
-#' }
-#' @export
-score_contextseqs <- function(contextseqs, verbose = TRUE){
+score_contextseqs_rs1 <- function(contextseqs, verbose){
     
     # Assert
-    tmp <- Reduce(assertive.base::assert_are_identical, nchar(contextseqs))
+    assertive.types::assert_is_character(contextseqs)
+    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
     assertive.types::assert_is_a_bool(verbose)
+    
+    # Message
+    if (verbose)  message('\tScore contextseqs (4-23-3) with ruleset1')
+    
+    # Score
+    CRISPRseek::calculategRNAEfficiency(
+        contextseqs,
+        baseBeforegRNA       = 4, 
+        featureWeightMatrix  =  system.file("extdata", 
+                                            "DoenchNBT2014.csv", 
+		                                    package = "CRISPRseek") %>% 
+                                read.csv(header = TRUE)) %>% 
+    extract(, 1)
+}
+
+
+score_contextseqs_rs2 <- function(contextseqs, verbose = TRUE){
+    
+    # Assert
+    assertive.reflection::assert_is_unix() & 
+    assertive.base::is_identical_to_true(
+        reticulate::py_module_available('azimuth'))
+    assertive.types::assert_is_character(contextseqs)
+    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
+    assertive.types::assert_is_a_bool(verbose)
+    
+    # Message
+    if (verbose)  message(  '\tScore contextseqs (4-23-3) with ruleset2',
+                            ' (https://github.com/MicrosoftResearch/Azimuth)')
     
     # Score
     score <- contextseq <- NULL
     seqdt   <- data.table::data.table(contextseq = contextseqs)
     scoredt <- data.table::data.table(contextseq = unique(contextseqs))
-    if (verbose)  message(  '\tScore cas9 sites ', 
-                            '(https://github.com/MicrosoftResearch/Azimuth)')
     azimuth <- reticulate::import("azimuth", delay_load = TRUE)
     numpy   <- reticulate::import("numpy",   delay_load = TRUE)
     scoredt [ , score := azimuth$model_comparison$predict(
@@ -90,42 +80,113 @@ score_contextseqs <- function(contextseqs, verbose = TRUE){
 }
 
 
-#' Score cas9ranges
-#' @param chr       character vector: chromosome values
-#' @param start     numeric vector: start positions
-#' @param end       numeric vector: end positions
-#' @param strand    character vector: '+' or '-' values
-#' @param bsgenome  BSGenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' @param verbose   logical(1)
+#' Score contextualized cas9seqs
+#' 
+#' Score contextualized cas9seqs using ruleset1 (Doench2014) or
+#' ruleset2 (Doench2016)
+#' 
+#' @param contextseqs  30-char string vector: 4-23-3 (flank-cas9-flank)
+#' @param ruleset      1 (Doench 2014 - CRISPRseek) or 
+#'                     2 (Doench 2016 - github/MicrosoftResearch/azimuth)
+#' @param verbose      logical(1)
 #' @return numeric vector
 #' @examples
-#' do_run <-   assertive.reflection::is_unix() &
-#'             reticulate::py_module_available('azimuth')
-#' if (do_run){
-#'     require(magrittr)
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
-#'     cas9dt <-   read_bed(bedfile)        %>% 
-#'                 head(3)                  %>% 
-#'                 slop_fourways(bsgenome)  %>% 
-#'                 find_cas9s(bsgenome)
-#'     cas9dt [ , score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
-#' }
+#' require(magrittr)
+#' contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
+#'                  'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
+#'                  'CCAAATATTGTCAAGTTGACAACCAGGAAT')
+#' contextseqs %>% score_contextseqs()
+#' @references 
+#' Doench 2014, Rational design of highly active sgRNAs for 
+#' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
+#' doi: 10.1038/nbt.3026
+#' 
+#' Doench 2016, Optimized sgRNA design to maximize activity and minimize 
+#' off-target effects of CRISPR-Cas9. Nature Biotechnology, 
+#' doi: 10.1038/nbt.3437
 #' @export
-score_cas9ranges <- function(
-    chr, 
-    start, 
-    end, 
-    strand, 
-    bsgenome, 
-    verbose = TRUE
-){
-    range2seq(  chr, 
-                contextify_start(chr, start, strand, bsgenome), 
-                contextify_end(  chr, end,   strand, bsgenome), 
-                strand, 
-                bsgenome) %>% 
-    score_contextseqs(verbose)
-
+score_contextseqs <- function(contextseqs, ruleset = 1, verbose = TRUE){
+    
+    # Assert
+    assertive.types::assert_is_a_number(ruleset)
+    assertive.sets::assert_is_subset(ruleset, c('1', '2'))
+    
+    # Score
+    scorefun <- switch(ruleset, `1` = score_contextseqs_rs1, 
+                                `2` = score_contextseqs_rs2)
+    scorefun(contextseqs, verbose)
+    
 }
 
+#' Get contextseqs
+#' 
+#' Get [-3, +3] contextseqs for given cas9ranges
+#' 
+#' @param cas9ranges GenomicRanges::GRanges
+#' @examples 
+#' require(magrittr)
+#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#' cas9ranges  <-  read_bed(bedfile, bsgenome) %>% 
+#'                 flank_fourways() %>% 
+#'                 find_cas9ranges()
+#' cas9ranges[1:3] %>% seqs()
+#' cas9ranges[1:3] %>% contextseqs()
+#' @export
+contextseqs <- function(cas9ranges){
+    cas9ranges          %>% 
+    contextify_start()  %>%
+    contextify_end()    %>% 
+    seqs()              %>% 
+    as.character()
+}
+
+
+#' Score cas9ranges
+#' 
+#' Score cas9ranges using ruleset1 (Doench 2014) or ruleset2 (Doench 2016)
+#' 
+#' For ruleset1, the CRISPRseek implementation is used.
+#' For ruleset2, azimuth (github/MicrosoftResearch/azimuth) is used.
+#' 
+#' @param cas9ranges   GenomicRanges::GRanges
+#' @param ruleset      1 (default) or 2 (only if python module 
+#'                     github/MicrosoftResearch/azimuth is installed)
+#' @param verbose logical(1)
+#' @return numeric vector
+#' @examples
+#' 
+#' # Get cas9ranges
+#'     require(magrittr)
+#'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+#'     targetranges <- read_bed(bedfile, bsgenome) %>% 
+#'                     flank_fourways() %>% 
+#'                     find_cas9ranges()
+#' # Score
+#'     cas9ranges[1:3] %>% score_cas9ranges()
+#'     cas9ranges[1:3] %>% contextseqs() %>% score_contextseqs()
+#' 
+#' @references 
+#' Doench 2014, Rational design of highly active sgRNAs for 
+#' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
+#' doi: 10.1038/nbt.3026
+#' 
+#' Doench 2016, Optimized sgRNA design to maximize activity and minimize 
+#' off-target effects of CRISPR-Cas9. Nature Biotechnology, 
+#' doi: 10.1038/nbt.3437
+#' @export
+score_cas9ranges <- function(
+    cas9ranges,
+    ruleset = 1,
+    verbose = TRUE
+){
+    # Assert
+    assertive.base::assert_is_identical_to_true(is(cas9ranges, 'GRanges'))
+
+    # Score
+    cas9ranges %>% 
+    contextseqs() %>%  
+    score_contextseqs(ruleset=ruleset, verbose=verbose)
+
+}

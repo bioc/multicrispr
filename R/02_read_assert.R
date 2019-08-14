@@ -20,8 +20,10 @@ get_bsgenome <- function(granges){
     assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
     genome <- GenomeInfoDb::genome(granges) %>% unname() %>% unique()
     assertive.types::assert_is_a_string(genome)
-    BSgenome::getBSgenome(genome)
     
+    bsname <- BSgenome:::.getInstalledPkgnameFromProviderVersion(genome)
+    bsgenome <- utils::getFromNamespace(bsname, bsname)
+    bsgenome
 }
 
 #' Assert that object is a genomic ranges datatable
@@ -58,22 +60,29 @@ assert_is_granges_datatable <- function (x, bsgenome){
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' x <- read_bed(bedfile, bsgenome)
-#' x %>% data.table::as.data.table() %>% as.granges(bsgenome = bsgenome)
+#' granges <- read_bed(bedfile, bsgenome)
+#' granges$seqs <- seqs(granges)
+#' x <- granges %>% data.table::as.data.table() 
+#' x %>% as.granges(bsgenome = bsgenome)
 #' @export
-as.granges <- function(dt, bsgenome){
+as.granges <- function(x, bsgenome){
     
     # Assert
-    assert_is_granges_datatable(dt, bsgenome)
+    assert_is_granges_datatable(x, bsgenome)
 
     # Convert
-    GenomicRanges::GRanges(
-        seqnames = dt$seqnames, 
-        ranges   = IRanges::IRanges(start = dt$start, end = dt$end), 
-        strand   = dt$strand, 
+    granges <- GenomicRanges::GRanges(
+        seqnames = x$seqnames, 
+        ranges   = IRanges::IRanges(start = x$start, end = x$end), 
+        strand   = x$strand, 
         seqinfo  = BSgenome::seqinfo(bsgenome)
     )
-
+    metavars <- names(x) %>% setdiff(c('seqnames', 'start', 'end', 'strand', 'width'))
+    metadata <- x %>% extract( , metavars, with = FALSE )
+    if (ncol(metadata)>0) S4Vectors::mcols(granges) <-  metadata
+    
+    # Return 
+    granges
 }
 
 

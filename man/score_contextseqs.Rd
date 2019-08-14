@@ -2,12 +2,15 @@
 % Please edit documentation in R/06_score_cas9s.R
 \name{score_contextseqs}
 \alias{score_contextseqs}
-\title{Score contextseqs}
+\title{Score contextualized cas9seqs}
 \usage{
-score_contextseqs(contextseqs, verbose = TRUE)
+score_contextseqs(contextseqs, ruleset = 1, verbose = TRUE)
 }
 \arguments{
-\item{contextseqs}{character vector}
+\item{contextseqs}{30-char string vector: 4-23-3 (flank-cas9-flank)}
+
+\item{ruleset}{1 (Doench 2014 - CRISPRseek) or 
+2 (Doench 2016 - github/MicrosoftResearch/azimuth)}
 
 \item{verbose}{logical(1)}
 }
@@ -15,15 +18,22 @@ score_contextseqs(contextseqs, verbose = TRUE)
 numeric vector
 }
 \description{
-Score contextseqs
+Score contextualized cas9seqs using ruleset1 (Doench2014) or
+ruleset2 (Doench2016)
 }
 \examples{
-do_run <-   assertive.reflection::is_unix() &
-            reticulate::py_module_available('azimuth')
-if (do_run){
-    contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
-                     'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
-                     'CCAAATATTGTCAAGTTGACAACCAGGAAT')
-    score_contextseqs(contextseqs)
+require(magrittr)
+contextseqs <- c('TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
+                 'TGCCCTTATATTGTCTCCAGCAGAAGGTGT',
+                 'CCAAATATTGTCAAGTTGACAACCAGGAAT')
+contextseqs \%>\% score_contextseqs()
 }
+\references{
+Doench 2014, Rational design of highly active sgRNAs for 
+CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
+doi: 10.1038/nbt.3026
+
+Doench 2016, Optimized sgRNA design to maximize activity and minimize 
+off-target effects of CRISPR-Cas9. Nature Biotechnology, 
+doi: 10.1038/nbt.3437
 }

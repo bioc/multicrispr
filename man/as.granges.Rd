@@ -4,12 +4,12 @@
 \alias{as.granges}
 \title{Convert data.table into GenomicRanges::GRanges}
 \usage{
-as.granges(dt, bsgenome)
+as.granges(x, bsgenome)
 }
 \arguments{
-\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
-
 \item{x}{data.table}
+
+\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
 }
 \value{
 GenomicRanges::GRanges
@@ -21,6 +21,8 @@ Convert data.table into GenomicRanges::GRanges
 require(magrittr)
 bedfile <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-x <- read_bed(bedfile, bsgenome)
-x \%>\% data.table::as.data.table() \%>\% as.granges(bsgenome = bsgenome)
+granges <- read_bed(bedfile, bsgenome)
+granges$seqs <- seqs(granges)
+x <- granges \%>\% data.table::as.data.table() 
+x \%>\% as.granges(bsgenome = bsgenome)
 }

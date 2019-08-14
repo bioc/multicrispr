@@ -18,13 +18,15 @@ Serving to the specifics of such experiments, these functions:
 * Allow to target the **flanks** of genomic loci rather than loci themselves.
 * Are **efficient**, building on top of data.table and Biostrings.
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "    #"
+  comment = "    #", 
+  cache = TRUE
 )
 ```
-```{r setup}
+
+```{r load}
 library(magrittr)
 library(crisprapex)
 ```
@@ -32,23 +34,23 @@ library(crisprapex)
 
 # Find cas9 sites specific for TBS flanks
 
-```{r}
+```{r findcas9s}
 bedfile      <- system.file('extdata/SRF_sites.bed', package = 'crisprapex')
 bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
-cas9dt       <- find_specific_cas9s(targetranges)
+cas9ranges   <- find_specific_cas9ranges(targetranges, mismatch = 0)
 ```
-# Keep well-binding cas9sites
 
-```{r}
-do_score <- assertive.reflection::is_unix() & 
-            reticulate::py_module_available('azimuth')
-if (do_score){
+# Score cas9s and filter on score
+
+```{r scorecas9s}
+cas9ranges$score_rs1 <- score_cas9ranges(cas9ranges, ruleset = 1)
+if (assertive.reflection::is_unix() & reticulate::py_module_available('azimuth')){
   reticulate::use_condaenv('default')
-  cas9dt [ !is.na(cas9start), ontargetscore := score_cas9ranges(chr, cas9start, cas9end, strand, bsgenome) ]
+  cas9ranges$score_rs2 <- score_cas9s(cas9ranges, ruleset = 2)
   message('\tFilter for scores > 0.4')
-  cas9dt %<>% extract( ontargetscore>0.4 )
-  message(sprintf('\t\t%d cas9 seqs across %d ranges', cas9dt[, length(unique(cas9seq))], nrow(cas9dt)))
+  cas9ranges %<>% extract(cas9ranges$score > 0.4)
 }
+cmessage(sprintf('\t\t%d cas9 seqs across %d ranges', length(unique(cas9ranges$seqs)), length(cas9ranges)))
 ```
 
