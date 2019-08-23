@@ -9,4 +9,6 @@ Such These experiments often require:
 * **efficient** functions, which are provided by building on top of 
     data.table and Biostrings.
 
-# Example use
+# Overview
+
+![overview](https://gitlab.gwdg.de/loosolab/software/multicrispr/blob/master/inst/extdata/workflow.png)
