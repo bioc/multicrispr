@@ -12,7 +12,7 @@ Authors@R: c(
             email  = "mette.bentsen@mpi-bn.mpg.de"), 
     person( given  = "Mario",
             family = "Looso",
-            role   = "ctb", 
+            role   = "aut", 
             email  = "mario.looso@mpi-bn.mpg.de"), 
     person( given  = "Manuel", 
             family = "Kaulich", 

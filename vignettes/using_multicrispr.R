@@ -5,6 +5,16 @@ knitr::opts_chunk$set(
   cache = TRUE
 )
 
+## ----read------------------------------------------------------------------
+library(magrittr)
+library(multicrispr)
+bedfile      <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
+targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+
+## ----findcas9s-------------------------------------------------------------
+cas9ranges <- find_specific_cas9ranges(targetranges, mismatch = 0)
+
 ## ----score_rs1-------------------------------------------------------------
 cas9ranges$score_rs1 <- score_cas9ranges(cas9ranges, ruleset = 1)
 

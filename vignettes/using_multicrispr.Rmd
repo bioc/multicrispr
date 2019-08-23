@@ -28,9 +28,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# Workflow
-
-## Read target ranges
+# Read target ranges
 
 ```{r read}
 library(magrittr)
@@ -41,14 +39,14 @@ targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
 ```
 
 
-## Find offtarget-free cas9s
+# Find offtarget-free cas9s
 
 ```{r findcas9s}
 cas9ranges <- find_specific_cas9ranges(targetranges, mismatch = 0)
 ```
 
 
-## Score cas9s
+# Score cas9s
 
 Doench et al. (2014)'s "ruleset1" for scoring cas9 sequences is readily available:
 
