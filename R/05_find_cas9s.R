@@ -6,9 +6,8 @@ GRanges      <- methods::getClassDef('GRanges',      package = 'GenomicRanges')
 DNAStringSet <- methods::getClassDef('DNAStringSet', package = 'Biostrings')
 
 
-#' Get/set sequence values
+#' Get sequence values
 #' @param granges GenomicRanges::GRanges
-#' @param value character vector or DNAStringSet
 #' @return DNAStringSet (get) or GRanges (set)
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
@@ -17,7 +16,7 @@ DNAStringSet <- methods::getClassDef('DNAStringSet', package = 'Biostrings')
 #' seqs(granges)
 #' @export
 seqs <- function(granges){
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
     BSgenome::getSeq(get_bsgenome(granges), granges) %>% 
     as.character()
 }
@@ -29,7 +28,6 @@ seqs <- function(granges){
 
 #' Find cas9 ranges in targetranges
 #' @param targetranges  GenomicRanges::GRanges
-#' @param specific      logical(1)
 #' @param verbose       logical(1)
 #' @return GenomicRanges::GRanges
 #' @examples
@@ -44,8 +42,14 @@ find_cas9ranges <- function(
     verbose = TRUE
 ){
     # Assert
-    assertive.base::assert_is_identical_to_true(is(targetranges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(targetranges, 'GRanges'))
     assertive.types::assert_is_a_bool(verbose)
+    
+    # Comply
+    start <- substart <- cas9start <- NULL
+    end <- subend <- cas9end <- NULL
+    strand <- seqnames <- NULL
     
     # Find cas9s in targetranges
     if (verbose) message('\tFind N{20}NGG cas9seqs')
@@ -60,7 +64,8 @@ find_cas9ranges <- function(
     # Rm cas9-free targetranges
     idx <- targetdt[, substart == 'NA']
     if (sum(idx)>0){
-        if (verbose)  cmessage('\t\tRm %d targetranges with no cas9sites', sum(idx)) 
+        if (verbose)  cmessage('\t\tRm %d targetranges with no cas9sites', 
+                                sum(idx)) 
         targetdt %<>% extract(!idx)
     }
 
@@ -108,6 +113,7 @@ count_target_matches <- function(cas9seqs, targetseqs, mismatch, verbose){
 
 
 count_genome_matches <- function(cas9seqs, bsgenome, mismatch, verbose){
+    . <- count <- NULL
     
     starttime <- Sys.time()
     matches   <-    Biostrings::vcountPDict(
@@ -135,7 +141,7 @@ count_genome_matches <- function(cas9seqs, bsgenome, mismatch, verbose){
 #'             matches1 = single mismatch counts
 #'             matches2 = double mismatch counts
 #' @examples
-#' \donrun{
+#' \dontrun{
 #'    require(magrittr)
 #'    bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #'    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus

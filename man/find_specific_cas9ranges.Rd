@@ -24,7 +24,7 @@ GenomicRanges::GRanges
 Find target cas9 ranges with no offtargets
 }
 \examples{
-\\donrun{
+\dontrun{
    require(magrittr)
    bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus

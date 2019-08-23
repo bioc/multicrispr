@@ -2,20 +2,18 @@
 % Please edit documentation in R/05_find_cas9s.R
 \name{seqs}
 \alias{seqs}
-\title{Get/set sequence values}
+\title{Get sequence values}
 \usage{
 seqs(granges)
 }
 \arguments{
 \item{granges}{GenomicRanges::GRanges}
-
-\item{value}{character vector or DNAStringSet}
 }
 \value{
 DNAStringSet (get) or GRanges (set)
 }
 \description{
-Get/set sequence values
+Get sequence values
 }
 \examples{
 bedfile  <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')

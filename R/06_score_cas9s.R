@@ -1,13 +1,13 @@
 contextify_start <- function(granges){
     
     # Assert
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
     
     # Contextify
     GenomicRanges::start(granges) %<>% 
         subtract(ifelse(GenomicRanges::strand(granges)=='+', 4, 3))
     assertive.numbers::assert_all_are_greater_than_or_equal_to(
-        start(granges), 1)
+        GenomicRanges::start(granges), 1)
     
     # Return
     return(granges)
@@ -17,7 +17,7 @@ contextify_start <- function(granges){
 contextify_end <- function(granges){
 
     # Assert
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
     
     # Contextify
     GenomicRanges::end(granges) %<>% 
@@ -54,7 +54,7 @@ score_contextseqs_rs1 <- function(
         featureWeightMatrix  =  system.file("extdata", 
                                             "DoenchNBT2014.csv", 
 		                                    package = "CRISPRseek") %>% 
-                                read.csv(header = TRUE)) %>% 
+                                utils::read.csv(header = TRUE)) %>% 
     extract(, 1)
 }
 
@@ -111,17 +111,16 @@ score_contextseqs <- function(
     # Assert
     assertive.types::assert_is_a_number(ruleset)
     assertive.sets::assert_is_subset(ruleset, c('1', '2'))
-    is.null()
     
     # Score
     scorefun <- switch(ruleset, `1` = score_contextseqs_rs1, 
                                 `2` = score_contextseqs_rs2)
     scorefun(
-        contextseqs, 
-        verbose, 
-        python     = python, 
-        virtualenv = virtualenv, 
-        condaenv   = condaenv
+        contextseqs = contextseqs, 
+        verbose     = verbose,
+        python      = python, 
+        virtualenv  = virtualenv, 
+        condaenv    = condaenv
     )
     
 }
@@ -175,9 +174,9 @@ contextseqs <- function(cas9ranges){
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#'     targetranges <- read_bed(bedfile, bsgenome) %>% 
-#'                     flank_fourways() %>% 
-#'                     find_cas9ranges()
+#'     cas9ranges <- read_bed(bedfile, bsgenome) %>% 
+#'                   flank_fourways() %>% 
+#'                   find_cas9ranges()
 #' # Score
 #'     cas9ranges[1:3] %>% score_cas9ranges()
 #'     cas9ranges[1:3] %>% contextseqs() %>% score_contextseqs()
@@ -200,7 +199,8 @@ score_cas9ranges <- function(
     condaenv   = NULL
 ){
     # Assert
-    assertive.base::assert_is_identical_to_true(is(cas9ranges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(cas9ranges, 'GRanges'))
 
     # Score
     cas9ranges %>% 

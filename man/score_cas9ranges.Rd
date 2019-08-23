@@ -46,9 +46,9 @@ and specifying a value for either 'python' (python binary path),
     require(magrittr)
     bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-    targetranges <- read_bed(bedfile, bsgenome) \%>\% 
-                    flank_fourways() \%>\% 
-                    find_cas9ranges()
+    cas9ranges <- read_bed(bedfile, bsgenome) \%>\% 
+                  flank_fourways() \%>\% 
+                  find_cas9ranges()
 # Score
     cas9ranges[1:3] \%>\% score_cas9ranges()
     cas9ranges[1:3] \%>\% contextseqs() \%>\% score_contextseqs()

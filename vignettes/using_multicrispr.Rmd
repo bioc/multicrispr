@@ -1,6 +1,6 @@
 ---
 title: "Using multicrispr"
-author: A. M. Bhagwat, M. Bentsen, J. Graumann, M. Looso, 
+author: Aditya M Bhagwat
 output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{finding_flank_cas9s}
@@ -56,7 +56,7 @@ Doench et al. (2014)'s "ruleset1" for scoring cas9 sequences is readily availabl
 cas9ranges$score_rs1 <- score_cas9ranges(cas9ranges, ruleset = 1)
 ```
 
-The improved "ruleset2" (Doench, 2016) is also accessible, but requires for they python module  [azimuth](https://github.com/MicrosoftResearch/Azimuth]) to be installed and accessible as a python binary, virtual environment, or conda environment. The code chunk below shows how to score using ruleset 2 if azimuth was installed in the condaenv "default". It also shows the common operation of filtering for rulset2 score values above 0.4.
+The improved "ruleset2" (Doench, 2016) is also accessible, but requires for the python module  [azimuth](https://github.com/MicrosoftResearch/Azimuth]) to be installed and accessible as a python binary, virtual environment, or conda environment. The code chunk below shows how to score using ruleset 2 if azimuth was installed in the condaenv "default". It also shows the common operation of filtering for rulset2 score values above 0.4.
 
 
 ```{r score_rs2}

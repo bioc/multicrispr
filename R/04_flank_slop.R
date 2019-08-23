@@ -21,7 +21,8 @@ left_flank <- function(
     verbose   = TRUE
 ){
     # Assert
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(granges, 'GRanges'))
     assertive.types::assert_is_a_number(leftstart)
     assertive.types::assert_is_a_number(leftend)
     assertive.types::assert_is_a_bool(verbose)
@@ -47,7 +48,7 @@ left_flank <- function(
 #' Right flank 
 #' @param granges      data.table(chr, start, end)
 #' @param rightstart flank start relative to range start
-#' @param leftend   flank end   relative to range start
+#' @param rightend   flank end   relative to range start
 #' @param verbose     logical(1)
 #' @return GenomicRanges::GRanges
 #' @export
@@ -66,7 +67,8 @@ right_flank <- function(
     verbose     = TRUE
 ){
     # Assert
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(granges, 'GRanges'))
     assertive.types::assert_is_a_number(rightstart)
     assertive.types::assert_is_a_number(rightend)
     assertive.types::assert_is_a_bool(verbose)
@@ -112,7 +114,7 @@ slop <- function(
 ){
 
     # Assert
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
     assertive.types::assert_is_a_number(leftstart)
     assertive.types::assert_is_a_number(rightend)
     assertive.types::assert_is_a_bool(verbose)
@@ -150,7 +152,7 @@ slop <- function(
 complement <- function(granges, verbose = TRUE){
 
     # Assert
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
     assertive.sets::assert_is_subset(
         unique(S4Vectors::runValue(GenomicRanges::strand(granges))), 
         c('-', '+'))

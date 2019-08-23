@@ -16,21 +16,22 @@
 #' granges %>% get_bsgenome()
 #' @export
 get_bsgenome <- function(granges){
+    . <- NULL
     
-    assertive.base::assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(
+        methods::is(granges, 'GRanges'))
     genome <- GenomeInfoDb::genome(granges) %>% unname() %>% unique()
     assertive.types::assert_is_a_string(genome)
     
-    paste0('BSgenomex.UCSC..')
-    
     BSgenome::available.genomes() %>% 
     extract(stringi::stri_detect_fixed(., genome)) %>% 
-    extract(stringi::stri_detect_fixed(., 'masked'))
+    extract(stringi::stri_detect_fixed(., 'masked', ))
     
     bsname <- BSgenome:::.getInstalledPkgnameFromProviderVersion(genome)
     bsgenome <- utils::getFromNamespace(bsname, bsname)
     bsgenome
 }
+
 
 #' Assert that object is a genomic ranges datatable
 #' @param x data.table

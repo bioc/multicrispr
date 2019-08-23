@@ -11,9 +11,9 @@ right_flank(granges, rightstart = 1, rightend = 200, verbose = TRUE)
 
 \item{rightstart}{flank start relative to range start}
 
-\item{verbose}{logical(1)}
+\item{rightend}{flank end   relative to range start}
 
-\item{leftend}{flank end   relative to range start}
+\item{verbose}{logical(1)}
 }
 \value{
 GenomicRanges::GRanges

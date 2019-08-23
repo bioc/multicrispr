@@ -10,8 +10,6 @@ find_cas9ranges(targetranges, verbose = TRUE)
 \item{targetranges}{GenomicRanges::GRanges}
 
 \item{verbose}{logical(1)}
-
-\item{specific}{logical(1)}
 }
 \value{
 GenomicRanges::GRanges

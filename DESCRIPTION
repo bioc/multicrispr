@@ -1,21 +1,42 @@
 Package: multicrispr
-Title: multi-locus crispr design
+Title: Multi-locus crispr design
 Version: 0.0.1
-Authors@R: c(person("Aditya", "Bhagwat", role = c("aut", "cre"), 
-                    email = "aditya.bhagwat@mpi-bn.mpg.de"), 
-            person("Mette", "Bentsen", role = "ctb", 
-                    email = "mette.bentsen@mpi-bn.mpg.de"), 
-            person("Mario", "Looso", role = "ctb", 
-                    email = "mario.looso@mpi-bn.mpg.de"), 
-            person("Johannes", "Graumann", role = "ctb", 
-                    email = 'johannes.graumann@mpi-bn.mpg.de'))
+Authors@R: c(
+    person( given  = "Aditya", 
+            family = "Bhagwat", 
+            role   = c("aut", "cre"), 
+            email  = "aditya.bhagwat@mpi-bn.mpg.de"), 
+    person( given  = "Mette", 
+            family = "Bentsen", 
+            role   = "aut", 
+            email  = "mette.bentsen@mpi-bn.mpg.de"), 
+    person( given  = "Mario",
+            family = "Looso",
+            role   = "ctb", 
+            email  = "mario.looso@mpi-bn.mpg.de"), 
+    person( given  = "Manuel", 
+            family = "Kaulich", 
+            role   = "ctb",
+            email  = "kaulich@em.uni-frankfurt.de"),
+    person( given  = "Martin", 
+            family = "Wegner", 
+            role   = "ctb", 
+            email  = "ma.wegner@em.uni-frankfurt.de"), 
+    person( given  = "Marie", 
+            family = "Hebel", 
+            role   = "ctb", 
+            email  = "hebel@biochem2.uni-frankfurt.de"), 
+    person( given = "Johannes", 
+            family = "Graumann", 
+            role   = "ctb", 
+            email  = 'johannes.graumann@mpi-bn.mpg.de'))
 Description: Contains functions to facilitate the design of a multi-locus crispr/cas9 library.
 License: GPL
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Depends:
-    R (>= 3.6.1)
+    R (>= 3.6.0)
 Imports:
     assertive.base,
     assertive.files,
