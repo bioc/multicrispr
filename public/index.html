@@ -71,8 +71,37 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<p><img src="https://gitlab.gwdg.de/loosolab/software/multicrispr/wikis/uploads/43b432cd32eb156af2ac217efd98aceb/workflow.png" alt="overview"></p>
-  </div>
+
+<center> <div class="page-header"><h1> multicrispr </h1></div> </center>
+<p><img src="https://gitlab.gwdg.de/loosolab/software/multicrispr/wikis/uploads/43b432cd32eb156af2ac217efd98aceb/workflow.png"></p>
+<ol>
+<li><p>Read a set of genomics ranges</p></li>
+<li>
+<p>Find cas9 sequences which</p>
+<ul>
+<li>
+<p>target</p>
+<ul>
+<li>
+<strong>thousands</strong> of such <strong>ranges</strong>, their <strong>flanks</strong>, or <strong>slopped extensions</strong>
+</li>
+<li>
+<strong>efficiently</strong> with <strong>data.table</strong> and <strong>Biostrings</strong> based <strong>c-level</strong> looping and matching</li>
+<li>enabling <strong>crispr<sub>ko</sub></strong>, <strong>crispr<sub>i</sub></strong>, and <strong>crispr<sub>a</sub></strong> design.</li>
+</ul>
+</li>
+<li><p>are free of offtarget (mis)matches</p></li>
+<li>
+<p>bind well</p>
+<ul>
+<li>as determined by Doench 2016 ontargetscore (interfacing to original python module <strong>azimuth</strong> when available)</li>
+<li>or Doench 2014 ontargetscore otherwise</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <div class="license">
