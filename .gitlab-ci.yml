@@ -1,4 +1,6 @@
 pages:
+  script:
+    - touch pages
   artifacts:
     paths:
       - public
