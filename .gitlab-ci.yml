@@ -1,6 +1,6 @@
 pages:
   script:
-    - touch pages
+    - touch public
   artifacts:
     paths:
       - public
