@@ -9,7 +9,7 @@
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges %>% head(3)
@@ -54,7 +54,7 @@ left_flank <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges %>% head(1)
@@ -100,7 +100,7 @@ right_flank <- function(
 #' @export
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges %>% head(1)
@@ -143,7 +143,7 @@ slop <- function(
 #' @param verbose logical(1)
 #' @return GenomicRanges::GRanges
 #' @examples
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr') 
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr') 
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges
@@ -181,7 +181,7 @@ complement <- function(granges, verbose = TRUE){
 #' @return data.table(chr, start, end, strand)
 #' @examples
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges
@@ -234,7 +234,7 @@ flank_fourways <- function(
 #' @return GenomicRanges::GRanges
 #' @examples
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' granges <- read_bed(bedfile, bsgenome)
 #' granges

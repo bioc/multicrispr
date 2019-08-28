@@ -19,7 +19,7 @@ Assert that object is a genomic ranges datatable
 }
 \examples{
 require(magrittr)
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 x <- read_bed(bedfile, bsgenome) \%>\% data.table::as.data.table()
 assert_is_granges_datatable(x, bsgenome)

@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 ## ----read------------------------------------------------------------------
 library(magrittr)
 library(multicrispr)
-bedfile      <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+bedfile      <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
 

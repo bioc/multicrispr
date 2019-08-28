@@ -18,7 +18,7 @@ GenomicRanges::GRanges
 Complement granges
 }
 \examples{
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr') 
+bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr') 
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 granges <- read_bed(bedfile, bsgenome)
 granges

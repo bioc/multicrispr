@@ -26,7 +26,7 @@ Find target cas9 ranges with no offtargets
 \examples{
 \dontrun{
    require(magrittr)
-   bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+   bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
    targetranges <- read_bed(bedfile, bsgenome)[1:10] \%>\% flank_fourways()
    targetranges \%>\% find_specific_cas9ranges(mismatch=0)

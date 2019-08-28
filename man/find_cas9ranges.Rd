@@ -19,7 +19,7 @@ Find cas9 ranges in targetranges
 }
 \examples{
 require(magrittr)
-bedfile  <- system.file('extdata/SRF_sites.bed', package='multicrispr')
+bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 targetranges <- read_bed(bedfile, bsgenome) \%>\% flank_fourways()
 find_cas9ranges(targetranges)

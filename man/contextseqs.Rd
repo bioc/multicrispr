@@ -14,7 +14,7 @@ Get [-3, +3] contextseqs for given cas9ranges
 }
 \examples{
 require(magrittr)
-bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 cas9ranges  <-  read_bed(bedfile, bsgenome) \%>\% 
                 flank_fourways() \%>\% 

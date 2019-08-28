@@ -132,7 +132,7 @@ score_contextseqs <- function(
 #' @param cas9ranges GenomicRanges::GRanges
 #' @examples 
 #' require(magrittr)
-#' bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' cas9ranges  <-  read_bed(bedfile, bsgenome) %>% 
 #'                 flank_fourways() %>% 
@@ -172,7 +172,7 @@ contextseqs <- function(cas9ranges){
 #' 
 #' # Get cas9ranges
 #'     require(magrittr)
-#'     bedfile <- system.file('extdata/SRF_sites.bed', package = 'multicrispr')
+#'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #'     cas9ranges <- read_bed(bedfile, bsgenome) %>% 
 #'                   flank_fourways() %>% 
