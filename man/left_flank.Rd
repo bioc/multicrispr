@@ -4,28 +4,29 @@
 \alias{left_flank}
 \title{Left flank}
 \usage{
-left_flank(granges, leftstart = -200, leftend = -1, verbose = TRUE)
+left_flank(gr, leftstart = -200, leftend = -1, plot = TRUE,
+  verbose = TRUE)
 }
 \arguments{
-\item{granges}{GenomicRanges::GRanges}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{leftstart}{left flank start (relative to range start)}
+\item{leftstart}{number: flank start (relative to range start)}
 
-\item{leftend}{left flank end   (relative to range start)}
+\item{leftend}{number: flank end   (relative to range start)}
+
+\item{plot}{logical(1)}
 
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+a \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
 Left flank
 }
 \examples{
-require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-granges <- read_bed(bedfile, bsgenome)
-granges \%>\% head(3)
-granges \%>\% head(3) \%>\% left_flank()
+gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+left_flank(gr)
 }

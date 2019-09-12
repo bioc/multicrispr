@@ -4,28 +4,29 @@
 \alias{right_flank}
 \title{Right flank}
 \usage{
-right_flank(granges, rightstart = 1, rightend = 200, verbose = TRUE)
+right_flank(gr, rightstart = 1, rightend = 200, plot = TRUE,
+  verbose = TRUE)
 }
 \arguments{
-\item{granges}{data.table(chr, start, end)}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{rightstart}{flank start relative to range start}
+\item{rightstart}{number: flank start (relative to range end)}
 
-\item{rightend}{flank end   relative to range start}
+\item{rightend}{number: flank end   (relative to range end)}
+
+\item{plot}{logical(1)}
 
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+\code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
 Right flank
 }
 \examples{
-require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-granges <- read_bed(bedfile, bsgenome)
-granges \%>\% head(1)
-granges \%>\% head(1) \%>\% right_flank()
+gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+right_flank(gr)
 }

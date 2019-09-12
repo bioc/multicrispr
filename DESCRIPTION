@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus crispr design
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: c(person(given  = "Aditya", family = "Bhagwat", 
                     role   = c("aut", "cre"), 
                     email  = "aditya.bhagwat@mpi-bn.mpg.de"), 
@@ -40,13 +40,16 @@ Imports:
     assertive.reflection,
     assertive.sets,
     assertive.types,
+    BiocGenerics,
     Biostrings,
-    CRISPRseek,
     BSgenome,
+    CRISPRseek,
     data.table,
     GenomeInfoDb,
     GenomicRanges,
-    IRanges,
+    ggplot2,
+    Gviz, 
+    karyoploteR,
     magrittr,
     methods,
     reticulate,

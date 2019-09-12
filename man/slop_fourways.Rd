@@ -4,29 +4,29 @@
 \alias{slop_fourways}
 \title{Slop granges for both strands, merging overlaps}
 \usage{
-slop_fourways(granges, leftstart = -22, rightend = 22,
+slop_fourways(gr, leftstart = -22, rightend = 22, plot = TRUE,
   verbose = TRUE)
 }
 \arguments{
-\item{granges}{GenomicRanges::GRanges}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{leftstart}{numeric(1)}
+\item{leftstart}{number}
 
-\item{rightend}{numeric(1)}
+\item{rightend}{number}
+
+\item{plot}{logical(1)}
 
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+\code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
 Slop granges for both strands, merging overlaps
 }
 \examples{
-require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-granges <- read_bed(bedfile, bsgenome)
-granges
-granges \%>\% slop_fourways()
+gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+slop_fourways(gr)
 }

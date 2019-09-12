@@ -1,13 +1,12 @@
 contextify_start <- function(granges){
     
     # Assert
-    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
+    assert_is_identical_to_true(methods::is(granges, 'GRanges'))
     
     # Contextify
-    GenomicRanges::start(granges) %<>% 
-        subtract(ifelse(GenomicRanges::strand(granges)=='+', 4, 3))
+    start(granges) %<>%  subtract(ifelse(strand(granges)=='+', 4, 3))
     assertive.numbers::assert_all_are_greater_than_or_equal_to(
-        GenomicRanges::start(granges), 1)
+        start(granges), 1)
     
     # Return
     return(granges)
@@ -17,14 +16,13 @@ contextify_start <- function(granges){
 contextify_end <- function(granges){
 
     # Assert
-    assertive.base::assert_is_identical_to_true(methods::is(granges, 'GRanges'))
+    assert_is_identical_to_true(is(granges, 'GRanges'))
     
     # Contextify
-    GenomicRanges::end(granges) %<>% 
-        add(ifelse(GenomicRanges::strand(granges) == '+', 3, 4))
-    chrlengths  <-  GenomeInfoDb::seqlengths(get_bsgenome(granges)) %>% 
-                    extract(as.character(BSgenome::seqnames(granges)))
-    assertive.base::assert_all_are_true(granges$contextend < chrlengths)
+    end(granges) %<>% add(ifelse(strand(granges) == '+', 3, 4))
+    chrlengths  <-  seqlengths(get_bsgenome(granges)) %>% 
+                    extract(as.character(seqnames(granges)))
+    assert_all_are_true(granges$contextend < chrlengths)
     
     # Return
     return(granges)
@@ -40,9 +38,9 @@ score_contextseqs_rs1 <- function(
 ){
     
     # Assert
-    assertive.types::assert_is_character(contextseqs)
-    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_is_character(contextseqs)
+    assert_all_are_true(nchar(contextseqs)==30)
+    assert_is_a_bool(verbose)
     
     # Message
     if (verbose)  message('\tScore contextseqs (4-23-3) with ruleset1')
@@ -73,12 +71,11 @@ score_contextseqs_rs2 <- function(
     if (!is.null(condaenv))     reticulate::use_condaenv(condaenv)
     
     # Assert
-    assertive.reflection::assert_is_unix() & 
-    assertive.base::is_identical_to_true(
-        reticulate::py_module_available('azimuth'))
-    assertive.types::assert_is_character(contextseqs)
-    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_is_unix() & 
+    is_identical_to_true(reticulate::py_module_available('azimuth'))
+    assert_is_character(contextseqs)
+    assert_all_are_true(nchar(contextseqs)==30)
+    assert_is_a_bool(verbose)
     
     # Message
     if (verbose)  message(  '\tScore contextseqs (4-23-3) with ruleset2',
@@ -109,8 +106,8 @@ score_contextseqs <- function(
 ){
     
     # Assert
-    assertive.types::assert_is_a_number(ruleset)
-    assertive.sets::assert_is_subset(ruleset, c('1', '2'))
+    assert_is_a_number(ruleset)
+    assert_is_subset(ruleset, c('1', '2'))
     
     # Score
     scorefun <- switch(ruleset, `1` = score_contextseqs_rs1, 
@@ -129,7 +126,8 @@ score_contextseqs <- function(
 #' 
 #' Get [-3, +3] contextseqs for given cas9ranges
 #' 
-#' @param cas9ranges GenomicRanges::GRanges
+#' @param cas9ranges \code{\link[GenomicRanges]{GRanges-class}}
+#' @return character vector
 #' @examples 
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
@@ -159,7 +157,7 @@ contextseqs <- function(cas9ranges){
 #' 'virtualenv' (python virtual environment dir) or 
 #' 'condaenv' (python conda environment).
 #' 
-#' @param cas9ranges GenomicRanges::GRanges
+#' @param cas9ranges \code{\link[GenomicRanges]{GRanges-class}}
 #' @param contextseqs character vector with 4-23-3 contextseqs
 #' @param ruleset    1 (default) or 2 (only if python module 
 #'                   github/MicrosoftResearch/azimuth is installed)
@@ -199,11 +197,10 @@ score_cas9ranges <- function(
     condaenv   = NULL
 ){
     # Assert
-    assertive.base::assert_is_identical_to_true(
-        methods::is(cas9ranges, 'GRanges'))
+    assert_is_identical_to_true(methods::is(cas9ranges, 'GRanges'))
 
     # Score
-    cas9ranges %>% 
+    cas9ranges    %>% 
     contextseqs() %>%  
     score_contextseqs(
         ruleset    = ruleset, 

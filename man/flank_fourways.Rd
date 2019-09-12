@@ -4,33 +4,33 @@
 \alias{flank_fourways}
 \title{Flank fourways}
 \usage{
-flank_fourways(granges, leftstart = -200, leftend = -1,
-  rightstart = 1, rightend = 200, verbose = TRUE)
+flank_fourways(gr, leftstart = -200, leftend = -1, rightstart = 1,
+  rightend = 200, plot = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{granges}{GenomicRanges::GRanges}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{leftstart}{numeric(1): left flank start  (from range start)}
+\item{leftstart}{number: left flank start  (relative to range start)}
 
-\item{leftend}{numeric(1): left flank  end   (from range start)}
+\item{leftend}{number: left flank  end   (relative to range start)}
 
-\item{rightstart}{numeric(1): right flank start (from range end)}
+\item{rightstart}{number: right flank start (relative to range end)}
 
-\item{rightend}{numeric(1): right flank end   (from range end)}
+\item{rightend}{number: right flank end   (relative to range end)}
 
-\item{verbose}{logical(1): report?}
+\item{plot}{logical(1)}
+
+\item{verbose}{logical(1)}
 }
 \value{
-data.table(chr, start, end, strand)
+\code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
 Flank left and right, for both strands, and merge overlaps
 }
 \examples{
-require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-granges <- read_bed(bedfile, bsgenome)
-granges
-granges \%>\% flank_fourways()
+gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+flank_fourways(gr)
 }

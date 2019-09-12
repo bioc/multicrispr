@@ -7,14 +7,14 @@
 find_specific_cas9ranges(targetranges, mismatch = 2, verbose = TRUE)
 }
 \arguments{
-\item{targetranges}{GenomicRanges::GRanges}
+\item{targetranges}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{mismatch}{max number of mismatches to consider}
 
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+\code{\link[GenomicRanges]{GRanges-class}}
         mcols(GRanges) contains sequences and match counts:
             matches0 = perfect match counts
             matches1 = single mismatch counts
@@ -25,10 +25,9 @@ Find target cas9 ranges with no offtargets
 }
 \examples{
 \dontrun{
-   require(magrittr)
    bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-   targetranges <- read_bed(bedfile, bsgenome)[1:10] \%>\% flank_fourways()
-   targetranges \%>\% find_specific_cas9ranges(mismatch=0)
+   targetranges <- slop_fourways(read_bed(bedfile, bsgenome)[1:10])
+   find_specific_cas9ranges(targetranges, mismatch=0)
 }
 }

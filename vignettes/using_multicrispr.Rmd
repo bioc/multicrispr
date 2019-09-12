@@ -22,8 +22,8 @@ crispr/cas9 library, offering a set of intuitive functions:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "    #", 
-  cache = TRUE
+  comment  = "    #", 
+  cache    = TRUE
 )
 ```
 
@@ -35,7 +35,13 @@ library(magrittr)
 library(multicrispr)
 bedfile      <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-targetranges <- read_bed(bedfile, bsgenome) %>% flank_fourways()
+targetranges <- read_bed(bedfile, bsgenome)
+```
+
+# Flank
+
+```{r Flank}
+targetranges %<>% flank_fourways()
 ```
 
 
@@ -54,7 +60,7 @@ Doench et al. (2014)'s "ruleset1" for scoring cas9 sequences is readily availabl
 cas9ranges$score_rs1 <- score_cas9ranges(cas9ranges, ruleset = 1)
 ```
 
-The improved "ruleset2" (Doench, 2016) is also accessible, but requires for the python module  [azimuth](https://github.com/MicrosoftResearch/Azimuth]) to be installed and accessible as a python binary, virtual environment, or conda environment. The code chunk below shows how to score using ruleset 2 if azimuth was installed in the condaenv "default". It also shows the common operation of filtering for rulset2 score values above 0.4.
+The improved "ruleset2" (Doench, 2016) is also accessible, but requires for the python module  [azimuth](https://github.com/MicrosoftResearch/Azimuth]) to be installed and accessible as a python binary, virtual environment, or conda environment. The code chunk below shows how to score using ruleset 2 if azimuth was installed in the condaenv "default". It also shows the common operation of filtering for ruleset2 score values above 0.4.
 
 
 ```{r score_rs2}

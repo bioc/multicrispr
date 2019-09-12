@@ -7,20 +7,19 @@
 find_cas9ranges(targetranges, verbose = TRUE)
 }
 \arguments{
-\item{targetranges}{GenomicRanges::GRanges}
+\item{targetranges}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+\code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
 Find cas9 ranges in targetranges
 }
 \examples{
-require(magrittr)
 bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-targetranges <- read_bed(bedfile, bsgenome) \%>\% flank_fourways()
+targetranges <- slop_fourways(read_bed(bedfile, bsgenome))
 find_cas9ranges(targetranges)
 }

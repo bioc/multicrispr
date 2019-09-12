@@ -4,28 +4,29 @@
 \alias{slop}
 \title{Slop (i.e. extend left/right)}
 \usage{
-slop(granges, leftstart = -22, rightend = 22, verbose = TRUE)
+slop(gr, leftstart = -22, rightend = 22, plot = TRUE,
+  verbose = TRUE)
 }
 \arguments{
-\item{granges}{GenomicRanges::GRanges}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{leftstart}{flank start relative to range start}
+\item{leftstart}{number: flank start (relative to range start)}
 
-\item{rightend}{flank end   relative to range start}
+\item{rightend}{number: flank end   (relative to range end)}
+
+\item{plot}{logical(1)}
 
 \item{verbose}{logical(1)}
 }
 \value{
-GenomicRanges::GRanges
+\code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
 Slop (i.e. extend left/right)
 }
 \examples{
-require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-granges <- read_bed(bedfile, bsgenome)
-granges \%>\% head(1)
-granges \%>\% head(1) \%>\% slop()
+gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+slop(gr)
 }

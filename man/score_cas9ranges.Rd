@@ -25,7 +25,7 @@ github/MicrosoftResearch/azimuth is installed)}
 
 \item{condaenv}{NULL (ruleset=1) or name of condaenv (ruleset=2). See details.}
 
-\item{cas9ranges}{GenomicRanges::GRanges}
+\item{cas9ranges}{\code{\link[GenomicRanges]{GRanges-class}}}
 }
 \value{
 numeric vector

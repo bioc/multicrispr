@@ -7,7 +7,10 @@
 contextseqs(cas9ranges)
 }
 \arguments{
-\item{cas9ranges}{GenomicRanges::GRanges}
+\item{cas9ranges}{\code{\link[GenomicRanges]{GRanges-class}}}
+}
+\value{
+character vector
 }
 \description{
 Get [-3, +3] contextseqs for given cas9ranges
