@@ -30,6 +30,15 @@ get_bsgenome <- function(gr){
 
 #' Read bedfile into GRanges
 #' 
+#' Reads bedfile into GRanges, adds seqinfo(bsgenome), converts 0-based 
+#' into 1-based representation, removes duplicates, and visualizes through 
+#' karyoplots.
+#' 
+#' This function accepts bedfiles with metadata (first 6 columns specify
+#' ranges, additional columns specify metadata), which the otherwise similar
+#' function \code{\link[rtracklayer]{import.bed} doesn not (which was the 
+#' motivation to create this function)
+#' 
 #' @param bedfile        file path
 #' @param bsgenome       BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus
 #' @param zero_based     logical(1): whether bedfile GRanges are 0-based
