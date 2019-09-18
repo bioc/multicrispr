@@ -17,7 +17,6 @@ Get sequence values
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-granges <- read_bed(bedfile, bsgenome)
+granges <- read_bed(bedfile, 'mm10')
 seqs(granges)
 }

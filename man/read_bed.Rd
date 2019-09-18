@@ -4,17 +4,12 @@
 \alias{read_bed}
 \title{Read bedfile into GRanges}
 \usage{
-read_bed(bedfile, bsgenome, zero_based = TRUE, rm_duplicates = TRUE,
-  plot = TRUE, verbose = TRUE)
+read_bed(bedfile, genome, plot = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{bedfile}{file path}
 
-\item{bsgenome}{BSgenome, e.g. BSgenome.Mmusculus.UCSC.mm10::Mmusculus}
-
-\item{zero_based}{logical(1): whether bedfile GRanges are 0-based}
-
-\item{rm_duplicates}{logical(1)}
+\item{genome}{character: e.g. 'mm10'}
 
 \item{plot}{logical(1)}
 
@@ -24,16 +19,13 @@ read_bed(bedfile, bsgenome, zero_based = TRUE, rm_duplicates = TRUE,
 \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
-Reads bedfile into GRanges, adds seqinfo(bsgenome), converts 0-based 
-into 1-based representation, removes duplicates, and karyoplots.
-}
-\note{
-By convention BED files are 0-based. GRanges are always 1-based.
-      A good discussion on these two alternative codings is given 
-      by Obi Griffith on Biostars: https://www.biostars.org/p/84686/
+Read bedfile into granges and output graphical and textual summaries
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-(gr <- read_bed(bedfile, bsgenome))
+read_bed(bedfile, 'mm10')
+}
+\seealso{
+\code{rtracklayer::import.bed} (documented in 
+\code{\link[rtracklayer]{BEDFile-class}}), around which this function wraps.
 }

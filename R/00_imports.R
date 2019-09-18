@@ -6,6 +6,7 @@
 #' @import BiocGenerics
 #' @import Biostrings
 #' @import BSgenome
+#' @importFrom data.table :=
 #' @import GenomeInfoDb
 #' @import GenomicRanges
 #' @import magrittr

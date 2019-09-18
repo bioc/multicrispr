@@ -53,6 +53,7 @@ Imports:
     magrittr,
     methods,
     reticulate,
+    rtracklayer,
     S4Vectors,
     stringi, 
     tidyr

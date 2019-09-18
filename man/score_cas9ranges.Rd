@@ -45,8 +45,7 @@ and specifying a value for either 'python' (python binary path),
 # Get cas9ranges
     require(magrittr)
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-    cas9ranges <- read_bed(bedfile, bsgenome) \%>\% 
+    cas9ranges <- read_bed(bedfile, 'mm10') \%>\% 
                   flank_fourways() \%>\% 
                   find_cas9ranges()
 # Score

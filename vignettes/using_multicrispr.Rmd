@@ -1,6 +1,6 @@
 ---
-title: "Using multicrispr"
-author: Aditya M Bhagwat
+title: "multicrispr: intuitive design of offtarget-free crispr/cas9 libraries"
+author: Aditya M Bhagwat, Mario Looso, Manuel Kaulich, Johannes Graumann.
 output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{finding_flank_cas9s}
@@ -10,14 +10,19 @@ vignette: >
 
 # Introduction
 
-The `multicrispr` package facilitates the design of a multi-locus
-crispr/cas9 library, offering a set of intuitive functions:
+Since its initial discovery in 1987, crispr/Cas9, in 2005 understood to be a bacterial immune system, has now matured into a versatile molecular tool for genome engineering and analysis. As a molecular tool, it consists of two components: a 23-bp $N_{20}NGG$ gRNA (guideRNA) that targets the Cas9 enzyme to a particular genomic locus, and the cas9 enzyme itself, that performs some action at that locus. While the S. pyogenes Cas9 helicase/endonuclease creates double stranded breaks at the genomic locus of interest, the subsequently engineered (catalytically dead) dCas9 used in many contemporary applications  targets a genomic locus without cutting it, instead allowing for alternative activities through Cas9 gene fusion with an additional effector domain, such as KRAB (repression), VPR (activation), APEX (protein interactor biotinylation) and others.
 
-* `read_bed`: read bedfile into [GenomicRanges::GRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) object
-* `flank_fourways    `: obtain flank ranges (if they are to be targeted)
-* `find_specfic_cas9s`: find offtarget-free cas9 sequences (and ranges)
-* `score_cas9s       `: score cas9 sequences for binding efficiency.
+The Cas9 enzyme works with a $N_{20}NGG$ gRNA, a sequence generic enough to generally allow for multiple alternative cas9 sequences for a genomic target site. Not all cas9 sequences are equally suited, though, and some bioinformatics efforts for proper gRNA design can greatly enhance the success of a cas9 experiment. Making sure an appropriate crispr/Cas9 sequence is chosen involves two tasks: (1) ensuring that the chosen gRNA is offtarget-free and does not bind to any other genomic location that the target region and (2) choosing a gRNA with a high targeting efficiency (since not all gRNA sequences bind equally well).
 
+The latter task of selection for targeting efficiency is fortunate enough to benefit from the cas9 knowledge bases created in recent years. Perhaps the most comprehensive work has been done by Doench et al, who investigated the effects of 1841 alternate gRNA sequences (Doench 2014) of targeting efficiency, later extending this to a total of 4000+ alternative sequences (Doench 2016). From these, a targeting efficiency prediction ruleset was extracted, using an SVM/logistic regression combination initially (Doench, 2014), and an improved boosted regression trees ruleset later (Doench, 2016).
+
+Initially, crispr/Cas9 was used to target a single genomic locus. Later technological advances alowed for the targeting of multiple loci, through multi-gRNA multiplexing on a single plasmid. Subsequent further technological advances now enable mass targeting of thousands of genomic loci, through a massive gRNA library, with many different clones (each with a single gRNA). This mass targeting off course increases algorithmic/computational demands for gRNA design, since thousands of genomic target sites allow for many thousands of potential crispr sites, each of which require (mismatch-aware) offtarget analysis as well as targeting efficiency predictions to be performed.
+
+multicrispr has been developed to serve these needs in mass gRNA design. It provides intuitive functions to (1) read a bedfile with many genomic ranges into a `GRanges` object, (2) transform these into their extensions or flanks, (3) visualize the effects of such operations, (4) examine offtarget effects and filter for offtarget-free cas9 sequences, and (5) compute the predicted targeting efficiency and filter for efficient cas9 sequences.
+
+Care has been taken to make multicrispr intuitive and efficient, much of which is achieved by aligning its functionality with the existing R/Bioconductor universe, re-using the dedicated classes `GenomicRanges::GRanges` (genomic loci), `Biostrings` (genomic sequences) and `BSgenome` (full genomes), each with dedicated, efficient, c-rooted methods (e.g. for mismatch-aware offtarget analysis). Efficiency is further enhanced by performing many operations in a data.table context, enabling c-level loops. Intuition is further enhanced by having most functions output both graphical and textual summaries, allowing immediate inspection and anomaly detection.
+
+In the following sections, we discuss each of these steps in more detail.
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -27,15 +32,15 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Read
 
-# Read target ranges
+Mass targeting of genomic loci starts with a definition of the target loci of interest. This is often done in bed format. `rtracklayer::read.bed` reads a bedfile into a `GenomicRanges::GRanges`. `multicrispr::plot_karyogram` plots a karyogram overview of the different target ranges.
 
 ```{r read}
 library(magrittr)
 library(multicrispr)
 bedfile      <- system.file('extdata/SRF.bed', package = 'multicrispr')
-bsgenome     <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-targetranges <- read_bed(bedfile, bsgenome)
+targetranges <- read_bed(bedfile, 'mm10')
 ```
 
 # Flank
@@ -48,7 +53,7 @@ targetranges %<>% flank_fourways()
 # Find offtarget-free cas9s
 
 ```{r findcas9s}
-cas9ranges <- find_specific_cas9ranges(targetranges, mismatch = 0)
+cas9ranges <- find_offtargetfree_cas9s(targetranges, mismatch = 0)
 ```
 
 

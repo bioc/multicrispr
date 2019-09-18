@@ -30,9 +30,8 @@ genome tracks (plot_tracks) or intervals (plot_intervals)
 }
 \examples{
 # Plot GRanges
-  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-  granges   <- read_bed(bedfile,  bsgenome, plot = FALSE)
+  granges   <- read_bed(bedfile, 'mm10' , plot = FALSE)
   plot_karyogram(granges)
   plot_intervals(granges)
   

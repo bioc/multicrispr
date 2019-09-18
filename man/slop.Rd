@@ -26,7 +26,6 @@ Slop (i.e. extend left/right)
 }
 \examples{
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 slop(gr)
 }

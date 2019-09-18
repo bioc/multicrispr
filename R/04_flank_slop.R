@@ -17,8 +17,7 @@ summarize_loci <- function(gr){
 #' @export
 #' @examples 
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 #' left_flank(gr)
 left_flank <- function(
     gr, 
@@ -63,8 +62,7 @@ left_flank <- function(
 #' @export
 #' @examples 
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 #' right_flank(gr)
 #' @export
 right_flank <- function(
@@ -109,8 +107,7 @@ right_flank <- function(
 #' @export
 #' @examples 
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 #' slop(gr)
 #' @export
 slop <- function(
@@ -162,8 +159,7 @@ slop <- function(
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 #' flank_fourways(gr)
 #' @export
 flank_fourways <- function(
@@ -211,8 +207,7 @@ flank_fourways <- function(
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 #' slop_fourways(gr)
 #' @export
 slop_fourways <- function(

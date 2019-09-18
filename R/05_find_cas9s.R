@@ -4,8 +4,7 @@
 #' @return DNAStringSet (get) or GRanges (set)
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' granges <- read_bed(bedfile, bsgenome)
+#' granges <- read_bed(bedfile, 'mm10')
 #' seqs(granges)
 #' @export
 seqs <- function(granges){
@@ -19,17 +18,16 @@ seqs <- function(granges){
 # Find cas9 ranges
 #=============================================================================
 
-#' Find cas9 ranges in targetranges
+#' Find cas9 sites in targetranges
 #' @param targetranges  \code{\link[GenomicRanges]{GRanges-class}}
 #' @param verbose       logical(1)
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' targetranges <- slop_fourways(read_bed(bedfile, bsgenome))
-#' find_cas9ranges(targetranges)
+#' targetranges <- slop_fourways(read_bed(bedfile, 'mm10'))
+#' find_cas9s(targetranges)
 #' @export 
-find_cas9ranges <- function(targetranges, verbose = TRUE){
+find_cas9s <- function(targetranges, verbose = TRUE){
     
     # Assert
     assert_is_identical_to_true(is(targetranges, 'GRanges'))
@@ -91,17 +89,17 @@ find_cas9ranges <- function(targetranges, verbose = TRUE){
 #' # Read target ranges
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' targetranges <- read_bed(bedfile, bsgenome)
+#' targetranges <- read_bed(bedfile, 'mm10')
 #' targetranges %<>% slop_fourways %>% extract(1:10)
 #' 
 #' # Find cas9ranges
-#' cas9ranges <- find_cas9ranges(targetranges)
+#' cas9ranges <- find_cas9s(targetranges)
 #' 
 #' # Count target matches
+#' bsgenome <- get_bsgenome(cas9ranges)
 #' count_target_matches(
-#'     cas9seqs   = getSeq(bsgenome, cas9ranges), 
-#'     targetseqs = getSeq(bsgenome, targetranges), 
+#'     cas9seqs   = getSeq(bsgenome, cas9ranges),
+#'     targetseqs = getSeq(bsgenome, targetranges),
 #'     mismatch   = 0, 
 #'     verbose    = TRUE)
 #' @seealso \code{\link{count_target_matches}}, \code{\link{vcountPDict}}
@@ -146,16 +144,16 @@ count_target_matches <- function(
 #' # Read target ranges
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#' targetranges <- read_bed(bedfile, bsgenome)
+#' targetranges <- read_bed(bedfile, 'mm10')
 #' targetranges %<>% slop_fourways %>% extract(1:10)
 #' 
 #' # Find cas9ranges
-#' cas9ranges <- find_cas9ranges(targetranges)
+#' cas9ranges <- find_cas9s(targetranges)
 #' 
 #' # Count genome matches
+#' bsgenome <- get_bsgenome(cas9ranges)
 #' count_genome_matches(
-#'     cas9seqs    = getSeq(bsgenome, cas9ranges), 
+#'     cas9seqs    = getSeq(bsgenome, cas9ranges),
 #'     bsgenome    = bsgenome, 
 #'     mismatch    = 0, 
 #'     chromosomes = 'chrY',
@@ -197,10 +195,33 @@ count_genome_matches <- function(
     matches
 }
 
+#' Get (canonical) chromosomes
+#' @param gr \code{\link[GenomicRanges]{GRanges-class}}
+#' @return character vector
+#' @examples 
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#' gr <- read_bed(bedfile, 'mm10')
+#' chromosomes(gr)
+#' canonicalchr(gr)
+#' @export
+chromosomes <- function(gr){
+    seqnames(seqinfo(gr))
+}
 
-#' Find target cas9 ranges with no offtargets
+#' @rdname chromosomes
+#' @export
+canonicalchr <- function(gr){
+    chromosomes(gr) %>%
+    extract(stringi::stri_detect_fixed(., '_random', negate = TRUE)) %>% 
+    extract(stringi::stri_detect_fixed(., 'chrUn', negate = TRUE))
+}
+
+#' Find offtarget-free cas9 sites in targetranges
 #' @param targetranges  \code{\link[GenomicRanges]{GRanges-class}}
-#' @param mismatch max number of mismatches to consider
+#' @param mismatch        number: max number of mismatches to consider
+#' @param offtargetchr character vector: chromosomes for offtarget analysis, 
+#'                     probably generated with chromosomes(targetranges) or 
+#'                     canonicalchr(targetranges)
 #' @param verbose  logical(1)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #'         mcols(GRanges) contains sequences and match counts:
@@ -208,17 +229,18 @@ count_genome_matches <- function(
 #'             matches1 = single mismatch counts
 #'             matches2 = double mismatch counts
 #' @examples
-#' \dontrun{
-#'    bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-#'    targetranges <- slop_fourways(read_bed(bedfile, bsgenome)[1:10])
-#'    find_specific_cas9ranges(targetranges, mismatch=0)
-#' }
+#' # Note: restricting example to 'chrY' only to keep it fast
+#' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#' targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) %>% 
+#'                 extract(seqnames(.)=='chrY') %>% 
+#'                 slop_fourways()
+#' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
 #' @export
-find_specific_cas9ranges <- function(
+find_offtargetfree_cas9s <- function(
     targetranges, 
-    mismatch = 2,
-    verbose = TRUE
+    mismatch     = 2,
+    offtargetchr = canonicalchr(targetranges),
+    verbose      = TRUE
 ){
     # Assert
     assertive.types::assert_is_a_number(mismatch)
@@ -226,7 +248,7 @@ find_specific_cas9ranges <- function(
     # Prepare
     bsgenome   <- get_bsgenome(targetranges)
     targetseqs <- seqs(targetranges)
-    cas9ranges <- targetranges %>% find_cas9ranges(verbose = verbose)
+    cas9ranges <- targetranges %>% find_cas9s(verbose = verbose)
     cas9seqdt  <- data.table::data.table(seqs = unique(cas9ranges$seqs))
     
     # Count-store-filter for 0-2 mismatches
@@ -234,10 +256,13 @@ find_specific_cas9ranges <- function(
     for (mis in 0:mismatch){
         if (verbose) cmessage('\t\twith %d mismatch(es)', mis)
         # Count
-        target_matches  <-  cas9seqdt$seqs %>% 
-                            count_target_matches(targetseqs, mis, verbose)
-        genome_matches  <-  cas9seqdt$seqs %>% 
-                            count_genome_matches(bsgenome,   mis, verbose)
+        target_matches  <-  count_target_matches(
+                                cas9seqdt$seqs, targetseqs, mis, 
+                                verbose = verbose)
+        genome_matches  <-  count_genome_matches(
+                                cas9seqdt$seqs, bsgenome, mis, 
+                                chromosomes = offtargetchr, 
+                                verbose = verbose)
         # Store
         cas9seqdt [ , (sprintf('matches%d', mis)) := target_matches ]
         

@@ -26,7 +26,6 @@ Slop granges for both strands, merging overlaps
 }
 \examples{
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-gr <- read_bed(bedfile, bsgenome, plot = FALSE)
+gr <- read_bed(bedfile, 'mm10', plot = FALSE)
 slop_fourways(gr)
 }
