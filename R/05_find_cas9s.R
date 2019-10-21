@@ -1,7 +1,7 @@
 
-#' Get sequence values
-#' @param granges GenomicRanges::GRanges
-#' @return DNAStringSet (get) or GRanges (set)
+#' Convert GRanges into Sequences
+#' @param granges \code{\link[GenomicRanges]{GRanges-class}}
+#' @return character vector
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' granges <- read_bed(bedfile, 'mm10')
@@ -9,7 +9,7 @@
 #' @export
 seqs <- function(granges){
     assert_is_identical_to_true(is(granges, 'GRanges'))
-    BSgenome::getSeq(get_bsgenome(granges), granges) %>% 
+    BSgenome::getSeq(get_bsgenome(granges), granges) %>%
     as.character()
 }
 
