@@ -55,8 +55,8 @@ complement <- function(gr, plot = TRUE, verbose = TRUE){
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' targetranges <- slop_fourways(read_bed(bedfile, 'mm10'))
-#' find_cas9s(targetranges)
+#' gr <- extend(read_bed(bedfile, 'mm10'), plot = FALSE)
+#' find_cas9s(gr)
 #' @export 
 find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
 
@@ -123,7 +123,7 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10')
-#' targetranges %<>% slop_fourways %>% extract(1:10)
+#' targetranges %<>% extend_fourways %>% extract(1:10)
 #' 
 #' # Find cas9ranges
 #' cas9ranges <- find_cas9s(targetranges)
@@ -178,7 +178,7 @@ count_target_matches <- function(
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10')
-#' targetranges %<>% slop_fourways %>% extract(1:10)
+#' targetranges %<>% extend_fourways %>% extract(1:10)
 #' 
 #' # Find cas9ranges
 #' cas9ranges <- find_cas9s(targetranges)
@@ -266,7 +266,7 @@ canonicalchr <- function(gr){
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) %>% 
 #'                 extract(seqnames(.)=='chrY') %>% 
-#'                 slop_fourways()
+#'                 extend_fourways()
 #' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
 #' @export
 find_offtargetfree_cas9s <- function(
