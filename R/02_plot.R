@@ -101,7 +101,7 @@ to_megabase <- function(y){
 
 #' @rdname plot_karyogram
 #' @export
-plot_intervals <- function(grangeslist){
+plot_intervals <- function(grangeslist, title = NULL){
     
     # Comply - Assert - Process
     contig <- group <- .N <- .SD <- tmp <- xstart <- xend <- y <- NULL
@@ -136,7 +136,10 @@ plot_intervals <- function(grangeslist){
         ggplot2::geom_segment(
             ggplot2::aes(x = xstart, xend = xend, y = y, yend = y, color=group),
             arrow = grid::arrow(length = ggplot2::unit(0.1, "inches"))) + 
-        ggplot2::theme_bw()
+        ggplot2::theme_bw() + 
+        ggplot2::xlab('Bases') + 
+        ggplot2::ylab('Megabases') + 
+        ggplot2::ggtitle(title)
 
     # Print and return
     print(p)
