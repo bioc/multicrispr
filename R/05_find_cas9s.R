@@ -49,28 +49,32 @@ complement <- function(gr, plot = TRUE, verbose = TRUE){
 #=============================================================================
 
 #' Find cas9 sites in targetranges
-#' @param targetranges  \code{\link[GenomicRanges]{GRanges-class}}
-#' @param verbose       logical(1)
+#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
+#' @param inclcompl logical(1): include complementary strands in search?
+#' @param verbose   logical(1): report verbosely?
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #' targetranges <- slop_fourways(read_bed(bedfile, 'mm10'))
 #' find_cas9s(targetranges)
 #' @export 
-find_cas9s <- function(targetranges, verbose = TRUE){
-    
+find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
+
     # Assert
-    assert_is_identical_to_true(is(targetranges, 'GRanges'))
+    assert_is_identical_to_true(is(gr, 'GRanges'))
     assert_is_a_bool(verbose)
+    
+    # Add complementary strands
+    if (verbose) message('\tFind N{20}NGG cas9seqs')
+    if (inclcompl) gr %<>% complement(plot = FALSE, verbose = verbose)
     
     # Comply
     start <- substart <- cas9start <- NULL
     end <- subend <- cas9end <- strand <- seqnames <- NULL
     
     # Find cas9s in targetranges
-    if (verbose) message('\tFind N{20}NGG cas9seqs')
-    targetdt <- data.table::as.data.table(targetranges)
-    targetdt [ , seqs := seqs(targetranges) ]
+    targetdt <- data.table::as.data.table(gr)
+    targetdt [ , seqs := seqs(gr) ]
     res <- targetdt$seqs %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
@@ -80,8 +84,7 @@ find_cas9s <- function(targetranges, verbose = TRUE){
     # Rm cas9-free targetranges
     idx <- targetdt[, substart == 'NA']
     if (sum(idx)>0){
-        if (verbose)  cmessage('\t\tRm %d targetranges with no cas9sites', 
-                                sum(idx)) 
+        if (verbose)  cmessage('\t\tRm %d ranges with no cas9sites', sum(idx)) 
         targetdt %<>% extract(!idx)
     }
 
@@ -97,10 +100,10 @@ find_cas9s <- function(targetranges, verbose = TRUE){
         extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
         extract(, list(seqnames = seqnames, start  = cas9start, end = cas9end,  
                        strand   = strand,  seqs    = seqs) ) %>% 
-        unique() %>% as('GRanges') %>% add_seqinfo(get_bsgenome(targetranges))
+        unique() %>% as('GRanges') %>% add_seqinfo(get_bsgenome(gr))
     
     # Return
-    if (verbose)   cmessage('\t\t%d cas9 seqs across %d targetranges', 
+    if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
                             length(unique(seqs(cas9ranges))), 
                             length(cas9ranges))
     return(cas9ranges)
@@ -203,10 +206,10 @@ count_genome_matches <- function(
     assert_is_subset(mismatch, c(0,1,2))
     assert_is_character(chromosomes)
     assert_is_a_bool(verbose)
-    
+
     # Comply
     . <- count <- NULL
-    
+
     # Count
     starttime <- Sys.time()
     exclude  <- setdiff(seqnames(bsgenome), chromosomes)
