@@ -2,9 +2,9 @@
 
 export(EnsDb.Hsapiens.v98)
 export(EnsDb.Mmusculus.v98)
+export(add_inverse_strand)
 export(annotate_granges)
 export(canonicalseqlevels)
-export(complement)
 export(contextseqs)
 export(count_genome_matches)
 export(count_target_matches)

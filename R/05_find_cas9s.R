@@ -13,9 +13,7 @@ seqs <- function(granges){
     as.character()
 }
 
-#' Complement
-#'
-#' Adds inverse strand for each range
+#' Add inverse strand for each range
 #'
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
 #' @param plot     logical(1)
@@ -25,9 +23,9 @@ seqs <- function(granges){
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
-#' complement(gr)
+#' add_inverse_strand(gr)
 #' @export
-complement <- function(gr, plot = TRUE, verbose = TRUE){
+add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
     complements <- invertStrand(gr)
     newranges <- c(gr, complements)
     txt <- sprintf('\t\t%d ranges after adding inverse strands',
@@ -40,7 +38,6 @@ complement <- function(gr, plot = TRUE, verbose = TRUE){
     if (verbose) cmessage(txt)
     newranges
 }
-
 
 
 
@@ -66,7 +63,7 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
     
     # Add complementary strands
     if (verbose) message('\tFind N{20}NGG cas9seqs')
-    if (inclcompl) gr %<>% complement(plot = FALSE, verbose = verbose)
+    if (inclcompl) gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
     
     # Comply
     start <- substart <- cas9start <- NULL
