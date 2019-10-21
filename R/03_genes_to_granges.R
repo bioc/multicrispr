@@ -8,7 +8,7 @@
 #' @examples 
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' granges <- read_bed(bedfile, 'mm10', plot = FALSE)
-#' db <- EnsDb.Mmusculus.v98()
+#' db <- TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene
 #' annotate_granges(granges, db)
 #' @export
 annotate_granges <- function(granges, db){
