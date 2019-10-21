@@ -46,7 +46,7 @@ and specifying a value for either 'python' (python binary path),
     require(magrittr)
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     cas9ranges <- read_bed(bedfile, 'mm10') \%>\% 
-                  flank_fourways() \%>\% 
+                  double_flank() \%>\% 
                   find_cas9ranges()
 # Score
     cas9ranges[1:3] \%>\% score_cas9ranges()
