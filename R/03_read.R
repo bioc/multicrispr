@@ -33,6 +33,7 @@ get_bsgenome <- function(gr){
 #' 
 #' @param bedfile        file path
 #' @param genome         character: e.g. 'mm10'
+#' @param do_order       logical(1)
 #' @param plot           logical(1)
 #' @param verbose        logical(1)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
@@ -42,7 +43,13 @@ get_bsgenome <- function(gr){
 #' @seealso \code{rtracklayer::import.bed} (documented in 
 #' \code{\link[rtracklayer]{BEDFile-class}}), around which this function wraps.
 #' @export
-read_bed <- function(bedfile, genome, plot = TRUE, verbose= TRUE){
+read_bed <- function(
+    bedfile, 
+    genome, 
+    do_order = TRUE,
+    plot     = TRUE, 
+    verbose  = TRUE 
+){
     
     # Assert
     assert_all_are_existing_files(bedfile)
@@ -52,12 +59,16 @@ read_bed <- function(bedfile, genome, plot = TRUE, verbose= TRUE){
 
     # Read
     gr <- rtracklayer::import.bed(bedfile, genome = 'mm10')
-    if (verbose) cmessage('\t\tRanges: %d ranges on %d chromosomes',
+    if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
                             length(gr), length(unique(seqnames(gr))))
     
     # Plot
     title <- paste0(genome, ': ', basename(bedfile))
     if (plot) plot_karyogram(gr, title)
+    
+    # Order
+    if (do_order)
+        gr %<>% extract(order(seqnames(.), start(.)))
     
     # Return
     gr
