@@ -4,12 +4,15 @@
 \alias{read_bed}
 \title{Read bedfile into GRanges}
 \usage{
-read_bed(bedfile, genome, plot = TRUE, verbose = TRUE)
+read_bed(bedfile, genome, do_order = TRUE, plot = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{bedfile}{file path}
 
 \item{genome}{character: e.g. 'mm10'}
+
+\item{do_order}{logical(1)}
 
 \item{plot}{logical(1)}
 

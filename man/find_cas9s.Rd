@@ -4,12 +4,14 @@
 \alias{find_cas9s}
 \title{Find cas9 sites in targetranges}
 \usage{
-find_cas9s(targetranges, verbose = TRUE)
+find_cas9s(gr, inclcompl = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{targetranges}{\code{\link[GenomicRanges]{GRanges-class}}}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{verbose}{logical(1)}
+\item{inclcompl}{logical(1): include complementary strands in search?}
+
+\item{verbose}{logical(1): report verbosely?}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -19,6 +21,6 @@ Find cas9 sites in targetranges
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-targetranges <- slop_fourways(read_bed(bedfile, 'mm10'))
-find_cas9s(targetranges)
+gr <- extend(read_bed(bedfile, 'mm10'), plot = FALSE)
+find_cas9s(gr)
 }

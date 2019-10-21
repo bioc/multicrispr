@@ -10,7 +10,7 @@ plot_karyogram(grangeslist, title = unique(genome(grangeslist)))
 
 plot_tracks(grangeslist)
 
-plot_intervals(grangeslist)
+plot_intervals(grangeslist, title = NULL)
 }
 \arguments{
 \item{grangeslist}{\code{\link[GenomicRanges]{GRanges-class}} or 
@@ -40,4 +40,7 @@ genome tracks (plot_tracks) or intervals (plot_intervals)
   grangeslist <- GenomicRanges::GRangesList(sites = granges, flanks = flanks)
   plot_karyogram(grangeslist)
   plot_intervals(grangeslist)
+}
+\seealso{
+\code{\link[karyoploteR]{plotKaryotype}}, around which this function wraps
 }

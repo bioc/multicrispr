@@ -27,7 +27,7 @@ Count target matches
 require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targetranges <- read_bed(bedfile, 'mm10')
-targetranges \%<>\% slop_fourways \%>\% extract(1:10)
+targetranges \%<>\% extend_fourways \%>\% extract(1:10)
 
 # Find cas9ranges
 cas9ranges <- find_cas9s(targetranges)

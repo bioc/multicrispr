@@ -5,7 +5,7 @@
 \title{Find offtarget-free cas9 sites in targetranges}
 \usage{
 find_offtargetfree_cas9s(targetranges, mismatch = 2,
-  offtargetchr = canonicalchr(targetranges), verbose = TRUE)
+  offtargetchr = canonicalseqlevels(targetranges), verbose = TRUE)
 }
 \arguments{
 \item{targetranges}{\code{\link[GenomicRanges]{GRanges-class}}}
@@ -13,8 +13,8 @@ find_offtargetfree_cas9s(targetranges, mismatch = 2,
 \item{mismatch}{number: max number of mismatches to consider}
 
 \item{offtargetchr}{character vector: chromosomes for offtarget analysis, 
-probably generated with chromosomes(targetranges) or 
-canonicalchr(targetranges)}
+probably generated with genomeInfoDb::seqlevels(targetranges) or 
+canonicalseqlevels(targetranges)}
 
 \item{verbose}{logical(1)}
 }
@@ -33,6 +33,6 @@ Find offtarget-free cas9 sites in targetranges
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) \%>\% 
                 extract(seqnames(.)=='chrY') \%>\% 
-                slop_fourways()
+                extend_fourways()
 find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
 }

@@ -2,18 +2,18 @@
 % Please edit documentation in R/05_find_cas9s.R
 \name{seqs}
 \alias{seqs}
-\title{Get sequence values}
+\title{Convert GRanges into Sequences}
 \usage{
 seqs(granges)
 }
 \arguments{
-\item{granges}{GenomicRanges::GRanges}
+\item{granges}{\code{\link[GenomicRanges]{GRanges-class}}}
 }
 \value{
-DNAStringSet (get) or GRanges (set)
+character vector
 }
 \description{
-Get sequence values
+Convert GRanges into Sequences
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
