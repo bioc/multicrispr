@@ -21,7 +21,7 @@ get_bsgenome <- function(gr){
     . <- NULL
     
     assert_is_identical_to_true(is(gr, 'GRanges'))
-    genome <- unique(unname(genome(gr)))
+    genome <- unique(unname(GenomeInfoDb::genome(gr)))
     assert_is_a_string(genome)
     getBSgenome(genome)
 }
@@ -50,6 +50,7 @@ read_bed <- function(
     plot     = TRUE, 
     verbose  = TRUE 
 ){
+    . <- NULL
     
     # Assert
     assert_all_are_existing_files(bedfile)
@@ -60,7 +61,7 @@ read_bed <- function(
     # Read
     gr <- rtracklayer::import.bed(bedfile, genome = 'mm10')
     if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
-                            length(gr), length(unique(seqnames(gr))))
+                    length(gr), length(unique(GenomeInfoDb::seqnames(gr))))
     
     # Plot
     title <- paste0(genome, ': ', basename(bedfile))
@@ -68,7 +69,7 @@ read_bed <- function(
     
     # Order
     if (do_order)
-        gr %<>% extract(order(seqnames(.), start(.)))
+        gr %<>% extract(order(GenomeInfoDb::seqnames(.), start(.)))
     
     # Return
     gr

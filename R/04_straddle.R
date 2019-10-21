@@ -1,7 +1,7 @@
 
 summarize_loci <- function(gr){
     sprintf('%s:%s-%s', 
-            as.character(seqnames(gr)), 
+            as.character(GenomeInfoDb::seqnames(gr)), 
             start(gr), 
             end(gr))
 }

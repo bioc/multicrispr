@@ -20,8 +20,8 @@ contextify_end <- function(granges){
     
     # Contextify
     end(granges) %<>% add(ifelse(strand(granges) == '+', 3, 4))
-    chrlengths  <-  seqlengths(get_bsgenome(granges)) %>% 
-                    extract(as.character(seqnames(granges)))
+    chrlengths  <-  GenomeInfoDb::seqlengths(get_bsgenome(granges)) %>% 
+                    extract(as.character(GenomeInfoDb::seqnames(granges)))
     assert_all_are_true(granges$contextend < chrlengths)
     
     # Return

@@ -1,9 +1,5 @@
 
-#' Plot GRanges(List)
-#' 
-#' @details Visualize a GRanges(List) as karyogram (plot_karyogram), 
-#' genome tracks (plot_tracks) or intervals (plot_intervals)
-#' 
+#' Karyo/Interval Plot GRanges(List)
 #' @param grangeslist \code{\link[GenomicRanges]{GRanges-class}} or 
 #'                    \code{\link[GenomicRanges]{GRangesList-class}}
 #' @param title plot title
@@ -22,14 +18,17 @@
 #'   plot_karyogram(grangeslist)
 #'   plot_intervals(grangeslist)
 #' @export
-plot_karyogram <- function(grangeslist, title = unique(genome(grangeslist))){
+plot_karyogram <- function(
+    grangeslist, 
+    title = unique(GenomeInfoDb::genome(grangeslist))
+){
     
     # Assert
     if (is(grangeslist, 'GRanges'))  grangeslist <- GRangesList(grangeslist)
     assert_is_identical_to_true(is(grangeslist, 'GRangesList'))
     
     # Extract
-    relevantchroms <- union(seqlevelsInUse(grangeslist), 
+    relevantchroms <- union(GenomeInfoDb::seqlevelsInUse(grangeslist), 
                             canonicalseqlevels(grangeslist))
     genomeranges <- as(GenomeInfoDb::seqinfo(grangeslist)[relevantchroms], 
                         "GRanges")
@@ -60,9 +59,9 @@ plot_tracks <- function(grangeslist){
     group <- . <-  NULL
     
     if (is(grangeslist, 'GRangesList')) granges <- unlist(grangeslist)
-    genome  <- unique(genome(GenomeInfoDb::seqinfo(granges))); 
+    genome  <- unique(GenomeInfoDb::genome(GenomeInfoDb::seqinfo(granges))); 
     assert_is_a_string(genome)
-    chrom   <- unique(as.character(seqnames(granges)))[1]
+    chrom   <- unique(as.character(GenomeInfoDb::seqnames(granges)))[1]
     assert_is_a_string(chrom)
     
     # Find continuum groups

@@ -2,13 +2,11 @@
 % Please edit documentation in R/02_plot.R
 \name{plot_karyogram}
 \alias{plot_karyogram}
-\alias{plot_tracks}
 \alias{plot_intervals}
-\title{Plot GRanges(List)}
+\title{Karyo/Interval Plot GRanges(List)}
 \usage{
-plot_karyogram(grangeslist, title = unique(genome(grangeslist)))
-
-plot_tracks(grangeslist)
+plot_karyogram(grangeslist,
+  title = unique(GenomeInfoDb::genome(grangeslist)))
 
 plot_intervals(grangeslist, title = NULL)
 }
@@ -22,11 +20,7 @@ plot_intervals(grangeslist, title = NULL)
 list (plot_karyogram) or ggplot (plot_intervals)
 }
 \description{
-Plot GRanges(List)
-}
-\details{
-Visualize a GRanges(List) as karyogram (plot_karyogram), 
-genome tracks (plot_tracks) or intervals (plot_intervals)
+Karyo/Interval Plot GRanges(List)
 }
 \examples{
 # Plot GRanges

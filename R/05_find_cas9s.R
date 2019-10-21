@@ -213,7 +213,7 @@ count_genome_matches <- function(
 
     # Count
     starttime <- Sys.time()
-    exclude  <- setdiff(seqnames(bsgenome), chromosomes)
+    exclude  <- setdiff(GenomeInfoDb::seqnames(bsgenome), chromosomes)
     matches  <- Biostrings::vcountPDict(
                     Biostrings::DNAStringSet(cas9seqs),
                     bsgenome,
@@ -246,7 +246,7 @@ count_genome_matches <- function(
 #' # Note: restricting example to 'chrY' only to keep it fast
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) %>% 
-#'                 extract(seqnames(.)=='chrY') %>% 
+#'                 extract(GenomeInfoDb::seqnames(.)=='chrY') %>% 
 #'                 extend_fourways()
 #' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
 #' @export
