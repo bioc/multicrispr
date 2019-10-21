@@ -29,8 +29,9 @@ plot_karyogram <- function(grangeslist, title = unique(genome(grangeslist))){
     assert_is_identical_to_true(is(grangeslist, 'GRangesList'))
     
     # Extract
-    genomeranges <- as(seqinfo(grangeslist)[seqlevelsInUse(grangeslist)], 
-                       "GRanges")
+    relevantchroms <- union(seqlevelsInUse(grangeslist), 
+                            canonicalseqlevels(grangeslist))
+    genomeranges <- as(seqinfo(grangeslist)[relevantchroms], "GRanges")
 
     # Color
     n <- length(grangeslist)
