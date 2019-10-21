@@ -133,7 +133,7 @@ score_contextseqs <- function(
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' cas9ranges  <-  read_bed(bedfile, 'mm10') %>% 
 #'                 double_flank() %>% 
-#'                 find_cas9ranges()
+#'                 find_cas9s()
 #' cas9ranges[1:3] %>% seqs()
 #' cas9ranges[1:3] %>% contextseqs()
 #' @export
@@ -172,7 +172,7 @@ contextseqs <- function(cas9ranges){
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     cas9ranges <- read_bed(bedfile, 'mm10') %>% 
 #'                   double_flank() %>% 
-#'                   find_cas9ranges()
+#'                   find_cas9s()
 #' # Score
 #'     cas9ranges[1:3] %>% score_cas9ranges()
 #'     cas9ranges[1:3] %>% contextseqs() %>% score_contextseqs()
