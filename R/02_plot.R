@@ -31,7 +31,8 @@ plot_karyogram <- function(grangeslist, title = unique(genome(grangeslist))){
     # Extract
     relevantchroms <- union(seqlevelsInUse(grangeslist), 
                             canonicalseqlevels(grangeslist))
-    genomeranges <- as(seqinfo(grangeslist)[relevantchroms], "GRanges")
+    genomeranges <- as(GenomeInfoDb::seqinfo(grangeslist)[relevantchroms], 
+                        "GRanges")
 
     # Color
     n <- length(grangeslist)
@@ -54,13 +55,12 @@ plot_karyogram <- function(grangeslist, title = unique(genome(grangeslist))){
 }
 
 
-#' @rdname plot_karyogram
 plot_tracks <- function(grangeslist){
     
     group <- . <-  NULL
     
     if (is(grangeslist, 'GRangesList')) granges <- unlist(grangeslist)
-    genome  <- unique(genome(seqinfo(granges))); 
+    genome  <- unique(genome(GenomeInfoDb::seqinfo(granges))); 
     assert_is_a_string(genome)
     chrom   <- unique(as.character(seqnames(granges)))[1]
     assert_is_a_string(chrom)

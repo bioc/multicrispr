@@ -4,7 +4,7 @@
 #=============================================================================
 
 add_seqinfo <- function(gr, bsgenome){
-    seqinfo(gr) <- seqinfo(bsgenome)
+    GenomeInfoDb::seqinfo(gr) <- GenomeInfoDb::seqinfo(bsgenome)
     gr
 }
 

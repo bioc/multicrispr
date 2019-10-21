@@ -5,7 +5,7 @@
 \title{Count genome matches}
 \usage{
 count_genome_matches(cas9seqs, bsgenome, mismatch,
-  chromosomes = seqnames(bsgenome), verbose = TRUE)
+  chromosomes = GenomeInfoDb::seqnames(bsgenome), verbose = TRUE)
 }
 \arguments{
 \item{cas9seqs}{character() or \code{\link[Biostrings]{XStringSet-class}}}

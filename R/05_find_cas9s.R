@@ -153,10 +153,11 @@ count_target_matches <- function(
     
     # Count
     starttime <- Sys.time()
-    matches  <- rowSums(vcountPDict(DNAStringSet(cas9seqs),
-                                    DNAStringSet(targetseqs),
-                                    min.mismatch = mismatch,
-                                    max.mismatch = mismatch))
+    matches  <- rowSums(Biostrings::vcountPDict(
+                            Biostrings::DNAStringSet(cas9seqs),
+                            Biostrings::DNAStringSet(targetseqs),
+                            min.mismatch = mismatch,
+                            max.mismatch = mismatch))
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in targetranges: %s',
                             mismatch,
@@ -197,7 +198,7 @@ count_genome_matches <- function(
     cas9seqs, 
     bsgenome, 
     mismatch,
-    chromosomes = seqnames(bsgenome),
+    chromosomes = GenomeInfoDb::seqnames(bsgenome),
     verbose     = TRUE
 ){
     # Assert
@@ -213,11 +214,12 @@ count_genome_matches <- function(
     # Count
     starttime <- Sys.time()
     exclude  <- setdiff(seqnames(bsgenome), chromosomes)
-    matches  <- vcountPDict(DNAStringSet(cas9seqs),
-                            bsgenome,
-                            min.mismatch = mismatch,
-                            max.mismatch = mismatch, 
-                            exclude      = exclude) %>% 
+    matches  <- Biostrings::vcountPDict(
+                    Biostrings::DNAStringSet(cas9seqs),
+                    bsgenome,
+                    min.mismatch = mismatch,
+                    max.mismatch = mismatch, 
+                    exclude      = exclude) %>% 
                 data.table::as.data.table() %>% 
                 extract(, .(n = sum(count)), by ='index') %>%
                 extract2('n') 

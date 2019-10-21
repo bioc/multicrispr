@@ -4,10 +4,8 @@
 #' @import assertive.sets
 #' @import assertive.types
 #' @import BiocGenerics
-#' @import Biostrings
 #' @import BSgenome
 #' @importFrom data.table :=
-#' @import GenomeInfoDb
 #' @import GenomicRanges
 #' @import magrittr
 #' @import methods

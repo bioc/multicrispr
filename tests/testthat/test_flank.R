@@ -2,7 +2,7 @@
 # Create example granges
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 granges <-  GRanges('chr1', '100-200', strand = '-', 
-                    seqinfo = seqinfo(bsgenome))
+                    seqinfo = GenomeInfoDb::seqinfo(bsgenome))
 chrlength <- seqlengths(bsgenome)[['chr1']]
 
 # Test
