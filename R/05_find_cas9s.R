@@ -221,40 +221,19 @@ count_genome_matches <- function(
                 data.table::as.data.table() %>% 
                 extract(, .(n = sum(count)), by ='index') %>%
                 extract2('n') 
-    
+
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',
                             mismatch, format(signif(Sys.time() - starttime, 2)))
     matches
 }
 
-#' Get (canonical) chromosomes
-#' @param gr \code{\link[GenomicRanges]{GRanges-class}}
-#' @return character vector
-#' @examples 
-#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' gr <- read_bed(bedfile, 'mm10')
-#' chromosomes(gr)
-#' canonicalchr(gr)
-#' @export
-chromosomes <- function(gr){
-    seqnames(seqinfo(gr))
-}
-
-#' @rdname chromosomes
-#' @export
-canonicalchr <- function(gr){
-    chromosomes(gr) %>%
-    extract(stringi::stri_detect_fixed(., '_random', negate = TRUE)) %>% 
-    extract(stringi::stri_detect_fixed(., 'chrUn', negate = TRUE))
-}
-
 #' Find offtarget-free cas9 sites in targetranges
 #' @param targetranges  \code{\link[GenomicRanges]{GRanges-class}}
 #' @param mismatch        number: max number of mismatches to consider
 #' @param offtargetchr character vector: chromosomes for offtarget analysis, 
-#'                     probably generated with chromosomes(targetranges) or 
-#'                     canonicalchr(targetranges)
+#'                     probably generated with genomeInfoDb::seqlevels(targetranges) or 
+#'                     canonicalseqlevels(targetranges)
 #' @param verbose  logical(1)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #'         mcols(GRanges) contains sequences and match counts:
@@ -272,7 +251,7 @@ canonicalchr <- function(gr){
 find_offtargetfree_cas9s <- function(
     targetranges, 
     mismatch     = 2,
-    offtargetchr = canonicalchr(targetranges),
+    offtargetchr = canonicalseqlevels(targetranges),
     verbose      = TRUE
 ){
     # Assert
