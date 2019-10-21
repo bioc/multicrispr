@@ -13,6 +13,36 @@ seqs <- function(granges){
     as.character()
 }
 
+#' Complement
+#'
+#' Adds inverse strand for each range
+#'
+#' @param gr \code{\link[GenomicRanges]{GRanges-class}}
+#' @param plot     logical(1)
+#' @param verbose  logical(1)
+#' @return \code{\link[GenomicRanges]{GRanges-class}}, twice as long as input
+#' @examples
+#' require(magrittr)
+#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+#' complement(gr)
+#' @export
+complement <- function(gr, plot = TRUE, verbose = TRUE){
+    complements <- invertStrand(gr)
+    newranges <- c(gr, complements)
+    txt <- sprintf('\t\t%d ranges after adding inverse strands',
+                   length(newranges))
+    if (plot){
+        plot_intervals(
+            GRangesList(original = gr, complements = complements),
+            title = txt)
+    }
+    if (verbose) cmessage(txt)
+    newranges
+}
+
+
+
 
 #=============================================================================
 # Find cas9 ranges
