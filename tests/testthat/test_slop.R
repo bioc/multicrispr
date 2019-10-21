@@ -5,17 +5,17 @@ granges <-  GRanges('chr1', '100-200', strand   = '-',
 chrlength <- seqlengths(bsgenome)[['chr1']]
 
 # Test
-context('slop')
+context('extend')
 
-test_that('slop works', {
-    expect_equal(start(slop(granges, -5, 5)),  start(granges) - 5)
-    expect_equal(  end(slop(granges, -5, 5)),    end(granges) + 5)
+test_that('extend works', {
+    expect_equal(start(extend(granges, -5, 5)),  start(granges) - 5)
+    expect_equal(  end(extend(granges, -5, 5)),    end(granges) + 5)
 })
 
-test_that('slop warns for coordinates < 1', {
-    expect_warning(slop(granges,  -500))
+test_that('extend warns for coordinates < 1', {
+    expect_warning(extend(granges,  -500))
 })
 
-test_that('slop warns for coordinates > chrlength', {
-    expect_warning(slop(granges, 1, 1 + chrlength))
+test_that('extend warns for coordinates > chrlength', {
+    expect_warning(extend(granges, 1, 1 + chrlength))
 })
