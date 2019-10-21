@@ -5,3 +5,10 @@ knitr::opts_chunk$set(
   cache    = TRUE
 )
 
+## ----Flank-----------------------------------------------------------------
+
+targetranges %>% left_flank()
+targetranges %>% right_flank()
+targetranges %>% slop()
+targetranges %<>% flank_fourways()
+
