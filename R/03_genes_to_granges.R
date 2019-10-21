@@ -1,18 +1,22 @@
 
 #' Annotate GRanges
 #' @param granges \code{\link[GenomicRanges]{GRanges-class}}
-#' @param txdb    \code{\link[GenomicFeatures]{TxDb-class}}
+#' @param db      \code{\link[GenomicFeatures]{TxDb-class}} or 
+#'                \code{\link[ensembldb]{EnsDb-class}}
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @seealso \code{\link{genes_to_granges}} (inverse operation)
 #' @examples 
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' granges <- read_bed(bedfile, 'mm10', plot = FALSE)
-#' txdb <- TxDb.Mmusculus.UCSC.mm10.ensGene::TxDb.Mmusculus.UCSC.mm10.ensGene
-#' annotate_granges(granges, txdb)
+#' db <- EnsDb.Mmusculus.v98()
+#' annotate_granges(granges, db)
 #' @export
-annotate_granges <- function(granges, txdb){
+annotate_granges <- function(granges, db){
+    
+    gene_id <- NULL
+    
     granges %>% 
-    plyranges::join_overlap_left(GenomicFeatures::genes(txdb)) %>% 
+    plyranges::join_overlap_left(GenomicFeatures::genes(db)) %>% 
     data.table::as.data.table() %>% 
     extract(!is.na(gene_id) ,  
             gene_id := paste0(gene_id, collapse = ';'), 
@@ -26,43 +30,36 @@ annotate_granges <- function(granges, txdb){
 
 #' Convert geneids into GRanges
 #' @param geneids Entrezg vector
-#' @param txdb    \code{\link[GenomicFeatures]{TxDb-class}}
+#' @param db    \code{\link[GenomicFeatures]{TxDb-class}} or 
+#'                \code{\link[ensembldb]{EnsDb-class}}
 #' @param plot TRUE or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @seealso \code{\link{annotate_granges}} (inverse operation)
 #' @examples
-#' # Mouse - entrezgene
-#'     geneids <- c('100009600', '99889', '99982')
-#'     txdbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
-#'     txdb <- utils::getFromNamespace(txdbname, txdbname)
-#'     genes_to_granges(geneids, txdb)
-#' 
-#' # Mouse - ensembl
-#'     ensdb <- EnsDb.Mmusculus.v98()
-#'     geneids <- names(GenomicFeatures::genes(ensdb))
-#'     genes_to_granges(geneids, ensdb)
-#'     
-#'     txdbname <- 'TxDb.Mmusculus.UCSC.mm10.ensGene'
-#'     txdb <- utils::getFromNamespace(txdbname, txdbname)
-#'     genes_to_granges(geneids, txdb)
-#'     
-#' # Human - entrezgene
-#'     geneids <- c('1', '10', '100')
-#'     txdbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
-#'     txdb <- utils::getFromNamespace(txdbname, txdbname)
-#'     genes_to_granges(geneids, txdb)
-#'     
-#' # Human - ensemblgene
-#'     \dontrun{ # Takes a few minutes
-#'     hub <- AnnotationHub::AnnotationHub()
-#'     query(hub, c("Homo sapiens","EnsDb"))
-#'     ensdb <- hub[["AH75011"]]
-#'     geneids <- names(GenomicFeatures::genes(ensdb))[1:10]
-#'     genes_to_granges(geneids, ensdb)
-#'     }
+#' # Mouse Entrez
+#'     dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
+#'     db <- utils::getFromNamespace(dbname, dbname)
+#'     geneids <- names(GenomicFeatures::genes(db))[1:100]
+#'     genes_to_granges(geneids, db)
+#'
+#' # Human Entrez
+#'     dbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
+#'     db <- utils::getFromNamespace(dbname, dbname)
+#'     geneids <- names(GenomicFeatures::genes(db))[1:100]
+#'     genes_to_granges(geneids, db)
+#'
+#' # Mouse Ensembl
+#'     db <- EnsDb.Mmusculus.v98()
+#'     geneids <- names(GenomicFeatures::genes(db))[1:100]
+#'     genes_to_granges(geneids, db)
+#'
+#' # Human Ensembl
+#'     db <- EnsDb.Hsapiens.v98()
+#'     geneids <- names(GenomicFeatures::genes(db))[1:100]
+#'     genes_to_granges(geneids, db)
 #' @export
-genes_to_granges <- function(geneids, txdb, plot = TRUE){
-    gr <- GenomicFeatures::genes(txdb)[geneids]
+genes_to_granges <- function(geneids, db, plot = TRUE){
+    gr <- GenomicFeatures::genes(db)[geneids]
     if (plot) plot_karyogram(gr)
     gr
 }

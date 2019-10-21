@@ -17,33 +17,33 @@ Get canonical seqlevels
 }
 \examples{
 
-# TxDb mouse
-    txdbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
-    txdb <- utils::getFromNamespace(txdbname, txdbname)
-    gr <- GenomicFeatures::genes(txdb)
+# Mouse entrez
+    dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
+    db <- utils::getFromNamespace(dbname, dbname)
+    gr <- GenomicFeatures::genes(db)
     GenomeInfoDb::seqlevels(gr)
     canonicalseqlevels(gr)
 
-# TxDb Human
-    txdbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
-    txdb <- utils::getFromNamespace(txdbname, txdbname)
-    gr <- GenomicFeatures::genes(txdb)
+# Human entrez
+    dbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
+    db <- utils::getFromNamespace(dbname, dbname)
+    gr <- GenomicFeatures::genes(db)
     GenomeInfoDb::seqlevels(gr)
     canonicalseqlevels(gr)
     
-# EnsDb mouse
-    ensdb <- EnsDb.Mmusculus.v98()
-    gr <- ensembldb::genes(ensdb)
+# Mouse ensembl
+    db <- EnsDb.Mmusculus.v98()
+    gr <- ensembldb::genes(db)
     GenomeInfoDb::seqlevels(gr)
     canonicalseqlevels(gr)
     
-# EnsDb human
-    ensdb <- EnsDb.Hsapiens.v98()
-    gr <- ensembldb::genes(ensdb)
+# Human ensembl
+    db <- EnsDb.Hsapiens.v98()
+    gr <- ensembldb::genes(db)
     GenomeInfoDb::seqlevels(gr)
     canonicalseqlevels(gr)
     
-# Bedfile mouse
+# Mouse Bedfile
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     gr <- read_bed(bedfile, 'mm10', plot = FALSE)
     GenomeInfoDb::seqlevels(gr)

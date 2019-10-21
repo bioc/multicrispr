@@ -4,12 +4,13 @@
 \alias{annotate_granges}
 \title{Annotate GRanges}
 \usage{
-annotate_granges(granges, txdb)
+annotate_granges(granges, db)
 }
 \arguments{
 \item{granges}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{txdb}{\code{\link[GenomicFeatures]{TxDb-class}}}
+\item{db}{\code{\link[GenomicFeatures]{TxDb-class}} or 
+\code{\link[ensembldb]{EnsDb-class}}}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -20,8 +21,8 @@ Annotate GRanges
 \examples{
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 granges <- read_bed(bedfile, 'mm10', plot = FALSE)
-txdb <- TxDb.Mmusculus.UCSC.mm10.ensGene::TxDb.Mmusculus.UCSC.mm10.ensGene
-annotate_granges(granges, txdb)
+db <- EnsDb.Mmusculus.v98()
+annotate_granges(granges, db)
 }
 \seealso{
 \code{\link{genes_to_granges}} (inverse operation)

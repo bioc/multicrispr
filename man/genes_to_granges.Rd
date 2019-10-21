@@ -4,12 +4,13 @@
 \alias{genes_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
-genes_to_granges(geneids, txdb, plot = TRUE)
+genes_to_granges(geneids, db, plot = TRUE)
 }
 \arguments{
 \item{geneids}{Entrezg vector}
 
-\item{txdb}{\code{\link[GenomicFeatures]{TxDb-class}}}
+\item{db}{\code{\link[GenomicFeatures]{TxDb-class}} or 
+\code{\link[ensembldb]{EnsDb-class}}}
 
 \item{plot}{TRUE or FALSE}
 }
@@ -20,35 +21,27 @@ genes_to_granges(geneids, txdb, plot = TRUE)
 Convert geneids into GRanges
 }
 \examples{
-# Mouse - entrezgene
-    geneids <- c('100009600', '99889', '99982')
-    txdbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
-    txdb <- utils::getFromNamespace(txdbname, txdbname)
-    genes_to_granges(geneids, txdb)
+# Mouse Entrez
+    dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
+    db <- utils::getFromNamespace(dbname, dbname)
+    geneids <- names(GenomicFeatures::genes(db))[1:100]
+    genes_to_granges(geneids, db)
 
-# Mouse - ensembl
-    ensdb <- EnsDb.Mmusculus.v98()
-    geneids <- names(GenomicFeatures::genes(ensdb))
-    genes_to_granges(geneids, ensdb)
-    
-    txdbname <- 'TxDb.Mmusculus.UCSC.mm10.ensGene'
-    txdb <- utils::getFromNamespace(txdbname, txdbname)
-    genes_to_granges(geneids, txdb)
-    
-# Human - entrezgene
-    geneids <- c('1', '10', '100')
-    txdbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
-    txdb <- utils::getFromNamespace(txdbname, txdbname)
-    genes_to_granges(geneids, txdb)
-    
-# Human - ensemblgene
-    \dontrun{ # Takes a few minutes
-    hub <- AnnotationHub::AnnotationHub()
-    query(hub, c("Homo sapiens","EnsDb"))
-    ensdb <- hub[["AH75011"]]
-    geneids <- names(GenomicFeatures::genes(ensdb))[1:10]
-    genes_to_granges(geneids, ensdb)
-    }
+# Human Entrez
+    dbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
+    db <- utils::getFromNamespace(dbname, dbname)
+    geneids <- names(GenomicFeatures::genes(db))[1:100]
+    genes_to_granges(geneids, db)
+
+# Mouse Ensembl
+    db <- EnsDb.Mmusculus.v98()
+    geneids <- names(GenomicFeatures::genes(db))[1:100]
+    genes_to_granges(geneids, db)
+
+# Human Ensembl
+    db <- EnsDb.Hsapiens.v98()
+    geneids <- names(GenomicFeatures::genes(db))[1:100]
+    genes_to_granges(geneids, db)
 }
 \seealso{
 \code{\link{annotate_granges}} (inverse operation)
