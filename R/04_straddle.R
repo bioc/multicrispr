@@ -27,11 +27,8 @@ left_flank <- function(
     end(newranges)   <- start(gr) + leftend
     start(newranges) <- start(gr) + leftstart
     txt <- sprintf('\t\t%d left  flanks: [start%s%d, start%s%d]', 
-                   length(newranges),
-                   csign(leftstart), 
-                   abs(leftstart), 
-                   csign(leftend),
-                   abs(leftend))
+                    length(newranges), csign(leftstart), abs(leftstart), 
+                    csign(leftend), abs(leftend))
 
     # Plot, Message, Return
     if (plot){

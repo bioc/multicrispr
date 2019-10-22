@@ -73,9 +73,9 @@ plot_tracks <- function(grangeslist){
                                         chromosome = chrom, 
                                         genome     = genome), 
                         genomeaxis = Gviz::GenomeAxisTrack())
-    selectedgr <- subset(granges, group==1) %>% split(names(.))
-    annottracks <- mapply(Gviz::AnnotationTrack, 
-                          selectedgr, name = names(granges))
+    selectedgr   <- subset(granges, group==1) %>% split(names(.))
+    annottracks  <- mapply( Gviz::AnnotationTrack, 
+                            selectedgr, name = names(granges))
     Gviz::plotTracks(c(coretracks, annottracks), 
                     background.title = 'gray40', 
                     add = TRUE)

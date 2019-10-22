@@ -51,7 +51,7 @@ score_contextseqs_rs1 <- function(
         baseBeforegRNA       = 4, 
         featureWeightMatrix  =  system.file("extdata", 
                                             "DoenchNBT2014.csv", 
-		                                    package = "CRISPRseek") %>% 
+                                            package = "CRISPRseek") %>% 
                                 utils::read.csv(header = TRUE)) %>% 
     extract(, 1)
 }
