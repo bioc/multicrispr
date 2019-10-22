@@ -12,3 +12,6 @@ EnsDb.Mmusculus.v98()
 \description{
 Get EnsDb.Mmusculus.v98 from AnnotationHub
 }
+\examples{
+EnsDb.Mmusculus.v98()
+}

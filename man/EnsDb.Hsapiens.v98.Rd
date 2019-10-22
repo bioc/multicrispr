@@ -12,3 +12,6 @@ EnsDb.Hsapiens.v98()
 \description{
 Get EnsDb.Hsapiens.v98 from AnnotationHub
 }
+\examples{
+EnsDb.Hsapiens.v98()
+}
