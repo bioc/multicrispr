@@ -241,6 +241,7 @@ count_genome_matches <- function(
 #'             matches2 = double mismatch counts
 #' @examples
 #' # Note: restricting example to 'chrY' only to keep it fast
+#' require(magrittr)
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) %>% 
 #'                 extract(GenomeInfoDb::seqnames(.)=='chrY') %>% 
