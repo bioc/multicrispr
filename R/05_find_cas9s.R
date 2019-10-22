@@ -29,7 +29,7 @@ add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
     complements <- invertStrand(gr)
     newranges <- c(gr, complements)
     txt <- sprintf('\t\t%d ranges after adding inverse strands',
-                   length(newranges))
+                    length(newranges))
     if (plot){
         plot_intervals(
             GRangesList(original = gr, complements = complements),
@@ -95,8 +95,8 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
         extract( strand=='+', cas9end   := start + subend   - 1  ) %>%
         extract( strand=='-', cas9start := end   - subend   + 1  ) %>%
         extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
-        extract(, list(seqnames = seqnames, start  = cas9start, end = cas9end,  
-                       strand   = strand,  seqs    = seqs) ) %>% 
+        extract(, list( seqnames = seqnames, start  = cas9start, end = cas9end,  
+                        strand   = strand,  seqs    = seqs) ) %>% 
         unique() %>% as('GRanges') %>% add_seqinfo(get_bsgenome(gr))
     
     # Return
@@ -287,9 +287,9 @@ find_offtargetfree_cas9s <- function(
     }
     
     # Return
-    specificranges  <-  cas9seqdt %>% 
-                        merge(data.table::as.data.table(cas9ranges), 
-                              by = 'seqs') %>% 
+    specificranges  <-  merge(cas9seqdt, 
+                            data.table::as.data.table(cas9ranges), 
+                            by = 'seqs') %>% 
                         as('GRanges') %>% 
                         add_seqinfo(bsgenome)
         
