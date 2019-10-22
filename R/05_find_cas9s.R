@@ -268,13 +268,11 @@ find_offtargetfree_cas9s <- function(
     for (mis in 0:mismatch){
         if (verbose) cmessage('\t\twith %d mismatch(es)', mis)
         # Count
-        target_matches  <-  count_target_matches(
-                                cas9seqdt$seqs, targetseqs, mis, 
-                                verbose = verbose)
-        genome_matches  <-  count_genome_matches(
-                                cas9seqdt$seqs, bsgenome, mis, 
-                                chromosomes = offtargetchr, 
-                                verbose = verbose)
+        target_matches <- count_target_matches(
+                            cas9seqdt$seqs, targetseqs, mis, verbose = verbose)
+        genome_matches <- count_genome_matches(
+                            cas9seqdt$seqs, bsgenome, mis, 
+                            chromosomes = offtargetchr, verbose = verbose)
         # Store
         cas9seqdt [ , (sprintf('matches%d', mis)) := target_matches ]
         
@@ -297,5 +295,4 @@ find_offtargetfree_cas9s <- function(
                             length(unique(specificranges$seqs)), 
                             length(specificranges))
     specificranges
-        
 }
