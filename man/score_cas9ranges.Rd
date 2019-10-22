@@ -19,11 +19,14 @@ github/MicrosoftResearch/azimuth is installed)}
 
 \item{verbose}{logical(1)}
 
-\item{python}{NULL (ruleset=1) or path to a python binary (ruleset=2). See details.}
+\item{python}{NULL (ruleset=1) or path to a python binary (ruleset=2). 
+See details.}
 
-\item{virtualenv}{NULL (ruleset=1) or directory containing python virtualenv (ruleset=2). See details.}
+\item{virtualenv}{NULL (ruleset=1) or directory containing python 
+virtualenv (ruleset=2). See details.}
 
-\item{condaenv}{NULL (ruleset=1) or name of condaenv (ruleset=2). See details.}
+\item{condaenv}{NULL (ruleset=1) or name of condaenv (ruleset=2). 
+See details.}
 
 \item{cas9ranges}{\code{\link[GenomicRanges]{GRanges-class}}}
 }

@@ -161,9 +161,12 @@ contextseqs <- function(cas9ranges){
 #' @param ruleset    1 (default) or 2 (only if python module 
 #'                   github/MicrosoftResearch/azimuth is installed)
 #' @param verbose    logical(1)
-#' @param python     NULL (ruleset=1) or path to a python binary (ruleset=2). See details.
-#' @param virtualenv NULL (ruleset=1) or directory containing python virtualenv (ruleset=2). See details.
-#' @param condaenv   NULL (ruleset=1) or name of condaenv (ruleset=2). See details.
+#' @param python     NULL (ruleset=1) or path to a python binary (ruleset=2). 
+#'                   See details.
+#' @param virtualenv NULL (ruleset=1) or directory containing python 
+#'                   virtualenv (ruleset=2). See details.
+#' @param condaenv   NULL (ruleset=1) or name of condaenv (ruleset=2). 
+#'                   See details.
 #' @return numeric vector
 #' @examples
 #' 

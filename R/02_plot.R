@@ -4,7 +4,8 @@
 #'                    \code{\link[GenomicRanges]{GRangesList-class}}
 #' @param title plot title
 #' @return list (plot_karyogram) or ggplot (plot_intervals)
-#' @seealso  \code{\link[karyoploteR]{plotKaryotype}}, around which this function wraps
+#' @seealso  \code{\link[karyoploteR]{plotKaryotype}}, around which this 
+#'           function wraps
 #' @examples 
 #' # Plot GRanges
 #'   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')

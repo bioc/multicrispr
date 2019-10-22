@@ -95,8 +95,8 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
         extract( strand=='+', cas9end   := start + subend   - 1  ) %>%
         extract( strand=='-', cas9start := end   - subend   + 1  ) %>%
         extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
-        extract(, list( seqnames = seqnames, start  = cas9start, end = cas9end,  
-                        strand   = strand,  seqs    = seqs) ) %>% 
+        extract(, list( seqnames = seqnames, start = cas9start, 
+                        end = cas9end,  strand  = strand,  seqs = seqs)) %>% 
         unique() %>% as('GRanges') %>% add_seqinfo(get_bsgenome(gr))
     
     # Return
@@ -231,8 +231,8 @@ count_genome_matches <- function(
 #' @param targetranges  \code{\link[GenomicRanges]{GRanges-class}}
 #' @param mismatch        number: max number of mismatches to consider
 #' @param offtargetchr character vector: chromosomes for offtarget analysis, 
-#'                     probably generated with genomeInfoDb::seqlevels(targetranges) or 
-#'                     canonicalseqlevels(targetranges)
+#'          probably generated with genomeInfoDb::seqlevels(targetranges) or 
+#'          canonicalseqlevels(targetranges)
 #' @param verbose  logical(1)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #'         mcols(GRanges) contains sequences and match counts:

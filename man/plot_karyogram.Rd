@@ -36,5 +36,6 @@ Karyo/Interval Plot GRanges(List)
   plot_intervals(grangeslist)
 }
 \seealso{
-\code{\link[karyoploteR]{plotKaryotype}}, around which this function wraps
+\code{\link[karyoploteR]{plotKaryotype}}, around which this 
+          function wraps
 }
