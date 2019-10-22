@@ -120,7 +120,7 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10')
-#' targetranges %<>% extend_fourways %>% extract(1:10)
+#' targetranges %<>% extend() %>% extract(1:10)
 #' 
 #' # Find cas9ranges
 #' cas9ranges <- find_cas9s(targetranges)
@@ -176,7 +176,7 @@ count_target_matches <- function(
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10')
-#' targetranges %<>% extend_fourways %>% extract(1:10)
+#' targetranges %<>% extend() %>% extract(1:10)
 #' 
 #' # Find cas9ranges
 #' cas9ranges <- find_cas9s(targetranges)
@@ -244,7 +244,7 @@ count_genome_matches <- function(
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) %>% 
 #'                 extract(GenomeInfoDb::seqnames(.)=='chrY') %>% 
-#'                 extend_fourways()
+#'                 extend()
 #' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
 #' @export
 find_offtargetfree_cas9s <- function(
