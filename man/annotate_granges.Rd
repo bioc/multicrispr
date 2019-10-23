@@ -19,10 +19,18 @@ annotate_granges(granges, db)
 Annotate GRanges
 }
 \examples{
-bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-granges <- read_bed(bedfile, 'mm10', plot = FALSE)
-db <- TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene
-annotate_granges(granges, db)
+# Read 
+    bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
+    granges <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+    
+# Annotate Entrez 
+    dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
+    db <- utils::getFromNamespace(dbname, dbname)
+    annotate_granges(granges, db)
+
+# Annotate Ensembl
+    db <- EnsDb.Mmusculus.v98()
+    annotate_granges(granges, db)
 }
 \seealso{
 \code{\link{genes_to_granges}} (inverse operation)

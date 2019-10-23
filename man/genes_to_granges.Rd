@@ -2,9 +2,12 @@
 % Please edit documentation in R/03_genes_to_granges.R
 \name{genes_to_granges}
 \alias{genes_to_granges}
+\alias{genefile_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
 genes_to_granges(geneids, db, plot = TRUE)
+
+genefile_to_granges(file, db, plot = TRUE)
 }
 \arguments{
 \item{geneids}{Entrezg vector}
@@ -21,27 +24,21 @@ genes_to_granges(geneids, db, plot = TRUE)
 Convert geneids into GRanges
 }
 \examples{
-# Mouse Entrez
-    dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
-    db <- utils::getFromNamespace(dbname, dbname)
-    geneids <- names(GenomicFeatures::genes(db))[1:100]
-    genes_to_granges(geneids, db)
+ # Entrez
+     dbname  <-'TxDb.Mmusculus.UCSC.mm10.knownGene'
+     db      <- utils::getFromNamespace(dbname, dbname)
+     genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
+     genefile_to_granges(genefile, db)
+     geneids <- as.character(read.table(genefile)[[1]])
+     genes_to_granges(geneids, db)
 
-# Human Entrez
-    dbname <- 'TxDb.Hsapiens.UCSC.hg38.knownGene'
-    db <- utils::getFromNamespace(dbname, dbname)
-    geneids <- names(GenomicFeatures::genes(db))[1:100]
-    genes_to_granges(geneids, db)
-
-# Mouse Ensembl
-    db <- EnsDb.Mmusculus.v98()
-    geneids <- names(GenomicFeatures::genes(db))[1:100]
-    genes_to_granges(geneids, db)
-
-# Human Ensembl
-    db <- EnsDb.Hsapiens.v98()
-    geneids <- names(GenomicFeatures::genes(db))[1:100]
-    genes_to_granges(geneids, db)
+# Ensembl
+     db <- EnsDb.Mmusculus.v98()
+     genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
+     genefile_to_granges(genefile, db)
+     geneids <- as.character(read.table(genefile)[[1]])
+     genes_to_granges(geneids, db)
+     
 }
 \seealso{
 \code{\link{annotate_granges}} (inverse operation)
