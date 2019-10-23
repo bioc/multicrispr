@@ -1,30 +1,12 @@
 Package: multicrispr
 Title: Multi-locus crispr design
 Version: 0.1.0
-Authors@R: c(person(given  = "Aditya", family = "Bhagwat", 
-                    role   = c("aut", "cre"), 
-                    email  = "aditya.bhagwat@mpi-bn.mpg.de"), 
-            person( given  = "Mette",  family = "Bentsen", 
-                    role   = "aut", 
-                    email  = "mette.bentsen@mpi-bn.mpg.de"), 
-            person( given  = "Jens", family = "Preussner", 
-                    role   = "aut", 
-                    email  = "jens.preussner@mpi-bn.mpg.de"),
-            person( given  = "Mario", family = "Looso",
-                    role   = "aut", 
-                    email  = "mario.looso@mpi-bn.mpg.de"), 
-            person( given  = "Manuel", family = "Kaulich", 
-                    role   = "ctb",
-                    email  = "kaulich@em.uni-frankfurt.de"),
-            person( given  = "Martin", family = "Wegner", 
-                    role   = "ctb", 
-                    email  = "ma.wegner@em.uni-frankfurt.de"), 
-            person( given  = "Marie", family = "Hebel", 
-                    role   = "ctb", 
-                    email  = "hebel@biochem2.uni-frankfurt.de"), 
-            person( given = "Johannes", family = "Graumann", 
-                    role   = "ctb", 
-                    email  = 'johannes.graumann@mpi-bn.mpg.de'))
+Authors@R: c(person("Aditya",  "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",  c("aut", "cre")),
+            person( "Mette",    "Bentsen",   NULL, "mette.bentsen@mpi-bn.mpg.de",     "ctb"),
+            person( "Jens",     "Preussner", NULL, "jens.preussner@mpi-bn.mpg.de",    "ctb"),
+            person( "Johannes", "Graumann",  NULL, 'johannes.graumann@mpi-bn.mpg.de', "sad"),
+            person( "Manuel",   "Kaulich",   NULL, "mario.looso@mpi-bn.mpg.de",       "sad"),
+            person( "Mario",    "Looso",     NULL, "mario.looso@mpi-bn.mpg.de",     c("sad","rth")))
 Description: Contains functions to facilitate the design of a multi-locus crispr/cas9 library.
 License: GPL
 Encoding: UTF-8
@@ -33,6 +15,7 @@ RoxygenNote: 6.1.1
 Depends:
     R (>= 3.6.0)
 Imports:
+    AnnotationHub,
     assertive.base,
     assertive.files,
     assertive.numbers,
@@ -46,12 +29,14 @@ Imports:
     CRISPRseek,
     data.table,
     GenomeInfoDb,
+    GenomicFeatures,
     GenomicRanges,
     ggplot2,
     Gviz, 
     karyoploteR,
     magrittr,
     methods,
+    plyranges,
     reticulate,
     rtracklayer,
     S4Vectors,
@@ -60,8 +45,11 @@ Imports:
 Suggests: 
     BiocStyle,
     BSgenome.Mmusculus.UCSC.mm10,
+    ensembldb,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    TxDb.Mmusculus.UCSC.mm10.knownGene
 VignetteBuilder: knitr
 biocViews: CRISPR
