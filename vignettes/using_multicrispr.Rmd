@@ -54,6 +54,7 @@ library(multicrispr)
     geneids <- c('100009600', '99889', '99982')
     txdbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
     txdb <- utils::getFromNamespace(txdbname, txdbname)
+    geneids <- names(GenomicFeatures::genes(txdb))[1:100]
     gr <- genes_to_granges(geneids, txdb)
 
     # Ensembl ids -> GRanges

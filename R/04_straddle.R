@@ -126,7 +126,7 @@ extend <- function(
 #' @examples 
 #' # Read ranges
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+#'     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 #' 
 #' # Flank/Extend
 #'     left_flank( gr, -200,  -1)
@@ -201,7 +201,7 @@ straddle <- function(
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+#' gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 #' double_flank(gr)
 #' @export
 double_flank <- function(

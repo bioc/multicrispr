@@ -25,7 +25,7 @@ Karyo/Interval Plot GRanges(List)
 \examples{
 # Plot GRanges
   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-  granges   <- read_bed(bedfile, 'mm10' , plot = FALSE)
+  granges <- bed_to_granges(bedfile, 'mm10' , plot = FALSE)
   plot_karyogram(granges)
   plot_intervals(granges)
   

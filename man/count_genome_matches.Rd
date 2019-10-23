@@ -29,7 +29,7 @@ Count genome matches
 # Read target ranges
 require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-targetranges <- read_bed(bedfile, 'mm10')
+targetranges <- bed_to_granges(bedfile, 'mm10')
 targetranges \%<>\% extend() \%>\% extract(1:10)
 
 # Find cas9ranges

@@ -45,7 +45,7 @@ Get canonical seqlevels
     
 # Mouse Bedfile
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+    gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
     GenomeInfoDb::seqlevels(gr)
     canonicalseqlevels(gr)
     

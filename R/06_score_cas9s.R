@@ -131,7 +131,7 @@ score_contextseqs <- function(
 #' @examples 
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' cas9ranges  <-  read_bed(bedfile, 'mm10') %>% 
+#' cas9ranges  <-  bed_to_granges(bedfile, 'mm10') %>% 
 #'                 double_flank() %>% 
 #'                 find_cas9s()
 #' cas9ranges[1:3] %>% seqs()
@@ -173,7 +173,7 @@ contextseqs <- function(cas9ranges){
 #' # Get cas9ranges
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     cas9ranges <- read_bed(bedfile, 'mm10') %>% 
+#'     cas9ranges <- bed_to_granges(bedfile, 'mm10') %>% 
 #'                   double_flank() %>% 
 #'                   find_cas9s()
 #' # Score

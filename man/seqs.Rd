@@ -17,6 +17,6 @@ Convert GRanges into Sequences
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-granges <- read_bed(bedfile, 'mm10')
+granges <- bed_to_granges(bedfile, 'mm10')
 seqs(granges)
 }

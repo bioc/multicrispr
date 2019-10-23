@@ -14,7 +14,7 @@ add_seqinfo <- function(gr, bsgenome){
 #' @return BSgenome
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' gr <- read_bed(bedfile, 'mm10')
+#' gr <- bed_to_granges(bedfile, 'mm10')
 #' get_bsgenome(gr)
 #' @export
 get_bsgenome <- function(gr){
@@ -32,20 +32,20 @@ get_bsgenome <- function(gr){
 #' Read bedfile into granges and output graphical and textual summaries
 #' 
 #' @param bedfile        file path
-#' @param genome         character: e.g. 'mm10'
+#' @param genome         genome identifier ('mm10')
 #' @param do_order       logical(1)
 #' @param plot           logical(1)
 #' @param verbose        logical(1)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' read_bed(bedfile, 'mm10')
+#' bed_to_granges(bedfile, 'mm10')
 #' @seealso \code{rtracklayer::import.bed} (documented in 
 #' \code{\link[rtracklayer]{BEDFile-class}}), around which this function wraps.
 #' @export
-read_bed <- function(
+bed_to_granges <- function(
     bedfile, 
-    genome, 
+    genome   = NULL, 
     do_order = TRUE,
     plot     = TRUE, 
     verbose  = TRUE 
@@ -54,12 +54,11 @@ read_bed <- function(
     
     # Assert
     assert_all_are_existing_files(bedfile)
-    assert_is_character(genome)
     assert_is_a_bool(plot)
     assert_is_a_bool(verbose)
 
     # Read
-    gr <- rtracklayer::import.bed(bedfile, genome = 'mm10')
+    gr <- rtracklayer::import.bed(bedfile, genome = genome)
     if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
                     length(gr), length(unique(GenomeInfoDb::seqnames(gr))))
     

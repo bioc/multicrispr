@@ -32,7 +32,7 @@ Find offtarget-free cas9 sites in targetranges
 # Note: restricting example to 'chrY' only to keep it fast
 require(magrittr)
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) \%>\% 
+targetranges <- bed_to_granges(bedfile, 'mm10', plot = FALSE) \%>\% 
                 extract(GenomeInfoDb::seqnames(.)=='chrY') \%>\% 
                 extend()
 find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')

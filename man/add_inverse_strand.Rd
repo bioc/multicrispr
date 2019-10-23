@@ -22,6 +22,6 @@ Add inverse strand for each range
 \examples{
 require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 add_inverse_strand(gr)
 }

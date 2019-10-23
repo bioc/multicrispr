@@ -21,6 +21,6 @@ Find cas9 sites in targetranges
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-gr <- extend(read_bed(bedfile, 'mm10'), plot = FALSE)
+gr <- extend(bed_to_granges(bedfile, 'mm10'), plot = FALSE)
 find_cas9s(gr)
 }

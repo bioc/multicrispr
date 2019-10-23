@@ -32,6 +32,6 @@ Flank left and right and merge overlaps
 }
 \examples{
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 double_flank(gr)
 }

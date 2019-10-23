@@ -4,7 +4,7 @@
 #' @return character vector
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' granges <- read_bed(bedfile, 'mm10')
+#' granges <- bed_to_granges(bedfile, 'mm10')
 #' seqs(granges)
 #' @export
 seqs <- function(granges){
@@ -22,7 +22,7 @@ seqs <- function(granges){
 #' @examples
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' gr <- read_bed(bedfile, 'mm10', plot = FALSE)
+#' gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 #' add_inverse_strand(gr)
 #' @export
 add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
@@ -52,7 +52,7 @@ add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' gr <- extend(read_bed(bedfile, 'mm10'), plot = FALSE)
+#' gr <- extend(bed_to_granges(bedfile, 'mm10'), plot = FALSE)
 #' find_cas9s(gr)
 #' @export 
 find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
@@ -119,7 +119,7 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
 #' # Read target ranges
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' targetranges <- read_bed(bedfile, 'mm10')
+#' targetranges <- bed_to_granges(bedfile, 'mm10')
 #' targetranges %<>% extend() %>% extract(1:10)
 #' 
 #' # Find cas9ranges
@@ -175,7 +175,7 @@ count_target_matches <- function(
 #' # Read target ranges
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' targetranges <- read_bed(bedfile, 'mm10')
+#' targetranges <- bed_to_granges(bedfile, 'mm10')
 #' targetranges %<>% extend() %>% extract(1:10)
 #' 
 #' # Find cas9ranges
@@ -243,7 +243,7 @@ count_genome_matches <- function(
 #' # Note: restricting example to 'chrY' only to keep it fast
 #' require(magrittr)
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' targetranges <- read_bed(bedfile, 'mm10', plot = FALSE) %>% 
+#' targetranges <- bed_to_granges(bedfile, 'mm10', plot = FALSE) %>% 
 #'                 extract(GenomeInfoDb::seqnames(.)=='chrY') %>% 
 #'                 extend()
 #' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
