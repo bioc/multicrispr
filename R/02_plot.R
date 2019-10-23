@@ -28,10 +28,19 @@ plot_karyogram <- function(
     if (is(grangeslist, 'GRanges'))  grangeslist <- GRangesList(grangeslist)
     assert_is_identical_to_true(is(grangeslist, 'GRangesList'))
     
-    # Extract
-    relevantchroms <- union(GenomeInfoDb::seqlevelsInUse(grangeslist), 
-                            canonicalseqlevels(grangeslist))
-    genomeranges <- as(GenomeInfoDb::seqinfo(grangeslist)[relevantchroms], 
+    # Extract relevant chromosomes and order them
+    chroms <- union(GenomeInfoDb::seqlevelsInUse(grangeslist), 
+                    canonicalseqlevels(grangeslist))
+    stri_extract <- function(stri, pattern){
+        stri %>% extract(stringi::stri_detect_regex(., pattern)) 
+    }
+    chrs1  <- chroms %>% stri_extract('^(chr)?[0-9]$')    %>% sort()
+    chrs2  <- chroms %>% stri_extract('^(chr)?[0-9]{2}$') %>% sort()
+    chrsXY <- chroms %>% stri_extract('^(chr)?[XY]$')     %>% sort()
+    chrsM  <- chroms %>% stri_extract('^(chr)?MT?$')
+    orderedchrs <-  c(chrs1, chrs2, chrsXY, chrsM) %>% 
+                    c(sort(setdiff(chroms, .)))
+    genomeranges <- as(GenomeInfoDb::seqinfo(grangeslist)[orderedchrs],
                         "GRanges")
 
     # Color
