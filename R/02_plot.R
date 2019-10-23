@@ -25,6 +25,7 @@ plot_karyogram <- function(
 ){
     
     # Assert
+    . <- NULL
     if (is(grangeslist, 'GRanges'))  grangeslist <- GRangesList(grangeslist)
     assert_is_identical_to_true(is(grangeslist, 'GRangesList'))
     
