@@ -53,9 +53,9 @@ bed_to_granges <- function(
     . <- NULL
     
     # Assert
-    assert_all_are_existing_files(bedfile)
-    assert_is_a_bool(plot)
-    assert_is_a_bool(verbose)
+    assertive.files::assert_all_are_existing_files(bedfile)
+    assertive.types::assert_is_a_bool(plot)
+    assertive.types::assert_is_a_bool(verbose)
 
     # Read
     gr <- rtracklayer::import.bed(bedfile, genome = genome)

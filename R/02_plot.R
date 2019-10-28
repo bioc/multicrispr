@@ -27,7 +27,7 @@ plot_karyogram <- function(
     # Assert
     . <- NULL
     if (is(grangeslist, 'GRanges'))  grangeslist <- GRangesList(grangeslist)
-    assert_is_identical_to_true(is(grangeslist, 'GRangesList'))
+    assertive.types::assert_is_all_of(grangeslist, 'GRangesList')
     
     # Extract relevant chromosomes and order them
     chroms <- union(GenomeInfoDb::seqlevelsInUse(grangeslist), 
@@ -71,9 +71,9 @@ plot_tracks <- function(grangeslist){
     
     if (is(grangeslist, 'GRangesList')) granges <- unlist(grangeslist)
     genome  <- unique(GenomeInfoDb::genome(GenomeInfoDb::seqinfo(granges))); 
-    assert_is_a_string(genome)
+    assertive.types::assert_is_a_string(genome)
     chrom   <- unique(as.character(GenomeInfoDb::seqnames(granges)))[1]
-    assert_is_a_string(chrom)
+    assertive.types::assert_is_a_string(chrom)
     
     # Find continuum groups
     granges$group <- findOverlaps(  granges, maxgap = 1, ignore.strand = TRUE, 
@@ -115,7 +115,7 @@ plot_intervals <- function(grangeslist, title = NULL){
     
     # Comply - Assert - Process
     contig <- group <- .N <- .SD <- tmp <- xstart <- xend <- y <- NULL
-    assert_is_any_of(grangeslist, c('GRanges', 'GRangesList'))
+    assertive.types::assert_is_any_of(grangeslist, c('GRanges', 'GRangesList'))
     granges <-  if (is(grangeslist, 'GRangesList')){  unlist(grangeslist)
                 } else {                              grangeslist    }
 

@@ -8,7 +8,7 @@
 #' seqs(granges)
 #' @export
 seqs <- function(granges){
-    assert_is_identical_to_true(is(granges, 'GRanges'))
+    assertive.types::assert_is_all_of(granges, 'GRanges')
     BSgenome::getSeq(get_bsgenome(granges), granges) %>%
     as.character()
 }
@@ -58,8 +58,8 @@ add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
 find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
 
     # Assert
-    assert_is_identical_to_true(is(gr, 'GRanges'))
-    assert_is_a_bool(verbose)
+    assertive.types::assert_is_all_of(gr, 'GRanges')
+    assertive.types::assert_is_a_bool(verbose)
     
     # Add complementary strands
     if (verbose) message('\tFind N{20}NGG cas9seqs')
