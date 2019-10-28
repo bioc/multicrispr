@@ -70,11 +70,11 @@ score_contextseqs_rs2 <- function(
     if (!is.null(condaenv))     reticulate::use_condaenv(condaenv)
     
     # Assert
-    assert_is_unix() & 
-    is_identical_to_true(reticulate::py_module_available('azimuth'))
-    assert_is_character(contextseqs)
-    assert_all_are_true(nchar(contextseqs)==30)
-    assert_is_a_bool(verbose)
+    assertive.reflection::assert_is_unix() & 
+    assertive.base::is_identical_to_true(reticulate::py_module_available('azimuth'))
+    assertive.types::assert_is_character(contextseqs)
+    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
+    assertive.types::assert_is_a_bool(verbose)
     
     # Message
     if (verbose)  message(  '\tScore contextseqs (4-23-3) with ruleset2',

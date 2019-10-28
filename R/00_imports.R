@@ -1,8 +1,3 @@
-#' @import      assertive.base
-#' @import      assertive.files
-#' @import      assertive.reflection
-#' @import      assertive.sets
-#' @import      assertive.types
 #' @importFrom  data.table       :=
 #' @import      BiocGenerics
 #' @import      BSgenome
