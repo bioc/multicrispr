@@ -198,7 +198,7 @@ score_cas9ranges <- function(
     condaenv   = NULL
 ){
     # Assert
-    assert_is_identical_to_true(methods::is(cas9ranges, 'GRanges'))
+    assertive.types::assert_is_all_of(cas9ranges, 'GRanges')
 
     # Score
     cas9ranges    %>% 
@@ -209,5 +209,4 @@ score_cas9ranges <- function(
         python     = python, 
         virtualenv = virtualenv, 
         condaenv   = condaenv)
-
 }

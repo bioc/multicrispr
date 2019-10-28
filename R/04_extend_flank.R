@@ -17,10 +17,10 @@ left_flank <- function(
     verbose    = TRUE
 ){
     # Assert
-    assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(leftstart)
-    assert_is_a_number(leftend)
-    assert_is_a_bool(verbose)
+    assertive.types::assert_is_any_of(gr, 'GRanges')
+    assertive.types::assert_is_a_number(leftstart)
+    assertive.types::assert_is_a_number(leftend)
+    assertive.types::assert_is_a_bool(verbose)
     
     # Flank
     newranges <- gr
@@ -50,10 +50,10 @@ right_flank <- function(
     verbose    = TRUE
 ){
     # Assert
-    assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(rightstart)
-    assert_is_a_number(rightend)
-    assert_is_a_bool(verbose)
+    assertive.types::assert_is_any_of(gr, 'GRanges')
+    assertive.types::assert_is_a_number(rightstart)
+    assertive.types::assert_is_a_number(rightend)
+    assertive.types::assert_is_a_bool(verbose)
     
     # Flank
     newranges <- gr
@@ -87,10 +87,10 @@ extend <- function(
 ){
 
     # Assert
-    assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(leftstart)
-    assert_is_a_number(rightend)
-    assert_is_a_bool(verbose)
+    assertive.types::assert_is_any_of(gr, 'GRanges')
+    assertive.types::assert_is_a_number(leftstart)
+    assertive.types::assert_is_a_number(rightend)
+    assertive.types::assert_is_a_bool(verbose)
     
     # Extend
     newranges <- gr
