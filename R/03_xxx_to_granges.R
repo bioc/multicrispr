@@ -188,7 +188,7 @@ bed_to_granges <- function(
 #' @param geneids Entrez Gene identifier vector
 #' @param BSgenome \code{\link[BSgenome]{BSgenome-class}} or NULL. 
 #'                 If specified, used to extract and add sequence to GRanges.
-#' @param db      \code{\link[GenomicFeatures]{TxDb-class}} or 
+#' @param txdb      \code{\link[GenomicFeatures]{TxDb-class}} or 
 #'                \code{\link[ensembldb]{EnsDb-class}}
 #' @param addseq  logical(1)
 #' @param plot    TRUE or FALSE
@@ -201,35 +201,35 @@ bed_to_granges <- function(
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #' genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
 #' geneids  <- as.character(read.table(genefile)[[1]])
-#' db       <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+#' txdb       <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
 #'                                     'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#' gr <- genes_to_granges(geneids, db)
-#' gr <- genes_to_granges(geneids, db, bsgenome)
-#' gr <- genefile_to_granges(genefile, db)
-#' gr <- genefile_to_granges(genefile, db, bsgenome)
+#' gr <- genes_to_granges(geneids, txdb)
+#' gr <- genes_to_granges(geneids, txdb, bsgenome)
+#' gr <- genefile_to_granges(genefile, txdb)
+#' gr <- genefile_to_granges(genefile, txdb, bsgenome)
 #'
 #' # Ensembl
 #' #--------
-#' db <- EnsDb.Mmusculus.v98()
+#' txdb <- EnsDb.Mmusculus.v98()
 #' genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
 #' geneids <- as.character(read.table(genefile)[[1]])
-#' gr <- genes_to_granges(geneids, db)
-#' gr <- genes_to_granges(geneids, db, bsgenome)
-#' gr <- genefile_to_granges(genefile, db)
-#' gr <- genefile_to_granges(genefile, db, bsgenome)
+#' gr <- genes_to_granges(geneids, txdb)
+#' gr <- genes_to_granges(geneids, txdb, bsgenome)
+#' gr <- genefile_to_granges(genefile, txdb)
+#' gr <- genefile_to_granges(genefile, txdb, bsgenome)
 #' @export
-genes_to_granges <- function(geneids, db, bsgenome = NULL, plot = TRUE){
+genes_to_granges <- function(geneids, txdb, bsgenome = NULL, plot = TRUE){
     
     # Assert
     assertive.types::assert_is_character(geneids)
-    assertive.types::assert_is_any_of(db, c('TxDb', 'EnsDb'))
+    assertive.types::assert_is_any_of(txdb, c('TxDb', 'EnsDb'))
     if (!is.null(bsgenome)){
         assertive.types::assert_is_any_of(bsgenome, 'BSgenome')
     }
     assertive.types::assert_is_a_bool(plot)
     
     # Convert
-    gr <- GenomicFeatures::genes(db)[geneids]
+    gr <- GenomicFeatures::genes(txdb)[geneids]
     if (!is.null(bsgenome)){
         cmessage('\t\tAdd seq')
         if (seqlevelsStyle(bsgenome)[1] != seqlevelsStyle(gr)[1]){
@@ -249,10 +249,10 @@ genes_to_granges <- function(geneids, db, bsgenome = NULL, plot = TRUE){
 
 #' @rdname genes_to_granges
 #' @export
-genefile_to_granges <- function(file, db, bsgenome = NULL, plot = TRUE){
+genefile_to_granges <- function(file, txdb, bsgenome = NULL, plot = TRUE){
     assertive.files::assert_all_are_existing_files(file)
     geneids <- utils::read.table(file)[[1]] %>% as.character()
-    genes_to_granges(geneids, db, bsgenome = bsgenome, plot = plot)
+    genes_to_granges(geneids, txdb, bsgenome = bsgenome, plot = plot)
 }
 
 

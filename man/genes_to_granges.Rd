@@ -5,14 +5,14 @@
 \alias{genefile_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
-genes_to_granges(geneids, db, bsgenome = NULL, plot = TRUE)
+genes_to_granges(geneids, txdb, bsgenome = NULL, plot = TRUE)
 
-genefile_to_granges(file, db, bsgenome = NULL, plot = TRUE)
+genefile_to_granges(file, txdb, bsgenome = NULL, plot = TRUE)
 }
 \arguments{
 \item{geneids}{Entrez Gene identifier vector}
 
-\item{db}{\code{\link[GenomicFeatures]{TxDb-class}} or 
+\item{txdb}{\code{\link[GenomicFeatures]{TxDb-class}} or 
 \code{\link[ensembldb]{EnsDb-class}}}
 
 \item{plot}{TRUE or FALSE}
@@ -37,22 +37,22 @@ Convert geneids into GRanges
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
 geneids  <- as.character(read.table(genefile)[[1]])
-db       <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+txdb       <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
                                     'TxDb.Mmusculus.UCSC.mm10.knownGene')
-gr <- genes_to_granges(geneids, db)
-gr <- genes_to_granges(geneids, db, bsgenome)
-gr <- genefile_to_granges(genefile, db)
-gr <- genefile_to_granges(genefile, db, bsgenome)
+gr <- genes_to_granges(geneids, txdb)
+gr <- genes_to_granges(geneids, txdb, bsgenome)
+gr <- genefile_to_granges(genefile, txdb)
+gr <- genefile_to_granges(genefile, txdb, bsgenome)
 
 # Ensembl
 #--------
-db <- EnsDb.Mmusculus.v98()
+txdb <- EnsDb.Mmusculus.v98()
 genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
 geneids <- as.character(read.table(genefile)[[1]])
-gr <- genes_to_granges(geneids, db)
-gr <- genes_to_granges(geneids, db, bsgenome)
-gr <- genefile_to_granges(genefile, db)
-gr <- genefile_to_granges(genefile, db, bsgenome)
+gr <- genes_to_granges(geneids, txdb)
+gr <- genes_to_granges(geneids, txdb, bsgenome)
+gr <- genefile_to_granges(genefile, txdb)
+gr <- genefile_to_granges(genefile, txdb, bsgenome)
 }
 \seealso{
 \code{\link{annotate_granges}} (inverse operation)
