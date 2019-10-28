@@ -33,7 +33,6 @@ targetranges \%<>\% extend() \%>\% extract(1:10)
 cas9ranges <- find_cas9s(targetranges)
 
 # Count target matches
-bsgenome <- get_bsgenome(cas9ranges)
 count_target_matches(
     cas9seqs   = seqs(cas9ranges, bsgenome),
     targetseqs = seqs(targetranges, bsgenome),

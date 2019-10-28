@@ -4,13 +4,15 @@
 \alias{filter_no_offtargets}
 \title{Filter for specific (i.e. offtarget-free) cas9 sites}
 \usage{
-filter_no_offtargets(cas9ranges, targetranges, mismatch = 2,
+filter_no_offtargets(cas9ranges, targetranges, bsgenome, mismatch = 2,
   offtargetchr = canonicalseqlevels(targetranges), verbose = TRUE)
 }
 \arguments{
 \item{cas9ranges}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{targetranges}{\code{\link[GenomicRanges]{GRanges-class}}}
+
+\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{mismatch}{number: max number of mismatches to consider}
 
@@ -38,5 +40,7 @@ bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 targetranges <- bed_to_granges(bedfile, bsgenome, plot = FALSE) \%>\% 
                 extract(GenomeInfoDb::seqnames(.)=='chrY') \%>\% 
                 extend()
-find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
+cas9ranges <- find_cas9s(targetranges, bsgenome)
+find_offtargetfree_cas9s(cas9ranges, targetranges, bsgenome, mismatch = 0, 
+                         offtargetchr = 'chrY')
 }

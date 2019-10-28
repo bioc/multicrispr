@@ -35,21 +35,21 @@ add_seqinfo <- function(gr, bsgenome){
 
 #' Get BSgenome
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
-#' @return BSgenome
-#' @examples 
-#' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' gr <- bed_to_granges(bedfile, bsgenome)
-#' get_bsgenome(gr)
-#' @export
-get_bsgenome <- function(gr){
-    . <- NULL
-    
-    assert_is_identical_to_true(is(gr, 'GRanges'))
-    genome <- unique(unname(GenomeInfoDb::genome(gr)))
-    assert_is_a_string(genome)
-    getBSgenome(genome)
-}
+# @return BSgenome
+# @examples 
+# bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+# bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+# gr <- bed_to_granges(bedfile, bsgenome)
+# get_bsgenome(gr)
+# @export
+#get_bsgenome <- function(gr){
+#    . <- NULL
+#    
+#    assert_is_identical_to_true(is(gr, 'GRanges'))
+#    genome <- unique(unname(GenomeInfoDb::genome(gr)))
+#    assert_is_a_string(genome)
+#    getBSgenome(genome)
+#}
 
 
 #' Annotate GRanges

@@ -2,20 +2,23 @@
 % Please edit documentation in R/03_xxx_to_granges.R
 \name{annotate_granges}
 \alias{annotate_granges}
-\title{Annotate GRanges}
+\title{Get BSgenome}
 \usage{
 annotate_granges(gr, txdb)
 }
 \arguments{
-\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}
+Annotate GRanges}
 
 \item{txdb}{\code{\link[GenomicFeatures]{TxDb-class}}}
+
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
-Annotate GRanges
+Get BSgenome
 }
 \examples{
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')

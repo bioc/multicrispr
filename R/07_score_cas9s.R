@@ -12,15 +12,15 @@ contextify_start <- function(gr){
 }
 
 
-contextify_end <- function(gr){
+contextify_end <- function(gr, bsgenome){
 
     # Assert
-    assert_is_identical_to_true(is(gr, 'GRanges'))
+    assertive.base::assert_is_identical_to_true(is(gr, 'GRanges'))
     
     # Contextify
     end(gr) %<>% add(ifelse(strand(gr) == '+', 3, 4))
-    chrlengths  <-  GenomeInfoDb::seqlengths(get_bsgenome(gr)) %>% 
-                    extract(as.character(GenomeInfoDb::seqnames(gr)))
+    chrlengths  <-  seqlengths(bsgenome) %>% 
+                    extract(as.character(seqnames(gr)))
     assert_all_are_true(gr$contextend < chrlengths)
     
     # Return
@@ -37,9 +37,9 @@ score_contextseqs_rs1 <- function(
 ){
     
     # Assert
-    assert_is_character(contextseqs)
-    assert_all_are_true(nchar(contextseqs)==30)
-    assert_is_a_bool(verbose)
+    assertive.types::assert_is_character(contextseqs)
+    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
+    assertive.types::assert_is_a_bool(verbose)
     
     # Message
     if (verbose)  message('\tScore contextseqs (4-23-3) with ruleset1')
@@ -105,8 +105,8 @@ score_contextseqs <- function(
 ){
     
     # Assert
-    assert_is_a_number(ruleset)
-    assert_is_subset(ruleset, c('1', '2'))
+    assertive.types::assert_is_a_number(ruleset)
+    assertive.sets::assert_is_subset(ruleset, c('1', '2'))
     
     # Score
     scorefun <- switch(ruleset, `1` = score_contextseqs_rs1, 
@@ -139,10 +139,10 @@ score_contextseqs <- function(
 #' cas9ranges[1:3] %>% contextseqs()
 #' @export
 contextseqs <- function(cas9ranges, bsgenome){
-    cas9ranges          %>% 
-    contextify_start()  %>%
-    contextify_end()    %>% 
-    seqs(bsgenome)      %>% 
+    cas9ranges                %>% 
+    contextify_start()        %>%
+    contextify_end(bsgenome)  %>% 
+    seqs(bsgenome)            %>% 
     as.character()
 }
 

@@ -18,7 +18,6 @@
 #' cas9ranges <- find_cas9s(targetranges)
 #' 
 #' # Count target matches
-#' bsgenome <- get_bsgenome(cas9ranges)
 #' count_target_matches(
 #'     cas9seqs   = seqs(cas9ranges, bsgenome),
 #'     targetseqs = seqs(targetranges, bsgenome),
@@ -75,7 +74,6 @@ count_target_matches <- function(
 #' cas9ranges <- find_cas9s(targetranges)
 #' 
 #' # Count genome matches
-#' bsgenome <- get_bsgenome(cas9ranges)
 #' count_genome_matches(
 #'     cas9seqs    = getSeq(bsgenome, cas9ranges),
 #'     bsgenome    = bsgenome, 
@@ -123,6 +121,7 @@ count_genome_matches <- function(
 #' Filter for specific (i.e. offtarget-free) cas9 sites
 #' @param cas9ranges    \code{\link[GenomicRanges]{GRanges-class}}
 #' @param targetranges  \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome      \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatch        number: max number of mismatches to consider
 #' @param offtargetchr character vector: chromosomes for offtarget analysis, 
 #'          probably generated with genomeInfoDb::seqlevels(targetranges) or 
@@ -141,11 +140,14 @@ count_genome_matches <- function(
 #' targetranges <- bed_to_granges(bedfile, bsgenome, plot = FALSE) %>% 
 #'                 extract(GenomeInfoDb::seqnames(.)=='chrY') %>% 
 #'                 extend()
-#' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')
+#' cas9ranges <- find_cas9s(targetranges, bsgenome)
+#' find_offtargetfree_cas9s(cas9ranges, targetranges, bsgenome, mismatch = 0, 
+#'                          offtargetchr = 'chrY')
 #' @export
 filter_no_offtargets <- function(
     cas9ranges, 
     targetranges,
+    bsgenome, 
     mismatch     = 2,
     offtargetchr = canonicalseqlevels(targetranges),
     verbose      = TRUE

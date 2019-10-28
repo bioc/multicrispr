@@ -3,6 +3,7 @@
 #' @import      BSgenome
 #' @importFrom  GenomeInfoDb     genome
 #' @importFrom  GenomeInfoDb     seqinfo           seqinfo<-
+#' @importFrom  GenomeInfoDb     seqlengths
 #' @importFrom  GenomeInfoDb     seqlevels         seqlevels<-
 #' @importFrom  GenomeInfoDb     seqlevelsInUse
 #' @importFrom  GenomeInfoDb     seqlevelsStyle    seqlevelsStyle<-
