@@ -25,13 +25,14 @@ Karyo/Interval Plot GRanges(List)
 \examples{
 # Plot GRanges
   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-  granges <- bed_to_granges(bedfile, 'mm10' , plot = FALSE)
-  plot_karyogram(granges)
-  plot_intervals(granges)
+  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+  gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+  plot_karyogram(gr)
+  plot_intervals(gr)
   
 # Plot GRangesList
-  flanks  <- left_flank(granges)
-  grangeslist <- GenomicRanges::GRangesList(sites = granges, flanks = flanks)
+  flanks  <- left_flank(gr)
+  grangeslist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
   plot_karyogram(grangeslist)
   plot_intervals(grangeslist)
 }

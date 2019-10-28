@@ -5,9 +5,9 @@
 \alias{genefile_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
-genes_to_granges(geneids, db, plot = TRUE)
+genes_to_granges(geneids, db, bsgenome = NULL, plot = TRUE)
 
-genefile_to_granges(file, db, plot = TRUE)
+genefile_to_granges(file, db, bsgenome = NULL, plot = TRUE)
 }
 \arguments{
 \item{geneids}{Entrez Gene identifier vector}
@@ -18,6 +18,11 @@ genefile_to_granges(file, db, plot = TRUE)
 \item{plot}{TRUE or FALSE}
 
 \item{file}{Entrez Gene identifier file (one per row)}
+
+\item{BSgenome}{\code{\link[BSgenome]{BSgenome-class}} or NULL. 
+If specified, used to extract and add sequence to GRanges.}
+
+\item{addseq}{logical(1)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -26,21 +31,28 @@ genefile_to_granges(file, db, plot = TRUE)
 Convert geneids into GRanges
 }
 \examples{
- # Entrez
-     dbname  <-'TxDb.Mmusculus.UCSC.mm10.knownGene'
-     db      <- utils::getFromNamespace(dbname, dbname)
-     genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
-     genefile_to_granges(genefile, db)
-     geneids <- as.character(read.table(genefile)[[1]])
-     genes_to_granges(geneids, db)
+
+# Entrez
+#-------
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
+geneids  <- as.character(read.table(genefile)[[1]])
+db       <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+                                    'TxDb.Mmusculus.UCSC.mm10.knownGene')
+gr <- genes_to_granges(geneids, db)
+gr <- genes_to_granges(geneids, db, bsgenome)
+gr <- genefile_to_granges(genefile, db)
+gr <- genefile_to_granges(genefile, db, bsgenome)
 
 # Ensembl
-     db <- EnsDb.Mmusculus.v98()
-     genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
-     genefile_to_granges(genefile, db)
-     geneids <- as.character(read.table(genefile)[[1]])
-     genes_to_granges(geneids, db)
-     
+#--------
+db <- EnsDb.Mmusculus.v98()
+genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
+geneids <- as.character(read.table(genefile)[[1]])
+gr <- genes_to_granges(geneids, db)
+gr <- genes_to_granges(geneids, db, bsgenome)
+gr <- genefile_to_granges(genefile, db)
+gr <- genefile_to_granges(genefile, db, bsgenome)
 }
 \seealso{
 \code{\link{annotate_granges}} (inverse operation)

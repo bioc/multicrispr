@@ -10,7 +10,8 @@
 #' # Read target ranges
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' targetranges <- bed_to_granges(bedfile, 'mm10')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' targetranges <- bed_to_granges(bedfile, bsgenome)
 #' targetranges %<>% extend() %>% extract(1:10)
 #' 
 #' # Find cas9ranges
@@ -19,8 +20,8 @@
 #' # Count target matches
 #' bsgenome <- get_bsgenome(cas9ranges)
 #' count_target_matches(
-#'     cas9seqs   = getSeq(bsgenome, cas9ranges),
-#'     targetseqs = getSeq(bsgenome, targetranges),
+#'     cas9seqs   = seqs(cas9ranges, bsgenome),
+#'     targetseqs = seqs(targetranges, bsgenome),
 #'     mismatch   = 0, 
 #'     verbose    = TRUE)
 #' @seealso \code{\link{count_target_matches}}, \code{\link{vcountPDict}}
@@ -66,7 +67,8 @@ count_target_matches <- function(
 #' # Read target ranges
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' targetranges <- bed_to_granges(bedfile, 'mm10')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' targetranges <- bed_to_granges(bedfile, bsgenome)
 #' targetranges %<>% extend() %>% extract(1:10)
 #' 
 #' # Find cas9ranges
@@ -135,7 +137,8 @@ count_genome_matches <- function(
 #' # Note: restricting example to 'chrY' only to keep it fast
 #' require(magrittr)
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' targetranges <- bed_to_granges(bedfile, 'mm10', plot = FALSE) %>% 
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' targetranges <- bed_to_granges(bedfile, bsgenome, plot = FALSE) %>% 
 #'                 extract(GenomeInfoDb::seqnames(.)=='chrY') %>% 
 #'                 extend()
 #' find_offtargetfree_cas9s(targetranges, 0, offtargetchr = 'chrY')

@@ -17,6 +17,7 @@ Get BSgenome
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-gr <- bed_to_granges(bedfile, 'mm10')
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+gr <- bed_to_granges(bedfile, bsgenome)
 get_bsgenome(gr)
 }

@@ -4,13 +4,12 @@
 \alias{annotate_granges}
 \title{Annotate GRanges}
 \usage{
-annotate_granges(granges, db)
+annotate_granges(gr, txdb)
 }
 \arguments{
-\item{granges}{\code{\link[GenomicRanges]{GRanges-class}}}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{db}{\code{\link[GenomicFeatures]{TxDb-class}} or 
-\code{\link[ensembldb]{EnsDb-class}}}
+\item{txdb}{\code{\link[GenomicFeatures]{TxDb-class}}}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -19,18 +18,12 @@ annotate_granges(granges, db)
 Annotate GRanges
 }
 \examples{
-# Read 
-    bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    granges <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-    
-# Annotate Entrez 
-    dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
-    db <- utils::getFromNamespace(dbname, dbname)
-    annotate_granges(granges, db)
-
-# Annotate Ensembl
-    db <- EnsDb.Mmusculus.v98()
-    annotate_granges(granges, db)
+bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+txdbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
+txdb <- utils::getFromNamespace(txdbname, txdbname)
+annotate_granges(gr, txdb)
 }
 \seealso{
 \code{\link{genes_to_granges}} (inverse operation)

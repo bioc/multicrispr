@@ -9,13 +9,14 @@
 #' @examples 
 #' # Plot GRanges
 #'   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-#'   granges <- bed_to_granges(bedfile, 'mm10' , plot = FALSE)
-#'   plot_karyogram(granges)
-#'   plot_intervals(granges)
+#'   bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'   gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+#'   plot_karyogram(gr)
+#'   plot_intervals(gr)
 #'   
 #' # Plot GRangesList
-#'   flanks  <- left_flank(granges)
-#'   grangeslist <- GenomicRanges::GRangesList(sites = granges, flanks = flanks)
+#'   flanks  <- left_flank(gr)
+#'   grangeslist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
 #'   plot_karyogram(grangeslist)
 #'   plot_intervals(grangeslist)
 #' @export
@@ -69,14 +70,14 @@ plot_tracks <- function(grangeslist){
     
     group <- . <-  NULL
     
-    if (is(grangeslist, 'GRangesList')) granges <- unlist(grangeslist)
-    genome  <- unique(GenomeInfoDb::genome(GenomeInfoDb::seqinfo(granges))); 
+    if (is(grangeslist, 'GRangesList')) gr <- unlist(grangeslist)
+    genome  <- unique(genome(seqinfo(gr)))
     assertive.types::assert_is_a_string(genome)
-    chrom   <- unique(as.character(GenomeInfoDb::seqnames(granges)))[1]
+    chrom   <- unique(as.character(seqnames(gr)))[1]
     assertive.types::assert_is_a_string(chrom)
     
     # Find continuum groups
-    granges$group <- findOverlaps(  granges, maxgap = 1, ignore.strand = TRUE, 
+    gr$group <- findOverlaps(  gr, maxgap = 1, ignore.strand = TRUE, 
                                     select = 'first')
     
     # Plot
@@ -84,9 +85,9 @@ plot_tracks <- function(grangeslist){
                                         chromosome = chrom, 
                                         genome     = genome), 
                         genomeaxis = Gviz::GenomeAxisTrack())
-    selectedgr   <- subset(granges, group==1) %>% split(names(.))
+    selectedgr   <- subset(gr, group==1) %>% split(names(.))
     annottracks  <- mapply( Gviz::AnnotationTrack, 
-                            selectedgr, name = names(granges))
+                            selectedgr, name = names(gr))
     Gviz::plotTracks(c(coretracks, annottracks), 
                     background.title = 'gray40', 
                     add = TRUE)
@@ -116,18 +117,18 @@ plot_intervals <- function(grangeslist, title = NULL){
     # Comply - Assert - Process
     contig <- group <- .N <- .SD <- tmp <- xstart <- xend <- y <- NULL
     assertive.types::assert_is_any_of(grangeslist, c('GRanges', 'GRangesList'))
-    granges <-  if (is(grangeslist, 'GRangesList')){  unlist(grangeslist)
+    gr <-  if (is(grangeslist, 'GRangesList')){  unlist(grangeslist)
                 } else {                              grangeslist    }
 
     # Find adjacent ranges    
-    granges$contig <- findOverlaps(
-        granges, maxgap = 1, select = 'first', ignore.strand = TRUE)
-    granges %<>% extract(order(granges$contig))
+    gr$contig <- findOverlaps(
+        gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
+    gr %<>% extract(order(gr$contig))
     
     # Prepare plotdt
-    plotdt <- data.table::as.data.table(granges)
+    plotdt <- data.table::as.data.table(gr)
     plotdt %>% extract( , 
-            group := if (is.null(names(granges))) 'ranges' else names(granges))
+            group := if (is.null(names(gr))) 'ranges' else names(gr))
     plotdt <- plotdt[ , .SD[contig %in% c(min(contig), max(contig)) ], 
                         by = c('seqnames')]
     plotdt %<>% extract(order(seqnames, start))

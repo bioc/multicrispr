@@ -1,31 +1,30 @@
-contextify_start <- function(granges){
+contextify_start <- function(gr){
     
     # Assert
-    assert_is_identical_to_true(methods::is(granges, 'GRanges'))
+    assertive.types::assert_is_all_of(gr, 'GRanges')
     
     # Contextify
-    start(granges) %<>%  subtract(ifelse(strand(granges)=='+', 4, 3))
-    assertive.numbers::assert_all_are_greater_than_or_equal_to(
-        start(granges), 1)
+    start(gr) %<>%  subtract(ifelse(strand(gr)=='+', 4, 3))
+    assertive.numbers::assert_all_are_greater_than_or_equal_to(start(gr), 1)
     
     # Return
-    return(granges)
+    return(gr)
 }
 
 
-contextify_end <- function(granges){
+contextify_end <- function(gr){
 
     # Assert
-    assert_is_identical_to_true(is(granges, 'GRanges'))
+    assert_is_identical_to_true(is(gr, 'GRanges'))
     
     # Contextify
-    end(granges) %<>% add(ifelse(strand(granges) == '+', 3, 4))
-    chrlengths  <-  GenomeInfoDb::seqlengths(get_bsgenome(granges)) %>% 
-                    extract(as.character(GenomeInfoDb::seqnames(granges)))
-    assert_all_are_true(granges$contextend < chrlengths)
+    end(gr) %<>% add(ifelse(strand(gr) == '+', 3, 4))
+    chrlengths  <-  GenomeInfoDb::seqlengths(get_bsgenome(gr)) %>% 
+                    extract(as.character(GenomeInfoDb::seqnames(gr)))
+    assert_all_are_true(gr$contextend < chrlengths)
     
     # Return
-    return(granges)
+    return(gr)
 }
 
 
@@ -127,21 +126,23 @@ score_contextseqs <- function(
 #' Get [-3, +3] contextseqs for given cas9ranges
 #' 
 #' @param cas9ranges \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #' @return character vector
 #' @examples 
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' cas9ranges  <-  bed_to_granges(bedfile, 'mm10') %>% 
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' cas9ranges  <-  bed_to_granges(bedfile, bsgenome) %>% 
 #'                 double_flank() %>% 
 #'                 find_cas9s()
 #' cas9ranges[1:3] %>% seqs()
 #' cas9ranges[1:3] %>% contextseqs()
 #' @export
-contextseqs <- function(cas9ranges){
+contextseqs <- function(cas9ranges, bsgenome){
     cas9ranges          %>% 
     contextify_start()  %>%
     contextify_end()    %>% 
-    seqs()              %>% 
+    seqs(bsgenome)      %>% 
     as.character()
 }
 
@@ -173,7 +174,8 @@ contextseqs <- function(cas9ranges){
 #' # Get cas9ranges
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     cas9ranges <- bed_to_granges(bedfile, 'mm10') %>% 
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     cas9ranges <- bed_to_granges(bedfile, bsgenome) %>% 
 #'                   double_flank() %>% 
 #'                   find_cas9s()
 #' # Score

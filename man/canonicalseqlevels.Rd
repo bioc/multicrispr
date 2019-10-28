@@ -45,7 +45,8 @@ Get canonical seqlevels
     
 # Mouse Bedfile
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+    gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
     GenomeInfoDb::seqlevels(gr)
     canonicalseqlevels(gr)
     

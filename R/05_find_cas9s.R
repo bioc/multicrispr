@@ -1,16 +1,4 @@
-#' Convert GRanges into Sequences
-#' @param granges \code{\link[GenomicRanges]{GRanges-class}}
-#' @return character vector
-#' @examples 
-#' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' granges <- bed_to_granges(bedfile, 'mm10')
-#' seqs(granges)
-#' @export
-seqs <- function(granges){
-    assertive.types::assert_is_all_of(granges, 'GRanges')
-    BSgenome::getSeq(get_bsgenome(granges), granges) %>%
-    as.character()
-}
+
 
 #' Add inverse strand for each range
 #'
@@ -21,7 +9,8 @@ seqs <- function(granges){
 #' @examples
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
 #' add_inverse_strand(gr)
 #' @export
 add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
@@ -44,18 +33,21 @@ add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
 
 #' Find cas9 sites in targetranges
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
 #' @param inclcompl logical(1): include complementary strands in search?
 #' @param verbose   logical(1): report verbosely?
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' gr <- extend(bed_to_granges(bedfile, 'mm10'), plot = FALSE)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' gr <- extend(bed_to_granges(bedfile, bsgenome), plot = FALSE)
 #' find_cas9s(gr)
 #' @export 
-find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
+find_cas9s <- function(gr, bsgenome, inclcompl = TRUE, verbose = TRUE){
 
     # Assert
     assertive.types::assert_is_all_of(gr, 'GRanges')
+    assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
     assertive.types::assert_is_a_bool(verbose)
     
     # Add complementary strands
@@ -68,7 +60,7 @@ find_cas9s <- function(gr, inclcompl = TRUE, verbose = TRUE){
     
     # Find cas9s in targetranges
     targetdt <- data.table::as.data.table(gr)
-    targetdt [ , seqs := seqs(gr) ]
+    targetdt [ , seqs := seqs(gr, bsgenome) ]
     res <- targetdt$seqs %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
