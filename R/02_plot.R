@@ -9,8 +9,9 @@
 #' @examples 
 #' # Plot GRanges
 #'   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-#'   bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'   gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+#'   txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
+#'                                   'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#'   gr <- bed_to_granges(bedfile, txdb, plot = FALSE)
 #'   plot_karyogram(gr)
 #'   plot_intervals(gr)
 #'   
@@ -31,8 +32,8 @@ plot_karyogram <- function(
     assertive.types::assert_is_all_of(grangeslist, 'GRangesList')
     
     # Extract relevant chromosomes and order them
-    chroms <- union(GenomeInfoDb::seqlevelsInUse(grangeslist), 
-                    canonicalseqlevels(grangeslist))
+    chroms <- union(seqlevelsInUse(grangeslist), 
+                    standardChromosomes(grangeslist))
     stri_extract <- function(stri, pattern){
         stri %>% extract(stringi::stri_detect_regex(., pattern)) 
     }

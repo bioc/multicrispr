@@ -9,8 +9,10 @@
 #' @examples
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+#' txdb <- utils::getFromNamespace(
+#'              'TxDb.Mmusculus.UCSC.mm10.knownGene', 
+#'              'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#' gr <- bed_to_granges(bedfile, txdb, plot = FALSE)
 #' add_inverse_strand(gr)
 #' @export
 add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
@@ -33,21 +35,28 @@ add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
 
 #' Find cas9 sites in targetranges
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
 #' @param inclcompl logical(1): include complementary strands in search?
-#' @param verbose   logical(1): report verbosely?
+#' @param plot      logical(1)
+#' @param verbose   logical(1)
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' gr <- extend(bed_to_granges(bedfile, bsgenome), plot = FALSE)
-#' find_cas9s(gr)
+#' # Read bed into granges, extend, add seqs
+#'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+#'     txdb <- utils::getFromNamespace(
+#'              'TxDb.Mmusculus.UCSC.mm10.knownGene', 
+#'              'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#'     gr <- extend(bed_to_granges(bedfile, txdb), plot = FALSE)
+#'     gr <- add_seq(gr, bsgenome)
+#'     
+#' # Find cas9 seqs
+#'     find_cas9s(gr)
 #' @export 
-find_cas9s <- function(gr, bsgenome, inclcompl = TRUE, verbose = TRUE){
+find_cas9s <- function(gr, inclcompl = TRUE, plot = TRUE, verbose = TRUE){
 
     # Assert
     assertive.types::assert_is_all_of(gr, 'GRanges')
-    assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    assertive.sets::assert_is_subset('seq', names(mcols(gr)))
+    assertive.types::assert_is_character(gr$seq)
     assertive.types::assert_is_a_bool(verbose)
     
     # Add complementary strands
@@ -60,8 +69,7 @@ find_cas9s <- function(gr, bsgenome, inclcompl = TRUE, verbose = TRUE){
     
     # Find cas9s in targetranges
     targetdt <- data.table::as.data.table(gr)
-    targetdt [ , seqs := seqs(gr, bsgenome) ]
-    res <- targetdt$seqs %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
+    res <- targetdt$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
     targetdt [ , substart := vapply( res, cextract1, character(1)) ]
@@ -79,19 +87,26 @@ find_cas9s <- function(gr, bsgenome, inclcompl = TRUE, verbose = TRUE){
         data.table::data.table()                                   %>% 
         extract(, substart := as.numeric(substart))                %>% 
         extract(, subend   := as.numeric(subend))                  %>% 
-        extract(, seqs     := substr(seqs, substart, subend))      %>%
+        extract(, seq      := substr(seq, substart, subend))      %>%
         extract( strand=='+', cas9start := start + substart - 1  ) %>% 
         extract( strand=='+', cas9end   := start + subend   - 1  ) %>%
         extract( strand=='-', cas9start := end   - subend   + 1  ) %>%
         extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
         extract(, list( seqnames = seqnames, start = cas9start, 
-                        end = cas9end,  strand  = strand,  seqs = seqs)) %>% 
-        unique() %>% as('GRanges')
+                        end = cas9end,  strand  = strand,  seq = seq)) %>% 
+        unique() %>%
+        as('GRanges')
     seqinfo(cas9ranges) <- seqinfo(gr)
 
+    # Plot
+    if (plot){
+        grlist <- GenomicRanges::GRangesList(target = gr, cas9site = cas9ranges)
+        plot_karyogram(grlist)
+    }
+    
     # Return
     if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
-                            length(unique(seqs(cas9ranges))), 
+                            length(unique(cas9ranges$seq)), 
                             length(cas9ranges))
     return(cas9ranges)
 }

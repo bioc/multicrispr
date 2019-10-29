@@ -126,8 +126,10 @@ extend <- function(
 #' @examples 
 #' # Read ranges
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+#'     txdb <- utils::getFromNamespace(
+#'                'TxDb.Mmusculus.UCSC.mm10.knownGene', 
+#'                'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#'     gr <- bed_to_granges(bedfile, txdb, plot = FALSE)
 #' 
 #' # Flank/Extend
 #'     left_flank( gr, -200,  -1)
@@ -202,8 +204,10 @@ straddle <- function(
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' gr <- bed_to_granges(bedfile, bsgenome, plot = FALSE)
+#' txdb <- utils::getFromNamespace(
+#'              'TxDb.Mmusculus.UCSC.mm10.knownGene', 
+#'              'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#' gr <- bed_to_granges(bedfile, txdb, plot = FALSE)
 #' double_flank(gr)
 #' @export
 double_flank <- function(

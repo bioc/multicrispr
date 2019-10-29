@@ -5,9 +5,9 @@
 \alias{genefile_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
-genes_to_granges(geneids, txdb, bsgenome = NULL, plot = TRUE)
+genes_to_granges(geneids, txdb, plot = TRUE)
 
-genefile_to_granges(file, txdb, bsgenome = NULL, plot = TRUE)
+genefile_to_granges(file, txdb, plot = TRUE)
 }
 \arguments{
 \item{geneids}{Entrez Gene identifier vector}
@@ -18,11 +18,6 @@ genefile_to_granges(file, txdb, bsgenome = NULL, plot = TRUE)
 \item{plot}{TRUE or FALSE}
 
 \item{file}{Entrez Gene identifier file (one per row)}
-
-\item{BSgenome}{\code{\link[BSgenome]{BSgenome-class}} or NULL. 
-If specified, used to extract and add sequence to GRanges.}
-
-\item{addseq}{logical(1)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -31,18 +26,14 @@ If specified, used to extract and add sequence to GRanges.}
 Convert geneids into GRanges
 }
 \examples{
-
 # Entrez
 #-------
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
 geneids  <- as.character(read.table(genefile)[[1]])
-txdb       <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+txdb     <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
                                     'TxDb.Mmusculus.UCSC.mm10.knownGene')
 gr <- genes_to_granges(geneids, txdb)
-gr <- genes_to_granges(geneids, txdb, bsgenome)
 gr <- genefile_to_granges(genefile, txdb)
-gr <- genefile_to_granges(genefile, txdb, bsgenome)
 
 # Ensembl
 #--------
@@ -50,10 +41,5 @@ txdb <- EnsDb.Mmusculus.v98()
 genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
 geneids <- as.character(read.table(genefile)[[1]])
 gr <- genes_to_granges(geneids, txdb)
-gr <- genes_to_granges(geneids, txdb, bsgenome)
 gr <- genefile_to_granges(genefile, txdb)
-gr <- genefile_to_granges(genefile, txdb, bsgenome)
-}
-\seealso{
-\code{\link{annotate_granges}} (inverse operation)
 }

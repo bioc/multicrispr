@@ -4,17 +4,13 @@
 \alias{bed_to_granges}
 \title{Read bedfile into GRanges}
 \usage{
-bed_to_granges(bedfile, bsgenome, txdb = NULL, addseq = TRUE,
-  do_order = TRUE, plot = TRUE, verbose = TRUE)
+bed_to_granges(bedfile, txdb, do_order = TRUE, plot = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{bedfile}{file path}
 
-\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
-
 \item{txdb}{\code{\link[TxDb]{TXDb-class}}}
-
-\item{addseq}{logical(1)}
 
 \item{do_order}{logical(1)}
 
@@ -30,11 +26,9 @@ Read bedfile into GRanges
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
                                 'TxDb.Mmusculus.UCSC.mm10.knownGene')
-gr <- bed_to_granges(bedfile, bsgenome)
-gr <- bed_to_granges(bedfile, bsgenome, txdb)
+gr <- bed_to_granges(bedfile, txdb)
 }
 \seealso{
 \code{rtracklayer::import.bed} (documented in 

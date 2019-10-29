@@ -8,8 +8,9 @@
 #' @importFrom  GenomeInfoDb     seqlevelsInUse
 #' @importFrom  GenomeInfoDb     seqlevelsStyle    seqlevelsStyle<-
 #' @importFrom  GenomeInfoDb     seqnames
+#' @importFrom  GenomeInfoDb     standardChromosomes
 #' @import      GenomicRanges
-#' @import      magrittr
+#' @importFrom  magrittr  %>%  %<>%  add  extract  extract2  set_names subtract
 #' @import      methods
 #' @import      S4Vectors
 NULL
