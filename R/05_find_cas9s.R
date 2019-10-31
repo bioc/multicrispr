@@ -23,11 +23,12 @@
 #' @export 
 find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
 
-    # Assert. Comply
+    # Assert. Import. Comply
     assertive.types::assert_is_all_of(targets, 'GRanges')
-    assertive.sets::assert_is_subset('seq', names(mcols(targets)))
+    assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(targets)))
     assertive.types::assert_is_character(targets$seq)
     assertive.types::assert_is_a_bool(verbose)
+    extract <- magrittr::extract
     start <- substart <- cas9start <- NULL
     end <- subend <- cas9end <- strand <- seqnames <- NULL
     
@@ -59,16 +60,14 @@ find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
         extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
         extract(, list( seqnames = seqnames, start = cas9start, 
                         end = cas9end,  strand  = strand,  seq = seq)) %>% 
-        unique() %>% as('GRanges')
-    seqinfo(cas9s) <- seqinfo(targets)
+        unique() %>% methods::as('GRanges')
+    GenomeInfoDb::seqinfo(cas9s) <- GenomeInfoDb::seqinfo(targets)
 
-    # Plot/Message
+    # Plot. Message. Return
     if (plot) plot_karyogram(GenomicRanges::GRangesList(
                                 target = targets, cas9site = cas9s))
     if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
                         length(unique(cas9s$seq)), length(cas9s))
-    
-    # Return
     return(cas9s)
 }
 

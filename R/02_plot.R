@@ -26,14 +26,16 @@ plot_karyogram <- function(
     
     # Assert
     . <- NULL
-    if (is(grangeslist, 'GRanges'))  grangeslist <- GRangesList(grangeslist)
+    if (methods::is(grangeslist, 'GRanges')){
+        grangeslist <- GenomicRanges::GRangesList(grangeslist)
+    }
     assertive.types::assert_is_all_of(grangeslist, 'GRangesList')
     
     # Extract relevant chromosomes and order them
-    chroms <- union(seqlevelsInUse(grangeslist), 
-                    standardChromosomes(grangeslist))
+    chroms <- union(GenomeInfoDb::seqlevelsInUse(grangeslist), 
+                    GenomeInfoDb::standardChromosomes(grangeslist))
     stri_extract <- function(stri, pattern){
-        stri %>% extract(stringi::stri_detect_regex(., pattern)) 
+        stri %>% magrittr::extract(stringi::stri_detect_regex(., pattern)) 
     }
     chrs1  <- chroms %>% stri_extract('^(chr)?[0-9]$')    %>% sort()
     chrs2  <- chroms %>% stri_extract('^(chr)?[0-9]{2}$') %>% sort()
@@ -41,7 +43,7 @@ plot_karyogram <- function(
     chrsM  <- chroms %>% stri_extract('^(chr)?MT?$')
     orderedchrs <-  c(chrs1, chrs2, chrsXY, chrsM) %>% 
                     c(sort(setdiff(chroms, .)))
-    genomeranges <- as(GenomeInfoDb::seqinfo(grangeslist)[orderedchrs],
+    genomeranges <- methods::as(GenomeInfoDb::seqinfo(grangeslist)[orderedchrs],
                         "GRanges")
 
     # Color
@@ -69,15 +71,15 @@ plot_tracks <- function(grangeslist){
     
     group <- . <-  NULL
     
-    if (is(grangeslist, 'GRangesList')) gr <- unlist(grangeslist)
-    genome  <- unique(genome(seqinfo(gr)))
+    if (methods::is(grangeslist, 'GRangesList')) gr <- unlist(grangeslist)
+    genome  <- unique(GenomeInfoDb::genome(GenomeInfoDb::seqinfo(gr)))
     assertive.types::assert_is_a_string(genome)
-    chrom   <- unique(as.character(seqnames(gr)))[1]
+    chrom   <- unique(as.character(GenomicRanges::seqnames(gr)))[1]
     assertive.types::assert_is_a_string(chrom)
     
     # Find continuum groups
-    gr$group <- findOverlaps(  gr, maxgap = 1, ignore.strand = TRUE, 
-                                    select = 'first')
+    gr$group <- GenomicRanges::findOverlaps(
+                    gr, maxgap = 1, ignore.strand = TRUE, select = 'first')
     
     # Plot
     coretracks <- list( ideogram = Gviz::IdeogramTrack(
@@ -105,7 +107,7 @@ to_megabase <- function(y){
     
     i <- y<=1e3
     z[i] <- paste0(round(y[i]), 'b')
-    z %>% set_names(names(y))
+    z %>% magrittr::set_names(names(y))
 }
 
 
@@ -113,16 +115,18 @@ to_megabase <- function(y){
 #' @export
 plot_intervals <- function(grangeslist, title = NULL){
     
-    # Comply - Assert - Process
-    contig <- group <- .N <- .SD <- tmp <- xstart <- xend <- y <- NULL
+    # Assert. Import. Comply. Process.
     assertive.types::assert_is_any_of(grangeslist, c('GRanges', 'GRangesList'))
-    gr <-  if (is(grangeslist, 'GRangesList')){  unlist(grangeslist)
-                } else {                              grangeslist    }
+    extract <- magrittr::extract
+    contig <- group <- .N <- .SD <- seqnames <- start <- NULL
+    strand <- tmp <- width <- xstart <- xend <- y <- NULL
+    gr  <-  if (methods::is(grangeslist, 'GRangesList')){  unlist(grangeslist)
+            } else {                                       grangeslist    }
 
     # Find adjacent ranges    
-    gr$contig <- findOverlaps(
-        gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
-    gr %<>% extract(order(gr$contig))
+    gr$contig <- GenomicRanges::findOverlaps(
+                    gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
+    gr %<>% magrittr::extract(order(gr$contig))
     
     # Prepare plotdt
     plotdt <- data.table::as.data.table(gr)

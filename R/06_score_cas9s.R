@@ -50,15 +50,15 @@ doench2014 <- function(
     # Message
     if (verbose)  message('\t\tScore contextseqs with Doench2014')
     
-    # Score
-    CRISPRseek::calculategRNAEfficiency(
-        contextseqs,
-        baseBeforegRNA       = 4, 
-        featureWeightMatrix  =  system.file("extdata", 
-                                            "DoenchNBT2014.csv", 
-                                            package = "CRISPRseek") %>% 
-                                utils::read.csv(header = TRUE)) %>% 
-    extract(, 1)
+    # Read featureWeightMatrix
+    fwfile   <- system.file("extdata/DoenchNBT2014.csv", package = "CRISPRseek")
+    fwmatrix <- utils::read.csv(fwfile, header = TRUE)
+    
+    # Score and return
+    CRISPRseek::calculategRNAEfficiency(contextseqs,
+                                        baseBeforegRNA       = 4, 
+                                        featureWeightMatrix  =  fwmatrix) %>% 
+    magrittr::extract(, 1)
 }
 
 
@@ -170,7 +170,7 @@ score_cas9s <- function(
     # Add contextseq
     if (verbose)  cmessage('\tScore cas9s')
     cas9s %<>% add_contextseq(bsgenome, verbose = verbose)
-    cas9dt <- data.table::as.data.table(cas9s)
+    cas9dt  <- data.table::as.data.table(cas9s)
     scoredt <- data.table::data.table(contextseq = unique(cas9dt$contextseq))
     
     # Score
@@ -180,7 +180,7 @@ score_cas9s <- function(
     # Merge back in and Return
     cas9smerged  <- merge(  cas9dt, scoredt, by = 'contextseq', sort = FALSE, 
                             all.x = TRUE) %>%
-                    as('GRanges')
-    seqinfo(cas9smerged) <- seqinfo(cas9s)
+                    methods::as('GRanges')
+    GenomeInfoDb::seqinfo(cas9smerged) <- GenomeInfoDb::seqinfo(cas9s)
     cas9smerged
 }

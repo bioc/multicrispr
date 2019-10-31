@@ -21,7 +21,6 @@ Imports:
     assertive.sets,
     assertive.types,
     AnnotationHub,
-    BiocGenerics,
     Biostrings,
     BSgenome,
     CRISPRseek,
@@ -37,7 +36,6 @@ Imports:
     plyranges,
     reticulate,
     rtracklayer,
-    S4Vectors,
     stringi, 
     tidyr
 Suggests: 
@@ -47,7 +45,6 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    TxDb.Hsapiens.UCSC.hg38.knownGene,
     TxDb.Mmusculus.UCSC.mm10.knownGene
 VignetteBuilder: knitr
 biocViews: CRISPR

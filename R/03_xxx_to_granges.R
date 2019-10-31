@@ -50,14 +50,14 @@
 
 
 add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
-    complements <- invertStrand(gr)
+    complements <- GenomicRanges::invertStrand(gr)
     newranges <- c(gr, complements)
     txt <- sprintf('\t\t%d ranges after adding inverse strands',
                     length(newranges))
     if (plot){
-        plot_intervals(
-            GRangesList(original = gr, complements = complements),
-            title = txt)
+        grlist <- GenomicRanges::GRangesList(original = gr, 
+                                            complements = complements)
+        plot_intervals(grlist, title = txt)
     }
     if (verbose) cmessage(txt)
     newranges
@@ -66,12 +66,15 @@ add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
 
 annotate_granges <- function(gr, txdb){
     
-    # Assert
+    # Assert. Import. Comply.
     assertive.types::assert_is_all_of(gr, 'GRanges')
     assertive.types::assert_is_all_of(txdb, 'TxDb')
     gene_id <- NULL
+    extract <- magrittr::extract
 
-    # Align seqlevelStyle if required    
+    # Align seqlevelStyle if required
+    `seqlevelsStyle`   <- GenomeInfoDb::`seqlevelsStyle`
+    `seqlevelsStyle<-` <- GenomeInfoDb::`seqlevelsStyle<-`
     if (seqlevelsStyle(gr) != seqlevelsStyle(txdb)){
         message("Setting seqlevelsStyle(txdb) <- seqlevelsStyle(gr)")
         seqlevelsStyle(txdb) <- seqlevelsStyle(gr)
@@ -80,23 +83,23 @@ annotate_granges <- function(gr, txdb){
     # Drop seqinfo (to overlap smoothly)
     txranges <- GenomicFeatures::genes(txdb)                                %>%
                 data.table::as.data.table()                                 %>%
-                extract(seqlevelsInUse(gr), on = 'seqnames')                %>%
+                extract(GenomeInfoDb::seqlevelsInUse(gr), on = 'seqnames')  %>%
                 extract(, c('seqnames', 'start', 'end', 'strand', 'gene_id'),
                             with = FALSE)                                   %>%
-                as('GRanges')
+                methods::as('GRanges')
     
     # Overlap
     granno <- data.table::as.data.table(gr)                         %>%
-            as('GRanges')                                           %>%
+            methods::as('GRanges')                                  %>%
             plyranges::join_overlap_left(txranges)                  %>%
             data.table::as.data.table()                             %>%
             extract(!is.na(gene_id) ,  
                     gene_id := paste0(gene_id, collapse = ';'), 
                     by = c('seqnames', 'start', 'end', 'strand'))   %>%
             unique()                                                %>%
-            as('GRanges')
-    seqlevels(granno) %<>% setdiff('.') # patch plyranges bug
-    seqinfo(granno) <- seqinfo(gr)
+            methods::as('GRanges')
+    GenomeInfoDb::seqlevels(granno) %<>% setdiff('.') # patch plyranges bug
+    GenomeInfoDb::seqinfo(granno) <- GenomeInfoDb::seqinfo(gr)
     granno
 }
 
@@ -141,7 +144,7 @@ bed_to_granges <- function(
     if (verbose) cmessage('\tRead %s into GRanges', basename(bedfile))
     gr <- rtracklayer::import.bed(bedfile, genome = genome)
     if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
-                    length(gr), length(unique(GenomeInfoDb::seqnames(gr))))
+                    length(gr), length(unique(GenomicRanges::seqnames(gr))))
     
     # Add complementary strand
     if (complement){
@@ -155,14 +158,14 @@ bed_to_granges <- function(
     }
     
     # Plot
-    genome1 <- unique(genome(gr))
+    genome1 <- unique(GenomeInfoDb::genome(gr))
     assertive.properties::assert_is_scalar(genome1)
     title <- paste0(genome1, ': ', basename(bedfile))
     if (plot) plot_karyogram(gr, title)
     
     # Order
-    if (do_order)
-        gr %<>% extract(order(seqnames(.), start(.)))
+    if (do_order)  gr %<>% magrittr::extract( order(GenomicRanges::seqnames(.), 
+                                                    GenomicRanges::start(.)))
     
     # Return
     gr
@@ -263,19 +266,21 @@ add_seq <- function(gr, bsgenome, verbose = TRUE){
     if (verbose)  cmessage('\tAdd seq')
     
     # Align seqlevelsStyle if required
+    `seqlevelsStyle`   <- GenomeInfoDb::`seqlevelsStyle`
+    `seqlevelsStyle<-` <- GenomeInfoDb::`seqlevelsStyle<-`
     if (seqlevelsStyle(bsgenome)[1] != seqlevelsStyle(gr)[1]){
-        cmessage("\t\t\tSet seqlevelStyle(bsgenome) <- seqlevelStyle(gr)")
-        seqlevelsStyle(bsgenome)[1] <- seqlevelsStyle(gr)[1]
+            cmessage("\t\t\tSet seqlevelStyle(bsgenome) <- seqlevelStyle(gr)")
+            seqlevelsStyle(bsgenome)[1] <- seqlevelsStyle(gr)[1]
     }
     
     # Add seq
     gr$seq <- unname(BSgenome::getSeq(
-                bsgenome,
-                names        = seqnames(gr),
-                start        = start(gr),
-                end          = end(gr), 
-                strand       = strand(gr), 
-                as.character = TRUE))
+                        bsgenome,
+                        names        = GenomicRanges::seqnames(gr),
+                        start        = GenomicRanges::start(gr),
+                        end          = GenomicRanges::end(gr), 
+                        strand       = GenomicRanges::strand(gr), 
+                        as.character = TRUE))
     
     # Return
     gr

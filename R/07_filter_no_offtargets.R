@@ -47,7 +47,7 @@ count_target_matches <- function(
                             Biostrings::DNAStringSet(targetseqs),
                             min.mismatch = mismatch,
                             max.mismatch = mismatch)) %>% 
-                set_names(uniquecas9s)
+                magrittr::set_names(uniquecas9s)
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in targets: %s',
@@ -63,7 +63,7 @@ count_genome_matches <- function(
     cas9seqs, 
     bsgenome, 
     mismatch,
-    chromosomes = seqnames(bsgenome),
+    chromosomes = BSgenome::seqnames(bsgenome),
     verbose     = TRUE
 ){
     # Assert
@@ -78,7 +78,7 @@ count_genome_matches <- function(
 
     # Count
     starttime <- Sys.time()
-    exclude  <- setdiff(GenomeInfoDb::seqnames(bsgenome), chromosomes)
+    exclude  <- setdiff(BSgenome::seqnames(bsgenome), chromosomes)
     uniquecas9s <- unique(cas9seqs)
     matches  <- Biostrings::vcountPDict(
                     Biostrings::DNAStringSet(uniquecas9s),
@@ -87,9 +87,9 @@ count_genome_matches <- function(
                     max.mismatch = mismatch, 
                     exclude      = exclude) %>% 
                 data.table::as.data.table() %>% 
-                extract(, .(n = sum(count)), by ='index') %>%
-                extract2('n') %>% 
-                set_names(uniquecas9s)
+                magrittr::extract(, .(n = sum(count)), by ='index') %>%
+                magrittr::extract2('n') %>% 
+                magrittr::set_names(uniquecas9s)
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',
@@ -123,7 +123,7 @@ add_seqinfo <- function(gr, bsgenome){
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     targets <- bed_to_granges(bedfile, 'mm10')
 #'     targets %<>% extend()
-#'     targets %<>% extract(GenomeInfoDb::seqnames(.)=='chrY')
+#'     targets %<>% extract(GenomicRanges::seqnames(.)=='chrY')
 #' 
 #' # Add seqs and find cas9s
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
@@ -133,8 +133,9 @@ add_seqinfo <- function(gr, bsgenome){
 #' # Filter for offtarget-free cas9s
 #'     filter_no_offtargets(cas9s, targets, bsgenome, 0, offtargetchr = 'chrY')
 #' @export
-filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2,
-    offtargetchr = standardChromosomes(targets), plot = TRUE, verbose = TRUE){
+filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2, 
+    offtargetchr = GenomeInfoDb::standardChromosomes(targets), 
+    plot = TRUE, verbose = TRUE){
     
     # Assert. Prepare
     assertive.types::assert_is_all_of(cas9s,    'GRanges')
@@ -142,9 +143,9 @@ filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2,
     assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
     assertive.types::assert_is_a_number(mismatch)
     assertive.types::assert_is_character(offtargetchr)
-    assertive.sets::assert_is_subset(offtargetchr, seqnames(bsgenome))
-    assertive.sets::assert_is_subset('seq', names(mcols(cas9s)))
-    assertive.sets::assert_is_subset('seq', names(mcols(targets)))
+    assertive.sets::assert_is_subset(offtargetchr, BSgenome::seqnames(bsgenome))
+    assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(cas9s)))
+    assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(targets)))
     targetseqs <- targets$seq
     cas9seqdt  <- data.table::data.table(seq = unique(cas9s$seq))
     
@@ -165,16 +166,17 @@ filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2,
         idx <- genome_matches == target_matches
         if (verbose)   cmessage('\t\t\tKeep %d/%d offtarget-free cas9seqs', 
                                 sum(idx), length(idx), mis)
-        cas9seqdt %<>% extract(idx)
+        cas9seqdt %<>% magrittr::extract(idx)
     }
     
     # Filter for offtargetfree
     offtargetfree  <-   cas9seqdt %>% 
                         merge(data.table::as.data.table(cas9s), by = 'seq') %>% 
-                        as('GRanges') %>%  add_seqinfo(bsgenome)
+                        methods::as('GRanges') %>%  add_seqinfo(bsgenome)
     # Plot/Report
-    if (plot)    plot_karyogram(GRangesList(target = targets, cas9 = cas9s, 
-                                            offtargetfree = offtargetfree))
+    if (plot)    plot_karyogram(GenomicRanges::GRangesList(
+                                    target = targets, cas9 = cas9s, 
+                                    offtargetfree = offtargetfree))
     if (verbose) cmessage('\tReturn %d cas9seqs across %d ranges',
                     length(unique(offtargetfree$seq)), length(offtargetfree))
     # Return

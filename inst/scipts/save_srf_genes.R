@@ -13,16 +13,18 @@
     dbname <- 'TxDb.Mmusculus.UCSC.mm10.knownGene'
     db <- utils::getFromNamespace(dbname, dbname)
     entrez  <-  annotate_granges(gr, db) %>% 
-                extract(!is.na(.$gene_id)) %>%
+                magrittr::extract(!is.na(.$gene_id)) %>%
                 data.table::as.data.table() %>% 
-                extract(, list(seqnames, start, end, strand, entrez=gene_id))
+                magrittr::extract(, 
+                          list(seqnames, start, end, strand, entrez=gene_id))
     
 # Ensembl
     db <- EnsDb.Mmusculus.v98()
     ensembl  <- annotate_granges(gr, db) %>% 
-                extract(!is.na(.$gene_id)) %>%
+                magrittr::extract(!is.na(.$gene_id)) %>%
                 data.table::as.data.table() %>%
-                extract(, list(seqnames, start, end, strand, ensembl=gene_id))
+                magrittr::extract(, 
+                          list(seqnames, start, end, strand, ensembl=gene_id))
     
 # Intersect
     both <- merge(entrez, ensembl, by = c('seqnames', 'start', 'end', 'strand'))

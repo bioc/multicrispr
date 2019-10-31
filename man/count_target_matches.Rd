@@ -8,7 +8,7 @@
 count_target_matches(cas9seqs, targetseqs, mismatch, verbose = TRUE)
 
 count_genome_matches(cas9seqs, bsgenome, mismatch,
-  chromosomes = seqnames(bsgenome), verbose = TRUE)
+  chromosomes = BSgenome::seqnames(bsgenome), verbose = TRUE)
 }
 \arguments{
 \item{cas9seqs}{character() or \code{\link[Biostrings]{XStringSet-class}}}

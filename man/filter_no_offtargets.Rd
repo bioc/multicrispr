@@ -5,8 +5,8 @@
 \title{Filter for no offtargets}
 \usage{
 filter_no_offtargets(cas9s, targets, bsgenome, mismatch = 2,
-  offtargetchr = standardChromosomes(targets), plot = TRUE,
-  verbose = TRUE)
+  offtargetchr = GenomeInfoDb::standardChromosomes(targets),
+  plot = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{cas9s}{\code{\link[GenomicRanges]{GRanges-class}}}
@@ -39,7 +39,7 @@ Filter for no offtargets
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     targets <- bed_to_granges(bedfile, 'mm10')
     targets \%<>\% extend()
-    targets \%<>\% extract(GenomeInfoDb::seqnames(.)=='chrY')
+    targets \%<>\% extract(GenomicRanges::seqnames(.)=='chrY')
 
 # Add seqs and find cas9s
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10

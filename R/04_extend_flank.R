@@ -1,9 +1,9 @@
 
 summarize_loci <- function(gr){
     sprintf('%s:%s-%s', 
-            as.character(GenomeInfoDb::seqnames(gr)), 
-            start(gr), 
-            end(gr))
+            as.character(GenomicRanges::seqnames(gr)), 
+            GenomicRanges::start(gr), 
+            GenomicRanges::end(gr))
 }
 
 
@@ -23,20 +23,20 @@ left_flank <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Flank
-    newranges <- gr
-    end(newranges)   <- start(gr) + leftend
-    start(newranges) <- start(gr) + leftstart
+    newgr <- gr
+    GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + leftend
+    GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + leftstart
     txt <- sprintf('\t\t%d left  flanks: [start%s%d, start%s%d]', 
-                    length(newranges), csign(leftstart), abs(leftstart), 
+                    length(newgr), csign(leftstart), abs(leftstart), 
                     csign(leftend), abs(leftend))
 
     # Plot, Message, Return
     if (plot){
-        grlist <- GRangesList(sites = gr, leftflanks = newranges)
+        grlist <- GenomicRanges::GRangesList(sites=gr, leftflanks=newgr)
         plot_intervals(grlist, title = txt)
     }
     if (verbose) message(txt)
-    newranges
+    newgr
 }
 
 
@@ -56,11 +56,11 @@ right_flank <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Flank
-    newranges <- gr
-    start(newranges) <- end(newranges) + rightstart
-    end(newranges)   <- end(newranges) + rightend
+    newgr <- gr
+    GenomicRanges::start(newgr) <- GenomicRanges::end(newgr) + rightstart
+    GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr) + rightend
     txt <- sprintf('\t\t%d right flanks : [end%s%d, end%s%d]', 
-                    length(newranges),
+                    length(newgr),
                     csign(rightstart), 
                     abs(rightstart), 
                     csign(rightend), 
@@ -68,11 +68,11 @@ right_flank <- function(
     
     # Plot, Message, Return
     if (plot){
-        grlist <- GRangesList(sites = gr, rightflanks = newranges)
+        grlist <- GenomicRanges::GRangesList(sites = gr, rightflanks = newgr)
         plot_intervals(grlist, title = txt)
     }
     if (verbose) message(txt)
-    newranges
+    newgr
 }
 
 
@@ -93,11 +93,11 @@ extend <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Extend
-    newranges <- gr
-    start(newranges) <- start(newranges) + leftstart
-    end(newranges)   <- end(newranges)   + rightend
+    newgr <- gr
+    GenomicRanges::start(newgr) <- GenomicRanges::start(newgr) + leftstart
+    GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr)   + rightend
     txt <- sprintf('\t\t%d extended ranges: [start%s%d, end%s%d]', 
-                    length(newranges),
+                    length(newgr),
                     csign(leftstart), 
                     abs(leftstart), 
                     csign(rightend), 
@@ -105,11 +105,11 @@ extend <- function(
     
     # Plot, Message, Return
     if (plot){
-        grlist <- GRangesList(original = gr, extended = newranges)
+        grlist <- GenomicRanges::GRangesList(original = gr, extended = newgr)
         plot_intervals(grlist, title = txt)
     }
     if (verbose) message(txt)
-    newranges
+    newgr
     
 }
 
@@ -149,7 +149,7 @@ straddle <- function(
 ){
     
     # Extend    
-    newranges <- gr
+    newgr <- gr
     if (is.numeric(leftstart) & is.numeric(rightend)){
         extend( gr, 
                 leftstart  = leftstart, 
@@ -221,17 +221,17 @@ double_flank <- function(
     if (verbose) cmessage('\tFlank fourways')
     left <-  left_flank(gr, leftstart,   leftend,  plot=FALSE, verbose=verbose)
     right <- right_flank(gr, rightstart, rightend, plot=FALSE, verbose=verbose)
-    newranges <- c(left, right)
-    if (verbose) cmessage('\t\t%d combined (left + right)', length(newranges))
+    newgr <- c(left, right)
+    if (verbose) cmessage('\t\t%d combined (left + right)', length(newgr))
 
     # Plot
-    if (plot)  plot_intervals(GRangesList(sites = gr, flanks = newranges))
+    if (plot) plot_intervals(GenomicRanges::GRangesList(sites=gr, flanks=newgr))
 
     # Merge overlaps
-    newranges %<>% reduce() # GenomicRanges::reduce
-    if (verbose) cmessage('\t\t%d after merging overlaps', length(newranges))
+    newgr %<>% GenomicRanges::reduce()
+    if (verbose) cmessage('\t\t%d after merging overlaps', length(newgr))
     
     # Return
-    newranges
+    newgr
 }
 
