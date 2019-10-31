@@ -21,10 +21,7 @@ Add sequence to GRanges
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
-                                'TxDb.Mmusculus.UCSC.mm10.knownGene')
-gr <- bed_to_granges(bedfile, txdb)
-
+gr <- bed_to_granges(bedfile, 'mm10')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 gr <- add_seq(gr, bsgenome)
 gr

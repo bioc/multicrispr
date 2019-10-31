@@ -4,19 +4,23 @@
 \alias{bed_to_granges}
 \title{Read bedfile into GRanges}
 \usage{
-bed_to_granges(bedfile, txdb, do_order = TRUE, plot = TRUE,
-  verbose = TRUE)
+bed_to_granges(bedfile, genome, complement = TRUE, txdb = NULL,
+  do_order = TRUE, plot = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{bedfile}{file path}
 
-\item{txdb}{\code{\link[TxDb]{TXDb-class}}}
+\item{genome}{string: UCSC genome name (e.g. 'mm10')}
 
-\item{do_order}{logical(1)}
+\item{complement}{TRUE (default) or FALSE: add complementary strand too?}
 
-\item{plot}{logical(1)}
+\item{txdb}{NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}} (for gene annotation)}
 
-\item{verbose}{logical(1)}
+\item{do_order}{TRUE (default) or FALSE: order on seqnames and star?}
+
+\item{plot}{TRUE (default) or FALSE: plot karyogram?}
+
+\item{verbose}{TRUE (default) or FALSE}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -26,9 +30,7 @@ Read bedfile into GRanges
 }
 \examples{
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
-                                'TxDb.Mmusculus.UCSC.mm10.knownGene')
-gr <- bed_to_granges(bedfile, txdb)
+gr <- bed_to_granges(bedfile, 'mm10')
 }
 \seealso{
 \code{rtracklayer::import.bed} (documented in 

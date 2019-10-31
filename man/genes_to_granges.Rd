@@ -5,19 +5,24 @@
 \alias{genefile_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
-genes_to_granges(geneids, txdb, plot = TRUE)
+genes_to_granges(geneids, txdb, complement = TRUE, plot = TRUE,
+  verbose = TRUE)
 
-genefile_to_granges(file, txdb, plot = TRUE)
+genefile_to_granges(file, txdb, complement = TRUE, plot = TRUE)
 }
 \arguments{
-\item{geneids}{Entrez Gene identifier vector}
+\item{geneids}{Gene identifier vector}
 
 \item{txdb}{\code{\link[GenomicFeatures]{TxDb-class}} or 
 \code{\link[ensembldb]{EnsDb-class}}}
 
-\item{plot}{TRUE or FALSE}
+\item{complement}{TRUE (default) or FALSE: add complementary strand?}
 
-\item{file}{Entrez Gene identifier file (one per row)}
+\item{plot}{TRUE (default) or FALSE}
+
+\item{verbose}{TRUE (default) or FALSE}
+
+\item{file}{Gene identifier file (one per row)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

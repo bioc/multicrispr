@@ -12,9 +12,7 @@
 #' # Read ranges and extend
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     txdb <-  utils::getFromNamespace( 'TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'                                       'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#'     targets <- bed_to_granges(bedfile, txdb)
+#'     targets <- bed_to_granges(bedfile, 'mm10')
 #'     targets %<>% extend()
 #' 
 #' # Add seqs and find cas9s
@@ -23,7 +21,7 @@
 #'     cas9s <- find_cas9s(targets)
 #' 
 #' # Count matches
-#'     cas9sseqs <- cas9s$seq[1:10]
+#'     cas9seqs <- cas9s$seq[1:10]
 #'     count_target_matches(cas9seqs, targets$seq, 0)
 #'     count_genome_matches(cas9seqs, bsgenome,    0, chromosomes = 'chrY')
 #' @export
@@ -123,9 +121,7 @@ add_seqinfo <- function(gr, bsgenome){
 #' # Read ranges, extend, and restrict to 'chrY' (to keep example fast)
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     txdb <-  utils::getFromNamespace( 'TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'                                       'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#'     targets <- bed_to_granges(bedfile, txdb)
+#'     targets <- bed_to_granges(bedfile, 'mm10')
 #'     targets %<>% extend()
 #'     targets %<>% extract(GenomeInfoDb::seqnames(.)=='chrY')
 #' 

@@ -8,10 +8,8 @@
 #' @examples 
 #' require(magrittr)
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'                                 'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10                                
-#' targets  <- bed_to_granges(bedfile, txdb)  %>% 
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' targets  <- bed_to_granges(bedfile, 'mm10')  %>% 
 #'             double_flank() %>% 
 #'             add_seq(bsgenome)
 #' cas9s    <- find_cas9s(targets)
@@ -20,6 +18,12 @@
 #' cas9s[1:3]$contextseq
 #' @export
 add_contextseq <- function(cas9s, bsgenome, verbose = TRUE){
+    
+    # Prevent from stats::start from being used (leads to bug!)
+    start  <- GenomicRanges::start;     `start<-`  <- GenomicRanges::`start<-`
+    end    <- GenomicRanges::end;       `end<-`    <- GenomicRanges::`end<-`
+    strand <- GenomicRanges::strand
+    
     contexts <- cas9s
     start(contexts) <- start(cas9s) - ifelse(strand(cas9s)=='+', 4, 3)
     end(contexts)   <- end(cas9s)   + ifelse(strand(cas9s)=='+', 3, 4)
@@ -30,7 +34,7 @@ add_contextseq <- function(cas9s, bsgenome, verbose = TRUE){
 }
 
 
-score_rs1 <- function(
+doench2014 <- function(
     contextseqs,
     python     = NULL,
     virtualenv = NULL,
@@ -44,7 +48,7 @@ score_rs1 <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Message
-    if (verbose)  message('\t\tScore contextseqs with ruleset1')
+    if (verbose)  message('\t\tScore contextseqs with Doench2014')
     
     # Score
     CRISPRseek::calculategRNAEfficiency(
@@ -58,7 +62,7 @@ score_rs1 <- function(
 }
 
 
-score_rs2 <- function(
+doench2016 <- function(
     contextseqs, 
     python     = NULL, 
     virtualenv = NULL, 
@@ -72,7 +76,6 @@ score_rs2 <- function(
     if (!is.null(condaenv))     reticulate::use_condaenv(condaenv)
     
     # Assert
-    assertive.reflection::assert_is_unix() & 
     assertive.base::is_identical_to_true(
         reticulate::py_module_available('azimuth'))
     assertive.types::assert_is_character(contextseqs)
@@ -80,59 +83,65 @@ score_rs2 <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Message
-    if (verbose)  message(  '\t\tScore contextseqs with ruleset2',
+    if (verbose)  message(  '\t\tScore contextseqs with Doench2016',
                             ' (https://github.com/MicrosoftResearch/Azimuth)')
     
     # Score
-    score <- contextseq <- NULL
-    seqdt   <- data.table::data.table(contextseq = contextseqs)
-    scoredt <- data.table::data.table(contextseq = unique(contextseqs))
-    azimuth <- reticulate::import("azimuth", delay_load = TRUE)
-    numpy   <- reticulate::import("numpy",   delay_load = TRUE)
-    scoredt [ , score := azimuth$model_comparison$predict(
-                            numpy$array(contextseq)) 
-            ]
-    seqdt %>% merge(scoredt, by = 'contextseq') %>% extract2('score')
+    azi <- reticulate::import('azimuth.model_comparison', delay_load = TRUE)
+    azi$predict(
+        reticulate::np_array(contextseqs), 
+        aa_cut                 = NULL, 
+        percent_peptide        = NULL, 
+        model                  = NULL, 
+        model_file             = NULL, 
+        pam_audit              = TRUE, 
+        length_audit           = TRUE, 
+        learn_options_override = NULL)
 }
 
 
-#' Filter on Doench score
+#' Score cas9 sites
 #' 
-#' Score cas9s using Doench ruleset 1 (Doench 2014) or 2 (Doench 2016). 
-#' Then filter on set threshold.
+#' Score cas9s with Doench2014 or Doench2016 model.
 #' 
-#' ruleset1 is readily available. ruleset2 is accessible after installing 
-#' the python module [azimuth](https://github.com/MicrosoftResearch/Azimuth), 
-#' and specifying a value for either \code{python} (python binary path), 
-#' \code{virtualenv} (python virtual environment dir) or 
-#' \code{condaenv} (python conda environment).
+#' Doench2014 is readily available. 
+#' Doench2016 is available after installing python module 
+#' [azimuth](https://github.com/MicrosoftResearch/Azimuth) (see examples).
 #' 
 #' @param cas9s     \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param ruleset    1 (default) or 2 (requires non-NULL value for either python, virtualenv, or condaenv)
-#' @param filter     score threshold to filter for
+#' @param method    'Doench2014' (default) or 'Doench2016'
+#'                   (requires non-NULL argument python, virtualenv, or condaenv)
 #' @param python     NULL (default) or python binary path with module azimuth
 #' @param virtualenv NULL (default) or python virtualenv with module azimuth
 #' @param condaenv   NULL (default) or python condaenv with module azimuth
-#' @param plot       TRUE (default) or FALSE
 #' @param verbose    TRUE (default) or FALSE
 #' @return numeric vector
 #' @examples
-#' # Get cas9s
+#' # Define targets
 #'     require(magrittr)
-#'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'                                     'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     targets <- bed_to_granges(bedfile, txdb)  %>% 
+#'     targets <- bed_to_granges(bedfile, 'mm10')  %>% 
 #'                double_flank() %>%
 #'                add_seq(bsgenome)
 #' 
 #' # Find cas9s
 #'     cas9s <- find_cas9s(targets)
 #'     
-#' # Compute and filter on Doench score
-#'     cas9s %>% filter_doench_score(bsgenome)
+#' # Score with Doench2014
+#'     score_cas9s(cas9s[1:10], bsgenome)
+#'         
+#' # Score with Doench2016
+#'     # First install python module azimuth, perhaps in a conda env:
+#'         # install conda for python 2.7
+#'         # conda create --name azimuthenv python=2.7
+#'         # conda activate azimuthenv
+#'         # pip install azimuth
+#'         # pip install scikit-learn==0.17.1
+#'         
+#'     # Then call score_cas9s with reference to conda env
+#'        # score_cas9s(cas9s[1:10], bsgenome, 'Doench2016', condaenv = 'azimuthenv')
 #' 
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
@@ -145,51 +154,32 @@ score_rs2 <- function(
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
 #' @export
-filter_doench_score <- function(
+score_cas9s <- function(
     cas9s,
     bsgenome, 
-    ruleset    = 1,
-    filter     = 0.3,
+    method     = c('Doench2014','Doench2016')[1],
     python     = NULL,
     virtualenv = NULL,
     condaenv   = NULL,
-    plot       = TRUE,
     verbose    = TRUE
 ){
     # Assert
     assertive.types::assert_is_all_of(cas9s, 'GRanges')
 
     # Add contextseq
+    if (verbose)  cmessage('\tScore cas9s')
     cas9s %<>% add_contextseq(bsgenome, verbose = verbose)
+    cas9dt <- data.table::as.data.table(cas9s)
+    scoredt <- data.table::data.table(contextseq = unique(cas9dt$contextseq))
     
     # Score
-    scorefun <- switch(ruleset, `1` = score_rs1, `2` = score_rs2)
-    cas9s$score <- scorefun(cas9s$contextseq, 
-                            verbose     = verbose,
-                            python      = python, 
-                            virtualenv  = virtualenv, 
-                            condaenv    = condaenv)
-    
-    # Filter
-    if (verbose) cmessage('\t\tFilter: score > %s', as.character(filter))
-    goodscore <- cas9s %>% extract(cas9s$score > filter)
-    
-    # Plot
-    if (plot){
-        grlist <- GRangesList(cas9 = cas9s, goodscore = goodscore)
-        names(grlist)[2] <- sprintf('score > %s', as.character(filter))
-        plot_karyogram(grlist)
-    }
-    
-    # Message
-    if (verbose)  cmessage('\t\tReturn %d/%d cas9seqs at %d/%d cas9 sites: score > %s', 
-                           length(unique(goodscore$seq)),
-                           length(unique(goodscore$seq)),
-                           length(cas9s),
-                           length(goodscore), 
-                           as.character(filter))
-    
-    # Return
-    cas9s
-    
+    scorefun <- switch(method, Doench2014 = doench2014, Doench2016 = doench2016)
+    scoredt[ , (method) := scorefun(scoredt$contextseq, verbose=verbose) ]
+
+    # Merge back in and Return
+    cas9smerged  <- cas9dt %>% 
+                    merge(scoredt, by = 'contextseq', sort = FALSE, all.x = TRUE) %>%
+                    as('GRanges')
+    seqinfo(cas9smerged) <- seqinfo(cas9s)
+    cas9smerged
 }

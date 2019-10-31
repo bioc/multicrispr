@@ -4,16 +4,14 @@
 \alias{find_cas9s}
 \title{Find cas9 sites in targetranges}
 \usage{
-find_cas9s(gr, inclcompl = TRUE, plot = TRUE, verbose = TRUE)
+find_cas9s(targets, plot = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
+\item{targets}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{inclcompl}{logical(1): include complementary strands in search?}
+\item{plot}{TRUE (default) or FALSE}
 
-\item{plot}{logical(1)}
-
-\item{verbose}{logical(1)}
+\item{verbose}{TRUE (default) or FALSE}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -23,13 +21,13 @@ Find cas9 sites in targetranges
 }
 \examples{
 # Read bed into granges, extend, add seqs
+    require(magrittr)
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-    txdb <- utils::getFromNamespace(
-             'TxDb.Mmusculus.UCSC.mm10.knownGene', 
-             'TxDb.Mmusculus.UCSC.mm10.knownGene')
-    gr <- extend(bed_to_granges(bedfile, txdb), plot = FALSE)
-    gr <- add_seq(gr, bsgenome)
+    targets <- bed_to_granges(bedfile, 'mm10')
+    targets \%<>\% extend(plot = FALSE)
+    targets \%<>\% add_seq(bsgenome)
     
 # Find cas9 seqs
-    find_cas9s(gr)
+    find_cas9s(targets)
 }

@@ -49,6 +49,21 @@
 #}
 
 
+add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
+    complements <- invertStrand(gr)
+    newranges <- c(gr, complements)
+    txt <- sprintf('\t\t%d ranges after adding inverse strands',
+                    length(newranges))
+    if (plot){
+        plot_intervals(
+            GRangesList(original = gr, complements = complements),
+            title = txt)
+    }
+    if (verbose) cmessage(txt)
+    newranges
+}
+
+
 annotate_granges <- function(gr, txdb){
     
     # Assert
@@ -88,45 +103,49 @@ annotate_granges <- function(gr, txdb){
 
 #' Read bedfile into GRanges
 #' 
-#' @param bedfile   file path
-#' @param txdb     \code{\link[TxDb]{TXDb-class}}
-#' @param do_order  logical(1)
-#' @param plot      logical(1)
-#' @param verbose   logical(1)
+#' @param bedfile    file path
+#' @param genome     string: UCSC genome name (e.g. 'mm10')
+#' @param complement TRUE (default) or FALSE: add complementary strand too?
+#' @param txdb       NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}} (for gene annotation)
+#' @param do_order   TRUE (default) or FALSE: order on seqnames and star?
+#' @param plot       TRUE (default) or FALSE: plot karyogram?
+#' @param verbose    TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'                                 'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#' gr <- bed_to_granges(bedfile, txdb)
+#' gr <- bed_to_granges(bedfile, 'mm10')
 #' @seealso \code{rtracklayer::import.bed} (documented in 
 #' \code{\link[rtracklayer]{BEDFile-class}}), around which this function wraps.
 #' @export
 bed_to_granges <- function(
-    bedfile, 
-    txdb,
-    do_order = TRUE,
-    plot     = TRUE, 
-    verbose  = TRUE 
+    bedfile,
+    genome,
+    complement = TRUE,
+    txdb       = NULL,
+    do_order   = TRUE,
+    plot       = TRUE, 
+    verbose    = TRUE 
 ){
     . <- NULL
     
     # Assert
     assertive.files::assert_all_are_existing_files(bedfile)
-    assertive.types::assert_is_all_of(txdb, 'TxDb')
+    assertive.types::assert_is_a_bool(complement)
+    if (!is.null(txdb)) assertive.types::assert_is_all_of(txdb, 'TxDb')
     assertive.types::assert_is_a_bool(do_order)
     assertive.types::assert_is_a_bool(plot)
     assertive.types::assert_is_a_bool(verbose)
 
     # Read
-    gr <- rtracklayer::import.bed(bedfile)
+    if (verbose) cmessage('\tRead %s into GRanges', basename(bedfile))
+    gr <- rtracklayer::import.bed(bedfile, genome = genome)
     if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
                     length(gr), length(unique(GenomeInfoDb::seqnames(gr))))
     
-    # Set seqinfo
-    assertive.sets::assert_is_subset(seqlevels(gr), seqlevels(txdb))
-    seqlevels(gr) <- intersect(seqlevels(txdb), seqlevels(gr))
-    seqinfo(gr) <- seqinfo(txdb)
+    # Add complementary strand
+    if (complement){
+        gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
+    }
     
     # Annotate
     if (!is.null(txdb)){
@@ -154,11 +173,13 @@ bed_to_granges <- function(
 #=============================================================================
 
 #' Convert geneids into GRanges
-#' @param file    Entrez Gene identifier file (one per row)
-#' @param geneids Entrez Gene identifier vector
-#' @param txdb    \code{\link[GenomicFeatures]{TxDb-class}} or 
-#'                \code{\link[ensembldb]{EnsDb-class}}
-#' @param plot    TRUE or FALSE
+#' @param file       Gene identifier file (one per row)
+#' @param geneids    Gene identifier vector
+#' @param complement TRUE (default) or FALSE: add complementary strand?
+#' @param txdb       \code{\link[GenomicFeatures]{TxDb-class}} or 
+#'                   \code{\link[ensembldb]{EnsDb-class}}
+#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # Entrez
@@ -178,15 +199,29 @@ bed_to_granges <- function(
 #' gr <- genes_to_granges(geneids, txdb)
 #' gr <- genefile_to_granges(genefile, txdb)
 #' @export
-genes_to_granges <- function(geneids, txdb, plot = TRUE){
+genes_to_granges <- function(
+    geneids, 
+    txdb, 
+    complement = TRUE, 
+    plot       = TRUE, 
+    verbose    = TRUE
+){
     
     # Assert
     assertive.types::assert_is_character(geneids)
     assertive.types::assert_is_any_of(txdb, c('TxDb', 'EnsDb'))
+    assertive.types::assert_is_a_bool(complement)
     assertive.types::assert_is_a_bool(plot)
     
     # Convert
     gr <- GenomicFeatures::genes(txdb)[geneids]
+    if (verbose)  cmessage('\t\tConvert %d genes to %d GRanges', 
+                            length(geneids), length(gr))
+    
+    # Add complementary strand
+    if (complement){
+        gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
+    }
 
     # Plot
     if (plot) plot_karyogram(gr)
@@ -198,10 +233,10 @@ genes_to_granges <- function(geneids, txdb, plot = TRUE){
 
 #' @rdname genes_to_granges
 #' @export
-genefile_to_granges <- function(file, txdb, plot = TRUE){
+genefile_to_granges <- function(file, txdb, complement = TRUE, plot = TRUE){
     assertive.files::assert_all_are_existing_files(file)
     geneids <- utils::read.table(file)[[1]] %>% as.character()
-    genes_to_granges(geneids, txdb, plot = plot)
+    genes_to_granges(geneids, txdb, complement = complement, plot = plot)
 }
 
 
@@ -212,10 +247,7 @@ genefile_to_granges <- function(file, txdb, plot = TRUE){
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' txdb <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'                                 'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#' gr <- bed_to_granges(bedfile, txdb)
-#' 
+#' gr <- bed_to_granges(bedfile, 'mm10')
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #' gr <- add_seq(gr, bsgenome)
 #' gr
@@ -227,7 +259,7 @@ add_seq <- function(gr, bsgenome, verbose = TRUE){
     assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
     
     # Message
-    if (verbose)  cmessage('\t\tAdd seq')
+    if (verbose)  cmessage('\tAdd seq')
     
     # Align seqlevelsStyle if required
     if (seqlevelsStyle(bsgenome)[1] != seqlevelsStyle(gr)[1]){

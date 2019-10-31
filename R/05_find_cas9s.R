@@ -1,74 +1,43 @@
 
 
-#' Add inverse strand for each range
-#'
-#' @param gr \code{\link[GenomicRanges]{GRanges-class}}
-#' @param plot     logical(1)
-#' @param verbose  logical(1)
-#' @return \code{\link[GenomicRanges]{GRanges-class}}, twice as long as input
-#' @examples
-#' require(magrittr)
-#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' txdb <- utils::getFromNamespace(
-#'              'TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'              'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#' gr <- bed_to_granges(bedfile, txdb, plot = FALSE)
-#' add_inverse_strand(gr)
-#' @export
-add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
-    complements <- invertStrand(gr)
-    newranges <- c(gr, complements)
-    txt <- sprintf('\t\t%d ranges after adding inverse strands',
-                    length(newranges))
-    if (plot){
-        plot_intervals(
-            GRangesList(original = gr, complements = complements),
-            title = txt)
-    }
-    if (verbose) cmessage(txt)
-    newranges
-}
-
 #=============================================================================
 # Find cas9 ranges
 #=============================================================================
 
 #' Find cas9 sites in targetranges
-#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param inclcompl logical(1): include complementary strands in search?
-#' @param plot      logical(1)
-#' @param verbose   logical(1)
+#' @param targets   \code{\link[GenomicRanges]{GRanges-class}}
+#' @param plot      TRUE (default) or FALSE
+#' @param verbose   TRUE (default) or FALSE
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # Read bed into granges, extend, add seqs
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#'     txdb <- utils::getFromNamespace(
-#'              'TxDb.Mmusculus.UCSC.mm10.knownGene', 
-#'              'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#'     gr <- extend(bed_to_granges(bedfile, txdb), plot = FALSE)
-#'     gr <- add_seq(gr, bsgenome)
+#'     targets <- bed_to_granges(bedfile, 'mm10')
+#'     targets %<>% extend(plot = FALSE)
+#'     targets %<>% add_seq(bsgenome)
 #'     
 #' # Find cas9 seqs
-#'     find_cas9s(gr)
+#'     find_cas9s(targets)
 #' @export 
-find_cas9s <- function(gr, inclcompl = TRUE, plot = TRUE, verbose = TRUE){
+find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
 
     # Assert
-    assertive.types::assert_is_all_of(gr, 'GRanges')
-    assertive.sets::assert_is_subset('seq', names(mcols(gr)))
-    assertive.types::assert_is_character(gr$seq)
+    assertive.types::assert_is_all_of(targets, 'GRanges')
+    assertive.sets::assert_is_subset('seq', names(mcols(targets)))
+    assertive.types::assert_is_character(targets$seq)
     assertive.types::assert_is_a_bool(verbose)
     
     # Add complementary strands
     if (verbose) message('\tFind N{20}NGG cas9seqs')
-    if (inclcompl) gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
-    
+
     # Comply
     start <- substart <- cas9start <- NULL
     end <- subend <- cas9end <- strand <- seqnames <- NULL
     
     # Find cas9s in targetranges
-    targetdt <- data.table::as.data.table(gr)
+    targetdt <- data.table::as.data.table(targets)
     res <- targetdt$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
@@ -83,7 +52,7 @@ find_cas9s <- function(gr, inclcompl = TRUE, plot = TRUE, verbose = TRUE){
     }
 
     # Transform into cas9ranges
-    cas9ranges <- tidyr::separate_rows(targetdt, substart, subend) %>%
+    cas9s <- tidyr::separate_rows(targetdt, substart, subend) %>%
         data.table::data.table()                                   %>% 
         extract(, substart := as.numeric(substart))                %>% 
         extract(, subend   := as.numeric(subend))                  %>% 
@@ -96,18 +65,18 @@ find_cas9s <- function(gr, inclcompl = TRUE, plot = TRUE, verbose = TRUE){
                         end = cas9end,  strand  = strand,  seq = seq)) %>% 
         unique() %>%
         as('GRanges')
-    seqinfo(cas9ranges) <- seqinfo(gr)
+    seqinfo(cas9s) <- seqinfo(targets)
 
     # Plot
     if (plot){
-        grlist <- GenomicRanges::GRangesList(target = gr, cas9site = cas9ranges)
+        grlist <- GenomicRanges::GRangesList(target = targets, cas9site = cas9s)
         plot_karyogram(grlist)
     }
     
     # Return
     if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
-                            length(unique(cas9ranges$seq)), 
-                            length(cas9ranges))
-    return(cas9ranges)
+                            length(unique(cas9s$seq)), 
+                            length(cas9s))
+    return(cas9s)
 }
 
