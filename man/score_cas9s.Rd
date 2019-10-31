@@ -59,7 +59,8 @@ Doench2016 is available after installing python module
         # pip install scikit-learn==0.17.1
         
     # Then call score_cas9s with reference to conda env
-       # score_cas9s(cas9s[1:10], bsgenome, 'Doench2016', condaenv = 'azimuthenv')
+        # score_cas9s(cas9s[1:10], bsgenome, 'Doench2016', 
+        #             condaenv = 'azimuthenv')
 
 }
 \references{

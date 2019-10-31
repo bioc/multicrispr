@@ -110,8 +110,8 @@ doench2016 <- function(
 #' 
 #' @param cas9s     \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param method    'Doench2014' (default) or 'Doench2016'
-#'                   (requires non-NULL argument python, virtualenv, or condaenv)
+#' @param method   'Doench2014' (default) or 'Doench2016'
+#'                 (requires non-NULL argument python, virtualenv, or condaenv)
 #' @param python     NULL (default) or python binary path with module azimuth
 #' @param virtualenv NULL (default) or python virtualenv with module azimuth
 #' @param condaenv   NULL (default) or python condaenv with module azimuth
@@ -141,7 +141,8 @@ doench2016 <- function(
 #'         # pip install scikit-learn==0.17.1
 #'         
 #'     # Then call score_cas9s with reference to conda env
-#'        # score_cas9s(cas9s[1:10], bsgenome, 'Doench2016', condaenv = 'azimuthenv')
+#'         # score_cas9s(cas9s[1:10], bsgenome, 'Doench2016', 
+#'         #             condaenv = 'azimuthenv')
 #' 
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
@@ -177,8 +178,8 @@ score_cas9s <- function(
     scoredt[ , (method) := scorefun(scoredt$contextseq, verbose=verbose) ]
 
     # Merge back in and Return
-    cas9smerged  <- cas9dt %>% 
-                    merge(scoredt, by = 'contextseq', sort = FALSE, all.x = TRUE) %>%
+    cas9smerged  <- merge(  cas9dt, scoredt, by = 'contextseq', sort = FALSE, 
+                            all.x = TRUE) %>%
                     as('GRanges')
     seqinfo(cas9smerged) <- seqinfo(cas9s)
     cas9smerged

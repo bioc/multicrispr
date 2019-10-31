@@ -23,20 +23,16 @@
 #' @export 
 find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
 
-    # Assert
+    # Assert. Comply
     assertive.types::assert_is_all_of(targets, 'GRanges')
     assertive.sets::assert_is_subset('seq', names(mcols(targets)))
     assertive.types::assert_is_character(targets$seq)
     assertive.types::assert_is_a_bool(verbose)
-    
-    # Add complementary strands
-    if (verbose) message('\tFind N{20}NGG cas9seqs')
-
-    # Comply
     start <- substart <- cas9start <- NULL
     end <- subend <- cas9end <- strand <- seqnames <- NULL
     
     # Find cas9s in targetranges
+    if (verbose) message('\tFind N{20}NGG cas9seqs')
     targetdt <- data.table::as.data.table(targets)
     res <- targetdt$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
@@ -63,20 +59,16 @@ find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
         extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
         extract(, list( seqnames = seqnames, start = cas9start, 
                         end = cas9end,  strand  = strand,  seq = seq)) %>% 
-        unique() %>%
-        as('GRanges')
+        unique() %>% as('GRanges')
     seqinfo(cas9s) <- seqinfo(targets)
 
-    # Plot
-    if (plot){
-        grlist <- GenomicRanges::GRangesList(target = targets, cas9site = cas9s)
-        plot_karyogram(grlist)
-    }
+    # Plot/Message
+    if (plot) plot_karyogram(GenomicRanges::GRangesList(
+                                target = targets, cas9site = cas9s))
+    if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
+                        length(unique(cas9s$seq)), length(cas9s))
     
     # Return
-    if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
-                            length(unique(cas9s$seq)), 
-                            length(cas9s))
     return(cas9s)
 }
 

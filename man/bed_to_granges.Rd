@@ -14,7 +14,8 @@ bed_to_granges(bedfile, genome, complement = TRUE, txdb = NULL,
 
 \item{complement}{TRUE (default) or FALSE: add complementary strand too?}
 
-\item{txdb}{NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}} (for gene annotation)}
+\item{txdb}{NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}}
+(used for gene annotation)}
 
 \item{do_order}{TRUE (default) or FALSE: order on seqnames and star?}
 

@@ -133,16 +133,10 @@ add_seqinfo <- function(gr, bsgenome){
 #' # Filter for offtarget-free cas9s
 #'     filter_no_offtargets(cas9s, targets, bsgenome, 0, offtargetchr = 'chrY')
 #' @export
-filter_no_offtargets <- function(
-    cas9s, 
-    targets,
-    bsgenome, 
-    mismatch     = 2,
-    offtargetchr = standardChromosomes(targets),
-    plot         = TRUE,
-    verbose      = TRUE
-){
-    # Assert
+filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2,
+    offtargetchr = standardChromosomes(targets), plot = TRUE, verbose = TRUE){
+    
+    # Assert. Prepare
     assertive.types::assert_is_all_of(cas9s,    'GRanges')
     assertive.types::assert_is_all_of(targets,  'GRanges')
     assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
@@ -151,8 +145,6 @@ filter_no_offtargets <- function(
     assertive.sets::assert_is_subset(offtargetchr, seqnames(bsgenome))
     assertive.sets::assert_is_subset('seq', names(mcols(cas9s)))
     assertive.sets::assert_is_subset('seq', names(mcols(targets)))
-
-    # Prepare
     targetseqs <- targets$seq
     cas9seqdt  <- data.table::data.table(seq = unique(cas9s$seq))
     
@@ -163,8 +155,7 @@ filter_no_offtargets <- function(
         # Count
         target_matches <- count_target_matches(
                             cas9seqdt$seq, targetseqs, mis, verbose = verbose)
-        genome_matches <- count_genome_matches(
-                            cas9seqdt$seq, bsgenome, mis, 
+        genome_matches <- count_genome_matches(cas9seqdt$seq, bsgenome, mis, 
                             chromosomes = offtargetchr, verbose = verbose)
         # Store
         cas9seqdt [ , (sprintf('matches%d', mis)) := target_matches ]
@@ -180,19 +171,12 @@ filter_no_offtargets <- function(
     # Filter for offtargetfree
     offtargetfree  <-   cas9seqdt %>% 
                         merge(data.table::as.data.table(cas9s), by = 'seq') %>% 
-                        as('GRanges') %>% 
-                        add_seqinfo(bsgenome)
+                        as('GRanges') %>%  add_seqinfo(bsgenome)
     # Plot/Report
-    if (plot){
-        grlist  <- GRangesList( target = targets, 
-                                cas9   = cas9s, 
-                                offtargetfree = offtargetfree)
-        plot_karyogram(grlist)
-    }
-    if (verbose)    cmessage('\tReturn %d cas9seqs across %d ranges',
-                            length(unique(offtargetfree$seq)), 
-                            length(offtargetfree))
-    
+    if (plot)    plot_karyogram(GRangesList(target = targets, cas9 = cas9s, 
+                                            offtargetfree = offtargetfree))
+    if (verbose) cmessage('\tReturn %d cas9seqs across %d ranges',
+                    length(unique(offtargetfree$seq)), length(offtargetfree))
     # Return
     offtargetfree
 }

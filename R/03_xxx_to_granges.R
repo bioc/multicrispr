@@ -106,7 +106,8 @@ annotate_granges <- function(gr, txdb){
 #' @param bedfile    file path
 #' @param genome     string: UCSC genome name (e.g. 'mm10')
 #' @param complement TRUE (default) or FALSE: add complementary strand too?
-#' @param txdb       NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}} (for gene annotation)
+#' @param txdb      NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}}
+#'                   (used for gene annotation)
 #' @param do_order   TRUE (default) or FALSE: order on seqnames and star?
 #' @param plot       TRUE (default) or FALSE: plot karyogram?
 #' @param verbose    TRUE (default) or FALSE
