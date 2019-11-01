@@ -5,7 +5,7 @@
 \title{Double flank}
 \usage{
 double_flank(gr, leftstart = -200, leftend = -1, rightstart = 1,
-  rightend = 200, complement = TRUE, plot = TRUE, verbose = TRUE)
+  rightend = 200, plot = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
@@ -17,8 +17,6 @@ double_flank(gr, leftstart = -200, leftend = -1, rightstart = 1,
 \item{rightstart}{number: right flank start (relative to range end)}
 
 \item{rightend}{number: right flank end   (relative to range end)}
-
-\item{complement}{logical(1): whether to add complementary strand}
 
 \item{plot}{logical(1)}
 

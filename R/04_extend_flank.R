@@ -195,7 +195,6 @@ straddle <- function(
 #' @param leftend     number: left flank  end   (relative to range start)
 #' @param rightstart  number: right flank start (relative to range end)
 #' @param rightend    number: right flank end   (relative to range end)
-#' @param complement  logical(1): whether to add complementary strand
 #' @param plot        logical(1)
 #' @param verbose     logical(1)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
@@ -210,7 +209,6 @@ double_flank <- function(
     leftend    =   -1,
     rightstart =    1,
     rightend   =  200,
-    complement = TRUE,
     plot       = TRUE,
     verbose    = TRUE
 ){

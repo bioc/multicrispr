@@ -166,6 +166,8 @@ score_cas9s <- function(
 ){
     # Assert
     assertive.types::assert_is_all_of(cas9s, 'GRanges')
+    assertive.types::assert_is_a_string(method)
+    assertive.sets::assert_is_subset(method, c('Doench2014', 'Doench2016'))
 
     # Add contextseq
     if (verbose)  cmessage('\tScore cas9s')
