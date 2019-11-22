@@ -1,10 +1,7 @@
 
 
-#=============================================================================
-# Find cas9 ranges
-#=============================================================================
 
-#' Find cas9 sites in targetranges
+#' Find crispr sites in targetranges
 #' @param targets   \code{\link[GenomicRanges]{GRanges-class}}
 #' @param plot      TRUE (default) or FALSE
 #' @param verbose   TRUE (default) or FALSE
@@ -18,10 +15,10 @@
 #'     targets %<>% extend(plot = FALSE)
 #'     targets %<>% add_seq(bsgenome)
 #'     
-#' # Find cas9 seqs
-#'     find_cas9s(targets)
+#' # Find crispr sites
+#'     find_crispr_sites(targets)
 #' @export 
-find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
+find_crispr_sites <- function(targets, plot = TRUE, verbose = TRUE){
 
     # Assert. Import. Comply
     assertive.types::assert_is_all_of(targets, 'GRanges')

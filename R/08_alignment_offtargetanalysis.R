@@ -18,7 +18,7 @@
 # 
 # # Align cas9s to targets and genome
 # require(multicrispr)
-# cas9s <- find_cas9s(targets)
+# cas9s <- find_crispr_sites(targets)
 # outdir <- tempdir()
 # name(bsgenome)
 # align_cas9s <- function(cas9s, outdir){

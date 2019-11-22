@@ -1,5 +1,5 @@
 Package: multicrispr
-Title: Multi-locus crispr design
+Title: Multi-locus Crispr/Cas design
 Version: 0.1.0
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",  c("aut", "cre")),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",     "ctb"),
@@ -9,7 +9,7 @@ Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.d
             person( "Michael",  "Lawrence",   NULL, "lawrence.michael@gene.com",       "ctb"),
             person( "Herve",    "Pages",      NULL, "hpages@fredhutch.org",            "ctb"),
             person( "Mario",    "Looso",      NULL, "mario.looso@mpi-bn.mpg.de",     c("sad","rth")))
-Description: Contains functions to facilitate the design of a multi-locus crispr/cas9 library.
+Description: Contains functions to facilitate the design of a multi-locus Crispr/Cas library.
 License: GPL
 Encoding: UTF-8
 LazyData: true

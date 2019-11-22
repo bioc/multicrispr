@@ -63,7 +63,7 @@ bsinfo <- BSgenome::seqinfo(bsgenome)
 #                                                                                template  x   bindingsite
 #
     
-    (cas9s <- multicrispr::find_cas9s(gr))
+    (cas9s <- multicrispr::find_crispr_sites(gr))
 
 # PRNP snp: Kuru resistance variant (G -> T)
     gr  <-  GenomicRanges::GRanges(
@@ -72,7 +72,7 @@ bsinfo <- BSgenome::seqinfo(bsgenome)
     (gr %<>% multicrispr::add_seq(bsgenome))
     (extended <- multicrispr::extend(gr, bsgenome = bsgenome))
     Biostrings::complement(Biostrings::DNAStringSet(extended$seq[2]))
-    (cas9s <- multicrispr::find_cas9s(extended))
+    (cas9s <- multicrispr::find_crispr_sites(extended))
 
     # Precision editing
     #
@@ -89,7 +89,7 @@ bsinfo <- BSgenome::seqinfo(bsgenome)
     gr %<>% multicrispr:::add_inverse_strand()
     extended <- multicrispr::extend(gr)
     extended %<>% multicrispr::add_seq(bsgenome)
-    cas9s <- multicrispr::find_cas9s(extended)
+    cas9s <- multicrispr::find_crispr_sites(extended)
     
     # Precision editing
     # 

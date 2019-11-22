@@ -26,7 +26,7 @@ bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 targets  <- bed_to_granges(bedfile, 'mm10')  \%>\% 
             double_flank() \%>\% 
             add_seq(bsgenome)
-cas9s    <- find_cas9s(targets)
+cas9s    <- find_crispr_sites(targets)
 cas9s \%<>\% add_contextseq(bsgenome)
 cas9s[1:3]$seq
 cas9s[1:3]$contextseq

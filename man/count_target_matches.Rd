@@ -44,7 +44,7 @@ Count target/genome matches
 # Add seqs and find cas9s
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     targets \%<>\% add_seq(bsgenome)
-    cas9s <- find_cas9s(targets)
+    cas9s <- find_crispr_sites(targets)
 
 # Count matches
     cas9seqs <- cas9s$seq[1:10]

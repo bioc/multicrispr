@@ -50,7 +50,7 @@ Filter for no offtargets
 # Add seqs and find cas9s
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     targets \%<>\% add_seq(bsgenome)
-    cas9s <- find_cas9s(targets)
+    cas9s <- find_crispr_sites(targets)
    
 # Filter for offtarget-free cas9s
     filter_no_offtargets(cas9s, targets, bsgenome, 0, offtargetchr = 'chrY')

@@ -59,6 +59,7 @@ Flank or Extend GRanges
 }
 \examples{
 # SRF binding sites
+    require(magrittr)
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
     gr \%>\% left_flank(-200,  -1)
@@ -66,7 +67,6 @@ Flank or Extend GRanges
     gr \%>\% extend(-200, 200)
     
 # HBB snp: sickle cell variant (T -> A)
-    require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
     bsinfo <- BSgenome::seqinfo(bsgenome)
     gr <- GenomicRanges::GRanges(

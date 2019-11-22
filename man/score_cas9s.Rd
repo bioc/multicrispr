@@ -51,7 +51,7 @@ Doench2016 is available after installing python module
                add_seq(bsgenome)
 
 # Find cas9s
-    cas9s <- find_cas9s(targets)
+    cas9s <- find_crispr_sites(targets)
     
 # Score with Doench2014
     score_cas9s(cas9s[1:10], bsgenome)
