@@ -26,45 +26,46 @@ find_crispr_sites <- function(targets, plot = TRUE, verbose = TRUE){
     assertive.types::assert_is_character(targets$seq)
     assertive.types::assert_is_a_bool(verbose)
     extract <- magrittr::extract
-    start <- substart <- cas9start <- NULL
-    end <- subend <- cas9end <- strand <- seqnames <- NULL
+    start <- substart <- crispr_start <- NULL
+    end <- subend <- crispr_end <- strand <- seqnames <- NULL
     
-    # Find cas9s in targetranges
-    if (verbose) message('\tFind N{20}NGG cas9seqs')
+    # Find crispr sites in targetranges
+    pattern <- '[ACGT]{21}GG'
+    if (verbose) cmessage('\tFind %s crispr sites', pattern)
     targetdt <- data.table::as.data.table(targets)
-    res <- targetdt$seq %>% stringi::stri_locate_all_regex('[ACGT]{21}GG')
+    res <- targetdt$seq %>% stringi::stri_locate_all_regex(pattern)
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
     targetdt [ , substart := vapply( res, cextract1, character(1)) ]
     targetdt [ , subend   := vapply( res, cextract2, character(1)) ]
     
-    # Rm cas9-free targetranges
+    # Rm crispr-free targetranges
     idx <- targetdt[, substart == 'NA']
     if (sum(idx)>0){
-        if (verbose)  cmessage('\t\tRm %d ranges with no cas9sites', sum(idx)) 
+        if (verbose)  cmessage('\t\tRm %d ranges with no crispr site', sum(idx))
         targetdt %<>% extract(!idx)
     }
 
-    # Transform into cas9ranges
-    cas9dt  <-  tidyr::separate_rows(targetdt, substart, subend) %>%
-                data.table::data.table()                                   %>% 
-                extract(, substart := as.numeric(substart))                %>% 
-                extract(, subend   := as.numeric(subend))                  %>% 
-                extract(, seq      := substr(seq, substart, subend))       %>%
-                extract( strand=='+', cas9start := start + substart - 1  ) %>% 
-                extract( strand=='+', cas9end   := start + subend   - 1  ) %>%
-                extract( strand=='-', cas9start := end   - subend   + 1  ) %>%
-                extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
-                extract(, list( seqnames = seqnames, start = cas9start, 
-                                end = cas9end,  strand  = strand,  seq = seq))
-    cas9s <- GenomicRanges::GRanges(unique(cas9dt), 
+    # Transform into crispr ranges
+    sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend) %>%
+                data.table::data.table()                                    %>% 
+                extract(, substart := as.numeric(substart))                 %>% 
+                extract(, subend   := as.numeric(subend))                   %>% 
+                extract(, seq      := substr(seq, substart, subend))        %>%
+                extract( strand=='+', crispr_start := start + substart - 1) %>% 
+                extract( strand=='+', crispr_end   := start + subend   - 1) %>%
+                extract( strand=='-', crispr_start := end   - subend   + 1) %>%
+                extract( strand=='-', crispr_end   := end   - substart + 1) %>%
+                extract(, list( seqnames = seqnames, start = crispr_start, 
+                                end = crispr_end,  strand = strand,  seq = seq))
+    sites <- GenomicRanges::GRanges(unique(sites_dt), 
                                     seqinfo =  GenomeInfoDb::seqinfo(targets))
 
     # Plot. Message. Return
     if (plot) plot_karyogram(GenomicRanges::GRangesList(
-                                target = targets, cas9site = cas9s))
+                                target = targets, crispr_site = sites))
     if (verbose)   cmessage('\t\t%d cas9 seqs across %d ranges', 
-                        length(unique(cas9s$seq)), length(cas9s))
-    return(cas9s)
+                        length(unique(sites$seq)), length(sites))
+    return(sites)
 }
 

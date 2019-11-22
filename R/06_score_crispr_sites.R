@@ -158,7 +158,7 @@ doench2016 <- function(
 score_crispr_sites <- function(
     sites,
     bsgenome, 
-    method     = c('Doench2014','Doench2016')[1],
+    method     = c('Doench2014', 'Doench2016')[1],
     python     = NULL,
     virtualenv = NULL,
     condaenv   = NULL,
@@ -172,17 +172,17 @@ score_crispr_sites <- function(
     # Add contextseq
     if (verbose)  cmessage('\tScore crispr sites')
     sites %<>% add_contextseq(bsgenome, verbose = verbose)
-    cas9dt  <- data.table::as.data.table(sites)
-    scoredt <- data.table::data.table(contextseq = unique(cas9dt$contextseq))
+    sitedt  <- data.table::as.data.table(sites)
+    scoredt <- data.table::data.table(contextseq = unique(sitedt$contextseq))
     
     # Score
     scorefun <- switch(method, Doench2014 = doench2014, Doench2016 = doench2016)
     scoredt[ , (method) := scorefun(scoredt$contextseq, verbose=verbose) ]
 
     # Merge back in and Return
-    cas9smerged  <- merge(  cas9dt, scoredt, by = 'contextseq', sort = FALSE, 
+    sites_merged  <- merge(  sitedt, scoredt, by = 'contextseq', sort = FALSE, 
                             all.x = TRUE) %>%
                     methods::as('GRanges')
-    GenomeInfoDb::seqinfo(cas9smerged) <- GenomeInfoDb::seqinfo(sites)
-    cas9smerged
+    GenomeInfoDb::seqinfo(sites_merged) <- GenomeInfoDb::seqinfo(sites)
+    sites_merged
 }

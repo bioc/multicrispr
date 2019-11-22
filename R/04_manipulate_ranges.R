@@ -255,25 +255,15 @@ extend <- function(
 #' @author Aditya Bhagwat, after discussing with Michael Lawrence on bioc-devel
 #' @export
 straddle <- function(
-    gr, 
-    leftstart  = NULL, 
-    leftend    = NULL, 
-    rightstart = NULL, 
-    rightend   = NULL,
-    bsgenome   = NULL,
-    plot       = TRUE,
-    verbose    = TRUE
+    gr, leftstart  = NULL, leftend = NULL, rightstart = NULL, 
+    rightend = NULL, bsgenome = NULL, plot = TRUE, verbose = TRUE
 ){
     
     # Extend    
     newgr <- gr
     if (is.numeric(leftstart) & is.numeric(rightend)){
-        newgr <- extend(gr, 
-                        leftstart  = leftstart, 
-                        rightend   = rightend,
-                        bsgenome = bsgenome,
-                        plot       = plot, 
-                        verbose    = verbose)
+        newgr <- extend(gr, leftstart  = leftstart, rightend   = rightend,
+                        bsgenome = bsgenome, plot = plot, verbose = verbose)
         if (!is.null(leftend) | !is.null(rightstart)){
             warning('Ignore leftend/rightstart to resolve ambiguity')
         }
@@ -281,12 +271,8 @@ straddle <- function(
     
     # Left flank
     if (is.numeric(leftstart) & is.numeric(leftend)){
-        newgr <- left_flank(gr, 
-                            leftstart  = leftstart, 
-                            leftend    = leftend, 
-                            bsgenome   = bsgenome, 
-                            plot       = plot, 
-                            verbose    = verbose)
+        newgr <- left_flank(gr, leftstart = leftstart, leftend = leftend, 
+                            bsgenome = bsgenome, plot = plot, verbose = verbose)
         if (!is.null(rightstart) | !is.null(rightend)){
             warning('Ignore rightstart/rightend to resolve ambiguity')
         }
@@ -294,12 +280,8 @@ straddle <- function(
     
     # Right flank
     if (is.numeric(rightstart) & is.numeric(rightend)){
-        newgr <- right_flank(gr, 
-                            rightstart = rightstart, 
-                            rightend   = rightend, 
-                            bsgenome   = bsgenome, 
-                            plot       = plot, 
-                            verbose    = verbose)
+        newgr <- right_flank(gr, rightstart = rightstart, rightend = rightend, 
+                            bsgenome = bsgenome, plot = plot, verbose = verbose)
         if (!is.null(leftstart) | !is.null(leftend)){
             warning('Ignore leftstart/leftend to resolve ambiguity')
         }

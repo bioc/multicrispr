@@ -39,7 +39,7 @@ count_target_matches <- function(
     assertive.types::assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_any_of(targetseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_a_number(mismatch)
-    assertive.sets::assert_is_subset(mismatch, c(0,1,2))
+    assertive.sets::assert_is_subset(mismatch, 0:4)
     assertive.types::assert_is_a_bool(verbose)
     
     # Count
@@ -97,7 +97,7 @@ count_genome_matches <- function(
     # Assert
     assertive.types::assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_any_of(bsgenome, 'BSgenome')
-    assertive.sets::assert_is_subset(mismatch, c(0,1,2))
+    assertive.sets::assert_is_subset(mismatch, 0:4)
     assertive.types::assert_is_character(include)
     assertive.types::assert_is_a_bool(verbose)
 
@@ -176,30 +176,30 @@ filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2,
     assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(sites)))
     assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(targets)))
     targetseqs <- targets$seq
-    cas9seqdt  <- data.table::data.table(seq = unique(sites$seq))
+    crisprseq_dt  <- data.table::data.table(seq = unique(sites$seq))
     
     # Count-store-filter for 0-2 mismatches
     if (verbose) message('\tFind crispr seq (mis)matches')
     for (mis in 0:mismatch){
         if (verbose) cmessage('\t\twith %d mismatch(es)', mis)
         # Count
-        target_matches <- count_target_matches(
-                            cas9seqdt$seq, targetseqs, mis, verbose = verbose)
-        genome_matches <- count_genome_matches(cas9seqdt$seq, bsgenome, mis, 
+        target_matches <- count_target_matches(crisprseq_dt$seq, 
+                                            targetseqs, mis, verbose = verbose)
+        genome_matches <- count_genome_matches(crisprseq_dt$seq, bsgenome, mis, 
                             include = include, verbose = verbose)
         # Store
-        cas9seqdt [ , (sprintf('matches%d', mis)) := target_matches ]
+        crisprseq_dt [ , (sprintf('matches%d', mis)) := target_matches ]
         
         # Filter
         assertive.base::assert_all_are_false(genome_matches < target_matches)
         idx <- genome_matches == target_matches
         if (verbose)   cmessage('\t\t\tKeep %d/%d offtarget-free crispr seqs', 
                                 sum(idx), length(idx), mis)
-        cas9seqdt %<>% magrittr::extract(idx)
+        crisprseq_dt %<>% magrittr::extract(idx)
     }
     
     # Filter for offtargetfree sites
-    offtargetfree  <-   cas9seqdt %>% 
+    offtargetfree  <-   crisprseq_dt %>% 
                         merge(data.table::as.data.table(sites), by = 'seq') %>% 
                         methods::as('GRanges') %>%  add_seqinfo(bsgenome)
     # Plot/Report
