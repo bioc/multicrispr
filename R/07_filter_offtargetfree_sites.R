@@ -1,13 +1,13 @@
 #============================================================================
 
 #' Count target/genome matches
-#' @param cas9seqs    character() or \code{\link[Biostrings]{XStringSet-class}}
+#' @param crisprseqs    character() or \code{\link[Biostrings]{XStringSet-class}}
 #' @param targetseqs  character() or \code{\link[Biostrings]{XStringSet-class}}
 #' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatch    number: number of allowed mismatches 
 #' @param chromosomes character vector
 #' @param verbose     logical(1)
-#' @return numeric(length(cas9seqs))
+#' @return numeric(length(crisprseqs))
 #' @examples
 #' # Read ranges and extend
 #'     require(magrittr)
@@ -15,32 +15,32 @@
 #'     targets <- bed_to_granges(bedfile, 'mm10')
 #'     targets %<>% extend()
 #' 
-#' # Add seqs and find cas9s
+#' # Add seqs and find crispr sites
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets %<>% add_seq(bsgenome)
-#'     cas9s <- find_crispr_sites(targets)
+#'     sites <- find_crispr_sites(targets)
 #' 
 #' # Count matches
-#'     cas9seqs <- cas9s$seq[1:10]
-#'     count_target_matches(cas9seqs, targets$seq, 0)
-#'     count_genome_matches(cas9seqs, bsgenome,    0, chromosomes = 'chrY')
+#'     crisprseqs <- sites$seq[1:10]
+#'     count_target_matches(crisprseqs, targets$seq, 0)
+#'     count_genome_matches(crisprseqs, bsgenome,    0, chromosomes = 'chrY')
 #' @export
 count_target_matches <- function(
-    cas9seqs, 
+    crisprseqs, 
     targetseqs, 
     mismatch, 
     verbose = TRUE
 ){
     
     # Assert
-    assertive.types::assert_is_any_of(cas9seqs,   c('character', 'XStringSet'))
+    assertive.types::assert_is_any_of(crisprseqs,   c('character', 'XStringSet'))
     assertive.types::assert_is_any_of(targetseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_a_number(mismatch)
     assertive.sets::assert_is_subset(mismatch, c(0,1,2))
     assertive.types::assert_is_a_bool(verbose)
     
     # Count
-    uniquecas9s <- unique(cas9seqs)
+    uniquecas9s <- unique(crisprseqs)
     starttime <- Sys.time()
     matches  <- rowSums(Biostrings::vcountPDict(
                             Biostrings::DNAStringSet(uniquecas9s),
@@ -53,21 +53,21 @@ count_target_matches <- function(
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in targets: %s',
                             mismatch,
                             format(signif(Sys.time() - starttime, 2)))
-    unname(matches[cas9seqs])
+    unname(matches[crisprseqs])
 }
 
 
 #' @rdname count_target_matches
 #' @export
 count_genome_matches <- function(
-    cas9seqs, 
+    crisprseqs, 
     bsgenome, 
     mismatch,
     chromosomes = BSgenome::seqnames(bsgenome),
     verbose     = TRUE
 ){
     # Assert
-    assertive.types::assert_is_any_of(cas9seqs, c('character', 'XStringSet'))
+    assertive.types::assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_any_of(bsgenome, 'BSgenome')
     assertive.sets::assert_is_subset(mismatch, c(0,1,2))
     assertive.types::assert_is_character(chromosomes)
@@ -79,7 +79,7 @@ count_genome_matches <- function(
     # Count
     starttime <- Sys.time()
     exclude  <- setdiff(BSgenome::seqnames(bsgenome), chromosomes)
-    uniquecas9s <- unique(cas9seqs)
+    uniquecas9s <- unique(crisprseqs)
     matches  <- Biostrings::vcountPDict(
                     Biostrings::DNAStringSet(uniquecas9s),
                     bsgenome,
@@ -95,7 +95,7 @@ count_genome_matches <- function(
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',
                             mismatch, format(signif(Sys.time() - starttime, 2)))
-    unname(matches[cas9seqs])
+    unname(matches[crisprseqs])
 }
 
 
@@ -105,8 +105,8 @@ add_seqinfo <- function(gr, bsgenome){
 }
 
 
-#' Filter for no offtargets
-#' @param cas9s         \code{\link[GenomicRanges]{GRanges-class}}
+#' Filter for offtarget-free crispr sites
+#' @param sites         \code{\link[GenomicRanges]{GRanges-class}}: crispr sites
 #' @param targets       \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome      \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatch      number: max number of mismatches to consider
@@ -126,32 +126,32 @@ add_seqinfo <- function(gr, bsgenome){
 #'     targets %<>% extend()
 #'     targets %<>% extract(GenomicRanges::seqnames(.)=='chrY')
 #' 
-#' # Add seqs and find cas9s
+#' # Add seqs and find crispr sites
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets %<>% add_seq(bsgenome)
-#'     cas9s <- find_crispr_sites(targets)
+#'     sites <- find_crispr_sites(targets)
 #'    
-#' # Filter for offtarget-free cas9s
-#'     filter_no_offtargets(cas9s, targets, bsgenome, 0, offtargetchr = 'chrY')
+#' # Filter for offtarget-free sites
+#'     filter_offtargetfree_sites(sites, targets, bsgenome, 0, offtargetchr = 'chrY')
 #' @export
-filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2, 
+filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2, 
     offtargetchr = GenomeInfoDb::standardChromosomes(targets), 
     plot = TRUE, verbose = TRUE){
     
     # Assert. Prepare
-    assertive.types::assert_is_all_of(cas9s,    'GRanges')
+    assertive.types::assert_is_all_of(sites,    'GRanges')
     assertive.types::assert_is_all_of(targets,  'GRanges')
     assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
     assertive.types::assert_is_a_number(mismatch)
     assertive.types::assert_is_character(offtargetchr)
     assertive.sets::assert_is_subset(offtargetchr, BSgenome::seqnames(bsgenome))
-    assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(cas9s)))
+    assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(sites)))
     assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(targets)))
     targetseqs <- targets$seq
-    cas9seqdt  <- data.table::data.table(seq = unique(cas9s$seq))
+    cas9seqdt  <- data.table::data.table(seq = unique(sites$seq))
     
     # Count-store-filter for 0-2 mismatches
-    if (verbose) message('\tFind cas9seq hits')
+    if (verbose) message('\tFind crispr seq (mis)matches')
     for (mis in 0:mismatch){
         if (verbose) cmessage('\t\twith %d mismatch(es)', mis)
         # Count
@@ -165,20 +165,20 @@ filter_no_offtargets <- function(cas9s, targets, bsgenome, mismatch = 2,
         # Filter
         assertive.base::assert_all_are_false(genome_matches < target_matches)
         idx <- genome_matches == target_matches
-        if (verbose)   cmessage('\t\t\tKeep %d/%d offtarget-free cas9seqs', 
+        if (verbose)   cmessage('\t\t\tKeep %d/%d offtarget-free crispr seqs', 
                                 sum(idx), length(idx), mis)
         cas9seqdt %<>% magrittr::extract(idx)
     }
     
     # Filter for offtargetfree
     offtargetfree  <-   cas9seqdt %>% 
-                        merge(data.table::as.data.table(cas9s), by = 'seq') %>% 
+                        merge(data.table::as.data.table(sites), by = 'seq') %>% 
                         methods::as('GRanges') %>%  add_seqinfo(bsgenome)
     # Plot/Report
     if (plot)    plot_karyogram(GenomicRanges::GRangesList(
-                                    target = targets, cas9 = cas9s, 
+                                    target = targets, cas9 = sites, 
                                     offtargetfree = offtargetfree))
-    if (verbose) cmessage('\tReturn %d cas9seqs across %d ranges',
+    if (verbose) cmessage('\tReturn %d crispr seqs across %d ranges',
                     length(unique(offtargetfree$seq)), length(offtargetfree))
     # Return
     offtargetfree
