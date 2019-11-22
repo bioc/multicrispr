@@ -1,7 +1,7 @@
 
 #' Add [-4, +3] contextseq
 #' 
-#' @param cas9s \code{\link[GenomicRanges]{GRanges-class}}
+#' @param sites \code{\link[GenomicRanges]{GRanges-class}}: crispr sites
 #' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #' @param verbose logical(1)
 #' @return character vector
@@ -12,25 +12,25 @@
 #' targets  <- bed_to_granges(bedfile, 'mm10')  %>% 
 #'             double_flank() %>% 
 #'             add_seq(bsgenome)
-#' cas9s    <- find_crispr_sites(targets)
-#' cas9s %<>% add_contextseq(bsgenome)
-#' cas9s[1:3]$seq
-#' cas9s[1:3]$contextseq
+#' sites    <- find_crispr_sites(targets)
+#' sites %<>% add_contextseq(bsgenome)
+#' sites[1:3]$seq
+#' sites[1:3]$contextseq
 #' @export
-add_contextseq <- function(cas9s, bsgenome, verbose = TRUE){
+add_contextseq <- function(sites, bsgenome, verbose = TRUE){
     
     # Prevent from stats::start from being used (leads to bug!)
     start  <- GenomicRanges::start;     `start<-`  <- GenomicRanges::`start<-`
     end    <- GenomicRanges::end;       `end<-`    <- GenomicRanges::`end<-`
     strand <- GenomicRanges::strand
     
-    contexts <- cas9s
-    start(contexts) <- start(cas9s) - ifelse(strand(cas9s)=='+', 4, 3)
-    end(contexts)   <- end(cas9s)   + ifelse(strand(cas9s)=='+', 3, 4)
+    contexts <- sites
+    start(contexts) <- start(sites) - ifelse(strand(sites)=='+', 4, 3)
+    end(contexts)   <- end(sites)   + ifelse(strand(sites)=='+', 3, 4)
     if (verbose) cmessage('\t\tAdd (4-23-3) contextseqs')
     contexts %<>% add_seq(bsgenome, verbose = FALSE)
-    cas9s$contextseq <- contexts$seq
-    cas9s
+    sites$contextseq <- contexts$seq
+    sites
 }
 
 
@@ -100,15 +100,15 @@ doench2016 <- function(
 }
 
 
-#' Score cas9 sites
+#' Score crispr sites
 #' 
-#' Score cas9s with Doench2014 or Doench2016 model.
+#' Score crispr sites with Doench2014 or Doench2016 model.
 #' 
 #' Doench2014 is readily available. 
 #' Doench2016 is available after installing python module 
 #' [azimuth](https://github.com/MicrosoftResearch/Azimuth) (see examples).
 #' 
-#' @param cas9s     \code{\link[GenomicRanges]{GRanges-class}}
+#' @param sites     \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
@@ -126,11 +126,11 @@ doench2016 <- function(
 #'                double_flank() %>%
 #'                add_seq(bsgenome)
 #' 
-#' # Find cas9s
-#'     cas9s <- find_crispr_sites(targets)
+#' # Find sites
+#'     sites <- find_crispr_sites(targets)
 #'     
 #' # Score with Doench2014
-#'     score_cas9s(cas9s[1:10], bsgenome)
+#'     score_crispr_sites(sites[1:10], bsgenome)
 #'         
 #' # Score with Doench2016
 #'     # First install python module azimuth, perhaps in a conda env:
@@ -140,8 +140,8 @@ doench2016 <- function(
 #'         # pip install azimuth
 #'         # pip install scikit-learn==0.17.1
 #'         
-#'     # Then call score_cas9s with reference to conda env
-#'         # score_cas9s(cas9s[1:10], bsgenome, 'Doench2016', 
+#'     # Then call score_crispr_sites with reference to conda env
+#'         # score_crispr_sites(sites[1:10], bsgenome, 'Doench2016', 
 #'         #             condaenv = 'azimuthenv')
 #' 
 #' @references 
@@ -155,8 +155,8 @@ doench2016 <- function(
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
 #' @export
-score_cas9s <- function(
-    cas9s,
+score_crispr_sites <- function(
+    sites,
     bsgenome, 
     method     = c('Doench2014','Doench2016')[1],
     python     = NULL,
@@ -165,14 +165,14 @@ score_cas9s <- function(
     verbose    = TRUE
 ){
     # Assert
-    assertive.types::assert_is_all_of(cas9s, 'GRanges')
+    assertive.types::assert_is_all_of(sites, 'GRanges')
     assertive.types::assert_is_a_string(method)
     assertive.sets::assert_is_subset(method, c('Doench2014', 'Doench2016'))
 
     # Add contextseq
-    if (verbose)  cmessage('\tScore cas9s')
-    cas9s %<>% add_contextseq(bsgenome, verbose = verbose)
-    cas9dt  <- data.table::as.data.table(cas9s)
+    if (verbose)  cmessage('\tScore crispr sites')
+    sites %<>% add_contextseq(bsgenome, verbose = verbose)
+    cas9dt  <- data.table::as.data.table(sites)
     scoredt <- data.table::data.table(contextseq = unique(cas9dt$contextseq))
     
     # Score
@@ -183,6 +183,6 @@ score_cas9s <- function(
     cas9smerged  <- merge(  cas9dt, scoredt, by = 'contextseq', sort = FALSE, 
                             all.x = TRUE) %>%
                     methods::as('GRanges')
-    GenomeInfoDb::seqinfo(cas9smerged) <- GenomeInfoDb::seqinfo(cas9s)
+    GenomeInfoDb::seqinfo(cas9smerged) <- GenomeInfoDb::seqinfo(sites)
     cas9smerged
 }
