@@ -49,19 +49,19 @@ find_cas9s <- function(targets, plot = TRUE, verbose = TRUE){
     }
 
     # Transform into cas9ranges
-    cas9s <- tidyr::separate_rows(targetdt, substart, subend) %>%
-        data.table::data.table()                                   %>% 
-        extract(, substart := as.numeric(substart))                %>% 
-        extract(, subend   := as.numeric(subend))                  %>% 
-        extract(, seq      := substr(seq, substart, subend))      %>%
-        extract( strand=='+', cas9start := start + substart - 1  ) %>% 
-        extract( strand=='+', cas9end   := start + subend   - 1  ) %>%
-        extract( strand=='-', cas9start := end   - subend   + 1  ) %>%
-        extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
-        extract(, list( seqnames = seqnames, start = cas9start, 
-                        end = cas9end,  strand  = strand,  seq = seq)) %>% 
-        unique() %>% methods::as('GRanges')
-    GenomeInfoDb::seqinfo(cas9s) <- GenomeInfoDb::seqinfo(targets)
+    cas9dt  <-  tidyr::separate_rows(targetdt, substart, subend) %>%
+                data.table::data.table()                                   %>% 
+                extract(, substart := as.numeric(substart))                %>% 
+                extract(, subend   := as.numeric(subend))                  %>% 
+                extract(, seq      := substr(seq, substart, subend))       %>%
+                extract( strand=='+', cas9start := start + substart - 1  ) %>% 
+                extract( strand=='+', cas9end   := start + subend   - 1  ) %>%
+                extract( strand=='-', cas9start := end   - subend   + 1  ) %>%
+                extract( strand=='-', cas9end   := end   - substart + 1  ) %>%
+                extract(, list( seqnames = seqnames, start = cas9start, 
+                                end = cas9end,  strand  = strand,  seq = seq))
+    cas9s <- GenomicRanges::GRanges(unique(cas9dt), 
+                                    seqinfo =  GenomeInfoDb::seqinfo(targets))
 
     # Plot. Message. Return
     if (plot) plot_karyogram(GenomicRanges::GRangesList(

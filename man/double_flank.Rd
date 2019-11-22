@@ -4,8 +4,16 @@
 \alias{double_flank}
 \title{Double flank}
 \usage{
-double_flank(gr, leftstart = -200, leftend = -1, rightstart = 1,
-  rightend = 200, plot = TRUE, verbose = TRUE)
+double_flank(
+  gr,
+  leftstart = -200,
+  leftend = -1,
+  rightstart = 1,
+  rightend = 200,
+  bsgenome = NULL,
+  plot = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
@@ -18,9 +26,12 @@ double_flank(gr, leftstart = -200, leftend = -1, rightstart = 1,
 
 \item{rightend}{number: right flank end   (relative to range end)}
 
-\item{plot}{logical(1)}
+\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}
+Required to update gr$seq if present.}
 
-\item{verbose}{logical(1)}
+\item{plot}{TRUE (default) or FALSE}
+
+\item{verbose}{TRUE (default) or FALSE}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

@@ -5,8 +5,7 @@
 \alias{genefile_to_granges}
 \title{Convert geneids into GRanges}
 \usage{
-genes_to_granges(geneids, txdb, complement = TRUE, plot = TRUE,
-  verbose = TRUE)
+genes_to_granges(geneids, txdb, complement = TRUE, plot = TRUE, verbose = TRUE)
 
 genefile_to_granges(file, txdb, complement = TRUE, plot = TRUE)
 }

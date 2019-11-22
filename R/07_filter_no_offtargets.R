@@ -85,7 +85,8 @@ count_genome_matches <- function(
                     bsgenome,
                     min.mismatch = mismatch,
                     max.mismatch = mismatch, 
-                    exclude      = exclude) %>% 
+                    exclude      = exclude, 
+                    verbose      = verbose) %>% 
                 data.table::as.data.table() %>% 
                 magrittr::extract(, .(n = sum(count)), by ='index') %>%
                 magrittr::extract2('n') %>% 

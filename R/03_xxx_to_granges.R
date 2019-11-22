@@ -49,21 +49,6 @@
 #}
 
 
-add_inverse_strand <- function(gr, plot = TRUE, verbose = TRUE){
-    complements <- GenomicRanges::invertStrand(gr)
-    newranges <- c(gr, complements)
-    txt <- sprintf('\t\t%d ranges after adding inverse strands',
-                    length(newranges))
-    if (plot){
-        grlist <- GenomicRanges::GRangesList(original = gr, 
-                                            complements = complements)
-        plot_intervals(grlist, title = txt)
-    }
-    if (verbose) cmessage(txt)
-    newranges
-}
-
-
 annotate_granges <- function(gr, txdb){
     
     # Assert. Import. Comply.
@@ -243,46 +228,4 @@ genefile_to_granges <- function(file, txdb, complement = TRUE, plot = TRUE){
     genes_to_granges(geneids, txdb, complement = complement, plot = plot)
 }
 
-
-#' Add sequence to GRanges
-#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param verbose   logical(1)
-#' @return \code{\link[GenomicRanges]{GRanges-class}}
-#' @examples 
-#' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' gr <- bed_to_granges(bedfile, 'mm10')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' gr <- add_seq(gr, bsgenome)
-#' gr
-#' @export
-add_seq <- function(gr, bsgenome, verbose = TRUE){
-    
-    # Assert
-    assertive.types::assert_is_all_of(gr, 'GRanges')
-    assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
-    
-    # Message
-    if (verbose)  cmessage('\tAdd seq')
-    
-    # Align seqlevelsStyle if required
-    `seqlevelsStyle`   <- GenomeInfoDb::`seqlevelsStyle`
-    `seqlevelsStyle<-` <- GenomeInfoDb::`seqlevelsStyle<-`
-    if (seqlevelsStyle(bsgenome)[1] != seqlevelsStyle(gr)[1]){
-            cmessage("\t\t\tSet seqlevelStyle(bsgenome) <- seqlevelStyle(gr)")
-            seqlevelsStyle(bsgenome)[1] <- seqlevelsStyle(gr)[1]
-    }
-    
-    # Add seq
-    gr$seq <- unname(BSgenome::getSeq(
-                        bsgenome,
-                        names        = GenomicRanges::seqnames(gr),
-                        start        = GenomicRanges::start(gr),
-                        end          = GenomicRanges::end(gr), 
-                        strand       = GenomicRanges::strand(gr), 
-                        as.character = TRUE))
-    
-    # Return
-    gr
-}
 

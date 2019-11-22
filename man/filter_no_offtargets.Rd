@@ -4,9 +4,15 @@
 \alias{filter_no_offtargets}
 \title{Filter for no offtargets}
 \usage{
-filter_no_offtargets(cas9s, targets, bsgenome, mismatch = 2,
+filter_no_offtargets(
+  cas9s,
+  targets,
+  bsgenome,
+  mismatch = 2,
   offtargetchr = GenomeInfoDb::standardChromosomes(targets),
-  plot = TRUE, verbose = TRUE)
+  plot = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{cas9s}{\code{\link[GenomicRanges]{GRanges-class}}}

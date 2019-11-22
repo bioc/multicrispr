@@ -4,9 +4,15 @@
 \alias{score_cas9s}
 \title{Score cas9 sites}
 \usage{
-score_cas9s(cas9s, bsgenome, method = c("Doench2014", "Doench2016")[1],
-  python = NULL, virtualenv = NULL, condaenv = NULL,
-  verbose = TRUE)
+score_cas9s(
+  cas9s,
+  bsgenome,
+  method = c("Doench2014", "Doench2016")[1],
+  python = NULL,
+  virtualenv = NULL,
+  condaenv = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{cas9s}{\code{\link[GenomicRanges]{GRanges-class}}}

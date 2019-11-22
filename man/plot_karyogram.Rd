@@ -5,8 +5,7 @@
 \alias{plot_intervals}
 \title{Karyo/Interval Plot GRanges(List)}
 \usage{
-plot_karyogram(grangeslist,
-  title = unique(GenomeInfoDb::genome(grangeslist)))
+plot_karyogram(grangeslist, title = unique(GenomeInfoDb::genome(grangeslist)))
 
 plot_intervals(grangeslist, title = NULL)
 }

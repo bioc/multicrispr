@@ -4,8 +4,15 @@
 \alias{bed_to_granges}
 \title{Read bedfile into GRanges}
 \usage{
-bed_to_granges(bedfile, genome, complement = TRUE, txdb = NULL,
-  do_order = TRUE, plot = TRUE, verbose = TRUE)
+bed_to_granges(
+  bedfile,
+  genome,
+  complement = TRUE,
+  txdb = NULL,
+  do_order = TRUE,
+  plot = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{bedfile}{file path}
