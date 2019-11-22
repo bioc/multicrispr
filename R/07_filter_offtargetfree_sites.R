@@ -1,12 +1,12 @@
 #============================================================================
 
 #' Count target/genome matches
-#' @param crisprseqs    character() or \code{\link[Biostrings]{XStringSet-class}}
-#' @param targetseqs  character() or \code{\link[Biostrings]{XStringSet-class}}
+#' @param crisprseqs  character vector or \code{\link[Biostrings]{XStringSet-class}}
+#' @param targetseqs  character vector or \code{\link[Biostrings]{XStringSet-class}}
 #' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatch    number: number of allowed mismatches 
-#' @param chromosomes character vector
-#' @param verbose     logical(1)
+#' @param include     character vector: offtarget analysis chromosomes
+#' @param verbose     TRUE (default) or FALSE
 #' @return numeric(length(crisprseqs))
 #' @examples
 #' # Read ranges and extend
@@ -23,7 +23,7 @@
 #' # Count matches
 #'     crisprseqs <- sites$seq[1:10]
 #'     count_target_matches(crisprseqs, targets$seq, 0)
-#'     count_genome_matches(crisprseqs, bsgenome,    0, chromosomes = 'chrY')
+#'     count_genome_matches(crisprseqs, bsgenome,    0, include = 'chrY')
 #' @export
 count_target_matches <- function(
     crisprseqs, 
@@ -33,7 +33,7 @@ count_target_matches <- function(
 ){
     
     # Assert
-    assertive.types::assert_is_any_of(crisprseqs,   c('character', 'XStringSet'))
+    assertive.types::assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_any_of(targetseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_a_number(mismatch)
     assertive.sets::assert_is_subset(mismatch, c(0,1,2))
@@ -57,20 +57,44 @@ count_target_matches <- function(
 }
 
 
+#' Convert "included" into "excluded" seqnames
+#'
+#' @details Convert "included" into "excluded" seqnames. 
+#'          Do this in regex format as required by 
+#' \code{\link[BSgenome]{BSgenome-utils}}) \code{vcountPDict} and 
+#' \code{vmatchPDict}
+#' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
+#' @param include character vector with names of included chromosomes
+#' @examples 
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#' include_to_exclude(bsgenome)
+#' @export
+include_to_exclude <- function(
+    bsgenome, 
+    include = GenomeInfoDb::standardChromosomes(bsgenome)
+){
+    assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    assertive.types::assert_is_character(include)
+    
+    # needs to be a regex: https://support.bioconductor.org/p/126593/
+    sprintf('^%s$', setdiff(BSgenome::seqnames(bsgenome), include))
+}
+
+
 #' @rdname count_target_matches
 #' @export
 count_genome_matches <- function(
     crisprseqs, 
     bsgenome, 
     mismatch,
-    chromosomes = BSgenome::seqnames(bsgenome),
+    include = BSgenome::seqnames(bsgenome),
     verbose     = TRUE
 ){
     # Assert
     assertive.types::assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
     assertive.types::assert_is_any_of(bsgenome, 'BSgenome')
     assertive.sets::assert_is_subset(mismatch, c(0,1,2))
-    assertive.types::assert_is_character(chromosomes)
+    assertive.types::assert_is_character(include)
     assertive.types::assert_is_a_bool(verbose)
 
     # Comply
@@ -78,14 +102,13 @@ count_genome_matches <- function(
 
     # Count
     starttime <- Sys.time()
-    exclude  <- setdiff(BSgenome::seqnames(bsgenome), chromosomes)
     uniquecas9s <- unique(crisprseqs)
     matches  <- Biostrings::vcountPDict(
                     Biostrings::DNAStringSet(uniquecas9s),
                     bsgenome,
                     min.mismatch = mismatch,
                     max.mismatch = mismatch, 
-                    exclude      = exclude, 
+                    exclude      = include_to_exclude(bsgenome, include), 
                     verbose      = verbose) %>% 
                 data.table::as.data.table() %>% 
                 magrittr::extract(, .(n = sum(count)), by ='index') %>%
@@ -106,13 +129,13 @@ add_seqinfo <- function(gr, bsgenome){
 
 
 #' Filter for offtarget-free crispr sites
-#' @param sites         \code{\link[GenomicRanges]{GRanges-class}}: crispr sites
-#' @param targets       \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome      \code{\link[BSgenome]{BSgenome-class}}
-#' @param mismatch      number: max number of mismatches to consider
-#' @param offtargetchr  character vector: chromosomes for offtarget analysis
-#' @param plot          logical(1)
-#' @param verbose       logical(1)
+#' @param sites    \code{\link[GenomicRanges]{GRanges-class}}: crispr sites
+#' @param targets  \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
+#' @param mismatch number: max number of mismatches to consider
+#' @param include  character vector: offtarget analysis chromosomes
+#' @param plot     TRUE (default) or FALSE
+#' @param verbose  TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #'         mcols(GRanges) contains sequences and match counts:
 #'             matches0 = perfect match counts
@@ -132,10 +155,11 @@ add_seqinfo <- function(gr, bsgenome){
 #'     sites <- find_crispr_sites(targets)
 #'    
 #' # Filter for offtarget-free sites
-#'     filter_offtargetfree_sites(sites, targets, bsgenome, 0, offtargetchr = 'chrY')
+#'     filter_offtargetfree_sites(
+#'         sites, targets, bsgenome, 0, include = 'chrY')
 #' @export
 filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2, 
-    offtargetchr = GenomeInfoDb::standardChromosomes(targets), 
+    include = GenomeInfoDb::standardChromosomes(targets), 
     plot = TRUE, verbose = TRUE){
     
     # Assert. Prepare
@@ -143,8 +167,8 @@ filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2,
     assertive.types::assert_is_all_of(targets,  'GRanges')
     assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
     assertive.types::assert_is_a_number(mismatch)
-    assertive.types::assert_is_character(offtargetchr)
-    assertive.sets::assert_is_subset(offtargetchr, BSgenome::seqnames(bsgenome))
+    assertive.types::assert_is_character(include)
+    assertive.sets::assert_is_subset(include, BSgenome::seqnames(bsgenome))
     assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(sites)))
     assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(targets)))
     targetseqs <- targets$seq
@@ -158,7 +182,7 @@ filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2,
         target_matches <- count_target_matches(
                             cas9seqdt$seq, targetseqs, mis, verbose = verbose)
         genome_matches <- count_genome_matches(cas9seqdt$seq, bsgenome, mis, 
-                            chromosomes = offtargetchr, verbose = verbose)
+                            include = include, verbose = verbose)
         # Store
         cas9seqdt [ , (sprintf('matches%d', mis)) := target_matches ]
         
@@ -170,7 +194,7 @@ filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2,
         cas9seqdt %<>% magrittr::extract(idx)
     }
     
-    # Filter for offtargetfree
+    # Filter for offtargetfree sites
     offtargetfree  <-   cas9seqdt %>% 
                         merge(data.table::as.data.table(sites), by = 'seq') %>% 
                         methods::as('GRanges') %>%  add_seqinfo(bsgenome)

@@ -9,7 +9,7 @@ filter_offtargetfree_sites(
   targets,
   bsgenome,
   mismatch = 2,
-  offtargetchr = GenomeInfoDb::standardChromosomes(targets),
+  include = GenomeInfoDb::standardChromosomes(targets),
   plot = TRUE,
   verbose = TRUE
 )
@@ -23,11 +23,11 @@ filter_offtargetfree_sites(
 
 \item{mismatch}{number: max number of mismatches to consider}
 
-\item{offtargetchr}{character vector: chromosomes for offtarget analysis}
+\item{include}{character vector: offtarget analysis chromosomes}
 
-\item{plot}{logical(1)}
+\item{plot}{TRUE (default) or FALSE}
 
-\item{verbose}{logical(1)}
+\item{verbose}{TRUE (default) or FALSE}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -53,5 +53,6 @@ Filter for offtarget-free crispr sites
     sites <- find_crispr_sites(targets)
    
 # Filter for offtarget-free sites
-    filter_offtargetfree_sites(sites, targets, bsgenome, 0, offtargetchr = 'chrY')
+    filter_offtargetfree_sites(
+        sites, targets, bsgenome, 0, include = 'chrY')
 }
