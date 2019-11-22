@@ -1,8 +1,10 @@
 #============================================================================
 
 #' Count target/genome matches
-#' @param crisprseqs  character vector or \code{\link[Biostrings]{XStringSet-class}}
-#' @param targetseqs  character vector or \code{\link[Biostrings]{XStringSet-class}}
+#' @param crisprseqs  character vector or 
+#'                    \code{\link[Biostrings]{XStringSet-class}}
+#' @param targetseqs  character vector or 
+#'                    \code{\link[Biostrings]{XStringSet-class}}
 #' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatch    number: number of allowed mismatches 
 #' @param include     character vector: offtarget analysis chromosomes
@@ -22,7 +24,8 @@
 #' 
 #' # Count matches
 #'     crisprseqs <- sites$seq[1:10]
-#'     count_target_matches(crisprseqs, targets$seq, 0)
+#'     targetseqs <- targets$seq
+#'     count_target_matches(crisprseqs, targetseqs, 0)
 #'     count_genome_matches(crisprseqs, bsgenome,    0, include = 'chrY')
 #' @export
 count_target_matches <- function(
@@ -40,14 +43,14 @@ count_target_matches <- function(
     assertive.types::assert_is_a_bool(verbose)
     
     # Count
-    uniquecas9s <- unique(crisprseqs)
+    unique_crisprseqs <- unique(crisprseqs)
     starttime <- Sys.time()
     matches  <- rowSums(Biostrings::vcountPDict(
-                            Biostrings::DNAStringSet(uniquecas9s),
+                            Biostrings::DNAStringSet(unique_crisprseqs),
                             Biostrings::DNAStringSet(targetseqs),
                             min.mismatch = mismatch,
                             max.mismatch = mismatch)) %>% 
-                magrittr::set_names(uniquecas9s)
+                magrittr::set_names(unique_crisprseqs)
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in targets: %s',
@@ -65,6 +68,7 @@ count_target_matches <- function(
 #' \code{vmatchPDict}
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param include character vector with names of included chromosomes
+#' @return character vector
 #' @examples 
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' include_to_exclude(bsgenome)
@@ -102,9 +106,9 @@ count_genome_matches <- function(
 
     # Count
     starttime <- Sys.time()
-    uniquecas9s <- unique(crisprseqs)
+    unique_crisprseqs <- unique(crisprseqs)
     matches  <- Biostrings::vcountPDict(
-                    Biostrings::DNAStringSet(uniquecas9s),
+                    Biostrings::DNAStringSet(unique_crisprseqs),
                     bsgenome,
                     min.mismatch = mismatch,
                     max.mismatch = mismatch, 
@@ -113,7 +117,7 @@ count_genome_matches <- function(
                 data.table::as.data.table() %>% 
                 magrittr::extract(, .(n = sum(count)), by ='index') %>%
                 magrittr::extract2('n') %>% 
-                magrittr::set_names(uniquecas9s)
+                magrittr::set_names(unique_crisprseqs)
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',

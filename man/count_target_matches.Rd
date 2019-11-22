@@ -16,9 +16,11 @@ count_genome_matches(
 )
 }
 \arguments{
-\item{crisprseqs}{character vector or \code{\link[Biostrings]{XStringSet-class}}}
+\item{crisprseqs}{character vector or 
+\code{\link[Biostrings]{XStringSet-class}}}
 
-\item{targetseqs}{character vector or \code{\link[Biostrings]{XStringSet-class}}}
+\item{targetseqs}{character vector or 
+\code{\link[Biostrings]{XStringSet-class}}}
 
 \item{mismatch}{number: number of allowed mismatches}
 
@@ -48,6 +50,7 @@ Count target/genome matches
 
 # Count matches
     crisprseqs <- sites$seq[1:10]
-    count_target_matches(crisprseqs, targets$seq, 0)
+    targetseqs <- targets$seq
+    count_target_matches(crisprseqs, targetseqs, 0)
     count_genome_matches(crisprseqs, bsgenome,    0, include = 'chrY')
 }

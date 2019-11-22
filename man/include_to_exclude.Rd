@@ -14,6 +14,9 @@ include_to_exclude(
 
 \item{include}{character vector with names of included chromosomes}
 }
+\value{
+character vector
+}
 \description{
 Convert "included" into "excluded" seqnames
 }

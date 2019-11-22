@@ -377,6 +377,7 @@ double_flank <- function(
 #' @param gr      \code{\link[GenomicRanges]{GRanges-class}}
 #' @param plot    TRUE (default) or FALSE
 #' @param verbose TRUE (default) or FALSE
+#' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # Load
 #'     require(magrittr)

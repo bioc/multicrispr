@@ -13,6 +13,9 @@ add_inverse_strand(gr, plot = TRUE, verbose = TRUE)
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+\code{\link[GenomicRanges]{GRanges-class}}
+}
 \description{
 Add inverse strand
 }

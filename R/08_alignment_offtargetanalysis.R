@@ -12,7 +12,10 @@
 # # Index targets
 # bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 # targets0 <- bed_to_granges(bedfile, genome = 'mm10')
-# targets  <- double_flank(targets0, leftstart = -200, leftend=-1, rightstart=1, rightend=200)
+# targets  <- double_flank(
+#                 targets0, 
+#                 leftstart  = -200, leftend  = -1, 
+#                 rightstart = 1,    rightend = 200)
 # targets <- add_seq(targets, bsgenome)
 # index_targets(targets, outdir = outdir)
 # 
@@ -52,7 +55,10 @@
 #                                             targets2 = sum(mismatch==2)), 
 #                                     by = 'cas9seq' ]
 #     
-#     vcountres <- count_target_matches(uniquecas9s, unique(targetseqs), mismatch = 0)
+#     vcountres <- count_target_matches(
+#                     uniquecas9s, 
+#                     unique(targetseqs), 
+#                     mismatch = 0)
 #     
 #     
 #     
@@ -73,11 +79,12 @@
 #     
 #     # Write to fasta
 #     targetseqs <- Biostrings::DNAStringSet(targets$seq)
-#     names(targetseqs) <- sprintf('%s:%s-%s(%s)', 
-#                                 as.character(GenomicRanges::seqnames(targets)),
-#                                 GenomicRanges::start(targets),
-#                                 GenomicRanges::end(targets),
-#                                 GenomicRanges::strand(targets))
+#     names(targetseqs) <- sprintf(
+#                           '%s:%s-%s(%s)', 
+#                           as.character(GenomicRanges::seqnames(targets)),
+#                           GenomicRanges::start(targets),
+#                           GenomicRanges::end(targets),
+#                           GenomicRanges::strand(targets))
 #     Biostrings::writeXStringSet(targetseqs, targetfa)
 #     
 #     # Index targets
