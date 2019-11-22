@@ -8,13 +8,17 @@
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     bsinfo   <- BSgenome::seqinfo(bsgenome)
 #'     (gr <- add_seq(gr, bsgenome))
 #'     
 #' # PRNP snp: Kuru resistance variant (G -> T)
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#'     bsinfo   <- BSgenome::seqinfo(bsgenome)
 #'     gr  <-  GenomicRanges::GRanges(
 #'                'chr20:4699500', strand = '+', seqinfo = bsinfo)
-#'    gr %<>% multicrispr::add_inverse_strand()
-#'    gr %<>% multicrispr::extend(bsgenome = bsgenome)
+#'     gr %<>% multicrispr::add_inverse_strand()
+#'     gr %<>% multicrispr::extend(bsgenome = bsgenome)
 #'    (gr %<>% multicrispr::add_seq(bsgenome))
 #' @export
 add_seq <- function(gr, bsgenome, verbose = TRUE){
@@ -382,19 +386,19 @@ double_flank <- function(
 #' # PRNP snp: Kuru resistance variant (G -> T)
 #'     gr <- GenomicRanges::GRanges(
 #'            'chr20:4699500', strand = '+', seqinfo = bsinfo)
-#'     gr %<>% add_seq(bsgenome))
+#'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #'     
 #' # HBB snp: sickle cell variant (T -> A)
 #'     gr <- GenomicRanges::GRanges(
 #'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
-#'     gr %<>% add_seq(bsgenome))
+#'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #'     
 #' # HEXA TATC duplication: Tay-Sachs variant
 #'     gr <- GenomicRanges::GRanges(
 #'             'chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
-#'     gr %<>% add_seq(bsgenome))
+#'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #' @export
 add_inverse_strand <- function(
