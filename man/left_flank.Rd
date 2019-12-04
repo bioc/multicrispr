@@ -11,8 +11,8 @@ left_flank(
   leftstart = -200,
   leftend = -1,
   bsgenome = NULL,
-  plot = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  plot = TRUE
 )
 
 right_flank(
@@ -43,9 +43,9 @@ extend(
 \item{bsgenome}{NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 Required to update gr$seq if present.}
 
-\item{plot}{TRUE (default) or FALSE}
-
 \item{verbose}{TRUE (default) or FALSE}
+
+\item{plot}{TRUE (default) or FALSE}
 
 \item{rightstart}{number: right start (relative to range end)}
 

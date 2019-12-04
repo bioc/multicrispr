@@ -2,15 +2,12 @@
 % Please edit documentation in R/02_plot.R
 \name{plot_karyogram}
 \alias{plot_karyogram}
-\alias{plot_intervals}
 \title{Karyo/Interval Plot GRanges(List)}
 \usage{
-plot_karyogram(grangeslist, title = unique(GenomeInfoDb::genome(grangeslist)))
-
-plot_intervals(grangeslist, title = NULL)
+plot_karyogram(grlist, title = unique(GenomeInfoDb::genome(grlist)))
 }
 \arguments{
-\item{grangeslist}{\code{\link[GenomicRanges]{GRanges-class}} or 
+\item{grlist}{\code{\link[GenomicRanges]{GRanges-class}} or 
 \code{\link[GenomicRanges]{GRangesList-class}}}
 
 \item{title}{plot title}
@@ -26,15 +23,12 @@ Karyo/Interval Plot GRanges(List)
   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
   gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
   plot_karyogram(gr)
-  plot_intervals(gr)
   
 # Plot GRangesList
   flanks  <- left_flank(gr)
-  grangeslist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
-  plot_karyogram(grangeslist)
-  plot_intervals(grangeslist)
+  grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
+  plot_karyogram(grlist)
 }
 \seealso{
-\code{\link[karyoploteR]{plotKaryotype}}, around which this 
-          function wraps
+\code{\link{plot_intervals}}
 }

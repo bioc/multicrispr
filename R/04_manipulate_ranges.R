@@ -68,8 +68,8 @@ summarize_loci <- function(gr){
 #' @param rightend   number: right end   (relative to range end)
 #' @param bsgenome   NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                   Required to update gr$seq if present.
-#' @param plot       TRUE (default) or FALSE
 #' @param verbose    TRUE (default) or FALSE
+#' @param plot       TRUE (default) or FALSE
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # SRF binding sites
@@ -104,8 +104,8 @@ left_flank <- function(
     leftstart  = -200,
     leftend    = -1,
     bsgenome   = NULL,
-    plot       = TRUE,
-    verbose    = TRUE
+    verbose    = TRUE,
+    plot       = TRUE
 ){
     # Assert
     assertive.types::assert_is_any_of(gr, 'GRanges')
@@ -115,8 +115,8 @@ left_flank <- function(
     
     # Flank
     newgr <- gr
-    GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + leftend
     GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + leftstart
+    GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + leftend
     txt <- sprintf('\t\t%d left  flanks: [start%s%d, start%s%d]', 
                     length(newgr), csign(leftstart), abs(leftstart), 
                     csign(leftend), abs(leftend))
@@ -129,8 +129,9 @@ left_flank <- function(
 
     # Plot, Message, Return
     if (plot){
-        grlist <- GenomicRanges::GRangesList(sites=gr, leftflanks=newgr)
-        plot_intervals(grlist, title = txt)
+        gr$color    <- 'sites'
+        newgr$color <- 'leftflanks'
+        plot_intervals(c(gr, newgr), title = txt)
     }
     if (verbose) message(txt)
     newgr
@@ -172,8 +173,9 @@ right_flank <- function(
     
     # Plot, Message, Return
     if (plot){
-        grlist <- GenomicRanges::GRangesList(sites = gr, rightflanks = newgr)
-        plot_intervals(grlist, title = txt)
+        gr$color <- 'sites'
+        newgr$color <- 'rightflanks'
+        plot_intervals(c(gr, newgr), title = txt)
     }
     if (verbose) message(txt)
     newgr
@@ -216,8 +218,9 @@ extend <- function(
     
     # Plot, Message, Return
     if (plot){
-        grlist <- GenomicRanges::GRangesList(original = gr, extended = newgr)
-        plot_intervals(grlist, title = txt)
+        gr$color <- 'sites'
+        newgr$color <- 'extensions'
+        plot_intervals(c(gr, newgr), title = txt)
     }
     if (verbose) message(txt)
     newgr
