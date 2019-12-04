@@ -81,10 +81,10 @@
 #     targetseqs <- Biostrings::DNAStringSet(targets$seq)
 #     names(targetseqs) <- sprintf(
 #                           '%s:%s-%s(%s)', 
-#                           as.character(GenomicRanges::seqnames(targets)),
-#                           GenomicRanges::start(targets),
-#                           GenomicRanges::end(targets),
-#                           GenomicRanges::strand(targets))
+#                           as.character(seqnames(targets)),
+#                           start(targets),
+#                           end(targets),
+#                           strand(targets))
 #     Biostrings::writeXStringSet(targetseqs, targetfa)
 #     
 #     # Index targets

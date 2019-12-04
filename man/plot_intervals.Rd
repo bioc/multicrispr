@@ -37,13 +37,13 @@ Interval plot GRanges
     
 # PE targets
     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    sites <- GenomicRanges::GRanges(
+    sites <- GRanges(
                seqnames= c(PRNP = 'chr20:4699600',
                            HBB  = 'chr11:5227002',
                            HEXA = 'chr15:72346580-72346583',
                            CFTR = 'chr7:117559593-117559595'),
                strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-               seqinfo  = BSgenome::seqinfo(bs))
+               seqinfo  = seqinfo(bs))
     sites$color <- names(sites)
     plot_intervals(sites)
 }

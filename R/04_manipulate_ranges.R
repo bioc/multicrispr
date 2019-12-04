@@ -8,15 +8,13 @@
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     bsinfo   <- BSgenome::seqinfo(bsgenome)
 #'     (gr <- add_seq(gr, bsgenome))
 #'     
 #' # PRNP snp: Kuru resistance variant (G -> T)
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo   <- BSgenome::seqinfo(bsgenome)
-#'     gr  <-  GenomicRanges::GRanges(
-#'                'chr20:4699500', strand = '+', seqinfo = bsinfo)
+#'     gr  <-  GRanges(
+#'                'chr20:4699500', strand = '+', seqinfo = seqinfo(bsgenome))
 #'     gr %<>% multicrispr::add_inverse_strand()
 #'     gr %<>% multicrispr::extend(bsgenome = bsgenome)
 #'    (gr %<>% multicrispr::add_seq(bsgenome))
@@ -24,15 +22,13 @@
 add_seq <- function(gr, bsgenome, verbose = TRUE){
     
     # Assert
-    assertive.types::assert_is_all_of(gr, 'GRanges')
-    assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    assert_is_all_of(gr, 'GRanges')
+    assert_is_all_of(bsgenome, 'BSgenome')
     
     # Message
     if (verbose)  cmessage('\tAdd seq')
     
     # Align seqlevelsStyle if required
-    `seqlevelsStyle`   <- GenomeInfoDb::`seqlevelsStyle`
-    `seqlevelsStyle<-` <- GenomeInfoDb::`seqlevelsStyle<-`
     if (seqlevelsStyle(bsgenome)[1] != seqlevelsStyle(gr)[1]){
             cmessage("\t\t\tSet seqlevelStyle(bsgenome) <- seqlevelStyle(gr)")
             seqlevelsStyle(bsgenome)[1] <- seqlevelsStyle(gr)[1]
@@ -41,10 +37,10 @@ add_seq <- function(gr, bsgenome, verbose = TRUE){
     # Add seq
     gr$seq <- unname(BSgenome::getSeq(
                         bsgenome,
-                        names        = GenomicRanges::seqnames(gr),
-                        start        = GenomicRanges::start(gr),
-                        end          = GenomicRanges::end(gr), 
-                        strand       = GenomicRanges::strand(gr), 
+                        names        = seqnames(gr),
+                        start        = start(gr),
+                        end          = end(gr), 
+                        strand       = strand(gr), 
                         as.character = TRUE))
     
     # Return
@@ -54,9 +50,9 @@ add_seq <- function(gr, bsgenome, verbose = TRUE){
 
 summarize_loci <- function(gr){
     sprintf('%s:%s-%s', 
-            as.character(GenomicRanges::seqnames(gr)), 
-            GenomicRanges::start(gr), 
-            GenomicRanges::end(gr))
+            as.character(seqnames(gr)), 
+            start(gr), 
+            end(gr))
 }
 
 
@@ -82,8 +78,8 @@ summarize_loci <- function(gr){
 #'     
 #' # HBB snp: sickle cell variant (T -> A)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo <- BSgenome::seqinfo(bsgenome)
-#'     gr <- GenomicRanges::GRanges(
+#'     bsinfo <- seqinfo(bsgenome)
+#'     gr <- GRanges(
 #'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
 #'     (gr %<>% add_seq(bsgenome))
 #'     gr %>% left_flank(-22, -1, bsgenome = bsgenome)
@@ -91,8 +87,7 @@ summarize_loci <- function(gr){
 #'     gr %>% extend(-22, 22, bsgenome = bsgenome)
 #' 
 #' # PRNP snp: Kuru variant
-#'    gr  <-  GenomicRanges::GRanges(
-#'                'chr20:4699500', strand = '+', seqinfo = bsinfo)
+#'    gr  <-  GRanges('chr20:4699500', strand = '+', seqinfo = bsinfo)
 #'    gr  %<>% multicrispr::add_inverse_strand()
 #'    (gr %<>% multicrispr::add_seq(bsgenome))
 #'    (extended <- multicrispr::extend(gr, bsgenome = bsgenome))
@@ -108,22 +103,22 @@ left_flank <- function(
     plot       = TRUE
 ){
     # Assert
-    assertive.types::assert_is_any_of(gr, 'GRanges')
-    assertive.types::assert_is_a_number(leftstart)
-    assertive.types::assert_is_a_number(leftend)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_is_any_of(gr, 'GRanges')
+    assert_is_a_number(leftstart)
+    assert_is_a_number(leftend)
+    assert_is_a_bool(verbose)
     
     # Flank
     newgr <- gr
-    GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + leftstart
-    GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + leftend
+    start(newgr) <- start(gr) + leftstart
+    end(newgr)   <- start(gr) + leftend
     txt <- sprintf('\t\t%d left  flanks: [start%s%d, start%s%d]', 
                     length(newgr), csign(leftstart), abs(leftstart), 
                     csign(leftend), abs(leftend))
     
     # Add seq
-    if ('seq' %in% names(GenomicRanges::mcols(gr))){
-        assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
 
@@ -149,15 +144,15 @@ right_flank <- function(
     verbose    = TRUE
 ){
     # Assert
-    assertive.types::assert_is_any_of(gr, 'GRanges')
-    assertive.types::assert_is_a_number(rightstart)
-    assertive.types::assert_is_a_number(rightend)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_is_any_of(gr, 'GRanges')
+    assert_is_a_number(rightstart)
+    assert_is_a_number(rightend)
+    assert_is_a_bool(verbose)
     
     # Flank
     newgr <- gr
-    GenomicRanges::start(newgr) <- GenomicRanges::end(newgr) + rightstart
-    GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr) + rightend
+    start(newgr) <- end(newgr) + rightstart
+    end(newgr)   <- end(newgr) + rightend
     txt <- sprintf('\t\t%d right flanks : [end%s%d, end%s%d]', 
                     length(newgr),
                     csign(rightstart), 
@@ -166,8 +161,8 @@ right_flank <- function(
                     abs(rightend))
     
     # Add seq
-    if ('seq' %in% names(GenomicRanges::mcols(gr))){
-        assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
     
@@ -194,15 +189,15 @@ extend <- function(
 ){
 
     # Assert
-    assertive.types::assert_is_any_of(gr, 'GRanges')
-    assertive.types::assert_is_a_number(leftstart)
-    assertive.types::assert_is_a_number(rightend)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_is_any_of(gr, 'GRanges')
+    assert_is_a_number(leftstart)
+    assert_is_a_number(rightend)
+    assert_is_a_bool(verbose)
     
     # Extend
     newgr <- gr
-    GenomicRanges::start(newgr) <- GenomicRanges::start(newgr) + leftstart
-    GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr)   + rightend
+    start(newgr) <- start(newgr) + leftstart
+    end(newgr)   <- end(newgr)   + rightend
     txt <- sprintf('\t\t%d extended ranges: [start%s%d, end%s%d]', 
                     length(newgr),
                     csign(leftstart), 
@@ -211,8 +206,8 @@ extend <- function(
                     abs(rightend))
     
     # Add seq
-    if ('seq' %in% names(GenomicRanges::mcols(gr))){
-        assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
     
@@ -243,9 +238,8 @@ extend <- function(
 #' # HBB snp: sickle cell variant (T -> A)
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo <- BSgenome::seqinfo(bsgenome)
-#'     gr <- GenomicRanges::GRanges(
-#'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
+#'     bsinfo <- seqinfo(bsgenome)
+#'     gr <- GRanges('chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
 #'     (gr %<>% add_seq(bsgenome))
 #'     gr %>% straddle(leftstart = -22, rightend = 22, bsgenome = bsgenome)
 #' 
@@ -291,8 +285,8 @@ straddle <- function(
     }
     
     # Add seq
-    if ('seq' %in% names(GenomicRanges::mcols(gr))){
-        assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
     
@@ -341,15 +335,19 @@ double_flank <- function(
     if (verbose) cmessage('\t\t%d combined (left + right)', length(newgr))
 
     # Plot
-    if (plot) plot_intervals(GenomicRanges::GRangesList(sites=gr, flanks=newgr))
+    if (plot){
+        gr$color <- 'sites'
+        newgr$color <- 'flanks'
+        plot_intervals(c(gr, newgr))
+    }
 
     # Merge overlaps
     newgr %<>% GenomicRanges::reduce()
     if (verbose) cmessage('\t\t%d after merging overlaps', length(newgr))
     
     # Add seq
-    if ('seq' %in% names(GenomicRanges::mcols(gr))){
-        assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
     
@@ -367,23 +365,20 @@ double_flank <- function(
 #' # Load
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo <- BSgenome::seqinfo(bsgenome)
+#'     bsinfo <- seqinfo(bsgenome)
 #'     
 #' # PRNP snp: Kuru resistance variant (G -> T)
-#'     gr <- GenomicRanges::GRanges(
-#'            'chr20:4699500', strand = '+', seqinfo = bsinfo)
+#'     gr <- GRanges('chr20:4699500', strand = '+', seqinfo = bsinfo)
 #'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #'     
 #' # HBB snp: sickle cell variant (T -> A)
-#'     gr <- GenomicRanges::GRanges(
-#'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
+#'     gr <- GRanges('chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
 #'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #'     
 #' # HEXA TATC duplication: Tay-Sachs variant
-#'     gr <- GenomicRanges::GRanges(
-#'             'chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
+#'     gr <- GRanges('chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
 #'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #' @export
@@ -393,32 +388,32 @@ add_inverse_strand <- function(
     verbose = TRUE
 ){
     # Invert
-    complements <- GenomicRanges::invertStrand(gr)
+    complements <- invertStrand(gr)
     
     # Add seq
-    if ('seq' %in% names(GenomicRanges::mcols(gr))){
+    if ('seq' %in% names(mcols(gr))){
         complements$seq <- as.character(
                                 Biostrings::complement(
                                     Biostrings::DNAStringSet(gr$seq)))
     }
     
     # Concatenate
-    newranges <- c(gr, complements)
+    newgr <- c(gr, complements)
     txt <- sprintf('\t\t%d ranges after adding inverse strands',
-                    length(newranges))
+                    length(newgr))
     
     # Sort
-    newranges <- GenomeInfoDb::sortSeqlevels(newranges)
-    newranges <- GenomicRanges::sort(newranges)
+    newgr <- GenomeInfoDb::sortSeqlevels(newgr)
+    newgr <- GenomicRanges::sort(newgr)
     
     # Plot
     if (plot){
-        grlist <- GenomicRanges::GRangesList(original = gr, 
-                                            complements = complements)
-        plot_intervals(grlist, title = txt)
+        gr$color    <- 'sites'
+        newgr$color <- 'inv'
+        plot_intervals(c(gr, newgr), title = txt)
     }
     
     # Message
     if (verbose) cmessage(txt)
-    newranges
+    newgr
 }

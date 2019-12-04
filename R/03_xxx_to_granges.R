@@ -16,8 +16,8 @@
 # seqs <- function(gr, bsgenome){
 #     
 #     # Assert
-#     assertive.types::assert_is_all_of(gr, 'GRanges')
-#     assertive.types::assert_is_all_of(bsgenome, 'BSgenome')
+#     assert_is_all_of(gr, 'GRanges')
+#     assert_is_all_of(bsgenome, 'BSgenome')
 #     
 #     # Do
 #     BSgenome::getSeq( bsgenome,
@@ -43,7 +43,7 @@
 #    . <- NULL
 #    
 #    assert_is_identical_to_true(is(gr, 'GRanges'))
-#    genome <- unique(unname(GenomeInfoDb::genome(gr)))
+#    genome <- unique(unname(genome(gr)))
 #    assert_is_a_string(genome)
 #    getBSgenome(genome)
 #}
@@ -52,14 +52,11 @@
 annotate_granges <- function(gr, txdb){
     
     # Assert. Import. Comply.
-    assertive.types::assert_is_all_of(gr, 'GRanges')
-    assertive.types::assert_is_all_of(txdb, 'TxDb')
+    assert_is_all_of(gr, 'GRanges')
+    assert_is_all_of(txdb, 'TxDb')
     gene_id <- NULL
-    extract <- magrittr::extract
 
     # Align seqlevelStyle if required
-    `seqlevelsStyle`   <- GenomeInfoDb::`seqlevelsStyle`
-    `seqlevelsStyle<-` <- GenomeInfoDb::`seqlevelsStyle<-`
     if (seqlevelsStyle(gr) != seqlevelsStyle(txdb)){
         message("Setting seqlevelsStyle(txdb) <- seqlevelsStyle(gr)")
         seqlevelsStyle(txdb) <- seqlevelsStyle(gr)
@@ -67,24 +64,24 @@ annotate_granges <- function(gr, txdb){
     
     # Drop seqinfo (to overlap smoothly)
     txranges <- GenomicFeatures::genes(txdb)                                %>%
-                data.table::as.data.table()                                 %>%
-                extract(GenomeInfoDb::seqlevelsInUse(gr), on = 'seqnames')  %>%
+                as.data.table()                                             %>%
+                extract(seqlevelsInUse(gr), on = 'seqnames')                %>%
                 extract(, c('seqnames', 'start', 'end', 'strand', 'gene_id'),
                             with = FALSE)                                   %>%
-                methods::as('GRanges')
+                as('GRanges')
     
     # Overlap
-    granno <- data.table::as.data.table(gr)                         %>%
-            methods::as('GRanges')                                  %>%
-            plyranges::join_overlap_left(txranges)                  %>%
-            data.table::as.data.table()                             %>%
-            extract(!is.na(gene_id) ,  
-                    gene_id := paste0(gene_id, collapse = ';'), 
-                    by = c('seqnames', 'start', 'end', 'strand'))   %>%
-            unique()                                                %>%
-            methods::as('GRanges')
-    GenomeInfoDb::seqlevels(granno) %<>% setdiff('.') # patch plyranges bug
-    GenomeInfoDb::seqinfo(granno) <- GenomeInfoDb::seqinfo(gr)
+    granno  <-  as.data.table(gr)                                       %>%
+                as('GRanges')                                           %>%
+                plyranges::join_overlap_left(txranges)                  %>%
+                as.data.table()                                         %>%
+                extract(!is.na(gene_id) ,  
+                        gene_id := paste0(gene_id, collapse = ';'), 
+                        by = c('seqnames', 'start', 'end', 'strand'))   %>%
+                unique()                                                %>%
+                as('GRanges')
+    seqlevels(granno) %<>% setdiff('.') # patch plyranges bug
+    seqinfo(granno) <- seqinfo(gr)
     granno
 }
 
@@ -118,18 +115,18 @@ bed_to_granges <- function(
     . <- NULL
     
     # Assert
-    assertive.files::assert_all_are_existing_files(bedfile)
-    assertive.types::assert_is_a_bool(complement)
-    if (!is.null(txdb)) assertive.types::assert_is_all_of(txdb, 'TxDb')
-    assertive.types::assert_is_a_bool(do_order)
-    assertive.types::assert_is_a_bool(plot)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_all_are_existing_files(bedfile)
+    assert_is_a_bool(complement)
+    if (!is.null(txdb)) assert_is_all_of(txdb, 'TxDb')
+    assert_is_a_bool(do_order)
+    assert_is_a_bool(plot)
+    assert_is_a_bool(verbose)
 
     # Read
     if (verbose) cmessage('\tRead %s into GRanges', basename(bedfile))
     gr <- rtracklayer::import.bed(bedfile, genome = genome)
     if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
-                    length(gr), length(unique(GenomicRanges::seqnames(gr))))
+                    length(gr), length(unique(seqnames(gr))))
     
     # Add complementary strand
     if (complement){
@@ -143,14 +140,13 @@ bed_to_granges <- function(
     }
     
     # Plot
-    genome1 <- unique(GenomeInfoDb::genome(gr))
+    genome1 <- unique(genome(gr))
     assertive.properties::assert_is_scalar(genome1)
     title <- paste0(genome1, ': ', basename(bedfile))
     if (plot) plot_karyogram(gr, title)
     
     # Order
-    if (do_order)  gr %<>% magrittr::extract( order(GenomicRanges::seqnames(.), 
-                                                    GenomicRanges::start(.)))
+    if (do_order)  gr %<>% extract( order(seqnames(.), start(.)))
     
     # Return
     gr
@@ -175,8 +171,8 @@ bed_to_granges <- function(
 #' #-------
 #' genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
 #' geneids  <- as.character(read.table(genefile)[[1]])
-#' txdb     <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
-#'                                     'TxDb.Mmusculus.UCSC.mm10.knownGene')
+#' txdb     <- getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+#'                              'TxDb.Mmusculus.UCSC.mm10.knownGene')
 #' gr <- genes_to_granges(geneids, txdb)
 #' gr <- genefile_to_granges(genefile, txdb)
 #'
@@ -197,10 +193,10 @@ genes_to_granges <- function(
 ){
     
     # Assert
-    assertive.types::assert_is_character(geneids)
-    assertive.types::assert_is_any_of(txdb, c('TxDb', 'EnsDb'))
-    assertive.types::assert_is_a_bool(complement)
-    assertive.types::assert_is_a_bool(plot)
+    assert_is_character(geneids)
+    assert_is_any_of(txdb, c('TxDb', 'EnsDb'))
+    assert_is_a_bool(complement)
+    assert_is_a_bool(plot)
     
     # Convert
     gr <- GenomicFeatures::genes(txdb)[geneids]
@@ -223,8 +219,8 @@ genes_to_granges <- function(
 #' @rdname genes_to_granges
 #' @export
 genefile_to_granges <- function(file, txdb, complement = TRUE, plot = TRUE){
-    assertive.files::assert_all_are_existing_files(file)
-    geneids <- utils::read.table(file)[[1]] %>% as.character()
+    assert_all_are_existing_files(file)
+    geneids <- read.table(file)[[1]] %>% as.character()
     genes_to_granges(geneids, txdb, complement = complement, plot = plot)
 }
 

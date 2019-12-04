@@ -43,9 +43,8 @@ Straddle GRanges
 # HBB snp: sickle cell variant (T -> A)
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    bsinfo <- BSgenome::seqinfo(bsgenome)
-    gr <- GenomicRanges::GRanges(
-            'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
+    bsinfo <- seqinfo(bsgenome)
+    gr <- GRanges('chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
     (gr \%<>\% add_seq(bsgenome))
     gr \%>\% straddle(leftstart = -22, rightend = 22, bsgenome = bsgenome)
 

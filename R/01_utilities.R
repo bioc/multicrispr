@@ -7,8 +7,8 @@ num2scalarstr <- function(x){
     if (length(unique(x))==1){
         x[1]
     } else {
-        x %<>% magrittr::extract(!is.na(x))
-        x %<>% magrittr::extract(is.finite(x))
+        x %<>% extract(!is.na(x))
+        x %<>% extract(is.finite(x))
         paste0(min(x), ' - ', max(x))
     }
 }

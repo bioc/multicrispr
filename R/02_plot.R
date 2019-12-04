@@ -7,18 +7,18 @@
 #' @seealso  \code{\link{plot_intervals}}
 #' @examples 
 #' # Plot GRanges
-#'   bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-#'   gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'   plot_karyogram(gr)
+#'     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
+#'     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+#'     plot_karyogram(gr)
 #'   
 #' # Plot GRangesList
-#'   flanks  <- left_flank(gr)
-#'   grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
-#'   plot_karyogram(grlist)
+#'     flanks  <- left_flank(gr)
+#'     grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
+#'     plot_karyogram(grlist)
 #' @export
 plot_karyogram <- function(
     grlist, 
-    title = unique(GenomeInfoDb::genome(grlist))
+    title = unique(genome(grlist))
 ){
     
     # Assert
@@ -26,13 +26,12 @@ plot_karyogram <- function(
     if (methods::is(grlist, 'GRanges')){
         grlist <- GenomicRanges::GRangesList(grlist)
     }
-    assertive.types::assert_is_all_of(grlist, 'GRangesList')
+    assert_is_all_of(grlist, 'GRangesList')
     
     # Extract relevant chromosomes and order them
-    chroms <- union(GenomeInfoDb::seqlevelsInUse(grlist), 
-                    GenomeInfoDb::standardChromosomes(grlist))
+    chroms <- union(seqlevelsInUse(grlist), standardChromosomes(grlist))
     stri_extract <- function(stri, pattern){
-        stri %>% magrittr::extract(stringi::stri_detect_regex(., pattern)) 
+        stri %>% extract(stri_detect_regex(., pattern)) 
     }
     chrs1  <- chroms %>% stri_extract('^(chr)?[0-9]$')    %>% sort()
     chrs2  <- chroms %>% stri_extract('^(chr)?[0-9]{2}$') %>% sort()
@@ -40,8 +39,7 @@ plot_karyogram <- function(
     chrsM  <- chroms %>% stri_extract('^(chr)?MT?$')
     orderedchrs <-  c(chrs1, chrs2, chrsXY, chrsM) %>% 
                     c(sort(setdiff(chroms, .)))
-    genomeranges <- methods::as(GenomeInfoDb::seqinfo(grlist)[orderedchrs],
-                        "GRanges")
+    genomeranges <- as(seqinfo(grlist)[orderedchrs], "GRanges")
 
     # Color
     n <- length(grlist)
@@ -57,7 +55,7 @@ plot_karyogram <- function(
     }
     
     # Add legend
-    if (assertive.properties::has_names(grlist)){
+    if (has_names(grlist)){
         graphics::legend('right', fill = colors, legend = names(grlist))
     }
 
@@ -69,10 +67,10 @@ plot_tracks <- function(grlist){
     group <- . <-  NULL
     
     if (methods::is(grlist, 'GRangesList')) gr <- unlist(grlist)
-    genome  <- unique(GenomeInfoDb::genome(GenomeInfoDb::seqinfo(gr)))
-    assertive.types::assert_is_a_string(genome)
-    chrom   <- unique(as.character(GenomicRanges::seqnames(gr)))[1]
-    assertive.types::assert_is_a_string(chrom)
+    genome  <- unique(genome(seqinfo(gr)))
+    assert_is_a_string(genome)
+    chrom   <- unique(as.character(seqnames(gr)))[1]
+    assert_is_a_string(chrom)
     
     # Find continuum groups
     gr$group <- GenomicRanges::findOverlaps(
@@ -84,8 +82,7 @@ plot_tracks <- function(grlist){
                                         genome     = genome), 
                         genomeaxis = Gviz::GenomeAxisTrack())
     selectedgr   <- subset(gr, group==1) %>% split(names(.))
-    annottracks  <- mapply( Gviz::AnnotationTrack, 
-                            selectedgr, name = names(gr))
+    annottracks  <- mapply( Gviz::AnnotationTrack, selectedgr, name = names(gr))
     Gviz::plotTracks(c(coretracks, annottracks), 
                     background.title = 'gray40', 
                     add = TRUE)
@@ -128,13 +125,13 @@ to_megabase <- function(y){
 #'     
 #' # PE targets
 #'     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     sites <- GenomicRanges::GRanges(
+#'     sites <- GRanges(
 #'                seqnames= c(PRNP = 'chr20:4699600',
 #'                            HBB  = 'chr11:5227002',
 #'                            HEXA = 'chr15:72346580-72346583',
 #'                            CFTR = 'chr7:117559593-117559595'),
 #'                strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'                seqinfo  = BSgenome::seqinfo(bs))
+#'                seqinfo  = seqinfo(bs))
 #'     sites$color <- names(sites)
 #'     plot_intervals(sites)
 #' @export
@@ -145,20 +142,18 @@ plot_intervals <- function(
 ){
     
     # Assert, Import, Comply
-    assertive.types::assert_is_all_of(gr, 'GRanges')
-    assertive.sets::assert_is_subset(
-        color_var, names(data.table::as.data.table(gr)))
-    extract <- magrittr::extract
+    assert_is_all_of(gr, 'GRanges')
+    assert_is_subset(color_var, names(as.data.table(gr)))
     contig <- group <- .N <- .SD <- seqnames <- start <- NULL
     strand <- tmp <- width <- xstart <- xend <- y <- NULL
 
     # Find adjacent ranges    
     gr$contig <- GenomicRanges::findOverlaps(
                     gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
-    gr %<>% magrittr::extract(order(gr$contig))
+    gr %<>% extract(order(gr$contig))
     
     # Prepare plotdt
-    plotdt <- data.table::as.data.table(gr)
+    plotdt <- as.data.table(gr)
     plotdt <- plotdt[ , .SD[contig %in% c(min(contig), max(contig)) ], 
                         by = c('seqnames')]
     plotdt %<>% extract(order(seqnames, start))

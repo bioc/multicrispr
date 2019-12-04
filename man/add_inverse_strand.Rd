@@ -23,23 +23,20 @@ Add inverse strand
 # Load
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    bsinfo <- BSgenome::seqinfo(bsgenome)
+    bsinfo <- seqinfo(bsgenome)
     
 # PRNP snp: Kuru resistance variant (G -> T)
-    gr <- GenomicRanges::GRanges(
-           'chr20:4699500', strand = '+', seqinfo = bsinfo)
+    gr <- GRanges('chr20:4699500', strand = '+', seqinfo = bsinfo)
     gr \%<>\% add_seq(bsgenome)
     gr \%>\%  add_inverse_strand()
     
 # HBB snp: sickle cell variant (T -> A)
-    gr <- GenomicRanges::GRanges(
-            'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
+    gr <- GRanges('chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
     gr \%<>\% add_seq(bsgenome)
     gr \%>\%  add_inverse_strand()
     
 # HEXA TATC duplication: Tay-Sachs variant
-    gr <- GenomicRanges::GRanges(
-            'chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
+    gr <- GRanges('chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
     gr \%<>\% add_seq(bsgenome)
     gr \%>\%  add_inverse_strand()
 }

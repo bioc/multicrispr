@@ -4,7 +4,7 @@
 \alias{plot_karyogram}
 \title{Karyo/Interval Plot GRanges(List)}
 \usage{
-plot_karyogram(grlist, title = unique(GenomeInfoDb::genome(grlist)))
+plot_karyogram(grlist, title = unique(genome(grlist)))
 }
 \arguments{
 \item{grlist}{\code{\link[GenomicRanges]{GRanges-class}} or 
@@ -20,14 +20,14 @@ Karyo/Interval Plot GRanges(List)
 }
 \examples{
 # Plot GRanges
-  bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-  gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-  plot_karyogram(gr)
+    bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
+    gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+    plot_karyogram(gr)
   
 # Plot GRangesList
-  flanks  <- left_flank(gr)
-  grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
-  plot_karyogram(grlist)
+    flanks  <- left_flank(gr)
+    grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
+    plot_karyogram(grlist)
 }
 \seealso{
 \code{\link{plot_intervals}}

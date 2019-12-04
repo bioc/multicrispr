@@ -11,7 +11,7 @@ count_genome_matches(
   crisprseqs,
   bsgenome,
   mismatch,
-  include = BSgenome::seqnames(bsgenome),
+  include = seqnames(bsgenome),
   verbose = TRUE
 )
 }

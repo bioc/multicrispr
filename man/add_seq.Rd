@@ -24,15 +24,13 @@ Add sequence to GRanges
     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10')
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-    bsinfo   <- BSgenome::seqinfo(bsgenome)
     (gr <- add_seq(gr, bsgenome))
     
 # PRNP snp: Kuru resistance variant (G -> T)
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    bsinfo   <- BSgenome::seqinfo(bsgenome)
-    gr  <-  GenomicRanges::GRanges(
-               'chr20:4699500', strand = '+', seqinfo = bsinfo)
+    gr  <-  GRanges(
+               'chr20:4699500', strand = '+', seqinfo = seqinfo(bsgenome))
     gr \%<>\% multicrispr::add_inverse_strand()
     gr \%<>\% multicrispr::extend(bsgenome = bsgenome)
    (gr \%<>\% multicrispr::add_seq(bsgenome))

@@ -20,10 +20,6 @@
 add_contextseq <- function(sites, bsgenome, verbose = TRUE){
     
     # Prevent from stats::start from being used (leads to bug!)
-    start  <- GenomicRanges::start;     `start<-`  <- GenomicRanges::`start<-`
-    end    <- GenomicRanges::end;       `end<-`    <- GenomicRanges::`end<-`
-    strand <- GenomicRanges::strand
-    
     contexts <- sites
     start(contexts) <- start(sites) - ifelse(strand(sites)=='+', 4, 3)
     end(contexts)   <- end(sites)   + ifelse(strand(sites)=='+', 3, 4)
@@ -43,16 +39,16 @@ doench2014 <- function(
 ){
     
     # Assert
-    assertive.types::assert_is_character(contextseqs)
-    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
-    assertive.types::assert_is_a_bool(verbose)
+    assert_is_character(contextseqs)
+    assert_all_are_true(nchar(contextseqs)==30)
+    assert_is_a_bool(verbose)
     
     # Message
     if (verbose)  message('\t\tScore contextseqs with Doench2014')
     
     # Read featureWeightMatrix
     fwfile   <- system.file("extdata/DoenchNBT2014.csv", package = "CRISPRseek")
-    fwmatrix <- utils::read.csv(fwfile, header = TRUE)
+    fwmatrix <- read.csv(fwfile, header = TRUE)
     
     # Score and return
     CRISPRseek::calculategRNAEfficiency(contextseqs,
@@ -76,11 +72,10 @@ doench2016 <- function(
     if (!is.null(condaenv))     reticulate::use_condaenv(condaenv)
     
     # Assert
-    assertive.base::is_identical_to_true(
-        reticulate::py_module_available('azimuth'))
-    assertive.types::assert_is_character(contextseqs)
-    assertive.base::assert_all_are_true(nchar(contextseqs)==30)
-    assertive.types::assert_is_a_bool(verbose)
+    is_identical_to_true(reticulate::py_module_available('azimuth'))
+    assert_is_character(contextseqs)
+    assert_all_are_true(nchar(contextseqs)==30)
+    assert_is_a_bool(verbose)
     
     # Message
     if (verbose)  message(  '\t\tScore contextseqs with Doench2016',
@@ -165,15 +160,15 @@ score_crispr_sites <- function(
     verbose    = TRUE
 ){
     # Assert
-    assertive.types::assert_is_all_of(sites, 'GRanges')
-    assertive.types::assert_is_a_string(method)
-    assertive.sets::assert_is_subset(method, c('Doench2014', 'Doench2016'))
+    assert_is_all_of(sites, 'GRanges')
+    assert_is_a_string(method)
+    assert_is_subset(method, c('Doench2014', 'Doench2016'))
 
     # Add contextseq
     if (verbose)  cmessage('\tScore crispr sites')
     sites %<>% add_contextseq(bsgenome, verbose = verbose)
-    sitedt  <- data.table::as.data.table(sites)
-    scoredt <- data.table::data.table(contextseq = unique(sitedt$contextseq))
+    sitedt  <- as.data.table(sites)
+    scoredt <- data.table(contextseq = unique(sitedt$contextseq))
     
     # Score
     scorefun <- switch(method, Doench2014 = doench2014, Doench2016 = doench2016)
@@ -182,7 +177,7 @@ score_crispr_sites <- function(
     # Merge back in and Return
     sites_merged  <- merge(  sitedt, scoredt, by = 'contextseq', sort = FALSE, 
                             all.x = TRUE) %>%
-                    methods::as('GRanges')
-    GenomeInfoDb::seqinfo(sites_merged) <- GenomeInfoDb::seqinfo(sites)
+                    as('GRanges')
+    seqinfo(sites_merged) <- seqinfo(sites)
     sites_merged
 }

@@ -9,7 +9,7 @@ filter_offtargetfree_sites(
   targets,
   bsgenome,
   mismatch = 2,
-  include = GenomeInfoDb::standardChromosomes(targets),
+  include = standardChromosomes(targets),
   plot = TRUE,
   verbose = TRUE
 )
@@ -45,7 +45,7 @@ Filter for offtarget-free crispr sites
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     targets <- bed_to_granges(bedfile, 'mm10')
     targets \%<>\% extend()
-    targets \%<>\% extract(GenomicRanges::seqnames(.)=='chrY')
+    targets \%<>\% extract(seqnames(.)=='chrY')
 
 # Add seqs and find crispr sites
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10

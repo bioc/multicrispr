@@ -68,8 +68,8 @@ Flank or Extend GRanges
     
 # HBB snp: sickle cell variant (T -> A)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    bsinfo <- BSgenome::seqinfo(bsgenome)
-    gr <- GenomicRanges::GRanges(
+    bsinfo <- seqinfo(bsgenome)
+    gr <- GRanges(
             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
     (gr \%<>\% add_seq(bsgenome))
     gr \%>\% left_flank(-22, -1, bsgenome = bsgenome)
@@ -77,8 +77,7 @@ Flank or Extend GRanges
     gr \%>\% extend(-22, 22, bsgenome = bsgenome)
 
 # PRNP snp: Kuru variant
-   gr  <-  GenomicRanges::GRanges(
-               'chr20:4699500', strand = '+', seqinfo = bsinfo)
+   gr  <-  GRanges('chr20:4699500', strand = '+', seqinfo = bsinfo)
    gr  \%<>\% multicrispr::add_inverse_strand()
    (gr \%<>\% multicrispr::add_seq(bsgenome))
    (extended <- multicrispr::extend(gr, bsgenome = bsgenome))

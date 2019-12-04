@@ -34,8 +34,8 @@ Convert geneids into GRanges
 #-------
 genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
 geneids  <- as.character(read.table(genefile)[[1]])
-txdb     <- utils::getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
-                                    'TxDb.Mmusculus.UCSC.mm10.knownGene')
+txdb     <- getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+                             'TxDb.Mmusculus.UCSC.mm10.knownGene')
 gr <- genes_to_granges(geneids, txdb)
 gr <- genefile_to_granges(genefile, txdb)
 

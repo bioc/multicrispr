@@ -21,19 +21,18 @@
 find_crispr_sites <- function(targets, plot = TRUE, verbose = TRUE){
 
     # Assert. Import. Comply
-    assertive.types::assert_is_all_of(targets, 'GRanges')
-    assertive.sets::assert_is_subset('seq',names(GenomicRanges::mcols(targets)))
-    assertive.types::assert_is_character(targets$seq)
-    assertive.types::assert_is_a_bool(verbose)
-    extract <- magrittr::extract
+    assert_is_all_of(targets, 'GRanges')
+    assert_is_subset('seq',names(mcols(targets)))
+    assert_is_character(targets$seq)
+    assert_is_a_bool(verbose)
     start <- substart <- crispr_start <- NULL
     end <- subend <- crispr_end <- strand <- seqnames <- NULL
     
     # Find crispr sites in targetranges
     pattern <- '[ACGT]{21}GG'
     if (verbose) cmessage('\tFind %s crispr sites', pattern)
-    targetdt <- data.table::as.data.table(targets)
-    res <- targetdt$seq %>% stringi::stri_locate_all_regex(pattern)
+    targetdt <- as.data.table(targets)
+    res <- targetdt$seq %>% stri_locate_all_regex(pattern)
     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
     targetdt [ , substart := vapply( res, cextract1, character(1)) ]
@@ -48,7 +47,7 @@ find_crispr_sites <- function(targets, plot = TRUE, verbose = TRUE){
 
     # Transform into crispr ranges
     sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend) %>%
-                data.table::data.table()                                    %>% 
+                data.table()                                                %>% 
                 extract(, substart := as.numeric(substart))                 %>% 
                 extract(, subend   := as.numeric(subend))                   %>% 
                 extract(, seq      := substr(seq, substart, subend))        %>%
@@ -58,8 +57,7 @@ find_crispr_sites <- function(targets, plot = TRUE, verbose = TRUE){
                 extract( strand=='-', crispr_end   := end   - substart + 1) %>%
                 extract(, list( seqnames = seqnames, start = crispr_start, 
                                 end = crispr_end,  strand = strand,  seq = seq))
-    sites <- GenomicRanges::GRanges(unique(sites_dt), 
-                                    seqinfo =  GenomeInfoDb::seqinfo(targets))
+    sites <- GRanges(unique(sites_dt), seqinfo =  seqinfo(targets))
 
     # Plot. Message. Return
     if (plot) plot_karyogram(GenomicRanges::GRangesList(
