@@ -26,11 +26,12 @@ Add sequence to GRanges
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     (gr <- add_seq(gr, bsgenome))
     
-# PRNP snp: Kuru resistance variant (G -> T)
+# PRNP
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    gr  <-  GRanges(
-               'chr20:4699500', strand = '+', seqinfo = seqinfo(bsgenome))
+    gr  <-  GenomicRanges::GRanges(
+                'chr20:4699500', strand = '+', 
+                 seqinfo = BSgenome::seqinfo(bsgenome))
     gr \%<>\% multicrispr::add_inverse_strand()
     gr \%<>\% multicrispr::extend(bsgenome = bsgenome)
    (gr \%<>\% multicrispr::add_seq(bsgenome))

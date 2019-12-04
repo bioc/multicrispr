@@ -30,20 +30,20 @@ Interval plot GRanges
     sites   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
     plot_intervals(sites)
     
-    flanks  <- left_flank(gr, plot = FALSE)
+    flanks  <- left_flank(sites)
     sites$color <- 'sites'
     flanks$color <- 'flanks'
     plot_intervals(c(sites, flanks))
     
 # PE targets
     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    sites <- GRanges(
+    sites <- GenomicRanges::GRanges(
                seqnames= c(PRNP = 'chr20:4699600',
                            HBB  = 'chr11:5227002',
                            HEXA = 'chr15:72346580-72346583',
                            CFTR = 'chr7:117559593-117559595'),
                strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-               seqinfo  = seqinfo(bs))
+               seqinfo  = BSgenome::seqinfo(bs))
     sites$color <- names(sites)
     plot_intervals(sites)
 }

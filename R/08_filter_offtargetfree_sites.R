@@ -117,7 +117,7 @@ count_genome_matches <- function(
                 as.data.table() %>% 
                 extract(, .(n = sum(count)), by ='index') %>%
                 extract2('n') %>% 
-                et_names(unique_crisprseqs)
+                set_names(unique_crisprseqs)
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',

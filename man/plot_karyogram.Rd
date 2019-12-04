@@ -7,13 +7,12 @@
 plot_karyogram(grlist, title = unique(genome(grlist)))
 }
 \arguments{
-\item{grlist}{\code{\link[GenomicRanges]{GRanges-class}} or 
-\code{\link[GenomicRanges]{GRangesList-class}}}
+\item{grlist}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{title}{plot title}
 }
 \value{
-list (plot_karyogram) or ggplot (plot_intervals)
+list
 }
 \description{
 Karyo/Interval Plot GRanges(List)
