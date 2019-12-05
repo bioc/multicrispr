@@ -13,8 +13,7 @@ straddle(
   bsgenome = NULL,
   verbose = TRUE,
   plot = TRUE,
-  color_var = "seqnames",
-  contig_var = NULL
+  ...
 )
 }
 \arguments{
@@ -35,9 +34,7 @@ Required to update gr$seq if present.}
 
 \item{plot}{TRUE (default) or FALSE}
 
-\item{color_var}{string (default 'seqnames') var mapped to plot color}
-
-\item{contig_var}{NULL (default) or string: var mapped to plot contig}
+\item{...}{\code{\link{plot_intervals}} arguments}
 }
 \value{
 a \code{\link[GenomicRanges]{GRanges-class}}

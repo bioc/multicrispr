@@ -137,13 +137,8 @@ to_megabase <- function(y){
 #'     plot_intervals(sites)
 #' @export
 plot_intervals <- function(
-    gr, 
-    color_var   = 'seqnames', 
-    contig_var  = NULL,
-    n_head_tail = 1,
-    title       = NULL
+    gr, color_var='seqnames', contig_var=NULL, n_head_tail=1, title=NULL
 ){
-    
     # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
     assert_is_a_string(color_var)
@@ -188,5 +183,4 @@ plot_intervals <- function(
     # Print and return
     print(p)
     p
-    
 }

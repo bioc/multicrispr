@@ -6,6 +6,7 @@
 #' @importFrom  assertive.types       assert_is_all_of    assert_is_any_of  
 #' @importFrom  assertive.types       assert_is_a_bool    assert_is_a_number
 #' @importFrom  assertive.types       assert_is_a_string  assert_is_character
+#' @importFrom  Biostrings            complement  DNAStringSet
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
 #' @importFrom  data.table            :=  data.table  as.data.table  setorderv
@@ -14,7 +15,7 @@
 #' @importFrom  GenomeInfoDb          seqlevels  seqlevels<-  seqlevelsInUse
 #' @importFrom  GenomeInfoDb          seqlevelsStyle  seqlevelsStyle<- 
 #' @importFrom  GenomeInfoDb          seqnames  seqnames<-   
-#' @importFrom  GenomeInfoDb          standardChromosomes
+#' @importFrom  GenomeInfoDb          sortSeqlevels  standardChromosomes
 #' @importFrom  GenomicRanges         GRanges  mcols  mcols<-
 #' @importFrom  ggplot2               aes_string  facet_wrap  geom_segment  
 #' @importFrom  ggplot2               ggplot  ggtitle  theme_bw  unit  xlab  

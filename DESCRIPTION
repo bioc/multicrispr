@@ -32,6 +32,7 @@ Imports:
     GenomicFeatures,
     GenomicRanges,
     ggplot2,
+    grid,
     Gviz, 
     karyoploteR,
     magrittr,
@@ -40,7 +41,8 @@ Imports:
     reticulate,
     rtracklayer,
     stringi, 
-    tidyr
+    tidyr,
+    utils
 Suggests: 
     BiocStyle,
     BSgenome.Hsapiens.UCSC.hg38,

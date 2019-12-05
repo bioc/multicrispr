@@ -67,8 +67,7 @@ summarize_loci <- function(gr){
 #'                   Required to update gr$seq if present.
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
-#' @param color_var  string (default 'seqnames') var mapped to plot color 
-#' @param contig_var NULL (default) or string: var mapped to plot contig
+#' @param ...        passed to \code{\link{plot_intervals}}
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # SRF binding sites
@@ -105,8 +104,7 @@ left_flank <- function(
     bsgenome   = NULL,
     verbose    = TRUE,
     plot       = TRUE,
-    color_var  = 'seqnames',
-    contig_var = NULL
+    ...
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
@@ -130,10 +128,9 @@ left_flank <- function(
 
     # Plot, Message, Return
     if (plot){
-        gr$color    <- 'sites'
-        newgr$color <- 'leftflanks'
-        plot_intervals(
-            c(gr, newgr), color_var=color_var, contig_var=contig_var, title=txt)
+        gr$set    <- 'sites'
+        newgr$set <- 'leftflanks'
+        plot_intervals(c(gr, newgr), color_var = 'set', ..., title = txt)
     }
     if (verbose) message(txt)
     newgr
@@ -149,8 +146,7 @@ right_flank <- function(
     bsgenome   = NULL,
     verbose    = TRUE,
     plot       = TRUE,
-    color_var  = 'seqnames',
-    contig_var = NULL
+    ...
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
@@ -177,10 +173,9 @@ right_flank <- function(
     
     # Plot, Message, Return
     if (plot){
-        gr$color <- 'sites'
-        newgr$color <- 'rightflanks'
-        plot_intervals(
-            c(gr, newgr), color_var=color_var, contig_var=contig_var, title=txt)
+        gr$set <- 'sites'
+        newgr$set <- 'rightflanks'
+        plot_intervals(c(gr, newgr), color_var = 'set', ..., title=txt)
     }
     if (verbose) message(txt)
     newgr
@@ -196,8 +191,7 @@ extend <- function(
     bsgenome  = NULL,
     verbose   = TRUE,
     plot      = TRUE,
-    color_var  = 'seqnames',
-    contig_var = NULL
+    ...
 ){
 
     # Assert
@@ -225,10 +219,9 @@ extend <- function(
     
     # Plot, Message, Return
     if (plot){
-        gr$color <- 'sites'
-        newgr$color <- 'extensions'
-        plot_intervals(
-            c(gr, newgr), color_var=color_var, contig_var=contig_var, title=txt)
+        gr$set <- 'sites'
+        newgr$set <- 'extensions'
+        plot_intervals(c(gr, newgr), color_var = 'set', ..., title=txt)
     }
     if (verbose) message(txt)
     newgr
@@ -246,8 +239,7 @@ extend <- function(
 #'                   Required to update gr$seq if present.
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
-#' @param color_var  string (default 'seqnames') var mapped to plot color 
-#' @param contig_var NULL (default) or string: var mapped to plot contig
+#' @param ...         \code{\link{plot_intervals}} arguments
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # HBB snp: sickle cell variant (T -> A)
@@ -269,16 +261,15 @@ extend <- function(
 #' @export
 straddle <- function(
     gr, leftstart  = NULL, leftend = NULL, rightstart = NULL, rightend = NULL, 
-    bsgenome = NULL, verbose = TRUE,
-    plot = TRUE, color_var  = 'seqnames', contig_var = NULL
+    bsgenome = NULL, verbose = TRUE, plot = TRUE, ...
 ){
     
     # Extend    
     newgr <- gr
     if (is.numeric(leftstart) & is.numeric(rightend)){
-        newgr <- extend(gr, leftstart  = leftstart, rightend   = rightend,
-                        bsgenome = bsgenome, verbose = verbose, plot = plot, 
-                        color_var = color_var, contig_var = contig_var)
+        newgr <- extend(
+                    gr, leftstart = leftstart, rightend = rightend,
+                    bsgenome = bsgenome, verbose = verbose, plot = plot, ...)
         if (!is.null(leftend) | !is.null(rightstart)){
             warning('Ignore leftend/rightstart to resolve ambiguity')
         }
@@ -286,9 +277,9 @@ straddle <- function(
     
     # Left flank
     if (is.numeric(leftstart) & is.numeric(leftend)){
-        newgr <- left_flank(gr, leftstart = leftstart, leftend = leftend, 
-                            bsgenome = bsgenome, verbose = verbose, plot = plot, 
-                            color_var = color_var, contig_var = contig_var)
+        newgr <- left_flank(
+                    gr, leftstart = leftstart, leftend = leftend, 
+                    bsgenome = bsgenome, verbose = verbose, plot = plot, ...)
         if (!is.null(rightstart) | !is.null(rightend)){
             warning('Ignore rightstart/rightend to resolve ambiguity')
         }
@@ -296,9 +287,9 @@ straddle <- function(
     
     # Right flank
     if (is.numeric(rightstart) & is.numeric(rightend)){
-        newgr <- right_flank(gr, rightstart = rightstart, rightend = rightend, 
-                            bsgenome = bsgenome, verbose = verbose, plot = plot, 
-                            color_var = color_var, contig_var = contig_var)
+        newgr <- right_flank(
+                    gr, rightstart = rightstart, rightend = rightend, 
+                    bsgenome = bsgenome, verbose = verbose, plot = plot, ...)
         if (!is.null(leftstart) | !is.null(leftend)){
             warning('Ignore leftstart/leftend to resolve ambiguity')
         }
@@ -328,8 +319,7 @@ straddle <- function(
 #'                   Required to update gr$seq if present.
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
-#' @param color_var  string (default 'seqnames') var mapped to plot color 
-#' @param contig_var NULL (default) or string: var mapped to plot contig
+#' @param ...         \code{\link{plot_intervals}} arguments
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
@@ -345,8 +335,7 @@ double_flank <- function(
     bsgenome   = NULL,
     verbose    = TRUE,
     plot       = TRUE,
-    color_var  = 'seqnames',
-    contig_var = NULL
+    ...
 ){
     # Comply
     . <- NULL
@@ -360,9 +349,9 @@ double_flank <- function(
 
     # Plot
     if (plot){
-        gr$color <- 'sites'
-        newgr$color <- 'flanks'
-        plot_intervals(c(gr, newgr), color_var=color_var, contig_var=contig_var)
+        gr$set <- 'sites'
+        newgr$set <- 'flanks'
+        plot_intervals(c(gr, newgr), color_var = 'set', ...)
     }
 
     # Merge overlaps
@@ -384,8 +373,7 @@ double_flank <- function(
 #' @param gr         \code{\link[GenomicRanges]{GRanges-class}}
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
-#' @param color_var  string (default 'seqnames'): var mapped to plot color 
-#' @param contig_var NULL (default) or string: var mapped to plot contig
+#' @param ...         \code{\link{plot_intervals}} arguments
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # Load
@@ -411,37 +399,29 @@ double_flank <- function(
 #'     gr %<>% add_seq(bsgenome)
 #'     gr %>%  add_inverse_strand()
 #' @export
-add_inverse_strand <- function(
-    gr, 
-    verbose = TRUE,
-    plot    = TRUE, 
-    color_var  = 'seqnames',
-    contig_var = NULL
-){
+add_inverse_strand <- function(gr, verbose = TRUE, plot = TRUE, ...){
+    
     # Invert
     complements <- invertStrand(gr)
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){
-        complements$seq <- as.character(
-                                Biostrings::complement(
-                                    Biostrings::DNAStringSet(gr$seq)))
+        complements$seq <- as.character(complement(DNAStringSet(gr$seq)))
     }
     
     # Concatenate
     newgr <- c(gr, complements)
-    txt <- sprintf('\t\t%d ranges after adding inverse strands',
-                    length(newgr))
+    txt <- sprintf('\t\t%d ranges after adding inverse strands', length(newgr))
     
     # Sort
-    newgr <- GenomeInfoDb::sortSeqlevels(newgr)
+    newgr <- sortSeqlevels(newgr)
     newgr <- GenomicRanges::sort(newgr)
     
     # Plot
     if (plot){
-        gr$color    <- 'sites'
-        newgr$color <- 'inv'
-        plot_intervals(c(gr, newgr), title = txt)
+        gr$set    <- 'sites'
+        newgr$set <- 'inv'
+        plot_intervals(c(gr, newgr), color_var = 'set', ..., title = txt)
     }
     
     # Message
