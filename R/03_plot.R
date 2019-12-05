@@ -105,9 +105,11 @@ to_megabase <- function(y){
 
 
 #' Interval plot GRanges
-#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param color_var string: mcol mapped to color.
-#' @param title     plot title
+#' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
+#' @param color_var   string: var mapped to plot color
+#' @param contig_var  NULL (default) or string: var mapped to plot contig. 
+#' @param n_head_tail number (default 1): n head/tail contigs to plot per facet
+#' @param title       plot title
 #' @return ggplot object
 #' @seealso  \code{\link{plot_karyogram}}
 #' @examples 
@@ -136,25 +138,34 @@ to_megabase <- function(y){
 #' @export
 plot_intervals <- function(
     gr, 
-    color_var = if ('color' %in% names(mcols(gr))) 'color' else 'seqnames', 
-    title = NULL
+    color_var   = 'seqnames', 
+    contig_var  = NULL,
+    n_head_tail = 1,
+    title       = NULL
 ){
     
     # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
+    assert_is_a_string(color_var)
     assert_is_subset(color_var, names(as.data.table(gr)))
+    if (!is.null(contig_var))  assert_is_subset(
+                                contig_var, names(as.data.table(gr)))
+    assert_is_a_number(n_head_tail)
     contig <- group <- .N <- .SD <- seqnames <- start <- NULL
-    strand <- tmp <- width <- xstart <- xend <- y <- NULL
+    strand <- tmp <- width <- xstart <- xend <- y <- . <- NULL
 
-    # Find adjacent ranges    
-    gr$contig <- GenomicRanges::findOverlaps(
-                    gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
-    gr %<>% extract(order(gr$contig))
+    # Identify (if not predefined) and order on range contigs
+    if (is.null(contig_var)){
+        gr$contig <- GenomicRanges::findOverlaps(
+                        gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
+        contig_var <- 'contig'
+    }
+    gr %<>% extract(order(mcols(.)[[contig_var]]))
     
     # Prepare plotdt
     plotdt <- as.data.table(gr)
-    plotdt <- plotdt[ , .SD[contig %in% c(min(contig), max(contig)) ], 
-                        by = c('seqnames')]
+    head_tail <- function(x, n=1) x %in% c(head(x, n), tail(x, n))
+    plotdt %<>% extract( , .SD[head_tail(get(contig_var))], by = c('seqnames'))
     plotdt %<>% extract(order(seqnames, start))
     plotdt %>%  extract(, y      := min(start), by = 'contig')
     plotdt %>%  extract(, y      := factor(round(y*1e-6)))

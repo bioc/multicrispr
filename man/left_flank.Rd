@@ -12,7 +12,9 @@ left_flank(
   leftend = -1,
   bsgenome = NULL,
   verbose = TRUE,
-  plot = TRUE
+  plot = TRUE,
+  color_var = "seqnames",
+  contig_var = NULL
 )
 
 right_flank(
@@ -20,8 +22,10 @@ right_flank(
   rightstart = 1,
   rightend = 200,
   bsgenome = NULL,
+  verbose = TRUE,
   plot = TRUE,
-  verbose = TRUE
+  color_var = "seqnames",
+  contig_var = NULL
 )
 
 extend(
@@ -29,8 +33,10 @@ extend(
   leftstart = -22,
   rightend = 22,
   bsgenome = NULL,
+  verbose = TRUE,
   plot = TRUE,
-  verbose = TRUE
+  color_var = "seqnames",
+  contig_var = NULL
 )
 }
 \arguments{
@@ -46,6 +52,10 @@ Required to update gr$seq if present.}
 \item{verbose}{TRUE (default) or FALSE}
 
 \item{plot}{TRUE (default) or FALSE}
+
+\item{color_var}{string (default 'seqnames') var mapped to plot color}
+
+\item{contig_var}{NULL (default) or string: var mapped to plot contig}
 
 \item{rightstart}{number: right start (relative to range end)}
 

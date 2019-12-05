@@ -11,8 +11,10 @@ double_flank(
   rightstart = 1,
   rightend = 200,
   bsgenome = NULL,
+  verbose = TRUE,
   plot = TRUE,
-  verbose = TRUE
+  color_var = "seqnames",
+  contig_var = NULL
 )
 }
 \arguments{
@@ -29,9 +31,13 @@ double_flank(
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}
 Required to update gr$seq if present.}
 
+\item{verbose}{TRUE (default) or FALSE}
+
 \item{plot}{TRUE (default) or FALSE}
 
-\item{verbose}{TRUE (default) or FALSE}
+\item{color_var}{string (default 'seqnames') var mapped to plot color}
+
+\item{contig_var}{NULL (default) or string: var mapped to plot contig}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

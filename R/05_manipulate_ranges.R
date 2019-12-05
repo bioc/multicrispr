@@ -67,6 +67,8 @@ summarize_loci <- function(gr){
 #'                   Required to update gr$seq if present.
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
+#' @param color_var  string (default 'seqnames') var mapped to plot color 
+#' @param contig_var NULL (default) or string: var mapped to plot contig
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # SRF binding sites
@@ -102,7 +104,9 @@ left_flank <- function(
     leftend    = -1,
     bsgenome   = NULL,
     verbose    = TRUE,
-    plot       = TRUE
+    plot       = TRUE,
+    color_var  = 'seqnames',
+    contig_var = NULL
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
@@ -128,7 +132,8 @@ left_flank <- function(
     if (plot){
         gr$color    <- 'sites'
         newgr$color <- 'leftflanks'
-        plot_intervals(c(gr, newgr), title = txt)
+        plot_intervals(
+            c(gr, newgr), color_var=color_var, contig_var=contig_var, title=txt)
     }
     if (verbose) message(txt)
     newgr
@@ -142,8 +147,10 @@ right_flank <- function(
     rightstart = 1, 
     rightend   = 200,
     bsgenome   = NULL,
+    verbose    = TRUE,
     plot       = TRUE,
-    verbose    = TRUE
+    color_var  = 'seqnames',
+    contig_var = NULL
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
@@ -172,7 +179,8 @@ right_flank <- function(
     if (plot){
         gr$color <- 'sites'
         newgr$color <- 'rightflanks'
-        plot_intervals(c(gr, newgr), title = txt)
+        plot_intervals(
+            c(gr, newgr), color_var=color_var, contig_var=contig_var, title=txt)
     }
     if (verbose) message(txt)
     newgr
@@ -186,8 +194,10 @@ extend <- function(
     leftstart = -22, 
     rightend  =  22,
     bsgenome  = NULL,
+    verbose   = TRUE,
     plot      = TRUE,
-    verbose   = TRUE
+    color_var  = 'seqnames',
+    contig_var = NULL
 ){
 
     # Assert
@@ -217,7 +227,8 @@ extend <- function(
     if (plot){
         gr$color <- 'sites'
         newgr$color <- 'extensions'
-        plot_intervals(c(gr, newgr), title = txt)
+        plot_intervals(
+            c(gr, newgr), color_var=color_var, contig_var=contig_var, title=txt)
     }
     if (verbose) message(txt)
     newgr
@@ -233,8 +244,10 @@ extend <- function(
 #' @param rightend   number: right end   (relative to range end)
 #' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #'                   Required to update gr$seq if present.
-#' @param plot       TRUE (default) or FALSE
 #' @param verbose    TRUE (default) or FALSE
+#' @param plot       TRUE (default) or FALSE
+#' @param color_var  string (default 'seqnames') var mapped to plot color 
+#' @param contig_var NULL (default) or string: var mapped to plot contig
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # HBB snp: sickle cell variant (T -> A)
@@ -255,15 +268,17 @@ extend <- function(
 #' @author Aditya Bhagwat, after discussing with Michael Lawrence on bioc-devel
 #' @export
 straddle <- function(
-    gr, leftstart  = NULL, leftend = NULL, rightstart = NULL, 
-    rightend = NULL, bsgenome = NULL, plot = TRUE, verbose = TRUE
+    gr, leftstart  = NULL, leftend = NULL, rightstart = NULL, rightend = NULL, 
+    bsgenome = NULL, verbose = TRUE,
+    plot = TRUE, color_var  = 'seqnames', contig_var = NULL
 ){
     
     # Extend    
     newgr <- gr
     if (is.numeric(leftstart) & is.numeric(rightend)){
         newgr <- extend(gr, leftstart  = leftstart, rightend   = rightend,
-                        bsgenome = bsgenome, plot = plot, verbose = verbose)
+                        bsgenome = bsgenome, verbose = verbose, plot = plot, 
+                        color_var = color_var, contig_var = contig_var)
         if (!is.null(leftend) | !is.null(rightstart)){
             warning('Ignore leftend/rightstart to resolve ambiguity')
         }
@@ -272,7 +287,8 @@ straddle <- function(
     # Left flank
     if (is.numeric(leftstart) & is.numeric(leftend)){
         newgr <- left_flank(gr, leftstart = leftstart, leftend = leftend, 
-                            bsgenome = bsgenome, plot = plot, verbose = verbose)
+                            bsgenome = bsgenome, verbose = verbose, plot = plot, 
+                            color_var = color_var, contig_var = contig_var)
         if (!is.null(rightstart) | !is.null(rightend)){
             warning('Ignore rightstart/rightend to resolve ambiguity')
         }
@@ -281,7 +297,8 @@ straddle <- function(
     # Right flank
     if (is.numeric(rightstart) & is.numeric(rightend)){
         newgr <- right_flank(gr, rightstart = rightstart, rightend = rightend, 
-                            bsgenome = bsgenome, plot = plot, verbose = verbose)
+                            bsgenome = bsgenome, verbose = verbose, plot = plot, 
+                            color_var = color_var, contig_var = contig_var)
         if (!is.null(leftstart) | !is.null(leftend)){
             warning('Ignore leftstart/leftend to resolve ambiguity')
         }
@@ -309,8 +326,10 @@ straddle <- function(
 #' @param rightend    number: right flank end   (relative to range end)
 #' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
 #'                   Required to update gr$seq if present.
-#' @param plot        TRUE (default) or FALSE
-#' @param verbose     TRUE (default) or FALSE
+#' @param verbose    TRUE (default) or FALSE
+#' @param plot       TRUE (default) or FALSE
+#' @param color_var  string (default 'seqnames') var mapped to plot color 
+#' @param contig_var NULL (default) or string: var mapped to plot contig
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
@@ -324,16 +343,18 @@ double_flank <- function(
     rightstart =    1,
     rightend   =  200,
     bsgenome   = NULL,
+    verbose    = TRUE,
     plot       = TRUE,
-    verbose    = TRUE
+    color_var  = 'seqnames',
+    contig_var = NULL
 ){
     # Comply
     . <- NULL
     
     # Flank
     if (verbose) cmessage('\tFlank fourways')
-    left <-  left_flank(gr, leftstart,   leftend,  plot=FALSE, verbose=verbose)
-    right <- right_flank(gr, rightstart, rightend, plot=FALSE, verbose=verbose)
+    left <-  left_flank(gr, leftstart,   leftend,  verbose=verbose, plot=FALSE)
+    right <- right_flank(gr, rightstart, rightend, verbose=verbose, plot=FALSE)
     newgr <- c(left, right)
     if (verbose) cmessage('\t\t%d combined (left + right)', length(newgr))
 
@@ -341,7 +362,7 @@ double_flank <- function(
     if (plot){
         gr$color <- 'sites'
         newgr$color <- 'flanks'
-        plot_intervals(c(gr, newgr))
+        plot_intervals(c(gr, newgr), color_var=color_var, contig_var=contig_var)
     }
 
     # Merge overlaps
@@ -360,9 +381,11 @@ double_flank <- function(
 
 
 #' Add inverse strand
-#' @param gr      \code{\link[GenomicRanges]{GRanges-class}}
-#' @param plot    TRUE (default) or FALSE
-#' @param verbose TRUE (default) or FALSE
+#' @param gr         \code{\link[GenomicRanges]{GRanges-class}}
+#' @param verbose    TRUE (default) or FALSE
+#' @param plot       TRUE (default) or FALSE
+#' @param color_var  string (default 'seqnames'): var mapped to plot color 
+#' @param contig_var NULL (default) or string: var mapped to plot contig
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # Load
@@ -390,8 +413,10 @@ double_flank <- function(
 #' @export
 add_inverse_strand <- function(
     gr, 
+    verbose = TRUE,
     plot    = TRUE, 
-    verbose = TRUE
+    color_var  = 'seqnames',
+    contig_var = NULL
 ){
     # Invert
     complements <- invertStrand(gr)

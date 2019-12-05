@@ -22,7 +22,8 @@
 #' @importFrom  grid                  arrow
 #' @importFrom  magrittr              %>%   %<>%   extract  extract2  set_names
 #' @importFrom  methods               as
-#' @importFrom  utils                 getFromNamespace  read.csv  read.table
+#' @importFrom  utils                 getFromNamespace  head  tail
+#' @importFrom  utils                 read.csv  read.table
 #' @importFrom  stringi               stri_detect_regex  stri_locate_all_fixed
 #' @importFrom  stringi               stri_locate_all_regex
 NULL

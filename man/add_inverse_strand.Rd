@@ -4,14 +4,24 @@
 \alias{add_inverse_strand}
 \title{Add inverse strand}
 \usage{
-add_inverse_strand(gr, plot = TRUE, verbose = TRUE)
+add_inverse_strand(
+  gr,
+  verbose = TRUE,
+  plot = TRUE,
+  color_var = "seqnames",
+  contig_var = NULL
+)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
+\item{verbose}{TRUE (default) or FALSE}
+
 \item{plot}{TRUE (default) or FALSE}
 
-\item{verbose}{TRUE (default) or FALSE}
+\item{color_var}{string (default 'seqnames'): var mapped to plot color}
+
+\item{contig_var}{NULL (default) or string: var mapped to plot contig}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

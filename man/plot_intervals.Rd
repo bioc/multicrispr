@@ -6,14 +6,20 @@
 \usage{
 plot_intervals(
   gr,
-  color_var = if ("color" \%in\% names(mcols(gr))) "color" else "seqnames",
+  color_var = "seqnames",
+  contig_var = NULL,
+  n_head_tail = 1,
   title = NULL
 )
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{color_var}{string: mcol mapped to color.}
+\item{color_var}{string: var mapped to plot color}
+
+\item{contig_var}{NULL (default) or string: var mapped to plot contig.}
+
+\item{n_head_tail}{number (default 1): n head/tail contigs to plot per facet}
 
 \item{title}{plot title}
 }
