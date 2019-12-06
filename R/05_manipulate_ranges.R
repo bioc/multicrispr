@@ -146,8 +146,8 @@ up_flank <- function(
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(leftstart)
-    assert_is_a_number(leftend)
+    assert_is_a_number(upstart)
+    assert_is_a_number(upend)
     assert_is_a_bool(verbose)
     
     # Left flank "+" ranges
@@ -158,11 +158,11 @@ up_flank <- function(
       
     # Right flank "-"  ranges
     idx <- as.logical(strand(newgr)=='-')
-    start(newgr)[idx] <- end(gr)[idx]   - upend
-      end(newgr)[idx] <- end(gr)[idx]   - upstart
+      end(newgr)[idx] <- end(gr)[idx]   - upstart  # do not switch these lines
+    start(newgr)[idx] <- end(gr)[idx]   - upend    # to avoid integrity errors
     txt <- sprintf('\t\t%d up  flanks: [seqstart%s%d, seqstart%s%d]', 
-                    length(newgr), csign(leftstart), abs(leftstart), 
-                    csign(leftend), abs(leftend))
+                    length(newgr), csign(upstart), abs(upstart), 
+                    csign(upend), abs(upend))
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){
@@ -243,8 +243,8 @@ down_flank <- function(
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(leftstart)
-    assert_is_a_number(leftend)
+    assert_is_a_number(downstart)
+    assert_is_a_number(downend)
     assert_is_a_bool(verbose)
     
     # Flank
@@ -254,11 +254,11 @@ down_flank <- function(
       end(newgr)[idx] <- end(gr)[idx] + downend
       
     idx <- as.logical(strand(newgr)=='-')
-    start(newgr)[idx] <- end(gr)[idx] - downend
-      end(newgr)[idx] <- end(gr)[idx] - downstart
+    start(newgr)[idx] <- start(gr)[idx] - downend
+      end(newgr)[idx] <- start(gr)[idx] - downstart
     txt <- sprintf('\t\t%d Down  flanks: [seqstart%s%d, seqstart%s%d]', 
-                    length(newgr), csign(leftstart), abs(leftstart), 
-                    csign(leftend), abs(leftend))
+                    length(newgr), csign(downstart), abs(downstart), 
+                    csign(downend), abs(downend))
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){

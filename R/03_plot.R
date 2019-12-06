@@ -144,7 +144,6 @@ plot_intervals <- function(
     assert_is_all_of(gr, 'GRanges')
     assert_is_a_string(color_var)
     assert_is_subset(color_var, names(as.data.table(gr)))
-    assert_is_a_number(n_head_tail)
     contig <- group <- .N <- .SD <- seqnames <- start <- NULL
     strand <- tmp <- width <- xstart <- xend <- y <- . <- NULL
 

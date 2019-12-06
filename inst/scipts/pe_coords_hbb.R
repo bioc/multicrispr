@@ -1,22 +1,62 @@
-# Load 
-#======
-require(magrittr)
-require(multicrispr)
-bsgenome <- BSgenome.Hsapiens.UCSC.hg38.masked::BSgenome.Hsapiens.UCSC.hg38.masked
-bsinfo <- BSgenome::seqinfo(bsgenome)
+#------------------------------------------------------------------------
+# Protein coordinates -> Genomic coordinates
+#              HBB: E6V : GGC>GTC : chr20:4699600
+#------------------------------------------------------------------------
 
-# HBB - sickle cell anemia
-#=========================
+# Load
+    require(magrittr)
+    require(multicrispr)
+    filter <- ensembldb::filter
+    UniprotMappingTypeFilter <- ensembldb::UniprotMappingTypeFilter
+    UniprotDbFilter          <- ensembldb::UniprotDbFilter
 
-# Sickle cell SNP is at chr11:5227002
+    bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+    ensdb <- multicrispr::EnsDb.Hsapiens.v98()
+    ensdb %<>% filter(UniprotMappingTypeFilter('DIRECT', condition = "=="))
+    ensdb %<>% filter(UniprotDbFilter(      'SWISSPROT', condition = "=="))
+
+# Map identifiers: HBB -> ENST00000335295
+    ensembldb::columns(ensdb)
+    mycolumns <- c(
+        'UNIPROTID', 'PROTEINID',  'TXID',
+        'SEQCOORDSYSTEM', 'SEQNAME', 'SEQSTRAND',
+        'GENESEQSTART', 'GENESEQEND', 
+        'TXSEQSTART', 'TXSEQEND',     'TXCDSSEQSTART', 'TXCDSSEQEND', 
+        'PROTEINSEQUENCE')
+    hbb <- ensembldb::select(ensdb, 'HBB', mycolumns, 'SYMBOL')
+            # Two transcript isoforms: ENST00000335295  &  ENST00000647020
+            # Translate into single proteform, differences are in 3'UTR
+            # Both are gold labeled in ensembl browser, T*95 has a RefSeq match
+            # Let's use ENST00000335295, since it has a RefSeq match
+            # (For genomic mapping it actually doesnt matter)
+    hbb %<>% extract(.$TXID=='ENST00000335295', )
+    
+# Map coordinates: E6V -> GAG (codes for E) -> chr11:5227002
+    ensp <- 'ENSP00000333994'
+    substr(hbb$PROTEINSEQUENCE[1], 1, 7)
+        # It's E7, not E6
+        # Reason: initiator Methionine is cleaved off!
+        # Mature protein doesn't contain it.
+        # However, Uniprot Sequence does contain it!
+    gr   <- ensembldb::proteinToGenome(
+                IRanges::IRanges(start=7, end=7) %>% set_names(ensp), 
+                ensdb) %>% 
+            extract2(ensp) %>% 
+            (function(y){seqlevelsStyle(y) <- 'UCSC'; y})
+    BSgenome::getSeq(
+        bs, seqnames(gr), start = start(gr), end = end(gr), strand = '-')
+    gr
+    
 # Explore environment around this locus
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38.masked::BSgenome.Hsapiens.UCSC.hg38.masked
+bsinfo <- seqinfo(bsgenome)
 (fwd <- BSgenome::getSeq(bsgenome, names = 'chr11', start = 5227002-50, end = 5227002+50, strand = '+'))
 (rev <- Biostrings::complement(fwd))
 
 # Anzalone et al. (2019): two prime editing sites allowed fixing
 # Retrieve sequences (pegspacer, pegext, and nickspacer) to reconstruct precision engineering topology
     # excl needs to be a regex - https://support.bioconductor.org/p/126593/#126606
-    excl <- BSgenome::seqnames(bsgenome) %>% setdiff('chr11') %>% paste0('^', ., '$')
+    excl <- seqnames(bsgenome) %>% setdiff('chr11') %>% paste0('^', ., '$')
     
     # 3.5
     (pegspacer3.5   <- BSgenome::vmatchPattern('GTAACGGCAGACTTCTCCAC',        bsgenome, min.mismatch = 0, max.mismatch = 2, exclude = excl))
@@ -35,13 +75,13 @@ bsinfo <- BSgenome::seqinfo(bsgenome)
 #                                                                             bindingsite  i    template
 #                                                                                          x          C
 #                                                                          3' CCGTCTGAAGAGGaGTCCTCAGTCTA 5'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
-#                                                                                                                                                 ^        3'  nicking spacer 5' 
+#                                                                             ::::::::::::                                                        ^        3'  nicking spacer 5' 
 #                                                                             GGCAGACTTCTC                                                        ^        ACTGAAAATACGGGTCGGGAC        
 #                                                                        GTAAC            CaC                                                     ^                             
 #                3.5                5'   CTTCATCCACGTTCACCTTGCCCCACAGGGCA                    AGGAGTCAGATGCACCATGGTGTCTGTTTGAGGTTGCTAGTGAACACAG... ^ ...GCCCTGACTTTTATGCCCAGCCCTG   3'
 #                                   3'   GAAGTAGGTGCAAGTGGAACGGGGTGTCCCGT                    TCCTCAGTCTACGTGGTACCACAGACAAACTCCAACGATCACTTGTGTC... ^ ...CGGGACTGAAAATACGGGTCGGGAC   5'
 #                                                                        CATTGCCGTCTGAAGAGGtG                                                     ^                           
-#                                                                                                                                                 ^    5227089           5227111
+#                                                                        ::::::::::::::::::::                                                     ^    5227089           5227111
 #                                                                    5'  GTAACGGCAGACTTCTCCaC >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                    
 #                                                                                                               
 #                                                                           pegRNAspacer         
@@ -62,37 +102,3 @@ bsinfo <- BSgenome::seqinfo(bsgenome)
 #                                                                                   RT     i     primer       
 #                                                                                template  x   bindingsite
 #
-    
-    (cas9s <- multicrispr::find_crispr_sites(gr))
-
-# PRNP snp: Kuru resistance variant (G -> T)
-    gr  <-  GenomicRanges::GRanges(
-                'chr20:4699500', strand = '+', seqinfo = bsinfo)
-    gr  %<>% multicrispr::add_inverse_strand()
-    (gr %<>% multicrispr::add_seq(bsgenome))
-    (extended <- multicrispr::extend(gr, bsgenome = bsgenome))
-    Biostrings::complement(Biostrings::DNAStringSet(extended$seq[2]))
-    (cas9s <- multicrispr::find_crispr_sites(extended))
-
-    # Precision editing
-    #
-    #    ------------^---===....*....
-    # 5' TGGTGGCTGGGG TCAAGGAGGTGGCACCCACAGTCAGTGGAACAA 3'
-    # 3' ACCACCGACCCC AGTTCCTCCACCGTGGGTGTCAGTCACCTTGTT 5'
-    #
-
-# Tay Sachs    
-    gr <- GenomicRanges::GRanges('chr15:72346580-72346583', strand = '-', 
-                                 seqinfo = BSgenome::seqinfo(bsgenome))
-    
-    BSgenome::getSeq(bsgenome, gr)
-    gr %<>% multicrispr:::add_inverse_strand()
-    extended <- multicrispr::extend(gr)
-    extended %<>% multicrispr::add_seq(bsgenome)
-    cas9s <- multicrispr::find_crispr_sites(extended)
-    
-    # Precision editing
-    # 
-    #                       ===*================---
-    # 5' AATGTGAGACAGCTTAAAATAAAATTAACTATAAGAAACTGGTAA
-    # 3' TTACCAGTTTCTTATAGTTAATTTTATTTTAAGCTGTCTCACATT
