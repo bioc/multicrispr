@@ -6,20 +6,22 @@
 \usage{
 plot_intervals(
   gr,
+  y_by = "contig",
   color_var = "seqnames",
-  contig_var = NULL,
-  n_head_tail = 1,
+  linetype_var = NULL,
+  size_var = NULL,
+  facet_var = "seqnames",
   title = NULL
 )
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{color_var}{string: var mapped to plot color}
+\item{y_by}{'contig' (default) or name of gr variable}
 
-\item{contig_var}{NULL (default) or string: var mapped to plot contig.}
+\item{color_var}{'seqnames' (default) or other gr variable}
 
-\item{n_head_tail}{number (default 1): n head/tail contigs to plot per facet}
+\item{linetype_var}{NULL (default) or gr variable}
 
 \item{title}{plot title}
 }

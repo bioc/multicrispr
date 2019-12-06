@@ -106,9 +106,9 @@ to_megabase <- function(y){
 
 #' Interval plot GRanges
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
-#' @param color_var   string: var mapped to plot color
-#' @param contig_var  NULL (default) or string: var mapped to plot contig. 
-#' @param n_head_tail number (default 1): n head/tail contigs to plot per facet
+#' @param y_by        'contig' (default) or name of gr variable
+#' @param color_var   'seqnames' (default) or other gr variable
+#' @param linetype_var NULL (default) or gr variable
 #' @param title       plot title
 #' @return ggplot object
 #' @seealso  \code{\link{plot_karyogram}}
@@ -137,33 +137,30 @@ to_megabase <- function(y){
 #'     plot_intervals(sites)
 #' @export
 plot_intervals <- function(
-    gr, color_var='seqnames', contig_var=NULL, n_head_tail=1, title=NULL
+    gr, y_by = 'contig', color_var = 'seqnames', linetype_var = NULL, 
+    size_var = NULL, facet_var = 'seqnames', title = NULL
 ){
     # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
     assert_is_a_string(color_var)
     assert_is_subset(color_var, names(as.data.table(gr)))
-    if (!is.null(contig_var))  assert_is_subset(
-                                contig_var, names(as.data.table(gr)))
     assert_is_a_number(n_head_tail)
     contig <- group <- .N <- .SD <- seqnames <- start <- NULL
     strand <- tmp <- width <- xstart <- xend <- y <- . <- NULL
 
-    # Identify (if not predefined) and order on range contigs
-    if (is.null(contig_var)){
-        gr$contig <- GenomicRanges::findOverlaps(
-                        gr, maxgap = 1, select = 'first', ignore.strand = TRUE)
-        contig_var <- 'contig'
-    }
-    gr %<>% extract(order(mcols(.)[[contig_var]]))
+    # Identify contigs and order on them
+    gr$contig <- GenomicRanges::findOverlaps(
+                    gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
+    gr %<>% extract(order(.$contig))
     
     # Prepare plotdt
     plotdt <- as.data.table(gr)
     head_tail <- function(x, n=1) x %in% c(head(x, n), tail(x, n))
-    plotdt %<>% extract( , .SD[head_tail(get(contig_var))], by = c('seqnames'))
+    plotdt %<>% extract( , .SD[head_tail(contig)], by = c('seqnames'))
     plotdt %<>% extract(order(seqnames, start))
-    plotdt %>%  extract(, y      := min(start), by = 'contig')
-    plotdt %>%  extract(, y      := factor(round(y*1e-6)))
+    plotdt %>%  extract(, y      := min(start), by = y_by)
+    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
+    #plotdt %>%  extract(, y      := factor(round(y*1e-6)))
     plotdt %>%  extract(, xstart := start-min(start), by = 'contig')
     plotdt %>%  extract(, xend   := xstart + width)
     plotdt %>%  extract(strand=='-', tmp    := xend)
@@ -173,12 +170,14 @@ plot_intervals <- function(
     
     # Plot
     p <-ggplot( plotdt, 
-                aes_string( x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
-                            color = color_var)) + 
-        facet_wrap(~ seqnames, scales = 'free') + 
+                aes_string(
+                    x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
+                    color = color_var, linetype = linetype_var, 
+                    size = size_var)) + 
+        facet_wrap(facet_var, scales = 'free') + 
         geom_segment(arrow = arrow(length = unit(0.1, "inches"))) + 
         theme_bw() + 
-        xlab('Bases') + ylab('Megabases') + ggtitle(title)
+        xlab('Offset') + ylab('Start') + ggtitle(title)
 
     # Print and return
     print(p)

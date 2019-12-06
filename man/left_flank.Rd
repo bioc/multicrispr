@@ -2,7 +2,9 @@
 % Please edit documentation in R/05_manipulate_ranges.R
 \name{left_flank}
 \alias{left_flank}
+\alias{up_flank}
 \alias{right_flank}
+\alias{down_flank}
 \alias{extend}
 \title{Flank or Extend GRanges}
 \usage{
@@ -16,10 +18,30 @@ left_flank(
   ...
 )
 
+up_flank(
+  gr,
+  upstart = -200,
+  upend = -1,
+  bsgenome = NULL,
+  verbose = TRUE,
+  plot = TRUE,
+  ...
+)
+
 right_flank(
   gr,
   rightstart = 1,
   rightend = 200,
+  bsgenome = NULL,
+  verbose = TRUE,
+  plot = TRUE,
+  ...
+)
+
+down_flank(
+  gr,
+  downstart = +1,
+  downend = +200,
   bsgenome = NULL,
   verbose = TRUE,
   plot = TRUE,
@@ -63,30 +85,25 @@ a \code{\link[GenomicRanges]{GRanges-class}}
 Flank or Extend GRanges
 }
 \examples{
-# SRF binding sites
+# Small GRanges
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+    gr <- GenomicRanges::GRanges(
+            c(HBB = 'chr11:5227002-5227002', PRNP = 'chr20:4699500'), 
+            strand = c('-', '+'), 
+            seqinfo = BSgenome::seqinfo(bsgenome))
+    gr \%>\% left_flank(-22, -1)
+    gr \%>\% right_flank( 1, 22)
+    gr \%>\%   up_flank(-22, -1)
+    gr \%>\% down_flank(1, 22)
+    gr \%>\% extend(-22, 22)
+
+# Large GRanges
     require(magrittr)
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-    gr \%>\% left_flank(-200,  -1)
-    gr \%>\% right_flank(1, 200)
-    gr \%>\% extend(-200, 200)
-    
-# HBB snp: sickle cell variant (T -> A)
-    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    bsinfo <- BSgenome::seqinfo(bsgenome)
-    gr <- GenomicRanges::GRanges(
-            'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
-    (gr \%<>\% add_seq(bsgenome))
-    gr \%>\% left_flank(-22, -1, bsgenome = bsgenome)
-    gr \%>\% right_flank( 1, 22, bsgenome = bsgenome)
-    gr \%>\% extend(-22, 22, bsgenome = bsgenome)
-
-# PRNP snp: Kuru variant
-   gr  <-  GenomicRanges::GRanges(
-              'chr20:4699500', strand = '+', seqinfo = bsinfo)
-   gr  \%<>\% multicrispr::add_inverse_strand()
-   (gr \%<>\% multicrispr::add_seq(bsgenome))
-   (extended <- multicrispr::extend(gr, bsgenome = bsgenome))
+    gr \%>\%   left_flank(-200,  -1)
+    gr \%>\%  right_flank(   1, 200)
+    gr \%>\%       extend(-200, 200)
 }
 \seealso{
 \code{\link{straddle}} (single verb function encompassing all of 

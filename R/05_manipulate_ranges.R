@@ -70,30 +70,25 @@ summarize_loci <- function(gr){
 #' @param ...        passed to \code{\link{plot_intervals}}
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
-#' # SRF binding sites
+#' # Small GRanges
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#'     gr <- GenomicRanges::GRanges(
+#'             c(HBB = 'chr11:5227002-5227002', PRNP = 'chr20:4699500'), 
+#'             strand = c('-', '+'), 
+#'             seqinfo = BSgenome::seqinfo(bsgenome))
+#'     gr %>% left_flank(-22, -1)
+#'     gr %>% right_flank( 1, 22)
+#'     gr %>%   up_flank(-22, -1)
+#'     gr %>% down_flank(1, 22)
+#'     gr %>% extend(-22, 22)
+#' 
+#' # Large GRanges
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'     gr %>% left_flank(-200,  -1)
-#'     gr %>% right_flank(1, 200)
-#'     gr %>% extend(-200, 200)
-#'     
-#' # HBB snp: sickle cell variant (T -> A)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo <- BSgenome::seqinfo(bsgenome)
-#'     gr <- GenomicRanges::GRanges(
-#'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
-#'     (gr %<>% add_seq(bsgenome))
-#'     gr %>% left_flank(-22, -1, bsgenome = bsgenome)
-#'     gr %>% right_flank( 1, 22, bsgenome = bsgenome)
-#'     gr %>% extend(-22, 22, bsgenome = bsgenome)
-#' 
-#' # PRNP snp: Kuru variant
-#'    gr  <-  GenomicRanges::GRanges(
-#'               'chr20:4699500', strand = '+', seqinfo = bsinfo)
-#'    gr  %<>% multicrispr::add_inverse_strand()
-#'    (gr %<>% multicrispr::add_seq(bsgenome))
-#'    (extended <- multicrispr::extend(gr, bsgenome = bsgenome))
+#'     gr %>%   left_flank(-200,  -1)
+#'     gr %>%  right_flank(   1, 200)
+#'     gr %>%       extend(-200, 200)
 #' @seealso \code{\link{straddle}} (single verb function encompassing all of 
 #'          left_flank, right_flank, and extend) and \code{\link{double_flank}}.
 #' @export
@@ -128,13 +123,65 @@ left_flank <- function(
 
     # Plot, Message, Return
     if (plot){
-        gr$set    <- 'sites'
+        gr$set    <- 'original'
         newgr$set <- 'leftflanks'
-        plot_intervals(c(gr, newgr), color_var = 'set', ..., title = txt)
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'leftflanks'))
+        plot_intervals(allgr, color_var = 'set', ..., title = txt)
     }
     if (verbose) message(txt)
     newgr
 }
+
+#' @rdname left_flank
+#' @export
+up_flank <- function(
+    gr, 
+    upstart    = -200,
+    upend      = -1,
+    bsgenome   = NULL,
+    verbose    = TRUE,
+    plot       = TRUE,
+    ...
+){
+    # Assert
+    assert_is_any_of(gr, 'GRanges')
+    assert_is_a_number(leftstart)
+    assert_is_a_number(leftend)
+    assert_is_a_bool(verbose)
+    
+    # Left flank "+" ranges
+    newgr <- gr
+    idx <- as.logical(strand(newgr)=='+')
+    start(newgr)[idx] <- start(gr)[idx] + upstart
+      end(newgr)[idx] <- start(gr)[idx] + upend
+      
+    # Right flank "-"  ranges
+    idx <- as.logical(strand(newgr)=='-')
+    start(newgr)[idx] <- end(gr)[idx]   - upend
+      end(newgr)[idx] <- end(gr)[idx]   - upstart
+    txt <- sprintf('\t\t%d up  flanks: [seqstart%s%d, seqstart%s%d]', 
+                    length(newgr), csign(leftstart), abs(leftstart), 
+                    csign(leftend), abs(leftend))
+    
+    # Add seq
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
+        newgr %<>% add_seq(bsgenome)
+    }
+
+    # Plot, Message, Return
+    if (plot){
+        gr$set    <- 'original'
+        newgr$set <- 'upflanks'
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'upflanks'))
+        plot_intervals(allgr, color_var = 'set', ..., title = txt)
+    }
+    if (verbose) message(txt)
+    newgr
+}
+
 
 
 #' @rdname left_flank
@@ -173,13 +220,64 @@ right_flank <- function(
     
     # Plot, Message, Return
     if (plot){
-        gr$set <- 'sites'
+        gr$set <- 'original'
         newgr$set <- 'rightflanks'
-        plot_intervals(c(gr, newgr), color_var = 'set', ..., title=txt)
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'rightflanks'))
+        plot_intervals(allgr, color_var = 'set', ..., title=txt)
     }
     if (verbose) message(txt)
     newgr
 }
+
+#' @rdname left_flank
+#' @export
+down_flank <- function(
+    gr, 
+    downstart    = +1,
+    downend      = +200,
+    bsgenome   = NULL,
+    verbose    = TRUE,
+    plot       = TRUE,
+    ...
+){
+    # Assert
+    assert_is_any_of(gr, 'GRanges')
+    assert_is_a_number(leftstart)
+    assert_is_a_number(leftend)
+    assert_is_a_bool(verbose)
+    
+    # Flank
+    newgr <- gr
+    idx <- as.logical(strand(newgr)=='+')
+    start(newgr)[idx] <- end(gr)[idx] + downstart
+      end(newgr)[idx] <- end(gr)[idx] + downend
+      
+    idx <- as.logical(strand(newgr)=='-')
+    start(newgr)[idx] <- end(gr)[idx] - downend
+      end(newgr)[idx] <- end(gr)[idx] - downstart
+    txt <- sprintf('\t\t%d Down  flanks: [seqstart%s%d, seqstart%s%d]', 
+                    length(newgr), csign(leftstart), abs(leftstart), 
+                    csign(leftend), abs(leftend))
+    
+    # Add seq
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
+        newgr %<>% add_seq(bsgenome)
+    }
+
+    # Plot, Message, Return
+    if (plot){
+        gr$set    <- 'original'
+        newgr$set <- 'downflanks'
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'downflanks'))
+        plot_intervals(allgr, color_var = 'set', ..., title = txt)
+    }
+    if (verbose) message(txt)
+    newgr
+}
+
 
 
 #' @rdname left_flank
@@ -219,9 +317,11 @@ extend <- function(
     
     # Plot, Message, Return
     if (plot){
-        gr$set <- 'sites'
+        gr$set <- 'original'
         newgr$set <- 'extensions'
-        plot_intervals(c(gr, newgr), color_var = 'set', ..., title=txt)
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'extensions'))
+        plot_intervals(allgr, color_var = 'set', ..., title=txt)
     }
     if (verbose) message(txt)
     newgr
@@ -351,7 +451,8 @@ double_flank <- function(
     if (plot){
         gr$set <- 'sites'
         newgr$set <- 'flanks'
-        plot_intervals(c(gr, newgr), color_var = 'set', ...)
+        allgr <- c(gr, newgr); allgr$set %<>% factor('original', 'flanks')
+        plot_intervals(allgr, color_var = 'set', ...)
     }
 
     # Merge overlaps
