@@ -106,7 +106,7 @@ to_megabase <- function(y){
 
 #' Interval plot GRanges
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
-#' @param y_by        'contig' (default) or name of gr variable
+#' @param yby        'contig' (default) or name of gr variable
 #' @param color_var   'seqnames' (default) or other gr variable
 #' @param linetype_var NULL (default) or gr variable
 #' @param title       plot title
@@ -137,7 +137,7 @@ to_megabase <- function(y){
 #'     plot_intervals(sites)
 #' @export
 plot_intervals <- function(
-    gr, y_by = 'contig', color_var = 'seqnames', linetype_var = NULL, 
+    gr, yby = 'contig', color_var = 'seqnames', linetype_var = NULL, 
     size_var = NULL, facet_var = 'seqnames', title = NULL
 ){
     # Assert, Import, Comply
@@ -157,7 +157,7 @@ plot_intervals <- function(
     head_tail <- function(x, n=1) x %in% c(head(x, n), tail(x, n))
     plotdt %<>% extract( , .SD[head_tail(contig)], by = c('seqnames'))
     plotdt %<>% extract(order(seqnames, start))
-    plotdt %>%  extract(, y      := min(start), by = y_by)
+    plotdt %>%  extract(, y      := min(start), by = yby)
     plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
     #plotdt %>%  extract(, y      := factor(round(y*1e-6)))
     plotdt %>%  extract(, xstart := start-min(start), by = 'contig')

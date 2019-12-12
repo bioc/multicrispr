@@ -11,8 +11,8 @@ double_flank(
   rightstart = 1,
   rightend = 200,
   bsgenome = NULL,
-  verbose = TRUE,
-  plot = TRUE,
+  verbose = FALSE,
+  plot = FALSE,
   ...
 )
 }
@@ -30,9 +30,9 @@ double_flank(
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}
 Required to update gr$seq if present.}
 
-\item{verbose}{TRUE (default) or FALSE}
+\item{verbose}{TRUE or FALSE (default)}
 
-\item{plot}{TRUE (default) or FALSE}
+\item{plot}{TRUE or FALSE (default)}
 
 \item{...}{\code{\link{plot_intervals}} arguments}
 }

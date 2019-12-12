@@ -6,7 +6,7 @@
 \usage{
 plot_intervals(
   gr,
-  y_by = "contig",
+  yby = "contig",
   color_var = "seqnames",
   linetype_var = NULL,
   size_var = NULL,
@@ -17,7 +17,7 @@ plot_intervals(
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{y_by}{'contig' (default) or name of gr variable}
+\item{yby}{'contig' (default) or name of gr variable}
 
 \item{color_var}{'seqnames' (default) or other gr variable}
 

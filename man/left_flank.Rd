@@ -13,8 +13,8 @@ left_flank(
   leftstart = -200,
   leftend = -1,
   bsgenome = NULL,
-  verbose = TRUE,
-  plot = TRUE,
+  verbose = FALSE,
+  plot = FALSE,
   ...
 )
 
@@ -23,8 +23,8 @@ up_flank(
   upstart = -200,
   upend = -1,
   bsgenome = NULL,
-  verbose = TRUE,
-  plot = TRUE,
+  verbose = FALSE,
+  plot = FALSE,
   ...
 )
 
@@ -33,8 +33,8 @@ right_flank(
   rightstart = 1,
   rightend = 200,
   bsgenome = NULL,
-  verbose = TRUE,
-  plot = TRUE,
+  verbose = FALSE,
+  plot = FALSE,
   ...
 )
 
@@ -43,8 +43,8 @@ down_flank(
   downstart = +1,
   downend = +200,
   bsgenome = NULL,
-  verbose = TRUE,
-  plot = TRUE,
+  verbose = FALSE,
+  plot = FALSE,
   ...
 )
 
@@ -53,8 +53,8 @@ extend(
   leftstart = -22,
   rightend = 22,
   bsgenome = NULL,
-  verbose = TRUE,
-  plot = TRUE,
+  verbose = FALSE,
+  plot = FALSE,
   ...
 )
 }
@@ -68,9 +68,9 @@ extend(
 \item{bsgenome}{NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 Required to update gr$seq if present.}
 
-\item{verbose}{TRUE (default) or FALSE}
+\item{verbose}{TRUE or FALSE (default)}
 
-\item{plot}{TRUE (default) or FALSE}
+\item{plot}{TRUE or FALSE (default)}
 
 \item{...}{passed to \code{\link{plot_intervals}}}
 
@@ -91,19 +91,19 @@ Flank or Extend GRanges
             c(HBB = 'chr11:5227002-5227002', PRNP = 'chr20:4699500'), 
             strand = c('-', '+'), 
             seqinfo = BSgenome::seqinfo(bsgenome))
-    gr \%>\% left_flank(-22, -1)
-    gr \%>\% right_flank( 1, 22)
-    gr \%>\%   up_flank(-22, -1)
-    gr \%>\% down_flank(1, 22)
-    gr \%>\% extend(-22, 22)
+    gr \%>\% left_flank(-22, -1, plot = TRUE)
+    gr \%>\% right_flank( 1, 22, plot = TRUE)
+    gr \%>\%   up_flank(-22, -1, plot = TRUE)
+    gr \%>\% down_flank(  1, 22, plot = TRUE)
+    gr \%>\% extend(    -22, 22, plot = TRUE)
 
 # Large GRanges
     require(magrittr)
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-    gr \%>\%   left_flank(-200,  -1)
-    gr \%>\%  right_flank(   1, 200)
-    gr \%>\%       extend(-200, 200)
+    gr \%>\%   left_flank(-200,  -1, plot = TRUE)
+    gr \%>\%  right_flank(   1, 200, plot = TRUE)
+    gr \%>\%       extend(-200, 200, plot = TRUE)
 }
 \seealso{
 \code{\link{straddle}} (single verb function encompassing all of 

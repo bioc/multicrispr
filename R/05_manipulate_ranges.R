@@ -1,7 +1,7 @@
 #' Add sequence to GRanges
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param verbose   logical(1)
+#' @param verbose   TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # SRF binding sites
@@ -20,7 +20,7 @@
 #'     gr %<>% multicrispr::extend(bsgenome = bsgenome)
 #'    (gr %<>% multicrispr::add_seq(bsgenome))
 #' @export
-add_seq <- function(gr, bsgenome, verbose = TRUE){
+add_seq <- function(gr, bsgenome, verbose = FALSE){
     
     # Assert
     assert_is_all_of(gr, 'GRanges')
@@ -65,8 +65,8 @@ summarize_loci <- function(gr){
 #' @param rightend   number: right end   (relative to range end)
 #' @param bsgenome   NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                   Required to update gr$seq if present.
-#' @param verbose    TRUE (default) or FALSE
-#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE or FALSE (default)
+#' @param plot       TRUE or FALSE (default)
 #' @param ...        passed to \code{\link{plot_intervals}}
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
@@ -76,19 +76,19 @@ summarize_loci <- function(gr){
 #'             c(HBB = 'chr11:5227002-5227002', PRNP = 'chr20:4699500'), 
 #'             strand = c('-', '+'), 
 #'             seqinfo = BSgenome::seqinfo(bsgenome))
-#'     gr %>% left_flank(-22, -1)
-#'     gr %>% right_flank( 1, 22)
-#'     gr %>%   up_flank(-22, -1)
-#'     gr %>% down_flank(1, 22)
-#'     gr %>% extend(-22, 22)
+#'     gr %>% left_flank(-22, -1, plot = TRUE)
+#'     gr %>% right_flank( 1, 22, plot = TRUE)
+#'     gr %>%   up_flank(-22, -1, plot = TRUE)
+#'     gr %>% down_flank(  1, 22, plot = TRUE)
+#'     gr %>% extend(    -22, 22, plot = TRUE)
 #' 
 #' # Large GRanges
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'     gr %>%   left_flank(-200,  -1)
-#'     gr %>%  right_flank(   1, 200)
-#'     gr %>%       extend(-200, 200)
+#'     gr %>%   left_flank(-200,  -1, plot = TRUE)
+#'     gr %>%  right_flank(   1, 200, plot = TRUE)
+#'     gr %>%       extend(-200, 200, plot = TRUE)
 #' @seealso \code{\link{straddle}} (single verb function encompassing all of 
 #'          left_flank, right_flank, and extend) and \code{\link{double_flank}}.
 #' @export
@@ -97,8 +97,8 @@ left_flank <- function(
     leftstart  = -200,
     leftend    = -1,
     bsgenome   = NULL,
-    verbose    = TRUE,
-    plot       = TRUE,
+    verbose    = FALSE,
+    plot       = FALSE,
     ...
 ){
     # Assert
@@ -140,8 +140,8 @@ up_flank <- function(
     upstart    = -200,
     upend      = -1,
     bsgenome   = NULL,
-    verbose    = TRUE,
-    plot       = TRUE,
+    verbose    = FALSE,
+    plot       = FALSE,
     ...
 ){
     # Assert
@@ -191,8 +191,8 @@ right_flank <- function(
     rightstart = 1, 
     rightend   = 200,
     bsgenome   = NULL,
-    verbose    = TRUE,
-    plot       = TRUE,
+    verbose    = FALSE,
+    plot       = FALSE,
     ...
 ){
     # Assert
@@ -237,8 +237,8 @@ down_flank <- function(
     downstart    = +1,
     downend      = +200,
     bsgenome   = NULL,
-    verbose    = TRUE,
-    plot       = TRUE,
+    verbose    = FALSE,
+    plot       = FALSE,
     ...
 ){
     # Assert
@@ -287,8 +287,8 @@ extend <- function(
     leftstart = -22, 
     rightend  =  22,
     bsgenome  = NULL,
-    verbose   = TRUE,
-    plot      = TRUE,
+    verbose   = FALSE,
+    plot      = FALSE,
     ...
 ){
 
@@ -337,8 +337,8 @@ extend <- function(
 #' @param rightend   number: right end   (relative to range end)
 #' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #'                   Required to update gr$seq if present.
-#' @param verbose    TRUE (default) or FALSE
-#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE or FALSE (default)
+#' @param plot       TRUE or FALSE (default)
 #' @param ...         \code{\link{plot_intervals}} arguments
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
@@ -361,7 +361,7 @@ extend <- function(
 #' @export
 straddle <- function(
     gr, leftstart  = NULL, leftend = NULL, rightstart = NULL, rightend = NULL, 
-    bsgenome = NULL, verbose = TRUE, plot = TRUE, ...
+    bsgenome = NULL, verbose = FALSE, plot = FALSE, ...
 ){
     
     # Extend    
@@ -417,8 +417,8 @@ straddle <- function(
 #' @param rightend    number: right flank end   (relative to range end)
 #' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
 #'                   Required to update gr$seq if present.
-#' @param verbose    TRUE (default) or FALSE
-#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE or FALSE (default)
+#' @param plot       TRUE or FALSE (default)
 #' @param ...         \code{\link{plot_intervals}} arguments
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
@@ -433,8 +433,8 @@ double_flank <- function(
     rightstart =    1,
     rightend   =  200,
     bsgenome   = NULL,
-    verbose    = TRUE,
-    plot       = TRUE,
+    verbose    = FALSE,
+    plot       = FALSE,
     ...
 ){
     # Comply
@@ -472,8 +472,8 @@ double_flank <- function(
 
 #' Add inverse strand
 #' @param gr         \code{\link[GenomicRanges]{GRanges-class}}
-#' @param verbose    TRUE (default) or FALSE
-#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE or FALSE (default)
+#' @param plot       TRUE or FALSE (default)
 #' @param ...         \code{\link{plot_intervals}} arguments
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
@@ -486,21 +486,21 @@ double_flank <- function(
 #'     gr <- GenomicRanges::GRanges(
 #'             'chr20:4699500', strand = '+', seqinfo = bsinfo)
 #'     gr %<>% add_seq(bsgenome)
-#'     gr %>%  add_inverse_strand()
+#'     gr %>%  add_inverse_strand(plot = TRUE)
 #'     
 #' # HBB snp: sickle cell variant (T -> A)
 #'     gr <- GenomicRanges::GRanges(
 #'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
 #'     gr %<>% add_seq(bsgenome)
-#'     gr %>%  add_inverse_strand()
+#'     gr %>%  add_inverse_strand(plot = TRUE)
 #'     
 #' # HEXA TATC duplication: Tay-Sachs variant
 #'     gr <- GenomicRanges::GRanges(
 #'             'chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
 #'     gr %<>% add_seq(bsgenome)
-#'     gr %>%  add_inverse_strand()
+#'     gr %>%  add_inverse_strand(plot = TRUE)
 #' @export
-add_inverse_strand <- function(gr, verbose = TRUE, plot = TRUE, ...){
+add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     
     # Invert
     complements <- invertStrand(gr)

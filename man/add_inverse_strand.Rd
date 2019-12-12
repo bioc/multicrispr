@@ -4,14 +4,14 @@
 \alias{add_inverse_strand}
 \title{Add inverse strand}
 \usage{
-add_inverse_strand(gr, verbose = TRUE, plot = TRUE, ...)
+add_inverse_strand(gr, verbose = FALSE, plot = FALSE, ...)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{verbose}{TRUE (default) or FALSE}
+\item{verbose}{TRUE or FALSE (default)}
 
-\item{plot}{TRUE (default) or FALSE}
+\item{plot}{TRUE or FALSE (default)}
 
 \item{...}{\code{\link{plot_intervals}} arguments}
 }
@@ -31,17 +31,17 @@ Add inverse strand
     gr <- GenomicRanges::GRanges(
             'chr20:4699500', strand = '+', seqinfo = bsinfo)
     gr \%<>\% add_seq(bsgenome)
-    gr \%>\%  add_inverse_strand()
+    gr \%>\%  add_inverse_strand(plot = TRUE)
     
 # HBB snp: sickle cell variant (T -> A)
     gr <- GenomicRanges::GRanges(
             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
     gr \%<>\% add_seq(bsgenome)
-    gr \%>\%  add_inverse_strand()
+    gr \%>\%  add_inverse_strand(plot = TRUE)
     
 # HEXA TATC duplication: Tay-Sachs variant
     gr <- GenomicRanges::GRanges(
             'chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
     gr \%<>\% add_seq(bsgenome)
-    gr \%>\%  add_inverse_strand()
+    gr \%>\%  add_inverse_strand(plot = TRUE)
 }

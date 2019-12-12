@@ -9,7 +9,8 @@
 #' @importFrom  Biostrings            complement  DNAStringSet
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
-#' @importFrom  data.table            :=  data.table  as.data.table  setorderv
+#' @importFrom  data.table            :=  data.table  as.data.table  
+#' @importFrom  data.table            setnames  setorderv
 #' @importFrom  GenomeInfoDb          genome
 #' @importFrom  GenomeInfoDb          seqinfo   seqinfo<-
 #' @importFrom  GenomeInfoDb          seqlevels  seqlevels<-  seqlevelsInUse
@@ -23,6 +24,7 @@
 #' @importFrom  grid                  arrow
 #' @importFrom  magrittr              %>%   %<>%   extract  extract2  set_names
 #' @importFrom  methods               as
+#' @importFrom  tidyr                 separate_rows
 #' @importFrom  utils                 getFromNamespace  head  tail
 #' @importFrom  utils                 read.csv  read.table
 #' @importFrom  stringi               stri_detect_regex  stri_locate_all_fixed

@@ -4,14 +4,14 @@
 \alias{add_seq}
 \title{Add sequence to GRanges}
 \usage{
-add_seq(gr, bsgenome, verbose = TRUE)
+add_seq(gr, bsgenome, verbose = FALSE)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{verbose}{logical(1)}
+\item{verbose}{TRUE or FALSE (default)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
