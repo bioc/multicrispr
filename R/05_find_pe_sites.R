@@ -38,6 +38,7 @@ copy <- function(
 #'         
 #' @param gr   target \code{\link[GenomicRanges]{GRanges-class}}
 #' @param nrt  n RT nucleotides (default 16, recommended 10-16)
+#' @param plot TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
@@ -90,11 +91,13 @@ extend_to_find_gg <- function(gr, nrt=16, plot = FALSE){
 #' @export
 find_gg <- function(gr){
     
+    substart <- subend <- windowstart <- windowend <- NULL
+    
     res <- stri_locate_all_fixed(gr$seq, 'GG')
     gr$substart <- vextract1(res)
     gr$subend   <- vextract2(res)
     
-    # Rm GG-free targetranges
+    # Rm GG-free gr
     idx <- gr$substart == 'NA'
     if (sum(idx)>0) gr %<>% extract(!idx)
 
@@ -113,18 +116,62 @@ find_gg <- function(gr){
     gg_dt %<>% setorderv(c('seqnames', 'start', 'strand'))
     gg_dt[, c('windowstart', 'windowend', 'seq', 'substart', 'subend') := NULL]
     gg_ranges   <- GRanges(gg_dt, seqinfo = seqinfo(gr))
-    gg_ranges %<>% add_seq(bsgenome, verbose = FALSE)
+    #gg_ranges %<>% add_seq(bsgenome, verbose = FALSE)
     return(gg_ranges)
 }
 
+name_ranges <- function(gr, name_base = 'range'){
+    if (has_names(gr)){  names(gr) 
+    } else {             sprintf('%s%d', name_base, seq_along(gr)) }
+}
+
+
+get_plus_seq <- function(bsgenome, gr){
+    seqs1  <-  BSgenome::getSeq(bsgenome, 
+                                seqnames(gr),
+                                start(gr),
+                                end(gr), 
+                                strand = '+', 
+                                as.character = TRUE)
+    if (has_names(gr)) names(seqs1) <- names(gr)
+    seqs1
+        
+}
+
+
+revcomp <- function(y)  y %>% 
+                        Biostrings::DNAStringSet() %>% 
+                        Biostrings::reverseComplement() %>% 
+                        as.character()
+
 
 #' Find prime editing sites
+#' 
+#' Find prime editing sites around target ranges
+#' 
+#' Below the architecture of a prime editing site.
+#' Fixes can be performed anywhere in the revtranscription area.
+#' 
+#'           primer   revtranscription
+#'       -------------================
+#'   1..............17....GG..........
+#'   --------------------===
+#'         spacer        pam
+#' 
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param fix       character vector: fixing sequence on '+' strand
+#' @param fixes     character vector: '+' strand fix seqs
 #' @param nprimer   n primer nucleotides (default 13, max 17)
-#' @param nrt       n RT nucleotides (default 16, recommended 10-16)
+#' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
 #' @param plot      TRUE (default) or FALSE
+#' @return  \code{\link[GenomicRanges]{GRanges-class}} with prime editing sites.
+#' Each prime editing range is defined in terms of its N20NGG spacer.
+#' Additionally, five sequences are returned per PE site:
+#'   * spacer: N20 spacers
+#'   * pam:    NGG PAMs
+#'   * primer: primers (end at N17 of spacer)
+#'   * revtrans: reverse transcription sequences (start at N18 of spacer)
+#'   * ext:    3' extensions of gRNA (reverse complements of primer+revtrans)
 #' @examples
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #' gr <- GenomicRanges::GRanges(
@@ -135,53 +182,53 @@ find_gg <- function(gr){
 #'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'         seqinfo  = BSgenome::seqinfo(bsgenome))
 #' BSgenome::getSeq(bsgenome, gr)
+#' find_pe_sites(gr, bsgenome)
 #' @export
-find_pe_sites <- function(
-    gr, 
-    bsgenome, 
-    fix     = BSgenome::getSeq(bsgenome, gr, as.character = TRUE), 
-    nprimer = 13, 
-    nrt     = 16, 
-    plot    = TRUE
-){
+find_pe_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
+    nprimer = 13, nrt = 16, plot = TRUE){
     
     # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
-    assert_is_character(fix)
-    assertive.strings::assert_all_are_matching_regex(fix, '^[ACGTacgt]+$')
+    assert_is_character(fixes)
+    assert_all_are_matching_regex(fixes, '^[ACGTacgt]+$')
     assert_is_a_number(nprimer)
     assert_is_a_number(nrt)
-    assertive.numbers::assert_all_are_less_than(nprimer, 17)
+    assert_all_are_less_than(nprimer, 17)
 
     # Find GG in nrt window around target site
-    gr$targetname <-  if (has_names(gr)){  names(gr) 
-                    } else {               sprintf('target%d', seq_along(gr)) }
-    gg <-  extend_to_find_gg(gr, nrt) %>% add_seq(bsgenome) %>% find_gg()
+    gr$targetname <- name_ranges(gr, 'target')
+    gg  <-  gr %>% extend_to_find_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
     gg$site <- table(gg$targetname) %>% lapply(seq_len) %>% unlist() %>% names()
     gg$seq <- NULL
     
     # Extract from these other components
-    spacerpam <- up_flank(gg, -21,        +1)
-    primer    <- up_flank(gg, -5-nprimer, -5)
-    fix       <- up_flank(gg, -4,         -4+nrt)
-    ext       <- up_flank(gg, -5-nprimer, -4+nrt) %>% invertStrand()
+    spacer   <- up_flank(gg, -21,        -2)     %>% add_seq(bsgenome)
+    pam      <- up_flank(gg,  -1,        +1)     %>% add_seq(bsgenome) 
+    primer   <- up_flank(gg, -4-nprimer, -5)     %>% add_seq(bsgenome)
+    revtrans <- up_flank(gg, -4,         -5+nrt) %>% add_seq(bsgenome)
+    ext      <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand()
+    ext$seq  <- get_plus_seq(bsgenome, ext)              # Get "+" seq
+    substr(ext$seq, ext$targetstart-start(ext)+1, 
+                    ext$targetend  -start(ext)+1) <- fixes[ext$targetname]
+    ext$seq[as.logical(strand(ext)=='-')] %<>% revcomp() # Revcomp for "-" seqs
+
+    # Plot
     if (plot){
-        spacerpam$part <- 'spacerpam';  primer$part <- 'primer'; fix$part <- 'fix'
-        allranges <- c(spacerpam, primer, fix)
-        allranges$part %<>% factor(rev(c('spacerpam', 'fix', 'primer')))
-        plot_intervals(
-            allranges, yby = 'site', color_var = 'part', 
+        spacer$part<-'spacer'; primer$part<-'primer'; revtrans$part<-'revtrans'
+        allranges <- c(spacerpam, primer, revtrans)
+        allranges$part %<>% factor(rev(c('spacer', 'revtrans', 'primer')))
+        plot_intervals(allranges, yby = 'site', color_var = 'part', 
             size_var = 'part', facet_var = c('seqnames', 'targetname'))
-        spacerpam$part <- primer$part <- fix$part <- NULL
-        
+        spacerpam$part <- primer$part <- revtrans$part <- NULL
     }
     
-    # Return
-    spacerpam$spacerpam <- BSgenome::getSeq(bsgenome, spacerpam, as.character = TRUE)
-    spacerpam$primer    <- BSgenome::getSeq(bsgenome, primer, as.character = TRUE)
-    spacerpam$fix       <- BSgenome::getSeq(bsgenome, fix,    as.character = TRUE)
-    spacerpam$extension <- BSgenome::getSeq(bsgenome, ext,    as.character = TRUE)
+    # Add sequences and return
+    names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'spacer')
+    spacer$pam <- pam$seq 
+    spacer$primer<-primer$seq; 
+    spacer$revtrans<-revtrans$seq
+    spacer$ext <- ext$seq
     spacerpam
 }
 

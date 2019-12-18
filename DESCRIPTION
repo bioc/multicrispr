@@ -1,5 +1,5 @@
 Package: multicrispr
-Title: Multi-locus Crispr/Cas design
+Title: Multi-locus multi-purpose Crispr/Cas design
 Version: 0.1.0
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",  c("aut", "cre")),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",     "ctb"),
@@ -19,8 +19,10 @@ Depends:
 Imports:
     assertive.base,
     assertive.files,
+    assertive.numbers,
     assertive.properties,
     assertive.sets,
+    assertive.strings,
     assertive.types,
     AnnotationHub,
     BiocGenerics,

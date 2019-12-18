@@ -10,6 +10,8 @@ extend_to_find_gg(gr, nrt = 16, plot = FALSE)
 \item{gr}{target \code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{nrt}{n RT nucleotides (default 16, recommended 10-16)}
+
+\item{plot}{TRUE or FALSE (default)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

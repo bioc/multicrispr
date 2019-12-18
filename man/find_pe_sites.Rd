@@ -7,7 +7,7 @@
 find_pe_sites(
   gr,
   bsgenome,
-  fix = BSgenome::getSeq(bsgenome, gr, as.character = TRUE),
+  fixes = get_plus_seq(bsgenome, gr),
   nprimer = 13,
   nrt = 16,
   plot = TRUE
@@ -18,16 +18,36 @@ find_pe_sites(
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{fix}{character vector: fixing sequence on '+' strand}
+\item{fixes}{character vector: '+' strand fix seqs}
 
 \item{nprimer}{n primer nucleotides (default 13, max 17)}
 
-\item{nrt}{n RT nucleotides (default 16, recommended 10-16)}
+\item{nrt}{n rev transcr nucleotides (default 16, recomm. 10-16)}
 
 \item{plot}{TRUE (default) or FALSE}
 }
+\value{
+\code{\link[GenomicRanges]{GRanges-class}} with prime editing sites.
+Each prime editing range is defined in terms of its N20NGG spacer.
+Additionally, five sequences are returned per PE site:
+  * spacer: N20 spacers
+  * pam:    NGG PAMs
+  * primer: primers (end at N17 of spacer)
+  * revtrans: reverse transcription sequences (start at N18 of spacer)
+  * ext:    3' extensions of gRNA (reverse complements of primer+revtrans)
+}
 \description{
-Find prime editing sites
+Find prime editing sites around target ranges
+}
+\details{
+Below the architecture of a prime editing site.
+Fixes can be performed anywhere in the revtranscription area.
+
+          primer   revtranscription
+      -------------================
+  1..............17....GG..........
+  --------------------===
+        spacer        pam
 }
 \examples{
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
@@ -39,4 +59,5 @@ gr <- GenomicRanges::GRanges(
         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
         seqinfo  = BSgenome::seqinfo(bsgenome))
 BSgenome::getSeq(bsgenome, gr)
+find_pe_sites(gr, bsgenome)
 }
