@@ -182,9 +182,10 @@ revcomp <- function(y)  y %>%
 #'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'         seqinfo  = BSgenome::seqinfo(bsgenome))
 #' BSgenome::getSeq(bsgenome, gr)
-#' find_pe_sites(gr, bsgenome)
+#' find_prime_sites(gr, bsgenome)
+#' @seealso \code{\link{find_crispr_sites}} to find standard crispr sites
 #' @export
-find_pe_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
+find_prime_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
     nprimer = 13, nrt = 16, plot = TRUE){
     
     # Assert

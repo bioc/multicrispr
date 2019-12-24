@@ -47,11 +47,11 @@ Doench2016 is available after installing python module
     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     targets <- bed_to_granges(bedfile, 'mm10')  \%>\% 
-               double_flank() \%>\%
+               extend() \%>\%
                add_seq(bsgenome)
 
 # Find sites
-    sites <- find_crispr_sites(targets)
+    sites <- find_crispr_sites(targets, bsgenome)
     
 # Score with Doench2014
     score_crispr_sites(sites[1:10], bsgenome)

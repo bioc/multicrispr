@@ -11,10 +11,10 @@ context('extend')
 
 test_that('extend works', {
     expect_equal(
-        start(extend(granges, -5, 5, plot = FALSE)),  
+        start(extend(granges, -5, 5, stranded = FALSE)),  
         start(granges) - 5)
     expect_equal(  
-        end(extend(granges, -5, 5, plot = FALSE)),
+        end(extend(granges, -5, 5, stranded = FALSE)),
         end(granges) + 5)
 })
 

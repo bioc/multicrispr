@@ -6,45 +6,45 @@ granges <-  GenomicRanges::GRanges('chr1', '100-200', strand = '-',
 chrlength <- GenomeInfoDb::seqlengths(bsgenome)[['chr1']]
 
 # Test
-context('left_flank and right_flank')
+context('up_flank and down_flank')
 
-test_that('left_flank works', {
+test_that('up_flank works', {
     expect_equal(   
-        start( left_flank(granges, -10, -1, plot = FALSE)),
+        start( up_flank(granges, -10, -1, stranded = FALSE)),
         start(granges) - 10 )
     
     expect_equal(
-        end( left_flank(granges, -10, -1, plot = FALSE)),
+        end( up_flank(granges, -10, -1, stranded = FALSE)),
         start(granges) - 1 )
 })
 
-test_that('right_flank works', {
+test_that('down_flank works', {
     expect_equal(
-        start( right_flank(granges, 1, 10, plot = FALSE)),
+        start( down_flank(granges, 1, 10, stranded = FALSE)),
         end(granges) + 1)
     
     expect_equal(
-        end( right_flank(granges, 1, 10, plot = FALSE)),
+        end( down_flank(granges, 1, 10, stranded = FALSE)),
         end(granges) + 10)
 })
 
-test_that('left_flank warns for coordinates < 1', {
+test_that('up_flank warns for coordinates < 1', {
     expect_warning(
-        left_flank(granges,  -500, plot = FALSE))
+        up_flank(granges,  -500, stranded = FALSE))
 })
 
-test_that('right_flank warns for coordinates < 1', {
+test_that('down_flank warns for coordinates < 1', {
     expect_warning(
-        right_flank(granges, -500, plot = FALSE))
+        down_flank(granges, -500, stranded = FALSE))
 })
 
-test_that('left_flank warns for coordinates > chrlength', {
+test_that('up_flank warns for coordinates > chrlength', {
     expect_warning(
-        left_flank( granges, 1, 1 + chrlength, plot = FALSE))
+        down_flank( granges, 1, 1 + chrlength, stranded = FALSE))
 })
 
-test_that('right_flank warns for coordinates > chrlength', {
+test_that('down_flank warns for coordinates > chrlength', {
     expect_warning(
-        right_flank(granges, 1, 1 + chrlength, plot = FALSE))
+        down_flank(granges, 1, 1 + chrlength, stranded = FALSE))
 })
 

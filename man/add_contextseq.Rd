@@ -24,9 +24,9 @@ require(magrittr)
 bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 targets  <- bed_to_granges(bedfile, 'mm10')  \%>\% 
-            double_flank() \%>\% 
+            extend() \%>\% 
             add_seq(bsgenome)
-sites    <- find_crispr_sites(targets)
+sites    <- find_crispr_sites(targets, bsgenome)
 sites \%<>\% add_contextseq(bsgenome)
 sites[1:3]$seq
 sites[1:3]$contextseq

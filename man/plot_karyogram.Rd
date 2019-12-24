@@ -24,7 +24,7 @@ Karyo/Interval Plot GRanges(List)
     plot_karyogram(gr)
   
 # Plot GRangesList
-    flanks  <- left_flank(gr)
+    flanks  <- up_flank(gr, stranded=FALSE)
     grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
     plot_karyogram(grlist)
 }

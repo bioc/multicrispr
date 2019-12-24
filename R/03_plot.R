@@ -11,7 +11,7 @@
 #'     plot_karyogram(gr)
 #'   
 #' # Plot GRangesList
-#'     flanks  <- left_flank(gr)
+#'     flanks  <- up_flank(gr, stranded=FALSE)
 #'     grlist <- GenomicRanges::GRangesList(sites = gr, flanks = flanks)
 #'     plot_karyogram(grlist)
 #' @export
@@ -121,7 +121,7 @@ to_megabase <- function(y){
 #'     sites   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 #'     plot_intervals(sites)
 #'     
-#'     flanks  <- left_flank(sites)
+#'     flanks  <- up_flank(sites, stranded = FALSE)
 #'     sites$color <- 'sites'
 #'     flanks$color <- 'flanks'
 #'     plot_intervals(c(sites, flanks))

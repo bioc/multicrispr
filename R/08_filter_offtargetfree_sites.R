@@ -20,7 +20,7 @@
 #' # Add seqs and find crispr sites
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets %<>% add_seq(bsgenome)
-#'     sites <- find_crispr_sites(targets)
+#'     sites <- find_crispr_sites(targets, bsgenome)
 #' 
 #' # Count matches
 #'     crisprseqs <- sites$seq[1:10]
@@ -156,7 +156,7 @@ add_seqinfo <- function(gr, bsgenome){
 #' # Add seqs and find crispr sites
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets %<>% add_seq(bsgenome)
-#'     sites <- find_crispr_sites(targets)
+#'     sites <- find_crispr_sites(targets, bsgenome)
 #'    
 #' # Filter for offtarget-free sites
 #'     filter_offtargetfree_sites(

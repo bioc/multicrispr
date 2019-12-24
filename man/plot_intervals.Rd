@@ -42,7 +42,7 @@ Interval plot GRanges
     sites   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
     plot_intervals(sites)
     
-    flanks  <- left_flank(sites)
+    flanks  <- up_flank(sites, stranded = FALSE)
     sites$color <- 'sites'
     flanks$color <- 'flanks'
     plot_intervals(c(sites, flanks))

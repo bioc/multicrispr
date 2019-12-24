@@ -4,10 +4,12 @@
 \alias{find_crispr_sites}
 \title{Find crispr sites in targetranges}
 \usage{
-find_crispr_sites(targets, plot = TRUE, verbose = TRUE)
+find_crispr_sites(gr, bsgenome, plot = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{targets}{\code{\link[GenomicRanges]{GRanges-class}}}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
+
+\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{plot}{TRUE (default) or FALSE}
 
@@ -20,14 +22,16 @@ find_crispr_sites(targets, plot = TRUE, verbose = TRUE)
 Find crispr sites in targetranges
 }
 \examples{
-# Read bed into granges, extend, add seqs
+# Read bed into granges and extend
     require(magrittr)
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-    targets <- bed_to_granges(bedfile, 'mm10')
-    targets \%<>\% extend(plot = FALSE)
-    targets \%<>\% add_seq(bsgenome)
+    gr <- bed_to_granges(bedfile, 'mm10')
+    gr \%<>\% extend(plot = FALSE)
     
 # Find crispr sites
-    find_crispr_sites(targets)
+    find_crispr_sites(gr, bsgenome)
+}
+\seealso{
+\code{\link{find_prime_sites}} to find prime editing sites
 }
