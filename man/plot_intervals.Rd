@@ -21,9 +21,13 @@ plot_intervals(
 
 \item{color_var}{'seqnames' (default) or other gr variable}
 
-\item{linetype_var}{NULL (default) or gr variable}
+\item{linetype_var}{NULL (default) or gr variable mapped to linetype}
 
-\item{title}{plot title}
+\item{size_var}{NULL (default) or gr variable mapped to size}
+
+\item{facet_var}{NULL(default)  or gr variable mapped to facet}
+
+\item{title}{NULL or string: plot title}
 }
 \value{
 ggplot object

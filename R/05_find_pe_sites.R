@@ -216,11 +216,11 @@ find_pe_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     # Plot
     if (plot){
         spacer$part<-'spacer'; primer$part<-'primer'; revtrans$part<-'revtrans'
-        allranges <- c(spacerpam, primer, revtrans)
+        allranges <- c(spacer, primer, revtrans)
         allranges$part %<>% factor(rev(c('spacer', 'revtrans', 'primer')))
         plot_intervals(allranges, yby = 'site', color_var = 'part', 
             size_var = 'part', facet_var = c('seqnames', 'targetname'))
-        spacerpam$part <- primer$part <- revtrans$part <- NULL
+        spacer$part <- primer$part <- revtrans$part <- NULL
     }
     
     # Add sequences and return
@@ -229,7 +229,7 @@ find_pe_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     spacer$primer<-primer$seq; 
     spacer$revtrans<-revtrans$seq
     spacer$ext <- ext$seq
-    spacerpam
+    spacer
 }
 
 # PRNP snp: Kuru resistance variant (G -> T)

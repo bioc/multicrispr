@@ -108,8 +108,10 @@ to_megabase <- function(y){
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
 #' @param yby        'contig' (default) or name of gr variable
 #' @param color_var   'seqnames' (default) or other gr variable
-#' @param linetype_var NULL (default) or gr variable
-#' @param title       plot title
+#' @param linetype_var NULL (default) or gr variable mapped to linetype
+#' @param size_var     NULL (default) or gr variable mapped to size
+#' @param facet_var    NULL(default)  or gr variable mapped to facet
+#' @param title        NULL or string: plot title
 #' @return ggplot object
 #' @seealso  \code{\link{plot_karyogram}}
 #' @examples 
