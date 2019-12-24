@@ -2,26 +2,16 @@
 % Please edit documentation in R/05_manipulate_ranges.R
 \name{left_flank}
 \alias{left_flank}
-\alias{up_flank}
 \alias{right_flank}
+\alias{up_flank}
 \alias{down_flank}
 \alias{extend}
-\title{Flank or Extend GRanges}
+\title{Extend or Flank GRanges}
 \usage{
 left_flank(
   gr,
-  leftstart = -200,
-  leftend = -1,
-  bsgenome = NULL,
-  verbose = FALSE,
-  plot = FALSE,
-  ...
-)
-
-up_flank(
-  gr,
-  upstart = -200,
-  upend = -1,
+  start = -200,
+  end = -1,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -30,8 +20,18 @@ up_flank(
 
 right_flank(
   gr,
-  rightstart = 1,
-  rightend = 200,
+  start = 1,
+  end = 200,
+  bsgenome = NULL,
+  verbose = FALSE,
+  plot = FALSE,
+  ...
+)
+
+up_flank(
+  gr,
+  start = -200,
+  end = -1,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -40,8 +40,8 @@ right_flank(
 
 down_flank(
   gr,
-  downstart = +1,
-  downend = +200,
+  start = +1,
+  end = +200,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -50,8 +50,8 @@ down_flank(
 
 extend(
   gr,
-  leftstart = -22,
-  rightend = 22,
+  start = -22,
+  end = 22,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -61,9 +61,9 @@ extend(
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{leftstart}{number: left start (relative to range start)}
+\item{start}{(pos or neg) number: relative start position (see details)}
 
-\item{leftend}{number: left end   (relative to range start)}
+\item{end}{(pos or neg) number: relative end position   (see details)}
 
 \item{bsgenome}{NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 Required to update gr$seq if present.}
@@ -73,39 +73,31 @@ Required to update gr$seq if present.}
 \item{plot}{TRUE or FALSE (default)}
 
 \item{...}{passed to \code{\link{plot_intervals}}}
-
-\item{rightstart}{number: right start (relative to range end)}
-
-\item{rightend}{number: right end   (relative to range end)}
 }
 \value{
 a \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
-Flank or Extend GRanges
+Extend or left/right/up/down Flank GRanges
+}
+\details{
+\code{      extend(gr,start,end)} = (grstart + start,   grend + end)
+\code{  left_flank(gr,start,end)} = (grstart + start, grstart + end)
+\code{ right_flank(gr,start,end)} = (  grend + start,   grend + end)
+\code{ up_flank(gr,start,end)}    = (grstart + start, grstart + end)   '+'
+                                    (  grend - end,   grend   - start) '-'
+\code{ down_flank(gr,start,end)} = (  grend + start,   grend + end)    '+'
+                                   (grstart - end,   grstart - start)  '-'
 }
 \examples{
-# Small GRanges
-    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    gr <- GenomicRanges::GRanges(
-            c(HBB = 'chr11:5227002-5227002', PRNP = 'chr20:4699500'), 
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+gr <- GenomicRanges::GRanges(
+          c(locus1 = 'chr11:5227002', locus2 = 'chr11:4699500'), 
             strand = c('-', '+'), 
             seqinfo = BSgenome::seqinfo(bsgenome))
-    gr \%>\% left_flank(-22, -1, plot = TRUE)
-    gr \%>\% right_flank( 1, 22, plot = TRUE)
-    gr \%>\%   up_flank(-22, -1, plot = TRUE)
-    gr \%>\% down_flank(  1, 22, plot = TRUE)
-    gr \%>\% extend(    -22, 22, plot = TRUE)
-
-# Large GRanges
-    require(magrittr)
-    bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-    gr \%>\%   left_flank(-200,  -1, plot = TRUE)
-    gr \%>\%  right_flank(   1, 200, plot = TRUE)
-    gr \%>\%       extend(-200, 200, plot = TRUE)
-}
-\seealso{
-\code{\link{straddle}} (single verb function encompassing all of 
-         left_flank, right_flank, and extend) and \code{\link{double_flank}}.
+left_flank( gr,  -22, -1, plot = TRUE)
+right_flank(gr,  +1, +22, plot = TRUE)
+up_flank(   gr, -22,  -1, plot = TRUE)
+down_flank( gr,  +1, +22, plot = TRUE)
+extend(     gr, -22, +22, plot = TRUE)
 }

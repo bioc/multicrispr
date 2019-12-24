@@ -57,12 +57,20 @@ summarize_loci <- function(gr){
 }
 
 
-#' Flank or Extend GRanges
-#' @param gr   \code{\link[GenomicRanges]{GRanges-class}}
-#' @param leftstart  number: left start (relative to range start)
-#' @param leftend    number: left end   (relative to range start)
-#' @param rightstart number: right start (relative to range end)
-#' @param rightend   number: right end   (relative to range end)
+#' Extend or Flank GRanges
+#' 
+#' Extend or left/right/up/down Flank GRanges
+#' 
+#' \code{      extend(gr,start,end)} = (grstart + start,   grend + end)
+#' \code{  left_flank(gr,start,end)} = (grstart + start, grstart + end)
+#' \code{ right_flank(gr,start,end)} = (  grend + start,   grend + end)
+#' \code{ up_flank(gr,start,end)}    = (grstart + start, grstart + end)   '+'
+#'                                     (  grend - end,   grend   - start) '-'
+#' \code{ down_flank(gr,start,end)} = (  grend + start,   grend + end)    '+'
+#'                                    (grstart - end,   grstart - start)  '-'
+#' @param gr         \code{\link[GenomicRanges]{GRanges-class}}
+#' @param start      (pos or neg) number: relative start position (see details)
+#' @param end        (pos or neg) number: relative end position   (see details)
 #' @param bsgenome   NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                   Required to update gr$seq if present.
 #' @param verbose    TRUE or FALSE (default)
@@ -70,50 +78,38 @@ summarize_loci <- function(gr){
 #' @param ...        passed to \code{\link{plot_intervals}}
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
-#' # Small GRanges
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     gr <- GenomicRanges::GRanges(
-#'             c(HBB = 'chr11:5227002-5227002', PRNP = 'chr20:4699500'), 
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#' gr <- GenomicRanges::GRanges(
+#'           c(locus1 = 'chr11:5227002', locus2 = 'chr11:4699500'), 
 #'             strand = c('-', '+'), 
 #'             seqinfo = BSgenome::seqinfo(bsgenome))
-#'     gr %>% left_flank(-22, -1, plot = TRUE)
-#'     gr %>% right_flank( 1, 22, plot = TRUE)
-#'     gr %>%   up_flank(-22, -1, plot = TRUE)
-#'     gr %>% down_flank(  1, 22, plot = TRUE)
-#'     gr %>% extend(    -22, 22, plot = TRUE)
-#' 
-#' # Large GRanges
-#'     require(magrittr)
-#'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'     gr %>%   left_flank(-200,  -1, plot = TRUE)
-#'     gr %>%  right_flank(   1, 200, plot = TRUE)
-#'     gr %>%       extend(-200, 200, plot = TRUE)
-#' @seealso \code{\link{straddle}} (single verb function encompassing all of 
-#'          left_flank, right_flank, and extend) and \code{\link{double_flank}}.
+#' left_flank( gr,  -22, -1, plot = TRUE)
+#' right_flank(gr,  +1, +22, plot = TRUE)
+#' up_flank(   gr, -22,  -1, plot = TRUE)
+#' down_flank( gr,  +1, +22, plot = TRUE)
+#' extend(     gr, -22, +22, plot = TRUE)
 #' @export
-left_flank <- function(
-    gr, 
-    leftstart  = -200,
-    leftend    = -1,
-    bsgenome   = NULL,
-    verbose    = FALSE,
-    plot       = FALSE,
+left_flank <- function(gr, 
+    start    = -200,
+    end      = -1,
+    bsgenome = NULL,
+    verbose  = FALSE,
+    plot     = FALSE,
     ...
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(leftstart)
-    assert_is_a_number(leftend)
+    assert_is_a_number(start)
+    assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
     # Flank
     newgr <- gr
-    start(newgr) <- start(gr) + leftstart
-    end(newgr)   <- start(gr) + leftend
+    GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
+    GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + end
     txt <- sprintf('\t\t%d left  flanks: [start%s%d, start%s%d]', 
-                    length(newgr), csign(leftstart), abs(leftstart), 
-                    csign(leftend), abs(leftend))
+                    length(newgr), csign(start), abs(start), 
+                    csign(end), abs(end))
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){
@@ -124,21 +120,22 @@ left_flank <- function(
     # Plot, Message, Return
     if (plot){
         gr$set    <- 'original'
-        newgr$set <- 'leftflanks'
+        newgr$set <- 'left_flanks'
         allgr <- c(gr, newgr)
-        allgr$set %<>% factor(c('original', 'leftflanks'))
+        allgr$set %<>% factor(c('original', 'left_flanks'))
         plot_intervals(allgr, color_var = 'set', ..., title = txt)
     }
     if (verbose) message(txt)
     newgr
 }
 
+
 #' @rdname left_flank
 #' @export
-up_flank <- function(
-    gr, 
-    upstart    = -200,
-    upend      = -1,
+right_flank <- function(
+    gr,
+    start = 1, 
+    end   = 200,
     bsgenome   = NULL,
     verbose    = FALSE,
     plot       = FALSE,
@@ -146,23 +143,70 @@ up_flank <- function(
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(upstart)
-    assert_is_a_number(upend)
+    assert_is_a_number(start)
+    assert_is_a_number(end)
+    assert_is_a_bool(verbose)
+    
+    # Flank
+    newgr <- gr
+    GenomicRanges::start(newgr) <- GenomicRanges::end(newgr) + start
+    GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr) + end
+    txt <- sprintf('\t\t%d right flanks : [end%s%d, end%s%d]', 
+                    length(newgr),
+                    csign(start), 
+                    abs(start), 
+                    csign(end), 
+                    abs(end))
+    
+    # Add seq
+    if ('seq' %in% names(mcols(gr))){
+        assert_is_all_of(bsgenome, 'BSgenome')
+        newgr %<>% add_seq(bsgenome)
+    }
+    
+    # Plot, Message, Return
+    if (plot){
+        gr$set <- 'original'
+        newgr$set <- 'right_flanks'
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'right_flanks'))
+        plot_intervals(allgr, color_var = 'set', ..., title=txt)
+    }
+    if (verbose) message(txt)
+    newgr
+}
+
+
+#' @rdname left_flank
+#' @export
+up_flank <- function(
+    gr, 
+    start    = -200,
+    end      = -1,
+    bsgenome = NULL,
+    verbose  = FALSE,
+    plot     = FALSE,
+    ...
+){
+    # Assert
+    assert_is_any_of(gr, 'GRanges')
+    assert_is_a_number(start)
+    assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
     # Left flank "+" ranges
     newgr <- gr
     idx <- as.logical(strand(newgr)=='+')
-    start(newgr)[idx] <- start(gr)[idx] + upstart
-      end(newgr)[idx] <- start(gr)[idx] + upend
+    GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] + start
+    GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx] + end
       
     # Right flank "-"  ranges
     idx <- as.logical(strand(newgr)=='-')
-      end(newgr)[idx] <- end(gr)[idx]   - upstart  # do not switch these lines
-    start(newgr)[idx] <- end(gr)[idx]   - upend    # to avoid integrity errors
+    GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx]   - start  # do not switch these lines
+    GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx]   - end    # to avoid integrity errors
     txt <- sprintf('\t\t%d up  flanks: [seqstart%s%d, seqstart%s%d]', 
-                    length(newgr), csign(upstart), abs(upstart), 
-                    csign(upend), abs(upend))
+                    length(newgr), csign(start), abs(start), 
+                    csign(end), abs(end))
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){
@@ -186,79 +230,33 @@ up_flank <- function(
 
 #' @rdname left_flank
 #' @export
-right_flank <- function(
-    gr,
-    rightstart = 1, 
-    rightend   = 200,
-    bsgenome   = NULL,
-    verbose    = FALSE,
-    plot       = FALSE,
-    ...
-){
-    # Assert
-    assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(rightstart)
-    assert_is_a_number(rightend)
-    assert_is_a_bool(verbose)
-    
-    # Flank
-    newgr <- gr
-    start(newgr) <- end(newgr) + rightstart
-    end(newgr)   <- end(newgr) + rightend
-    txt <- sprintf('\t\t%d right flanks : [end%s%d, end%s%d]', 
-                    length(newgr),
-                    csign(rightstart), 
-                    abs(rightstart), 
-                    csign(rightend), 
-                    abs(rightend))
-    
-    # Add seq
-    if ('seq' %in% names(mcols(gr))){
-        assert_is_all_of(bsgenome, 'BSgenome')
-        newgr %<>% add_seq(bsgenome)
-    }
-    
-    # Plot, Message, Return
-    if (plot){
-        gr$set <- 'original'
-        newgr$set <- 'rightflanks'
-        allgr <- c(gr, newgr)
-        allgr$set %<>% factor(c('original', 'rightflanks'))
-        plot_intervals(allgr, color_var = 'set', ..., title=txt)
-    }
-    if (verbose) message(txt)
-    newgr
-}
-
-#' @rdname left_flank
-#' @export
 down_flank <- function(
     gr, 
-    downstart    = +1,
-    downend      = +200,
-    bsgenome   = NULL,
-    verbose    = FALSE,
-    plot       = FALSE,
+    start    = +1,
+    end      = +200,
+    bsgenome = NULL,
+    verbose  = FALSE,
+    plot     = FALSE,
     ...
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(downstart)
-    assert_is_a_number(downend)
+    assert_is_a_number(start)
+    assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
     # Flank
     newgr <- gr
     idx <- as.logical(strand(newgr)=='+')
-    start(newgr)[idx] <- end(gr)[idx] + downstart
-      end(newgr)[idx] <- end(gr)[idx] + downend
+    GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] + start
+    GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] + end
       
     idx <- as.logical(strand(newgr)=='-')
-    start(newgr)[idx] <- start(gr)[idx] - downend
-      end(newgr)[idx] <- start(gr)[idx] - downstart
+    GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
+    GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx] - start
     txt <- sprintf('\t\t%d Down  flanks: [seqstart%s%d, seqstart%s%d]', 
-                    length(newgr), csign(downstart), abs(downstart), 
-                    csign(downend), abs(downend))
+                    length(newgr), csign(start), abs(start), 
+                    csign(end), abs(end))
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){
@@ -279,13 +277,12 @@ down_flank <- function(
 }
 
 
-
 #' @rdname left_flank
 #' @export
 extend <- function(
     gr, 
-    leftstart = -22, 
-    rightend  =  22,
+    start = -22, 
+    end  =  22,
     bsgenome  = NULL,
     verbose   = FALSE,
     plot      = FALSE,
@@ -294,20 +291,20 @@ extend <- function(
 
     # Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(leftstart)
-    assert_is_a_number(rightend)
+    assert_is_a_number(start)
+    assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
-    # Extend
+    # extend
     newgr <- gr
-    start(newgr) <- start(newgr) + leftstart
-    end(newgr)   <- end(newgr)   + rightend
+    GenomicRanges::start(newgr) <- GenomicRanges::start(newgr) + start
+    GenomicRanges::end(  newgr) <- GenomicRanges::end(  newgr) + end
     txt <- sprintf('\t\t%d extended ranges: [start%s%d, end%s%d]', 
                     length(newgr),
-                    csign(leftstart), 
-                    abs(leftstart), 
-                    csign(rightend), 
-                    abs(rightend))
+                    csign(start), 
+                    abs(start), 
+                    csign(end), 
+                    abs(end))
     
     # Add seq
     if ('seq' %in% names(mcols(gr))){
@@ -328,83 +325,6 @@ extend <- function(
     
 }
 
-
-#' Straddle GRanges
-#' @param gr   \code{\link[GenomicRanges]{GRanges-class}}
-#' @param leftstart  number: left start (relative to range start)
-#' @param leftend    number: left end   (relative to range start)
-#' @param rightstart number: right start (relative to range end)
-#' @param rightend   number: right end   (relative to range end)
-#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
-#'                   Required to update gr$seq if present.
-#' @param verbose    TRUE or FALSE (default)
-#' @param plot       TRUE or FALSE (default)
-#' @param ...         \code{\link{plot_intervals}} arguments
-#' @return a \code{\link[GenomicRanges]{GRanges-class}}
-#' @examples 
-#' # HBB snp: sickle cell variant (T -> A)
-#'     require(magrittr)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo <- BSgenome::seqinfo(bsgenome)
-#'     gr <- GenomicRanges::GRanges(
-#'              'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
-#'     (gr %<>% add_seq(bsgenome))
-#'     gr %>% straddle(leftstart = -22, rightend = 22, bsgenome = bsgenome)
-#' 
-#' # SRF binding sites
-#'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     gr <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'     straddle(gr, leftstart=-200, leftend=-1)    # left flank
-#'     straddle(gr, rightstart=1,   rightend=200)  # right flank
-#'     straddle(gr, leftstart=-200, rightend=200)  # extend
-#' @author Aditya Bhagwat, after discussing with Michael Lawrence on bioc-devel
-#' @export
-straddle <- function(
-    gr, leftstart  = NULL, leftend = NULL, rightstart = NULL, rightend = NULL, 
-    bsgenome = NULL, verbose = FALSE, plot = FALSE, ...
-){
-    
-    # Extend    
-    newgr <- gr
-    if (is.numeric(leftstart) & is.numeric(rightend)){
-        newgr <- extend(
-                    gr, leftstart = leftstart, rightend = rightend,
-                    bsgenome = bsgenome, verbose = verbose, plot = plot, ...)
-        if (!is.null(leftend) | !is.null(rightstart)){
-            warning('Ignore leftend/rightstart to resolve ambiguity')
-        }
-    }
-    
-    # Left flank
-    if (is.numeric(leftstart) & is.numeric(leftend)){
-        newgr <- left_flank(
-                    gr, leftstart = leftstart, leftend = leftend, 
-                    bsgenome = bsgenome, verbose = verbose, plot = plot, ...)
-        if (!is.null(rightstart) | !is.null(rightend)){
-            warning('Ignore rightstart/rightend to resolve ambiguity')
-        }
-    }
-    
-    # Right flank
-    if (is.numeric(rightstart) & is.numeric(rightend)){
-        newgr <- right_flank(
-                    gr, rightstart = rightstart, rightend = rightend, 
-                    bsgenome = bsgenome, verbose = verbose, plot = plot, ...)
-        if (!is.null(leftstart) | !is.null(leftend)){
-            warning('Ignore leftstart/leftend to resolve ambiguity')
-        }
-    }
-    
-    # Add seq
-    if ('seq' %in% names(mcols(gr))){
-        assert_is_all_of(bsgenome, 'BSgenome')
-        newgr %<>% add_seq(bsgenome)
-    }
-    
-    # Return
-    newgr
-
-}
 
 
 #' Double flank
