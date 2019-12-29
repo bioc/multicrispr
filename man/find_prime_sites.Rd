@@ -33,8 +33,8 @@ Additionally, five sequences are returned per PE site:
   * spacer: N20 spacers
   * pam:    NGG PAMs
   * primer: primers (end at N17 of spacer)
-  * revtrans: reverse transcription sequences (start at N18 of spacer)
-  * ext:    3' extensions of gRNA (reverse complements of primer+revtrans)
+  * revtranscript: reverse transcription sequences (start at N18 of spacer)
+  * ext:    3' extensions of gRNA (reverse complements of primer+revtranscript)
 }
 \description{
 Find prime editing sites around target ranges
@@ -43,11 +43,13 @@ Find prime editing sites around target ranges
 Below the architecture of a prime editing site.
 Fixes can be performed anywhere in the revtranscription area.
 
+        spacer        pam
+  --------------------===
           primer   revtranscription
       -------------================
   1..............17....GG..........
-  --------------------===
-        spacer        pam
+  .....................CC..........
+      ----------extension----------
 }
 \examples{
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
@@ -60,6 +62,7 @@ gr <- GenomicRanges::GRanges(
         seqinfo  = BSgenome::seqinfo(bsgenome))
 BSgenome::getSeq(bsgenome, gr)
 find_prime_sites(gr, bsgenome)
+find_crispr_sites(extend_for_pe(gr), bsgenome)
 }
 \seealso{
 \code{\link{find_crispr_sites}} to find standard crispr sites

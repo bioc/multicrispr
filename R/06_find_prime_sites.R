@@ -21,9 +21,9 @@ copy <- function(
     gr
 }
 
-#' Extend ranges to find GG
+#' Extend prime editing target to find GG sites
 #' 
-#' Extend ranges to find prime editing GG
+#' Extend prime editing target to find GG sites in accessible neighbourhood
 #' 
 #' Extends each target range to the area in which to search for a prime editing 
 #' GG duplet, as shown in the sketch below.
@@ -49,16 +49,16 @@ copy <- function(
 #'                      CFTR = 'chr7:117559593-117559595'), # ins
 #'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'         seqinfo  = BSgenome::seqinfo(bsgenome))
-#' extend_to_find_gg(gr, plot = TRUE)
+#' extend_pe_to_gg(gr, plot = TRUE)
 #' @export
-extend_to_find_gg <- function(gr, nrt=16, plot = FALSE){
+extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
 
     # Extend
     fw <- copy(gr, strand='+', start = end(gr) - nrt + 5, end = start(gr) + 5)
     rv <- copy(gr, strand='-', start = end(gr) - 5, end = start(gr) + nrt - 5)
-    fw$targetstart <- rv$targetstart   <- start(gr)
-    fw$targetend   <- rv$targetend     <- end(gr)
-    fw$targetstrand <- rv$targetstrand <- strand(gr)
+    fw$tstart  <- rv$tstart   <- start(gr)
+    fw$tend    <- rv$tend     <- end(gr)
+    fw$tstrand <- rv$tstrand  <- strand(gr)
     ext <- sort(c(fw, rv))
 
     # Plot    
@@ -73,6 +73,7 @@ extend_to_find_gg <- function(gr, nrt=16, plot = FALSE){
     ext
 }
 
+
 #' Find GG
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
@@ -86,14 +87,14 @@ extend_to_find_gg <- function(gr, nrt=16, plot = FALSE){
 #'                      CFTR = 'chr7:117559593-117559595'), # ins
 #'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'         seqinfo  = BSgenome::seqinfo(bsgenome))
-#' gr %<>% extend_to_find_gg(plot = TRUE)
+#' gr %<>% extend_pe_to_gg(plot = TRUE)
 #' gr %>% add_seq(bsgenome) %>% find_gg()
 #' @export
 find_gg <- function(gr){
     
     substart <- subend <- windowstart <- windowend <- NULL
     
-    res <- stri_locate_all_fixed(gr$seq, 'GG')
+    res <- stri_locate_all_fixed(gr$seq, 'GG', overlap=TRUE)
     gr$substart <- vextract1(res)
     gr$subend   <- vextract2(res)
     
@@ -120,9 +121,113 @@ find_gg <- function(gr){
     return(gg_ranges)
 }
 
-name_ranges <- function(gr, name_base = 'range'){
-    if (has_names(gr)){  names(gr) 
-    } else {             sprintf('%s%d', name_base, seq_along(gr)) }
+
+#' Find prime editing sites
+#' 
+#' Find prime editing sites around target ranges
+#' 
+#' Below the architecture of a prime editing site.
+#' Fixes can be performed anywhere in the revtranscription area.
+#' 
+#'         spacer        pam
+#'   --------------------===
+#'           primer   revtranscription
+#'       -------------================
+#'   1..............17....GG..........
+#'   .....................CC..........
+#'       ----------extension----------
+#' 
+#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
+#' @param fixes     character vector: '+' strand fix seqs
+#' @param nprimer   n primer nucleotides (default 13, max 17)
+#' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
+#' @param plot      TRUE (default) or FALSE
+#' @return  \code{\link[GenomicRanges]{GRanges-class}} with prime editing sites.
+#' Each prime editing range is defined in terms of its N20NGG spacer.
+#' Additionally, five sequences are returned per PE site:
+#'   * spacer: N20 spacers
+#'   * pam:    NGG PAMs
+#'   * primer: primers (end at N17 of spacer)
+#'   * revtranscript: reverse transcription sequences (start at N18 of spacer)
+#'   * ext:    3' extensions of gRNA (reverse complements of primer+revtranscript)
+#' @examples
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#' gr <- GenomicRanges::GRanges(
+#'         seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                      HBB  = 'chr11:5227002',             # snp
+#'                      HEXA = 'chr15:72346580-72346583',   # del
+#'                      CFTR = 'chr7:117559593-117559595'), # ins
+#'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'         seqinfo  = BSgenome::seqinfo(bsgenome))
+#' BSgenome::getSeq(bsgenome, gr)
+#' find_prime_sites(gr, bsgenome)
+#' find_crispr_sites(extend_for_pe(gr), bsgenome)
+#' @seealso \code{\link{find_crispr_sites}} to find standard crispr sites
+#' @export
+find_prime_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
+    nprimer = 13, nrt = 16, plot = TRUE){
+    
+    # Assert
+    assert_is_all_of(gr, 'GRanges')
+    assert_is_all_of(bsgenome, 'BSgenome')
+    assert_is_character(fixes)
+    assert_all_are_matching_regex(fixes, '^[ACGTacgt]+$')
+    assert_is_a_number(nprimer)
+    assert_is_a_number(nrt)
+    assert_all_are_less_than(nprimer, 17)
+
+    # Find GG in nrt window around target site
+    gr %<>% name_uniquely()
+    gr$tname <- names(gr)
+    gg  <-  gr %>% extend_pe_to_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
+    gg$site <- uniquify(gg$tname)
+    
+    # Extract from these other components
+    spacer        <- up_flank(gg, -21,        -2)     %>% add_seq(bsgenome)
+    pam           <- up_flank(gg,  -1,        +1)     %>% add_seq(bsgenome) 
+    extension     <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand()
+    extension$seq <- get_plus_seq(bsgenome, extension)  # Get "+" seq
+    substr( extension$seq, 
+            extension$tstart-start(extension)+1, 
+            extension$tend  -start(extension)+1) <- fixes[extension$tname]
+    extension$seq[as.logical(strand(extension)=='-')] %<>% revcomp() 
+                                                        # Revcomp for "-" seqs
+    # Plot
+    if (plot){
+        spacer$part<-'spacer'
+        extension$part <- 'extension'
+        allranges <- c(spacer, extension)
+        allranges$part %<>% factor(rev(c('spacer', 'extension')))
+        plot_intervals(allranges, yby = 'site', color_var = 'part', 
+            size_var = 'part', facet_var = c('seqnames', 'tname'))
+        spacer$part <- NULL
+    }
+    
+    # Add sequences and return
+    names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'spacer')
+    spacer$pam           <- pam$seq 
+    spacer$extension     <- extension$seq
+    spacer
+ }
+
+
+# name_uniquely <- function(gr){
+#     assertive::assert_has_no_duplicates(gr)
+#     if (has_names(gr)){  names(gr) %<>% uniquify()
+#     } else {             names(gr) <- as.character(gr)
+#     }
+#     gr
+# }
+name_uniquely <- function(gr){
+    if (has_names(gr)){ 
+        names(gr) %<>% uniquify()
+    } else {
+        nranges <- length(gr)
+        ndigits <- ceiling(log10(nranges))
+        names(gr) <- paste0('T', format(seq_len(nranges), digits = ndigits))
+    }
+    gr
 }
 
 
@@ -144,122 +249,11 @@ revcomp <- function(y)  y %>%
                         Biostrings::reverseComplement() %>% 
                         as.character()
 
-
-#' Find prime editing sites
-#' 
-#' Find prime editing sites around target ranges
-#' 
-#' Below the architecture of a prime editing site.
-#' Fixes can be performed anywhere in the revtranscription area.
-#' 
-#'           primer   revtranscription
-#'       -------------================
-#'   1..............17....GG..........
-#'   --------------------===
-#'         spacer        pam
-#' 
-#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param fixes     character vector: '+' strand fix seqs
-#' @param nprimer   n primer nucleotides (default 13, max 17)
-#' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
-#' @param plot      TRUE (default) or FALSE
-#' @return  \code{\link[GenomicRanges]{GRanges-class}} with prime editing sites.
-#' Each prime editing range is defined in terms of its N20NGG spacer.
-#' Additionally, five sequences are returned per PE site:
-#'   * spacer: N20 spacers
-#'   * pam:    NGG PAMs
-#'   * primer: primers (end at N17 of spacer)
-#'   * revtrans: reverse transcription sequences (start at N18 of spacer)
-#'   * ext:    3' extensions of gRNA (reverse complements of primer+revtrans)
-#' @examples
-#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#' gr <- GenomicRanges::GRanges(
-#'         seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                      HBB  = 'chr11:5227002',             # snp
-#'                      HEXA = 'chr15:72346580-72346583',   # del
-#'                      CFTR = 'chr7:117559593-117559595'), # ins
-#'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'         seqinfo  = BSgenome::seqinfo(bsgenome))
-#' BSgenome::getSeq(bsgenome, gr)
-#' find_prime_sites(gr, bsgenome)
-#' @seealso \code{\link{find_crispr_sites}} to find standard crispr sites
-#' @export
-find_prime_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, plot = TRUE){
-    
-    # Assert
-    assert_is_all_of(gr, 'GRanges')
-    assert_is_all_of(bsgenome, 'BSgenome')
-    assert_is_character(fixes)
-    assert_all_are_matching_regex(fixes, '^[ACGTacgt]+$')
-    assert_is_a_number(nprimer)
-    assert_is_a_number(nrt)
-    assert_all_are_less_than(nprimer, 17)
-
-    # Find GG in nrt window around target site
-    gr$targetname <- name_ranges(gr, 'target')
-    gg  <-  gr %>% extend_to_find_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
-    gg$site <- table(gg$targetname) %>% lapply(seq_len) %>% unlist() %>% names()
-    gg$seq <- NULL
-    
-    # Extract from these other components
-    spacer   <- up_flank(gg, -21,        -2)     %>% add_seq(bsgenome)
-    pam      <- up_flank(gg,  -1,        +1)     %>% add_seq(bsgenome) 
-    primer   <- up_flank(gg, -4-nprimer, -5)     %>% add_seq(bsgenome)
-    revtrans <- up_flank(gg, -4,         -5+nrt) %>% add_seq(bsgenome)
-    ext      <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand()
-    ext$seq  <- get_plus_seq(bsgenome, ext)              # Get "+" seq
-    substr(ext$seq, ext$targetstart-start(ext)+1, 
-                    ext$targetend  -start(ext)+1) <- fixes[ext$targetname]
-    ext$seq[as.logical(strand(ext)=='-')] %<>% revcomp() # Revcomp for "-" seqs
-
-    # Plot
-    if (plot){
-        spacer$part<-'spacer'; primer$part<-'primer'; revtrans$part<-'revtrans'
-        allranges <- c(spacer, primer, revtrans)
-        allranges$part %<>% factor(rev(c('spacer', 'revtrans', 'primer')))
-        plot_intervals(allranges, yby = 'site', color_var = 'part', 
-            size_var = 'part', facet_var = c('seqnames', 'targetname'))
-        spacer$part <- primer$part <- revtrans$part <- NULL
-    }
-    
-    # Add sequences and return
-    names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'spacer')
-    spacer$pam <- pam$seq 
-    spacer$primer<-primer$seq; 
-    spacer$revtrans<-revtrans$seq
-    spacer$ext <- ext$seq
-    spacer
+uniquify <- function(x){
+    dt <- data.table::data.table(x = x)
+    dt[, N := 1:.N, by='x']
+    dt[N==1, suffix := '']
+    dt[ N>1, suffix := as.character(N)]
+    dt[, paste0(x, suffix)]
 }
 
-# PRNP snp: Kuru resistance variant (G -> T)
-    # gr  <-  GRanges('chr20:4699500', strand = '+', seqinfo = bsinfo)
-    # gr  %<>% multicrispr::add_inverse_strand()
-    # (gr %<>% multicrispr::add_seq(bsgenome))
-    # (extended <- multicrispr::extend(gr, bsgenome = bsgenome))
-    # Biostrings::complement(Biostrings::DNAStringSet(extended$seq[2]))
-    # (cas9s <- multicrispr::find_crispr_sites(extended))
-    # 
-    # # Precision editing
-    # #
-    # #    ------------^---===....*....
-    # # 5' TGGTGGCTGGGG TCAAGGAGGTGGCACCCACAGTCAGTGGAACAA 3'
-    # # 3' ACCACCGACCCC AGTTCCTCCACCGTGGGTGTCAGTCACCTTGTT 5'
-    # #
-
-# Tay Sachs    
-    # gr <-GRanges('chr15:72346580-72346583', strand = '-', 
-    #                              seqinfo = seqinfo(bsgenome))
-    # 
-    # BSgenome::getSeq(bsgenome, gr)
-    # gr %<>% multicrispr:::add_inverse_strand()
-    # extended <- multicrispr::extend(gr)
-    # extended %<>% multicrispr::add_seq(bsgenome)
-    # cas9s <- multicrispr::find_crispr_sites(extended)
-    
-    # Precision editing
-    # 
-    #                       ===*================---
-    # 5' AATGTGAGACAGCTTAAAATAAAATTAACTATAAGAAACTGGTAA
-    # 3' TTACCAGTTTCTTATAGTTAATTTTATTTTAAGCTGTCTCACATT

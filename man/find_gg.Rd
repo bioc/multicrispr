@@ -25,6 +25,6 @@ gr <- GenomicRanges::GRanges(
                      CFTR = 'chr7:117559593-117559595'), # ins
         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
         seqinfo  = BSgenome::seqinfo(bsgenome))
-gr \%<>\% extend_to_find_gg(plot = TRUE)
+gr \%<>\% extend_pe_to_gg(plot = TRUE)
 gr \%>\% add_seq(bsgenome) \%>\% find_gg()
 }

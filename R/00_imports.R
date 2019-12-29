@@ -8,10 +8,11 @@
 #' @importFrom  assertive.types       assert_is_all_of    assert_is_any_of  
 #' @importFrom  assertive.types       assert_is_a_bool    assert_is_a_number
 #' @importFrom  assertive.types       assert_is_a_string  assert_is_character
-#' @importFrom  Biostrings            complement  DNAStringSet
+#' @importFrom  Biostrings            complement  DNAStringSet   vmatchPattern
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
-#' @importFrom  data.table            :=  data.table  as.data.table  
+#' @importFrom  BSgenome              getSeq
+#' @importFrom  data.table            :=  data.table  as.data.table  setnames
 #' @importFrom  data.table            setnames  setorderv
 #' @importFrom  GenomeInfoDb          genome
 #' @importFrom  GenomeInfoDb          seqinfo   seqinfo<-

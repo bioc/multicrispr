@@ -1,7 +1,8 @@
 #' Add sequence to GRanges
-#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param verbose   TRUE or FALSE (default)
+#' @param gr           \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome     \code{\link[BSgenome]{BSgenome-class}}
+#' @param verbose      TRUE or FALSE (default)
+#' @param as.character TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # SRF binding sites
@@ -20,7 +21,7 @@
 #'     gr %<>% multicrispr::extend(bsgenome = bsgenome)
 #'    (gr %<>% multicrispr::add_seq(bsgenome))
 #' @export
-add_seq <- function(gr, bsgenome, verbose = FALSE){
+add_seq <- function(gr, bsgenome, verbose = FALSE, as.character = TRUE){
     
     # Assert
     assert_is_all_of(gr, 'GRanges')
@@ -42,7 +43,7 @@ add_seq <- function(gr, bsgenome, verbose = FALSE){
                         start        = start(gr),
                         end          = end(gr), 
                         strand       = strand(gr), 
-                        as.character = TRUE))
+                        as.character = as.character))
     
     # Return
     gr
@@ -310,3 +311,5 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     if (verbose) cmessage(txt)
     newgr
 }
+
+

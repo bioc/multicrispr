@@ -4,16 +4,24 @@
 \alias{find_crispr_sites}
 \title{Find crispr sites in targetranges}
 \usage{
-find_crispr_sites(gr, bsgenome, plot = TRUE, verbose = TRUE)
+find_crispr_sites(
+  gr,
+  bsgenome,
+  spacer = strrep("N", 20),
+  pam = "NGG",
+  plot = TRUE
+)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{plot}{TRUE (default) or FALSE}
+\item{spacer}{string: spacer pattern in extended IUPAC alphabet}
 
-\item{verbose}{TRUE (default) or FALSE}
+\item{pam}{string: pam pattern in extended IUPAC alphabet}
+
+\item{plot}{TRUE (default) or FALSE}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -22,14 +30,25 @@ find_crispr_sites(gr, bsgenome, plot = TRUE, verbose = TRUE)
 Find crispr sites in targetranges
 }
 \examples{
-# Read bed into granges and extend
+# Small GRanges
+    require(magrittr)
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- GenomicRanges::GRanges(
+              seqnames = c(PRNP = 'chr20:4699600',             # snp
+                           HBB  = 'chr11:5227002',             # snp
+                           HEXA = 'chr15:72346580-72346583',   # del
+                           CFTR = 'chr7:117559593-117559595'), # ins
+              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+              seqinfo  = BSgenome::seqinfo(bsgenome))
+    gr \%<>\% extend_for_pe()
+    find_crispr_sites(gr, bsgenome)
+    
+# Large GRanges
     require(magrittr)
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10')
     gr \%<>\% extend(plot = FALSE)
-    
-# Find crispr sites
     find_crispr_sites(gr, bsgenome)
 }
 \seealso{
