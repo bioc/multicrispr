@@ -1,16 +1,31 @@
 #============================================================================
 
 #' Count target/genome matches
-#' @param crisprseqs  character vector or 
+#' @param spacerseqs  character vector or 
 #'                    \code{\link[Biostrings]{XStringSet-class}}
 #' @param targetseqs  character vector or 
 #'                    \code{\link[Biostrings]{XStringSet-class}}
+#' @param pam         string (default 'NGG'): sequence following spacerseqs
 #' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatch    number: number of allowed mismatches 
 #' @param include     character vector: offtarget analysis chromosomes
 #' @param verbose     TRUE (default) or FALSE
-#' @return numeric(length(crisprseqs))
+#' @return numeric(length(spacerseqs))
 #' @examples
+#' # PE example
+#' #-----------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     spacers <- find_spacers(extend_for_pe(gr), bsgenome)
+#'     spacerseqs <- spacers$spacer
+#'     
 #' # Read ranges and extend
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
@@ -20,30 +35,30 @@
 #' # Add seqs and find crispr sites
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets %<>% add_seq(bsgenome)
-#'     sites <- find_crispr_sites(targets, bsgenome)
+#'     sites <- find_spacers(targets, bsgenome)
 #' 
 #' # Count matches
-#'     crisprseqs <- sites$seq[1:10]
+#'     spacerseqs <- sites$seq[1:10]
 #'     targetseqs <- targets$seq
-#'     count_target_matches(crisprseqs, targetseqs, 0)
-#'     count_genome_matches(crisprseqs, bsgenome,    0, include = 'chrY')
+#'     count_target_matches(spacerseqs, targetseqs, 0)
+#'     count_genome_matches(spacerseqs, bsgenome,    0, include = 'chrY')
 #' @export
 count_target_matches <- function(
-    crisprseqs, 
+    spacerseqs, 
     targetseqs, 
     mismatch, 
     verbose = TRUE
 ){
     
     # Assert
-    assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
+    assert_is_any_of(spacerseqs, c('character', 'XStringSet'))
     assert_is_any_of(targetseqs, c('character', 'XStringSet'))
     assert_is_a_number(mismatch)
     assert_is_subset(mismatch, 0:4)
     assert_is_a_bool(verbose)
     
     # Count
-    unique_crisprseqs <- unique(crisprseqs)
+    unique_crisprseqs <- unique(spacerseqs)
     starttime <- Sys.time()
     matches  <- rowSums(Biostrings::vcountPDict(
                             Biostrings::DNAStringSet(unique_crisprseqs),
@@ -56,7 +71,7 @@ count_target_matches <- function(
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in targets: %s',
                             mismatch,
                             format(signif(Sys.time() - starttime, 2)))
-    unname(matches[crisprseqs])
+    unname(matches[spacerseqs])
 }
 
 
@@ -84,18 +99,52 @@ include_to_exclude <- function(
     sprintf('^%s$', setdiff(seqnames(bsgenome), include))
 }
 
+    explode <- function(x) unlist(strsplit(x, character(0)))
+    paste_dtcols <- function(x) x [, do.call(paste0, .SD) ]
+    expand_iupac_ambiguities <- function(x){
+        paste_dtcols( 
+            as.data.table( 
+                lapply(Biostrings::IUPAC_CODE_MAP[explode(x)], explode)))
+    }
 
+    vsprintf <- function(fmt, ..., first_slowest = TRUE){
+       . <- NULL
+       arguments <- list(...)
+       n <- arguments %>% vapply(length, integer(1)) %>% Reduce(max, .)
+       argdf <- arguments %>%
+               (function(x) if (first_slowest) rev(x) else x) %>%
+                expand.grid() %>%
+               (function(x) if (first_slowest) x %>% magrittr::extract(, ncol(.):1) else x)
+       fun <- function(...) sprintf(fmt, ...)
+       do.call(fun, argdf)
+    }
+    
+.count_genome_matches <- function(seqs, bsgenome, exclude, mismatch){
+    unlist(BiocParallel::bplapply(
+        seqs, 
+        function(x, bsgenome, exclude, mismatch){
+            sum(BSgenome::vcountPattern(
+                    pattern      = Biostrings::DNAString(x), 
+                    subject      = bsgenome, 
+                    min.mismatch = mismatch, 
+                    max.mismatch = mismatch, 
+                    exclude      = exclude)$count)},
+        bsgenome = bsgenome, exclude = exclude, mismatch = mismatch))
+}
+    
 #' @rdname count_target_matches
 #' @export
 count_genome_matches <- function(
-    crisprseqs, 
+    spacerseqs, 
+    pam     = 'NGG',
     bsgenome, 
     mismatch,
-    include = seqnames(bsgenome),
-    verbose     = TRUE
+    exclude = setdiff(seqnames(bsgenome), GenomeInfoDb::standardChromosomes(bsgenome)),
+    verbose = TRUE, 
+    joint   = FALSE
 ){
     # Assert
-    assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
+    assert_is_any_of(spacerseqs, c('character', 'XStringSet'))
     assert_is_any_of(bsgenome, 'BSgenome')
     assert_is_subset(mismatch, 0:4)
     assert_is_character(include)
@@ -106,23 +155,22 @@ count_genome_matches <- function(
 
     # Count
     starttime <- Sys.time()
-    unique_crisprseqs <- unique(crisprseqs)
-    matches  <- Biostrings::vcountPDict(
-                    Biostrings::DNAStringSet(unique_crisprseqs),
-                    bsgenome,
-                    min.mismatch = mismatch,
-                    max.mismatch = mismatch, 
-                    exclude      = include_to_exclude(bsgenome, include), 
-                    verbose      = verbose) %>% 
-                as.data.table() %>% 
-                extract(, .(n = sum(count)), by ='index') %>%
-                extract2('n') %>% 
-                set_names(unique_crisprseqs)
+    pamseqs <- expand_iupac_ambiguities(pam)
+    sitedt <- data.table(spacer = rep(spacerseqs, each = length(pamseqs)), 
+                        pam     = rep(pamseqs, times = length(spacerseqs))) %>% 
+              extract(, crispr := paste0(spacer, pamseqs) )
+    seqdt <- data.table(crispr = unique(sitedt$crispr))
+    seqdt[ , nmatches := .count_genome_matches(
+                            crispr, bsgenome, exclude, mismatch) ]
+    spacerdt <- sitedt %>% 
+                merge(seqdt, by = 'crispr') %>% 
+                extract(, .(nmatches = sum(nmatches)), by = 'spacer') %>% 
+                extract(spacerseqs, on = 'spacer')
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',
                             mismatch, format(signif(Sys.time() - starttime, 2)))
-    unname(matches[crisprseqs])
+    spacerdt$nmatches
 }
 
 
@@ -156,7 +204,7 @@ add_seqinfo <- function(gr, bsgenome){
 #' # Add seqs and find crispr sites
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets %<>% add_seq(bsgenome)
-#'     sites <- find_crispr_sites(targets, bsgenome)
+#'     sites <- find_spacers(targets, bsgenome)
 #'    
 #' # Filter for offtarget-free sites
 #'     filter_offtargetfree_sites(

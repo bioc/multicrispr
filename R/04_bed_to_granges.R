@@ -98,10 +98,13 @@ annotate_granges <- function(gr, txdb){
 #' @param verbose    TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' gr <- bed_to_granges(bedfile, 'mm10')
-#' @seealso \code{rtracklayer::import.bed} (documented in 
-#' \code{\link[rtracklayer]{BEDFile-class}}), around which this function wraps.
+#' # TFBS example
+#' #-------------
+#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     bed_to_granges(bedfile, 'mm10')
+#' @seealso \code{rtracklayer::import.bed} (see 
+#' \code{\link[rtracklayer]{BEDFile-class}}), which is used by this function
 #' @export
 bed_to_granges <- function(
     bedfile,

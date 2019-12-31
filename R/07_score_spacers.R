@@ -1,32 +1,47 @@
 
-#' Add [-4, +3] contextseq
+#' Add [-4, +3] context
 #' 
-#' @param sites \code{\link[GenomicRanges]{GRanges-class}}: crispr sites
+#' Add context for Doench2016 scoring
+#' 
+#' @param spacers \code{\link[GenomicRanges]{GRanges-class}}: spacer ranges
 #' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #' @param verbose logical(1)
 #' @return character vector
 #' @examples 
-#' require(magrittr)
-#' bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' targets  <- bed_to_granges(bedfile, 'mm10')  %>% 
-#'             extend() %>% 
-#'             add_seq(bsgenome)
-#' sites    <- find_crispr_sites(targets, bsgenome)
-#' sites %<>% add_contextseq(bsgenome)
-#' sites[1:3]$seq
-#' sites[1:3]$contextseq
+#' # PE example
+#' #-----------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'              seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                           HBB  = 'chr11:5227002',             # snp
+#'                           HEXA = 'chr15:72346580-72346583',   # del
+#'                           CFTR = 'chr7:117559593-117559595'), # ins
+#'              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'              seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     spacers <- find_spacers(extend_for_pe(gr), bsgenome)
+#'     add_context(spacers, bsgenome)
+#' 
+#' # TFBS example
+#' #-------------
+#'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     targets  <- bed_to_granges(bedfile, 'mm10')  %>% 
+#'                 extend() %>% 
+#'                 add_seq(bsgenome)
+#'     spacers    <- find_spacers(targets, bsgenome)
+#'     spacers %<>% add_context(bsgenome)
+#'     spacers[1:3]$seq
+#'     spacers[1:3]$contextseq
 #' @export
-add_contextseq <- function(sites, bsgenome, verbose = TRUE){
+add_context <- function(spacers, bsgenome, verbose = TRUE){
     
     # Prevent from stats::start from being used (leads to bug!)
-    contexts <- sites
-    start(contexts) <- start(sites) - ifelse(strand(sites)=='+', 4, 3)
-    end(contexts)   <- end(sites)   + ifelse(strand(sites)=='+', 3, 4)
-    if (verbose) cmessage('\t\tAdd (4-23-3) contextseqs')
-    contexts %<>% add_seq(bsgenome, verbose = FALSE)
-    sites$contextseq <- contexts$seq
-    sites
+    contexts <- extend(spacers, -4, +6)
+    spacers$context <- BSgenome::getSeq(
+                            bsgenome, contexts, as.character = TRUE)
+    if (verbose) message('\t\tAdd (4-23-3) contextseqs')
+    spacers
 }
 
 
@@ -95,15 +110,15 @@ doench2016 <- function(
 }
 
 
-#' Score crispr sites
+#' Score spacers
 #' 
-#' Score crispr sites with Doench2014 or Doench2016 model.
+#' Score spacers with Doench2014 or Doench2016
 #' 
 #' Doench2014 is readily available. 
 #' Doench2016 is available after installing python module 
 #' [azimuth](https://github.com/MicrosoftResearch/Azimuth) (see examples).
 #' 
-#' @param sites     \code{\link[GenomicRanges]{GRanges-class}}
+#' @param spacers   \code{\link[GenomicRanges]{GRanges-class}}: spacers
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
@@ -113,31 +128,33 @@ doench2016 <- function(
 #' @param verbose    TRUE (default) or FALSE
 #' @return numeric vector
 #' @examples
-#' # Define targets
+#' # PE example
+#' #-----------
 #'     require(magrittr)
-#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     targets <- bed_to_granges(bedfile, 'mm10')  %>% 
-#'                extend() %>%
-#'                add_seq(bsgenome)
-#' 
-#' # Find sites
-#'     sites <- find_crispr_sites(targets, bsgenome)
-#'     
-#' # Score with Doench2014
-#'     score_crispr_sites(sites[1:10], bsgenome)
-#'         
-#' # Score with Doench2016
-#'     # First install python module azimuth, perhaps in a conda env:
-#'         # install conda for python 2.7
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     spacers <- find_spacers(extend_for_pe(gr), bsgenome)
+#'     score_spacers(spacers, bsgenome, 'Doench2014')
 #'         # conda create --name azimuthenv python=2.7
 #'         # conda activate azimuthenv
 #'         # pip install azimuth
 #'         # pip install scikit-learn==0.17.1
-#'         
-#'     # Then call score_crispr_sites with reference to conda env
-#'         # score_crispr_sites(sites[1:10], bsgenome, 'Doench2016', 
-#'         #             condaenv = 'azimuthenv')
+#'     # score_spacers(spacers, bsgenome, 'Doench2016', condaenv = 'azimuthenv')
+#' 
+#' # TFBS example
+#' #-------------
+#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     gr <- extend(bed_to_granges(bedfile, 'mm10'))
+#'     spacers <- find_spacers(gr, bsgenome)
+#'     score_spacers(spacers, bsgenome, 'Doench2014')
+#'     # score_spacers(spacers, bsgenome, 'Doench2016')
 #' 
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
@@ -150,8 +167,8 @@ doench2016 <- function(
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
 #' @export
-score_crispr_sites <- function(
-    sites,
+score_spacers <- function(
+    spacers,
     bsgenome, 
     method     = c('Doench2014', 'Doench2016')[1],
     python     = NULL,
@@ -160,24 +177,21 @@ score_crispr_sites <- function(
     verbose    = TRUE
 ){
     # Assert
-    assert_is_all_of(sites, 'GRanges')
+    assert_is_all_of(spacers, 'GRanges')
     assert_is_a_string(method)
     assert_is_subset(method, c('Doench2014', 'Doench2016'))
 
     # Add contextseq
-    if (verbose)  cmessage('\tScore crispr sites')
-    sites %<>% add_contextseq(bsgenome, verbose = verbose)
-    sitedt  <- as.data.table(sites)
-    scoredt <- data.table(contextseq = unique(sitedt$contextseq))
+    if (verbose)  cmessage('\tScore crispr spacers')
+    spacers %<>% add_context(bsgenome, verbose = verbose)
+    spacerdt  <- as.data.table(spacers)
+    scoredt <- data.table(context = unique(spacerdt$context))
     
     # Score
     scorefun <- switch(method, Doench2014 = doench2014, Doench2016 = doench2016)
-    scoredt[ , (method) := scorefun(scoredt$contextseq, verbose=verbose) ]
+    scoredt[ , (method) := scorefun(scoredt$context, verbose=verbose) ]
 
     # Merge back in and Return
-    sites_merged  <- merge(  sitedt, scoredt, by = 'contextseq', sort = FALSE, 
-                            all.x = TRUE) %>%
-                    as('GRanges')
-    seqinfo(sites_merged) <- seqinfo(sites)
-    sites_merged
+    mergedt  <- merge(spacerdt, scoredt, by='context', sort=FALSE, all.x=TRUE)
+    GRanges(mergedt, seqinfo = seqinfo(spacers))
 }

@@ -41,15 +41,18 @@ copy <- function(
 #' @param plot TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#' gr <- GenomicRanges::GRanges(
-#'         seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                      HBB  = 'chr11:5227002',             # snp
-#'                      HEXA = 'chr15:72346580-72346583',   # del
-#'                      CFTR = 'chr7:117559593-117559595'), # ins
-#'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'         seqinfo  = BSgenome::seqinfo(bsgenome))
-#' extend_pe_to_gg(gr, plot = TRUE)
+#' # PE example
+#' #-----------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     extend_pe_to_gg(gr, plot = TRUE)
 #' @export
 extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
 
@@ -78,17 +81,18 @@ extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' require(magrittr)
-#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#' gr <- GenomicRanges::GRanges(
-#'         seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                      HBB  = 'chr11:5227002',             # snp
-#'                      HEXA = 'chr15:72346580-72346583',   # del
-#'                      CFTR = 'chr7:117559593-117559595'), # ins
-#'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'         seqinfo  = BSgenome::seqinfo(bsgenome))
-#' gr %<>% extend_pe_to_gg(plot = TRUE)
-#' gr %>% add_seq(bsgenome) %>% find_gg()
+#' # PE example
+#' #-----------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     gr %>% extend_pe_to_gg(plot = TRUE) %>% add_seq(bsgenome) %>% find_gg()
 #' @export
 find_gg <- function(gr){
     
@@ -122,16 +126,16 @@ find_gg <- function(gr){
 }
 
 
-#' Find prime editing sites
+#' Find prime editing spacers
 #' 
-#' Find prime editing sites around target ranges
+#' Find prime editing spacers around target ranges
 #' 
 #' Below the architecture of a prime editing site.
-#' Fixes can be performed anywhere in the revtranscription area.
+#' Fixes can be performed anywhere in the revtranscript area.
 #' 
 #'         spacer        pam
 #'   --------------------===
-#'           primer   revtranscription
+#'           primer     revtranscript
 #'       -------------================
 #'   1..............17....GG..........
 #'   .....................CC..........
@@ -143,29 +147,29 @@ find_gg <- function(gr){
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
 #' @param plot      TRUE (default) or FALSE
-#' @return  \code{\link[GenomicRanges]{GRanges-class}} with prime editing sites.
+#' @return  \code{\link[GenomicRanges]{GRanges-class}} with PE spacer ranges
 #' Each prime editing range is defined in terms of its N20NGG spacer.
-#' Additionally, five sequences are returned per PE site:
+#' Additionally, three sequence mcols are returned:
 #'   * spacer: N20 spacers
 #'   * pam:    NGG PAMs
-#'   * primer: primers (end at N17 of spacer)
-#'   * revtranscript: reverse transcription sequences (start at N18 of spacer)
-#'   * ext:    3' extensions of gRNA (reverse complements of primer+revtranscript)
+#'   * extension: 3' extension of gRNA (RTtemplate + primerbindingsite)
 #' @examples
-#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#' gr <- GenomicRanges::GRanges(
-#'         seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                      HBB  = 'chr11:5227002',             # snp
-#'                      HEXA = 'chr15:72346580-72346583',   # del
-#'                      CFTR = 'chr7:117559593-117559595'), # ins
-#'         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'         seqinfo  = BSgenome::seqinfo(bsgenome))
-#' BSgenome::getSeq(bsgenome, gr)
-#' find_prime_sites(gr, bsgenome)
-#' find_crispr_sites(extend_for_pe(gr), bsgenome)
-#' @seealso \code{\link{find_crispr_sites}} to find standard crispr sites
+#' # PE example
+#' #-----------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     find_pe_spacers(gr, bsgenome)
+#'     find_spacers(extend_for_pe(gr), bsgenome)
+#' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
-find_prime_sites <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
+find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
     nprimer = 13, nrt = 16, plot = TRUE){
     
     # Assert
@@ -250,6 +254,9 @@ revcomp <- function(y)  y %>%
                         as.character()
 
 uniquify <- function(x){
+    
+    .N <- N <- suffix <- NULL
+    
     dt <- data.table::data.table(x = x)
     dt[, N := 1:.N, by='x']
     dt[N==1, suffix := '']

@@ -33,6 +33,7 @@ Imports:
     GenomeInfoDb,
     GenomicFeatures,
     GenomicRanges,
+    IRanges,
     ggplot2,
     grid,
     Gviz, 

@@ -50,7 +50,7 @@ Filter for offtarget-free crispr sites
 # Add seqs and find crispr sites
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     targets \%<>\% add_seq(bsgenome)
-    sites <- find_crispr_sites(targets, bsgenome)
+    sites <- find_spacers(targets, bsgenome)
    
 # Filter for offtarget-free sites
     filter_offtargetfree_sites(

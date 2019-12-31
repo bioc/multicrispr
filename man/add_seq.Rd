@@ -22,19 +22,23 @@ add_seq(gr, bsgenome, verbose = FALSE, as.character = TRUE)
 Add sequence to GRanges
 }
 \examples{
-# SRF binding sites
-    bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    gr <- bed_to_granges(bedfile, 'mm10')
-    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-    (gr <- add_seq(gr, bsgenome))
-    
-# PRNP
+# PE example
+#-----------
     require(magrittr)
-    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    gr  <-  GenomicRanges::GRanges(
-                'chr20:4699500', strand = '+', 
-                 seqinfo = BSgenome::seqinfo(bsgenome))
-    gr \%<>\% multicrispr::add_inverse_strand()
-    gr \%<>\% multicrispr::extend(bsgenome = bsgenome)
-   (gr \%<>\% multicrispr::add_seq(bsgenome))
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- GenomicRanges::GRanges(
+              seqnames = c(PRNP = 'chr20:4699600',             # snp
+                           HBB  = 'chr11:5227002',             # snp
+                           HEXA = 'chr15:72346580-72346583',   # del
+                           CFTR = 'chr7:117559593-117559595'), # ins
+              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+              seqinfo  = BSgenome::seqinfo(bsgenome))
+   add_seq(gr, bsgenome)
+   
+# TFBS example
+#-------------
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+    bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+    gr <- bed_to_granges(bedfile, 'mm10')
+    add_seq(gr, bsgenome)
 }

@@ -17,6 +17,9 @@
 #' extract_subranges(gr, ir, plot = TRUE)
 #' @export
 extract_subranges <- function(gr, ir, plot = FALSE){
+  
+    # Comply
+    tstart <- tend <- substart <- subwidth <- NULL
     # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(ir, 'IRanges')
@@ -101,7 +104,8 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param plot      TRUE (default) or FALSE
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' # Small GRanges
+#' # PE example
+#' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #'     gr <- GenomicRanges::GRanges(
@@ -111,19 +115,18 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'                            CFTR = 'chr7:117559593-117559595'), # ins
 #'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'               seqinfo  = BSgenome::seqinfo(bsgenome))
-#'     gr %<>% extend_for_pe()
-#'     find_crispr_sites(gr, bsgenome)
+#'     find_pe_spacers(gr, bsgenome)
+#'     find_spacers(extend_for_pe(gr), bsgenome)
 #'     
-#' # Large GRanges
-#'     require(magrittr)
+#' # TFBS example
+#' #-------------
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10')
-#'     gr %<>% extend(plot = FALSE)
-#'     find_crispr_sites(gr, bsgenome)
-#' @seealso \code{\link{find_prime_sites}} to find prime editing sites
+#'     find_spacers(extend(gr), bsgenome)
+#' @seealso \code{\link{find_pe_spacers}} to find prime editing spacers 
 #' @export 
-find_crispr_sites <- function(
+find_spacers <- function(
     gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', plot = TRUE
 ){
     sites   <- extract_matchranges(gr, bsgenome, paste0(spacer, pam))
@@ -150,14 +153,17 @@ find_crispr_sites <- function(
 #' @param plot      TRUE (default) or FALSE
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' gr <- GenomicRanges::GRanges(
-#'           seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                        HBB  = 'chr11:5227002',             # snp
-#'                        HEXA = 'chr15:72346580-72346583',   # del
-#'                        CFTR = 'chr7:117559593-117559595'), # ins
-#'           strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'),
-#'           seqinfo  = BSgenome::seqinfo(bsgenome))
-#' extend_for_pe(gr)
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     find_pe_spacers(gr, bsgenome)
+#'     find_spacers(extend_for_pe(gr), bsgenome)
 #' @export
 extend_for_pe <- function(
     gr, bsgenome, nrt = 16, spacer = strrep('N', 20), pam = 'NGG', plot = TRUE
@@ -170,25 +176,23 @@ extend_for_pe <- function(
 }
 
 
-
 # Convert PAM into regex format
-# @examples 
+# @examples
 # x <- 'NGG'
 # pam_to_regex <- function(x){
 #     assert_is_a_string(x)
 #     x %>% stringi::stri_replace_all_fixed('N', '[ACGT]')
 # }
 
+
 # This regex-based function fails to find all crispr spacers
 # It is, therefore, no longer used, just kept for reference purposes.
-# Example of how it fails
-#     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#     target <- GenomicRanges::GRanges('chr20:4699568-4699605:+')
-#     seq <- BSgenome::getSeq(bsgenome, target)
-#     stringi::stri_locate_all_regex(as.character(seq), '[ACGT]{21}GG')
-#     Biostrings::vmatchPattern('NNNNNNNNNNNNNNNNNNNNNGG', seq, fixed = FALSE)
-# regex_based_find_crispr_spacers <- function(gr, bsgenome, pam = 'NGG', plot = TRUE, 
-#     verbose = TRUE){
+# Example explanation of why it fails
+#     x <- Biostrings::DNAString('AGCAGCTGGGGCAGTGGTGGGGGGCCTTGGCGGCTACA')
+#     stringi::stri_locate_all_regex(as.character(x), '[ACGT]{21}GG')
+#     Biostrings::matchPattern('NNNNNNNNNNNNNNNNNNNNNGG', x, fixed = FALSE)
+# regex_based_find_crispr_spacers <- function(
+#   gr, bsgenome, pam = 'NGG', plot = TRUE, verbose = TRUE){
 # 
 #     # Assert. Import. Comply
 #     assert_is_all_of(gr, 'GRanges')
@@ -197,8 +201,8 @@ extend_for_pe <- function(
 #     start <- substart <- crispr_start <- NULL
 #     end <- subend <- crispr_end <- strand <- seqnames <- NULL
 #     gr %<>% add_seq(bsgenome)
-#     gr %<>% name_uniquely(gr)
-#     
+#     gr %<>% name_uniquely()
+# 
 #     # Find crispr sites in targetranges
 #     pattern <- paste0('[ACGT]{20}', pam_to_regex(pam))
 #     if (verbose) cmessage('\tFind %s crispr sites', pattern)
@@ -208,7 +212,7 @@ extend_for_pe <- function(
 #     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
 #     targetdt [ , substart := vapply( res, cextract1, character(1)) ]
 #     targetdt [ , subend   := vapply( res, cextract2, character(1)) ]
-#     
+# 
 #     # Rm crispr-free targetranges
 #     idx <- targetdt[, substart == 'NA']
 #     if (sum(idx)>0){
@@ -219,20 +223,20 @@ extend_for_pe <- function(
 #     # Transform into crispr ranges
 #     targetdt[, targetstart  := start]
 #     targetdt[, targetend    := end  ]
-#     
+# 
 #     sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend)          %>%
-#                 data.table()                                                %>% 
-#                 extract(, substart := as.numeric(substart))                 %>% 
-#                 extract(, subend   := as.numeric(subend))                   %>% 
+#                 data.table()                                                %>%
+#                 extract(, substart := as.numeric(substart))                 %>%
+#                 extract(, subend   := as.numeric(subend))                   %>%
 #                 extract(, seq      := substr(seq, substart, subend))        %>%
-#                 extract( strand=='+', crispr_start := start + substart - 1) %>% 
+#                 extract( strand=='+', crispr_start := start + substart - 1) %>%
 #                 extract( strand=='+', crispr_end   := start + subend   - 1) %>%
 #                 extract( strand=='-', crispr_start := end   - subend   + 1) %>%
 #                 extract( strand=='-', crispr_end   := end   - substart + 1) %>%
-#                 extract(, list( 
-#                             seqnames = seqnames, start = crispr_start, 
-#                             end = crispr_end,  strand = strand,  seq = seq, 
-#                             targetname = targetname, targetstart = targetstart, 
+#                 extract(, list(
+#                             seqnames = seqnames, start = crispr_start,
+#                             end = crispr_end,  strand = strand,  seq = seq,
+#                             targetname = targetname, targetstart = targetstart,
 #                             targetend = targetend))
 #     sites <- GRanges(unique(sites_dt), seqinfo =  seqinfo(gr))
 #     sites$site <- uniquify(sites$targetname)
@@ -247,11 +251,11 @@ extend_for_pe <- function(
 #         original  <- copy(sites, start=sites$targetstart, end=sites$targetend)
 #         original$set <- 'target'
 #         spacer$set <- 'spacer'
-#         plot_intervals(c(original, spacer), color_var = 'set', 
+#         plot_intervals(c(original, spacer), color_var = 'set',
 #                        size_var = 'set', yby = 'site')
 #         sites$set <- NULL
 #     }
-#     if (verbose)   cmessage('\t\t%d cas9 spacers across %d ranges', 
+#     if (verbose)   cmessage('\t\t%d cas9 spacers across %d ranges',
 #                         length(unique(spacer$spacer)), length(spacer))
 #     return(sites)
 # }
@@ -292,11 +296,11 @@ extend_for_pe <- function(
 #         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #         seqinfo  = BSgenome::seqinfo(bsgenome))
 #         
-# spacers <- gr %>%  extend_for_pe() %>% find_crispr_sites(bsgenome)
+# spacers <- gr %>%  extend_for_pe() %>% find_spacers(bsgenome)
 #         
 # BSgenome::getSeq(bsgenome, gr)
 # add_prime_extensions(gr, bsgenome)
-# @seealso \code{\link{find_crispr_sites}} to find standard crispr sites
+# @seealso \code{\link{find_spacers}} to find standard crispr sites
 # @export
 # add_prime_extensions <- function(
 #   spacers, 

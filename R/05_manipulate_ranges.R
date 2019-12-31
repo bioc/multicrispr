@@ -5,21 +5,25 @@
 #' @param as.character TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
-#' # SRF binding sites
-#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     gr <- bed_to_granges(bedfile, 'mm10')
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     (gr <- add_seq(gr, bsgenome))
-#'     
-#' # PRNP
+#' # PE example
+#' #-----------
 #'     require(magrittr)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     gr  <-  GenomicRanges::GRanges(
-#'                 'chr20:4699500', strand = '+', 
-#'                  seqinfo = BSgenome::seqinfo(bsgenome))
-#'     gr %<>% multicrispr::add_inverse_strand()
-#'     gr %<>% multicrispr::extend(bsgenome = bsgenome)
-#'    (gr %<>% multicrispr::add_seq(bsgenome))
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'    add_seq(gr, bsgenome)
+#'    
+#' # TFBS example
+#' #-------------
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+#'     gr <- bed_to_granges(bedfile, 'mm10')
+#'     add_seq(gr, bsgenome)
 #' @export
 add_seq <- function(gr, bsgenome, verbose = FALSE, as.character = TRUE){
     
@@ -62,22 +66,13 @@ summarize_loci <- function(gr){
 #' 
 #' Returns extensions, upstream flanks, or downstream flanks
 #' 
-#' Operations are performed in a strand-aware fashion by default, but can be 
-#' made strand-agnostic by setting stranded=FALSE.
-#' 
-#' Return values (note: if stranded=FALSE, only + versions are returned)
-#'     up_flank  grstart + start  -->  grstart + end   (+)
-#'               grend - end     <--   grend - start   (-)
-#'            
-#'   down_flank  grend + start    -->  grend + end     (+) 
-#'               grstart - end    <--  grstart - start (-)
-#'               
-#'       extend  grstart + start  -->  grend + end     (+)
-#'               grstart - end    <--  grend - start   (-)
+#' \code{up_flank}   returns upstream flanks, in relation to start(gr).
+#' \code{down_flank} returns downstream flanks, in relation to end(gr).
+#' \code{extend}     returns extensions, in relation to start(gr) and end(gr)
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
 #' @param start     (pos or neg) number: relative start position (see details)
 #' @param end       (pos or neg) number: relative end position   (see details)
-#' @param stranded  TRUE (default) or FALSE: consider strand information
+#' @param stranded  TRUE (default) or FALSE: consider strand information?
 #' @param bsgenome  NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                  Required to update gr$seq if present.
 #' @param verbose   TRUE or FALSE (default)
@@ -85,18 +80,23 @@ summarize_loci <- function(gr){
 #' @param ...       passed to \code{\link{plot_intervals}}
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
-#' require(magrittr)
-#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#' gr <- GenomicRanges::GRanges(
-#'           c(locus1 = 'chr11:5227002', locus2 = 'chr11:4699500'), 
-#'             strand = c('-', '+'), 
-#'             seqinfo = BSgenome::seqinfo(bsgenome))
-#' gr %>%   up_flank(-22,  -1, plot = TRUE)
-#' gr %>%   up_flank(-22,  -1, plot = TRUE, stranded = FALSE)
-#' gr %>% down_flank( +1, +22, plot = TRUE)
-#' gr %>% down_flank( +1, +22, plot = TRUE, stranded = FALSE)
-#' gr %>%     extend(-10, +20, plot = TRUE)
-#' gr %>%     extend(-10, +20, plot = TRUE, stranded = FALSE)
+#' # PE example
+#' #-----------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- GenomicRanges::GRanges(
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'       up_flank(gr, -22,  -1, plot = TRUE)
+#'       up_flank(gr, -22,  -1, plot = TRUE, stranded = FALSE)
+#'     down_flank(gr,  +1, +22, plot = TRUE)
+#'     down_flank(gr,  +1, +22, plot = TRUE, stranded = FALSE)
+#'         extend(gr, -10, +20, plot = TRUE)
+#'         extend(gr, -10, +20, plot = TRUE, stranded = FALSE)
 #' @export
 up_flank <- function(
   gr, 
@@ -109,7 +109,7 @@ up_flank <- function(
   ...
 ){
     # Assert
-    assert_is_any_of(gr, 'GRanges')
+    assert_is_all_of(gr, 'GRanges')
     assert_is_a_number(start)
     assert_is_a_number(end)
     assert_is_a_bool(verbose)
@@ -259,28 +259,18 @@ extend <- function(
 #' @param ...         \code{\link{plot_intervals}} arguments
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#' # Load
+#' # PE example
+#' #-----------
 #'     require(magrittr)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#'     bsinfo <- BSgenome::seqinfo(bsgenome)
-#'     
-#' # PRNP snp: Kuru resistance variant (G -> T)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #'     gr <- GenomicRanges::GRanges(
-#'             'chr20:4699500', strand = '+', seqinfo = bsinfo)
-#'     gr %<>% add_seq(bsgenome)
-#'     gr %>%  add_inverse_strand(plot = TRUE)
-#'     
-#' # HBB snp: sickle cell variant (T -> A)
-#'     gr <- GenomicRanges::GRanges(
-#'             'chr11:5227002-5227002', strand = '-', seqinfo = bsinfo)
-#'     gr %<>% add_seq(bsgenome)
-#'     gr %>%  add_inverse_strand(plot = TRUE)
-#'     
-#' # HEXA TATC duplication: Tay-Sachs variant
-#'     gr <- GenomicRanges::GRanges(
-#'             'chr15:72346580-72346583', strand = '-', seqinfo = bsinfo)
-#'     gr %<>% add_seq(bsgenome)
-#'     gr %>%  add_inverse_strand(plot = TRUE)
+#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
+#'                            HBB  = 'chr11:5227002',             # snp
+#'                            HEXA = 'chr15:72346580-72346583',   # del
+#'                            CFTR = 'chr7:117559593-117559595'), # ins
+#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     add_inverse_strand(gr, plot = TRUE)
 #' @export
 add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     
@@ -302,9 +292,11 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     
     # Plot
     if (plot){
-        gr$set    <- 'sites'
-        newgr$set <- 'inv'
-        plot_intervals(c(gr, newgr), color_var = 'set', ..., title = txt)
+        gr$set    <- 'original'
+        complements$set <- 'inverse'
+        plot_intervals(
+          c(gr, complements), color_var = 'set', size_var = 'set', ..., title = txt)
+        gr$set <- NULL
     }
     
     # Message

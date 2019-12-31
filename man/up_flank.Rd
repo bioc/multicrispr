@@ -46,7 +46,7 @@ extend(
 
 \item{end}{(pos or neg) number: relative end position   (see details)}
 
-\item{stranded}{TRUE (default) or FALSE: consider strand information}
+\item{stranded}{TRUE (default) or FALSE: consider strand information?}
 
 \item{bsgenome}{NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 Required to update gr$seq if present.}
@@ -64,30 +64,26 @@ a \code{\link[GenomicRanges]{GRanges-class}}
 Returns extensions, upstream flanks, or downstream flanks
 }
 \details{
-Operations are performed in a strand-aware fashion by default, but can be 
-made strand-agnostic by setting stranded=FALSE.
-
-Return values (note: if stranded=FALSE, only + versions are returned)
-    up_flank  grstart + start  -->  grstart + end   (+)
-              grend - end     <--   grend - start   (-)
-           
-  down_flank  grend + start    -->  grend + end     (+) 
-              grstart - end    <--  grstart - start (-)
-              
-      extend  grstart + start  -->  grend + end     (+)
-              grstart - end    <--  grend - start   (-)
+\code{up_flank}   returns upstream flanks, in relation to start(gr).
+\code{down_flank} returns downstream flanks, in relation to end(gr).
+\code{extend}     returns extensions, in relation to start(gr) and end(gr)
 }
 \examples{
-require(magrittr)
-bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-gr <- GenomicRanges::GRanges(
-          c(locus1 = 'chr11:5227002', locus2 = 'chr11:4699500'), 
-            strand = c('-', '+'), 
-            seqinfo = BSgenome::seqinfo(bsgenome))
-gr \%>\%   up_flank(-22,  -1, plot = TRUE)
-gr \%>\%   up_flank(-22,  -1, plot = TRUE, stranded = FALSE)
-gr \%>\% down_flank( +1, +22, plot = TRUE)
-gr \%>\% down_flank( +1, +22, plot = TRUE, stranded = FALSE)
-gr \%>\%     extend(-10, +20, plot = TRUE)
-gr \%>\%     extend(-10, +20, plot = TRUE, stranded = FALSE)
+# PE example
+#-----------
+    require(magrittr)
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- GenomicRanges::GRanges(
+              seqnames = c(PRNP = 'chr20:4699600',             # snp
+                           HBB  = 'chr11:5227002',             # snp
+                           HEXA = 'chr15:72346580-72346583',   # del
+                           CFTR = 'chr7:117559593-117559595'), # ins
+              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+              seqinfo  = BSgenome::seqinfo(bsgenome))
+      up_flank(gr, -22,  -1, plot = TRUE)
+      up_flank(gr, -22,  -1, plot = TRUE, stranded = FALSE)
+    down_flank(gr,  +1, +22, plot = TRUE)
+    down_flank(gr,  +1, +22, plot = TRUE, stranded = FALSE)
+        extend(gr, -10, +20, plot = TRUE)
+        extend(gr, -10, +20, plot = TRUE, stranded = FALSE)
 }

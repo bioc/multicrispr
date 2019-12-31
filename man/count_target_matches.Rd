@@ -46,7 +46,7 @@ Count target/genome matches
 # Add seqs and find crispr sites
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     targets \%<>\% add_seq(bsgenome)
-    sites <- find_crispr_sites(targets, bsgenome)
+    sites <- find_spacers(targets, bsgenome)
 
 # Count matches
     crisprseqs <- sites$seq[1:10]
