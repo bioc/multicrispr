@@ -5,18 +5,20 @@
 \alias{count_genome_matches}
 \title{Count target/genome matches}
 \usage{
-count_target_matches(crisprseqs, targetseqs, mismatch, verbose = TRUE)
+count_target_matches(spacerseqs, targetseqs, mismatch, verbose = TRUE)
 
 count_genome_matches(
-  crisprseqs,
+  spacerseqs,
   bsgenome,
-  mismatch,
-  include = seqnames(bsgenome),
-  verbose = TRUE
+  mismatch = 0,
+  pam = "NGG",
+  include = GenomeInfoDb::standardChromosomes(bsgenome),
+  verbose = TRUE,
+  joint = FALSE
 )
 }
 \arguments{
-\item{crisprseqs}{character vector or 
+\item{spacerseqs}{character vector or 
 \code{\link[Biostrings]{XStringSet-class}}}
 
 \item{targetseqs}{character vector or 
@@ -28,29 +30,48 @@ count_genome_matches(
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
+\item{pam}{string (default 'NGG'): sequence following spacerseqs}
+
 \item{include}{character vector: offtarget analysis chromosomes}
 }
 \value{
-numeric(length(crisprseqs))
+numeric(length(spacerseqs))
 }
 \description{
 Count target/genome matches
 }
 \examples{
-# Read ranges and extend
+# PE example
+#-----------
+    require(magrittr)
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- GenomicRanges::GRanges(
+              seqnames = c(PRNP = 'chr20:4699600',             # snp
+                           HBB  = 'chr11:5227002',             # snp
+                           HEXA = 'chr15:72346580-72346583',   # del
+                           CFTR = 'chr7:117559593-117559595'), # ins
+              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+              seqinfo  = BSgenome::seqinfo(bsgenome))
+    spacers <- find_spacers(extend_for_pe(gr), bsgenome)
+    spacerseqs <- spacers$spacer
+    # count_genome_matches(spacerseqs, bsgenome, mismatch=0) # 6 mins
+    # count_genome_matches(spacerseqs, bsgenome, mismatch=1) # 32 mins
+    # count_genome_matches(spacerseqs, bsgenome, mismatch=2)
+    # count_genome_matches(spacerseqs, bsgenome, mismatch=3)
+    
+# TFBS example
+#-------------
     require(magrittr)
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    targets <- bed_to_granges(bedfile, 'mm10')
-    targets \%<>\% extend()
-
-# Add seqs and find crispr sites
+    targets <- extend(bed_to_granges(bedfile, 'mm10'))
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-    targets \%<>\% add_seq(bsgenome)
-    sites <- find_spacers(targets, bsgenome)
+    spacers <- find_spacers(targets, bsgenome)
+    spacerseqs <- spacers$spacer
+    count_genome_matches(spacerseqs, bsgenome, mismatch = 0, include = 'chrY')
 
 # Count matches
-    crisprseqs <- sites$seq[1:10]
+    spacerseqs <- sites$seq[1:10]
     targetseqs <- targets$seq
-    count_target_matches(crisprseqs, targetseqs, 0)
-    count_genome_matches(crisprseqs, bsgenome,    0, include = 'chrY')
+    count_target_matches(spacerseqs, targetseqs, 0)
+    count_genome_matches(spacerseqs, bsgenome,    0, include = 'chrY')
 }

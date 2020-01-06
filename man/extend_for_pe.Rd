@@ -2,7 +2,7 @@
 % Please edit documentation in R/06_find_spacers.R
 \name{extend_for_pe}
 \alias{extend_for_pe}
-\title{Extend for prime editing}
+\title{Extend ranges for prime editing}
 \usage{
 extend_for_pe(
   gr,
@@ -30,6 +30,9 @@ extend_for_pe(
 \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
+Extend target ranges to span in which to look for spacer-pam seqs
+}
+\details{
 Extend target ranges to find nearby spacers for prime editing
 }
 \examples{

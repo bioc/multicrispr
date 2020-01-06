@@ -2,9 +2,17 @@
 % Please edit documentation in R/06_find_spacers.R
 \name{find_spacers}
 \alias{find_spacers}
-\title{Find crispr sites in targetranges}
+\title{Find crispr spacers in targetranges}
 \usage{
-find_spacers(gr, bsgenome, spacer = strrep("N", 20), pam = "NGG", plot = TRUE)
+find_spacers(
+  gr,
+  bsgenome,
+  spacer = strrep("N", 20),
+  pam = "NGG",
+  complement = TRUE,
+  verbose = TRUE,
+  plot = TRUE
+)
 }
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
@@ -15,13 +23,17 @@ find_spacers(gr, bsgenome, spacer = strrep("N", 20), pam = "NGG", plot = TRUE)
 
 \item{pam}{string: pam pattern in extended IUPAC alphabet}
 
+\item{complement}{TRUE (default) or FALSE: also search in compl ranges?}
+
+\item{verbose}{TRUE (default) or FALSE}
+
 \item{plot}{TRUE (default) or FALSE}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
-Find crispr sites in targetranges
+Find crispr spacers in targetranges
 }
 \examples{
 # PE example
@@ -36,7 +48,10 @@ Find crispr sites in targetranges
               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
               seqinfo  = BSgenome::seqinfo(bsgenome))
     find_pe_spacers(gr, bsgenome)
-    find_spacers(extend_for_pe(gr), bsgenome)
+    find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+          # complement = FALSE because extend_for_pe  already 
+          # adds  reverse complements and does so in a strand-specific 
+          # manner
     
 # TFBS example
 #-------------

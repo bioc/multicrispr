@@ -72,11 +72,10 @@ extract_subranges <- function(gr, ir, plot = FALSE){
 #' require(magrittr)
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #' gr <- GenomicRanges::GRanges(
-#'           seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                        HBB  = 'chr11:5227002',             # snp
-#'                        HEXA = 'chr15:72346580-72346583',   # del
-#'                        CFTR = 'chr7:117559593-117559595'), # ins
-#'           strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'           c(PRNP = 'chr20:4699600:+',             # snp
+#'             HBB  = 'chr11:5227002:-',             # snp
+#'             HEXA = 'chr15:72346580-72346583:-',   # del
+#'             CFTR = 'chr7:117559593-117559595:+'), # ins
 #'           seqinfo  = BSgenome::seqinfo(bsgenome))
 #' gr %<>% extend_for_pe()
 #' pattern <- strrep('N',20) %>% paste0('NGG')
@@ -92,16 +91,19 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
     # Extract
     gr %<>% name_uniquely()
     matches <- unlist(vmatchPattern(pattern, getSeq(bsgenome, gr), fixed=FALSE))
-    extract_subranges(gr, matches, plot = plot)
+    extract_subranges(gr, matches, plot = plot) %>% sort(ignore.strand = TRUE)
+    
 }
 
 
-#' Find crispr sites in targetranges
-#' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param spacer    string: spacer pattern in extended IUPAC alphabet
-#' @param pam       string: pam pattern in extended IUPAC alphabet
-#' @param plot      TRUE (default) or FALSE
+#' Find crispr spacers in targetranges
+#' @param gr         \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
+#' @param spacer     string: spacer pattern in extended IUPAC alphabet
+#' @param pam        string: pam pattern in extended IUPAC alphabet
+#' @param complement TRUE (default) or FALSE: also search in compl ranges?
+#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE (default) or FALSE
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # PE example
@@ -116,7 +118,10 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'               seqinfo  = BSgenome::seqinfo(bsgenome))
 #'     find_pe_spacers(gr, bsgenome)
-#'     find_spacers(extend_for_pe(gr), bsgenome)
+#'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+#'           # complement = FALSE because extend_for_pe  already 
+#'           # adds  reverse complements and does so in a strand-specific 
+#'           # manner
 #'     
 #' # TFBS example
 #' #-------------
@@ -127,11 +132,16 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @seealso \code{\link{find_pe_spacers}} to find prime editing spacers 
 #' @export 
 find_spacers <- function(
-    gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', plot = TRUE
+    gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', complement = TRUE, 
+    verbose = TRUE, plot = TRUE
 ){
+    if (complement){
+        gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
+        gr %<>% sort(ignore.strand = TRUE)
+    }
     sites   <- extract_matchranges(gr, bsgenome, paste0(spacer, pam))
-    spacers <-     extend(sites,  0, -3)
-    pams    <- down_flank(sites, -2,  0)
+    spacers <-     extend(sites,  0, -3, bsgenome = bsgenome)
+    pams    <- down_flank(sites, -2,  0, bsgenome = bsgenome)
     spacers$spacer <- BSgenome::getSeq(bsgenome, spacers, as.character=TRUE)
     spacers$pam    <- BSgenome::getSeq(bsgenome, pams,    as.character=TRUE)
     if (plot){
@@ -142,7 +152,9 @@ find_spacers <- function(
     spacers
 }
 
-#' Extend for prime editing
+#' Extend ranges for prime editing
+#' 
+#' Extend target ranges to span in which to look for spacer-pam seqs
 #' 
 #' Extend target ranges to find nearby spacers for prime editing
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}

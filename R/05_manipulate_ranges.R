@@ -123,7 +123,7 @@ up_flank <- function(
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx]   - start  # do not switch these lines
         GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx]   - end    # to avoid integrity errors
-        formatstr <- '\t\t%d up  flanks: [seqstart%s%d, seqstart%s%d]'
+        formatstr <- '\t\t%d up   flanks: [seqstart%s%d, seqstart%s%d]'
     }
     txt <- sprintf(formatstr, 
                    length(newgr), csign(start), abs(start), csign(end), abs(end))
@@ -174,7 +174,7 @@ down_flank <- function(
       idx <- as.logical(strand(newgr)=='-')
       GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
       GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx] - start
-      formatstr <- '\t\t%d Down  flanks: [seqstart%s%d, seqstart%s%d]'
+      formatstr <- '\t\t%d down flanks: [seqstart%s%d, seqstart%s%d]'
     }
     txt <- sprintf(formatstr, length(newgr), csign(start), abs(start), 
                     csign(end), abs(end))
@@ -284,6 +284,7 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     
     # Concatenate
     newgr <- c(gr, complements)
+    newgr %<>% unique()
     txt <- sprintf('\t\t%d ranges after adding inverse strands', length(newgr))
     
     # Sort
@@ -302,6 +303,63 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     # Message
     if (verbose) cmessage(txt)
     newgr
+}
+
+#' Double flank
+#' 
+#' Double flanks, reduce overlaps, add reverse complement
+#' 
+#' This function is created for crispr in the context of crisprapex.
+#' It converts a set of crisprapex targets into a set of ranges in which to 
+#' search for crispr spacers. This involves (1) agnostifying the strand, 
+#' (2) calcuting up and down flanks, (3) merging overlapping ranges, and 
+#' (4) extending each range to both strands
+#' 
+#' @param gr \code{\link[GenomicRanges]{GRanges-class}}
+#' @param upstart      upstream flank start in relation to start(gr)
+#' @param upend        upstream flank end   in relation to start(gr)
+#' @param downstart    downstream flank start in relation to end(gr)
+#' @param downend      downstream flank end   in relation to end(gr)
+#' @param do_reduce    TRUE(default) or FALSE: merge overlapping ranges?
+#' @param add_inverse  TRUE (default) or FALSE: add inverse strand?
+#' @return \code{\link[GenomicRanges]{GRanges-class}}
+#' @examples 
+#' gr  <-  bed_to_granges(bedfile, genome = 'mm10')
+#' double_flank(gr)
+#' @export
+double_flank <- function(
+  gr, 
+  upstart     = -200, 
+  upend       = -1, 
+  downstart   = 1, 
+  downend     = 200, 
+  do_reduce   = TRUE,
+  add_inverse = TRUE
+){
+
+    # Agnostify strand
+    targets <- copy(gr, strand = '+')
+    cmessage('\t\t%d original ranges', length(targets))
+    
+    # Split into GRangesist
+    split(gr, seq_along(gr))
+
+    # Up flank, down flank, concatenate
+    up <- up_flank(  targets,   upstart,   upend, verbose = FALSE)
+    dn <- down_flank(targets, downstart, downend, verbose = FALSE)
+    targets  <- c(up, dn)
+    cmessage('\t\t%d flank ranges (%d up + %d down)', 
+             length(targets), length(up), length(dn))
+    
+    # Reduce
+    if (do_reduce) targets %<>% reduce()
+    cmessage('\t\t%d ranges after merging overlaps', length(targets))
+
+    # Add inverse    
+    if (add_inverse) targets %<>% add_inverse_strand(verbose = TRUE)
+    
+    # Return
+    targets
 }
 
 

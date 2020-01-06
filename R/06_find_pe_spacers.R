@@ -227,9 +227,7 @@ name_uniquely <- function(gr){
     if (has_names(gr)){ 
         names(gr) %<>% uniquify()
     } else {
-        nranges <- length(gr)
-        ndigits <- ceiling(log10(nranges))
-        names(gr) <- paste0('T', format(seq_len(nranges), digits = ndigits))
+        gr %<>% name_elements('T')
     }
     gr
 }
@@ -260,7 +258,7 @@ uniquify <- function(x){
     dt <- data.table::data.table(x = x)
     dt[, N := 1:.N, by='x']
     dt[N==1, suffix := '']
-    dt[ N>1, suffix := as.character(N)]
+    dt[ N>1, suffix := paste0('_', as.character(N))]
     dt[, paste0(x, suffix)]
 }
 

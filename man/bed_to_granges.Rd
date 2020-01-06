@@ -7,7 +7,6 @@
 bed_to_granges(
   bedfile,
   genome,
-  complement = TRUE,
   txdb = NULL,
   do_order = TRUE,
   plot = TRUE,
@@ -18,8 +17,6 @@ bed_to_granges(
 \item{bedfile}{file path}
 
 \item{genome}{string: UCSC genome name (e.g. 'mm10')}
-
-\item{complement}{TRUE (default) or FALSE: add complementary strand too?}
 
 \item{txdb}{NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}}
 (used for gene annotation)}

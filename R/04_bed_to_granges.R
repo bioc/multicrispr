@@ -90,7 +90,6 @@ annotate_granges <- function(gr, txdb){
 #' 
 #' @param bedfile    file path
 #' @param genome     string: UCSC genome name (e.g. 'mm10')
-#' @param complement TRUE (default) or FALSE: add complementary strand too?
 #' @param txdb      NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}}
 #'                   (used for gene annotation)
 #' @param do_order   TRUE (default) or FALSE: order on seqnames and star?
@@ -109,7 +108,6 @@ annotate_granges <- function(gr, txdb){
 bed_to_granges <- function(
     bedfile,
     genome,
-    complement = TRUE,
     txdb       = NULL,
     do_order   = TRUE,
     plot       = TRUE, 
@@ -119,7 +117,6 @@ bed_to_granges <- function(
     
     # Assert
     assert_all_are_existing_files(bedfile)
-    assert_is_a_bool(complement)
     if (!is.null(txdb)) assert_is_all_of(txdb, 'TxDb')
     assert_is_a_bool(do_order)
     assert_is_a_bool(plot)
@@ -130,11 +127,6 @@ bed_to_granges <- function(
     gr <- rtracklayer::import.bed(bedfile, genome = genome)
     if (verbose) cmessage('\t\t%d ranges on %d chromosomes',
                     length(gr), length(unique(seqnames(gr))))
-    
-    # Add complementary strand
-    if (complement){
-        gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
-    }
     
     # Annotate
     if (!is.null(txdb)){
@@ -149,7 +141,8 @@ bed_to_granges <- function(
     if (plot) plot_karyogram(gr, title)
     
     # Order
-    if (do_order)  gr %<>% extract( order(seqnames(.), start(.)))
+    if (do_order)  gr %<>% sort(ignore.strand = TRUE)
+                     #%<>% extract( order(seqnames(.), start(.)))
     
     # Return
     gr

@@ -8,7 +8,8 @@
 #' @importFrom  assertive.types       assert_is_all_of    assert_is_any_of  
 #' @importFrom  assertive.types       assert_is_a_bool    assert_is_a_number
 #' @importFrom  assertive.types       assert_is_a_string  assert_is_character
-#' @importFrom  Biostrings            complement  DNAStringSet   vmatchPattern
+#' @importFrom  Biostrings            complement  DNAStringSet   
+#' @importFrom  Biostrings            vmatchPattern  vcountPDict
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
 #' @importFrom  BSgenome              getSeq

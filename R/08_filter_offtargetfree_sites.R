@@ -25,17 +25,20 @@
 #'               seqinfo  = BSgenome::seqinfo(bsgenome))
 #'     spacers <- find_spacers(extend_for_pe(gr), bsgenome)
 #'     spacerseqs <- spacers$spacer
+#'     # count_genome_matches(spacerseqs, bsgenome, mismatch=0) # 6 mins
+#'     # count_genome_matches(spacerseqs, bsgenome, mismatch=1) # 32 mins
+#'     # count_genome_matches(spacerseqs, bsgenome, mismatch=2)
+#'     # count_genome_matches(spacerseqs, bsgenome, mismatch=3)
 #'     
-#' # Read ranges and extend
+#' # TFBS example
+#' #-------------
 #'     require(magrittr)
 #'     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     targets <- bed_to_granges(bedfile, 'mm10')
-#'     targets %<>% extend()
-#' 
-#' # Add seqs and find crispr sites
+#'     targets <- extend(bed_to_granges(bedfile, 'mm10'))
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     targets %<>% add_seq(bsgenome)
-#'     sites <- find_spacers(targets, bsgenome)
+#'     spacers <- find_spacers(targets, bsgenome)
+#'     spacerseqs <- spacers$spacer
+#'     count_genome_matches(spacerseqs, bsgenome, mismatch = 0, include = 'chrY')
 #' 
 #' # Count matches
 #'     spacerseqs <- sites$seq[1:10]
@@ -119,7 +122,19 @@ include_to_exclude <- function(
        do.call(fun, argdf)
     }
     
-.count_genome_matches <- function(seqs, bsgenome, exclude, mismatch){
+
+.match_genome <- function(seqs, bsgenome, exclude, mismatch){
+        res <- vcountPDict(seqs, bsgenome, min.mismatch = mismatch, 
+                                max.mismatch = mismatch, exclude = exclude)
+        res %<>% data.table::as.data.table()
+        counts = res[, .(N = sum(count)), by = index]$N
+}
+
+
+.match_genome_slow <- function(seqs, bsgenome, exclude, mismatch){
+    # Parallel R-loop equivalent to .match_genome (serial C loops)
+    # Is slower, more complicated, and more resource-consuming.
+    # So no longer used.
     unlist(BiocParallel::bplapply(
         seqs, 
         function(x, bsgenome, exclude, mismatch){
@@ -131,20 +146,22 @@ include_to_exclude <- function(
                     exclude      = exclude)$count)},
         bsgenome = bsgenome, exclude = exclude, mismatch = mismatch))
 }
-    
+
+
 #' @rdname count_target_matches
 #' @export
 count_genome_matches <- function(
     spacerseqs, 
-    pam     = 'NGG',
     bsgenome, 
-    mismatch,
-    exclude = setdiff(seqnames(bsgenome), GenomeInfoDb::standardChromosomes(bsgenome)),
-    verbose = TRUE, 
-    joint   = FALSE
+    mismatch = 0,
+    pam      = 'NGG',
+    include  = GenomeInfoDb::standardChromosomes(bsgenome),
+    verbose  = TRUE, 
+    joint    = FALSE
 ){
     # Assert
     assert_is_any_of(spacerseqs, c('character', 'XStringSet'))
+    assert_is_a_string(pam)
     assert_is_any_of(bsgenome, 'BSgenome')
     assert_is_subset(mismatch, 0:4)
     assert_is_character(include)
@@ -154,23 +171,22 @@ count_genome_matches <- function(
     . <- count <- NULL
 
     # Count
-    starttime <- Sys.time()
     pamseqs <- expand_iupac_ambiguities(pam)
     sitedt <- data.table(spacer = rep(spacerseqs, each = length(pamseqs)), 
                         pam     = rep(pamseqs, times = length(spacerseqs))) %>% 
               extract(, crispr := paste0(spacer, pamseqs) )
     seqdt <- data.table(crispr = unique(sitedt$crispr))
-    seqdt[ , nmatches := .count_genome_matches(
-                            crispr, bsgenome, exclude, mismatch) ]
-    spacerdt <- sitedt %>% 
-                merge(seqdt, by = 'crispr') %>% 
-                extract(, .(nmatches = sum(nmatches)), by = 'spacer') %>% 
-                extract(spacerseqs, on = 'spacer')
+    
+    starttime <- Sys.time()
+    excl <- include_to_exclude(bsgenome, include)
+    seqdt[ , nmatches := .match_genome(crispr, bsgenome, excl, mismatch) ]
     
     # Return
     if (verbose) cmessage( '\t\t\tCount %d-mismatch hits in genome      : %s',
                             mismatch, format(signif(Sys.time() - starttime, 2)))
-    spacerdt$nmatches
+    sitedt %>%  merge(seqdt, by = 'crispr') %>% 
+                extract(, .(n = sum(nmatches)), by = 'spacer') %>% 
+                extract(spacerseqs, n, on = 'spacer')
 }
 
 
