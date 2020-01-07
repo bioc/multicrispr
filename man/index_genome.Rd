@@ -15,7 +15,7 @@ index_genome(bsgenome, outdir = "~/.multicrispr/bowtie/genome")
 string: directory with indexed genome
 }
 \description{
-Performs bowtie indexing of genome
+Bowtie index genome
 }
 \examples{
 # index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)

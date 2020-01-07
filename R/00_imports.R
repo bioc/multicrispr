@@ -14,7 +14,7 @@
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
 #' @importFrom  BSgenome              getSeq
 #' @importFrom  data.table            :=  data.table  as.data.table  setnames
-#' @importFrom  data.table            setnames  setorderv
+#' @importFrom  data.table            setnames  setorderv   setnafill
 #' @importFrom  GenomeInfoDb          genome
 #' @importFrom  GenomeInfoDb          seqinfo   seqinfo<-
 #' @importFrom  GenomeInfoDb          seqlevels  seqlevels<-  seqlevelsInUse

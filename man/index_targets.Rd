@@ -17,7 +17,7 @@ index_targets(targets, bsgenome, outdir = "~/.multicrispr/bowtie/target")
 
 }
 \description{
-Index targets
+Bowtie index targets
 }
 \examples{
 require(magrittr)
