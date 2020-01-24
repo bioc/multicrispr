@@ -153,8 +153,8 @@ doench2016 <- function(
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     gr <- extend(bed_to_granges(bedfile, 'mm10'))
 #'     spacers <- find_spacers(gr, bsgenome)
-#'     score_spacers(spacers, bsgenome, 'Doench2014')
-#'     # score_spacers(spacers, bsgenome, 'Doench2016')
+#'     (spacers %<>% score_spacers(bsgenome, 'Doench2014'))
+#'     # (spacers %<>% score_spacers(bsgenome, 'Doench2016'))
 #' 
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 

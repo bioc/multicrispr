@@ -227,6 +227,13 @@ match_seqs <- function(
     readdt[seqs, on = 'readseq']
 }
 
+explode <- function(x) unlist(strsplit(x, character(0)))
+paste_dtcols <- function(x) x [, do.call(paste0, .SD) ]
+expand_iupac_ambiguities <- function(x){
+    paste_dtcols( 
+        as.data.table( 
+            lapply(Biostrings::IUPAC_CODE_MAP[explode(x)], explode)))
+}
 
 #' @rdname match_seqs
 #' @export

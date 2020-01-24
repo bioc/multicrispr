@@ -97,6 +97,14 @@ summarize_loci <- function(gr){
 #'     down_flank(gr,  +1, +22, plot = TRUE, stranded = FALSE)
 #'         extend(gr, -10, +20, plot = TRUE)
 #'         extend(gr, -10, +20, plot = TRUE, stranded = FALSE)
+#' # TFBS example
+#' #-------------
+#'     bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
+#'     gr <- bed_to_granges(bedfile, genome = 'mm10')
+#'     gr %>% up_flank(plot = TRUE)
+#'     gr %>% down_flank(plot = TRUE)
+#'     gr %>% double_flank()
+#'     gr %>% extend(plot = TRUE)
 #' @export
 up_flank <- function(
   gr, 
@@ -322,10 +330,12 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 #' @param downend      downstream flank end   in relation to end(gr)
 #' @param do_reduce    TRUE(default) or FALSE: merge overlapping ranges?
 #' @param add_inverse  TRUE (default) or FALSE: add inverse strand?
+#' @param plot         TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
+#' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #' gr  <-  bed_to_granges(bedfile, genome = 'mm10')
-#' double_flank(gr)
+#' double_flank(gr, plot = TRUE)
 #' @export
 double_flank <- function(
   gr, 
@@ -334,7 +344,8 @@ double_flank <- function(
   downstart   = 1, 
   downend     = 200, 
   do_reduce   = TRUE,
-  add_inverse = TRUE
+  add_inverse = TRUE, 
+  plot        = FALSE
 ){
 
     # Agnostify strand
@@ -357,6 +368,16 @@ double_flank <- function(
 
     # Add inverse    
     if (add_inverse) targets %<>% add_inverse_strand(verbose = TRUE)
+    
+    # Plot 
+    if (plot){
+      gr$set <- 'original'
+      targets$set <- 'flanks'
+      allgr <- c(gr, targets)
+      allgr$set %<>% factor(c('original', 'flanks'))
+      plot_intervals(allgr, color_var = 'set')
+      targets$set <- NULL
+    }
     
     # Return
     targets

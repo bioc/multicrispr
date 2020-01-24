@@ -111,12 +111,12 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'               c(PRNP = 'chr20:4699600:+',             # snp
+#'                 HBB  = 'chr11:5227002:-',             # snp
+#'                 HEXA = 'chr15:72346580-72346583:-',   # del
+#'                 CFTR = 'chr7:117559593-117559595:+'), # ins
 #'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     plot_intervals(gr)
 #'     find_pe_spacers(gr, bsgenome)
 #'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'           # complement = FALSE because extend_for_pe  already 
@@ -175,7 +175,8 @@ find_spacers <- function(
 #'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'               seqinfo  = BSgenome::seqinfo(bsgenome))
 #'     find_pe_spacers(gr, bsgenome)
-#'     find_spacers(extend_for_pe(gr), bsgenome)
+#'     (grext <- extend_for_pe(gr))
+#'     find_spacers(grext, bsgenome, complement = FALSE)
 #' @export
 extend_for_pe <- function(
     gr, bsgenome, nrt = 16, spacer = strrep('N', 20), pam = 'NGG', plot = TRUE
@@ -184,7 +185,14 @@ extend_for_pe <- function(
     rv <- copy( gr, start=end(gr)+1-6,      end=start(gr)-1+nrt+17, strand='-')
     names(fw) %<>% paste0('_f')
     names(rv) %<>% paste0('_r')
-    c(fw, rv)
+    ext <- c(fw, rv)
+    if (plot){
+      gr$set <- 'original'
+      fw$set <- 'fw'
+      rv$set <- 'rv'
+      plot_intervals(c(fw, gr, rv), color_var = 'set', yby = 'set')
+    }
+    ext
 }
 
 

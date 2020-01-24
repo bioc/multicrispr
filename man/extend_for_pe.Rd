@@ -46,5 +46,6 @@ Extend target ranges to find nearby spacers for prime editing
               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
               seqinfo  = BSgenome::seqinfo(bsgenome))
     find_pe_spacers(gr, bsgenome)
-    find_spacers(extend_for_pe(gr), bsgenome)
+    (grext <- extend_for_pe(gr))
+    find_spacers(grext, bsgenome, complement = FALSE)
 }

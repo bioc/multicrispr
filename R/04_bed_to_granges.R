@@ -101,7 +101,7 @@ annotate_granges <- function(gr, txdb){
 #' #-------------
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     bed_to_granges(bedfile, 'mm10')
+#'     (gr <- bed_to_granges(bedfile, 'mm10'))
 #' @seealso \code{rtracklayer::import.bed} (see 
 #' \code{\link[rtracklayer]{BEDFile-class}}), which is used by this function
 #' @export

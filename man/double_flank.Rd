@@ -11,7 +11,8 @@ double_flank(
   downstart = 1,
   downend = 200,
   do_reduce = TRUE,
-  add_inverse = TRUE
+  add_inverse = TRUE,
+  plot = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ double_flank(
 \item{do_reduce}{TRUE(default) or FALSE: merge overlapping ranges?}
 
 \item{add_inverse}{TRUE (default) or FALSE: add inverse strand?}
+
+\item{plot}{TRUE or FALSE (default)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
@@ -43,6 +46,7 @@ search for crispr spacers. This involves (1) agnostifying the strand,
 (4) extending each range to both strands
 }
 \examples{
+bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 gr  <-  bed_to_granges(bedfile, genome = 'mm10')
-double_flank(gr)
+double_flank(gr, plot = TRUE)
 }

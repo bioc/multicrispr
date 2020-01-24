@@ -86,4 +86,12 @@ Returns extensions, upstream flanks, or downstream flanks
     down_flank(gr,  +1, +22, plot = TRUE, stranded = FALSE)
         extend(gr, -10, +20, plot = TRUE)
         extend(gr, -10, +20, plot = TRUE, stranded = FALSE)
+# TFBS example
+#-------------
+    bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
+    gr <- bed_to_granges(bedfile, genome = 'mm10')
+    gr \%>\% up_flank(plot = TRUE)
+    gr \%>\% down_flank(plot = TRUE)
+    gr \%>\% double_flank()
+    gr \%>\% extend(plot = TRUE)
 }

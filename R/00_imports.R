@@ -23,8 +23,8 @@
 #' @importFrom  GenomeInfoDb          sortSeqlevels  standardChromosomes
 #' @importFrom  GenomicRanges         GRanges  mcols  mcols<-
 #' @importFrom  ggplot2               aes_string  facet_wrap  geom_segment  
-#' @importFrom  ggplot2               ggplot  ggtitle  theme_bw  unit  xlab  
-#' @importFrom  ggplot2               ylab
+#' @importFrom  ggplot2               ggplot  ggtitle  scale_x_continuous
+#' @importFrom  ggplot2               theme_bw  unit  xlab  ylab
 #' @importFrom  grid                  arrow
 #' @importFrom  magrittr              %>%   %<>%   extract  extract2  set_names
 #' @importFrom  methods               as

@@ -129,18 +129,17 @@ to_megabase <- function(y){
 #' # PE targets
 #'     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #'     sites <- GenomicRanges::GRanges(
-#'                seqnames= c(PRNP = 'chr20:4699600',
-#'                            HBB  = 'chr11:5227002',
-#'                            HEXA = 'chr15:72346580-72346583',
-#'                            CFTR = 'chr7:117559593-117559595'),
-#'                strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
+#'                seqnames= c(PRNP = 'chr20:4699600:+',
+#'                            HBB  = 'chr11:5227002:-',
+#'                            HEXA = 'chr15:72346580-72346583:-',
+#'                            CFTR = 'chr7:117559593-117559595:+'), 
 #'                seqinfo  = BSgenome::seqinfo(bs))
 #'     sites$color <- names(sites)
 #'     plot_intervals(sites)
 #' @export
 plot_intervals <- function(
     gr, yby = 'contig', color_var = 'seqnames', linetype_var = NULL, 
-    size_var = NULL, facet_var = 'seqnames', title = NULL
+    size_var = NULL, facet_var = 'seqnames', title = NULL, scales = 'free'
 ){
     # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
@@ -175,10 +174,10 @@ plot_intervals <- function(
                     x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
                     color = color_var, linetype = linetype_var, 
                     size = size_var)) + 
-        facet_wrap(facet_var, scales = 'free') + 
+        facet_wrap(facet_var, scales = scales) + 
         geom_segment(arrow = arrow(length = unit(0.1, "inches"))) + 
         theme_bw() + 
-        xlab('Offset') + ylab('Start') + ggtitle(title)
+        xlab('Offset') + ylab('Start') + ggtitle(title) #+
 
     # Print and return
     print(p)
