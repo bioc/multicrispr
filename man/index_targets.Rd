@@ -12,6 +12,8 @@ index_targets(targets, bsgenome, outdir = "~/.multicrispr/bowtie/target")
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{outdir}{string: output directory}
+
+\item{complement}{TRUE (default) or FALSE}
 }
 \value{
 

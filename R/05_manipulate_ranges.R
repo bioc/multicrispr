@@ -362,13 +362,13 @@ double_flank <- function(
     cmessage('\t\t%d flank ranges (%d up + %d down)', 
              length(targets), length(up), length(dn))
     
+    # Add inverse    
+    if (add_inverse) targets %<>% add_inverse_strand(verbose = TRUE)
+    
     # Reduce
     if (do_reduce) targets %<>% reduce()
     cmessage('\t\t%d ranges after merging overlaps', length(targets))
 
-    # Add inverse    
-    if (add_inverse) targets %<>% add_inverse_strand(verbose = TRUE)
-    
     # Plot 
     if (plot){
       gr$set <- 'original'

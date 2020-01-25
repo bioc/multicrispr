@@ -38,6 +38,7 @@ index_genome <- function(bsgenome, outdir = '~/.multicrispr/bowtie/genome'){
 #' Bowtie index targets
 #' @param targets   \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
+#' @param complement TRUE (default) or FALSE
 #' @param outdir    string: output directory
 #' @return
 #' @examples 
@@ -45,11 +46,24 @@ index_genome <- function(bsgenome, outdir = '~/.multicrispr/bowtie/genome'){
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targets0 <- bed_to_granges(bedfile, genome = 'mm10')
 #' targets  <- double_flank(targets0)
-#' index_targets(targets, bsgenome, outdir = outdir)
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' index_targets(targets, bsgenome)
 #' @export
 index_targets <- function(
-    targets, bsgenome, outdir = '~/.multicrispr/bowtie/target'){
+    targets, 
+    bsgenome, 
+    outdir = '~/.multicrispr/bowtie/target'
+){
 
+    # Complement
+    cmessage('\t\t%d target ranges', length(targets))
+    targets %<>% add_inverse_strand(plot = FALSE, verbose = TRUE)
+    targets %<>% sort(ignore.strand = TRUE)
+
+    # Reduce
+    targets %<>% reduce()
+    cmessage('\t\t%d ranges after merging overlaps', length(targets))
+    
     # Write to fasta
     targetfa <- file.path(outdir, 'target.fa')
     targetdir <- targetfa %>% substr(1, nchar(.)-3)
@@ -61,9 +75,11 @@ index_targets <- function(
                           start(targets),
                           end(targets),
                           strand(targets))
+    cmessage('\t\tWrite seqs  to %s', targetfa)
     Biostrings::writeXStringSet(targetseqs, targetfa)
 
     # Index targets
+    cmessage('\t\tWrite index to %s', targetdir)
     Rbowtie::bowtie_build(  targetfa,
                             targetdir,
                             prefix = basename(targetdir),
@@ -135,53 +151,46 @@ read_bowtie_results <- function(outfile){
 #' @examples
 #' # PE example
 #' #-----------
-#'     require(magrittr)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     genomedir <- '~/.multicrispr/bowtie/genome/BSgenome.Hsapiens.UCSC.hg38'
-#'     # index_genome(bsgenome, genomedir) # one time effort - takes few h
-#'     gr <- GenomicRanges::GRanges(
+#'  require(magrittr)
+#'  bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'  genomedir <- '~/.multicrispr/bowtie/genome/BSgenome.Hsapiens.UCSC.hg38'
+#'  # index_genome(bsgenome, genomedir) # one time effort - takes few h
+#'  gr <- GenomicRanges::GRanges(
 #'               seqnames = c(PRNP = 'chr20:4699600',             # snp
 #'                            HBB  = 'chr11:5227002',             # snp
 #'                            HEXA = 'chr15:72346580-72346583',   # del
 #'                            CFTR = 'chr7:117559593-117559595'), # ins
 #'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
 #'               seqinfo  = BSgenome::seqinfo(bsgenome))
-#'     spacers <- find_pe_spacers(gr, bsgenome)
-#'     outdir <- '~/.multicrispr/bowtie'
-#'     outfile <- file.path(outdir, 'crispr_to_ref.txt')
+#'  spacers <- find_pe_spacers(gr, bsgenome)
+#'  outdir <- '~/.multicrispr/bowtie'
+#'  outfile <- file.path(outdir, 'crispr_to_ref.txt')
 #'     
-#'     # Match sequences
-#'         match_seqs(spacers$spacer, genomedir, norc=FALSE, outfile=outfile)
-#'     # Match crisprs (i.e. spacer + alternate pams)
-#'         match_crisprs(spacers, genomedir, norc = FALSE, outfile = outfile)
-#'     # Add "crispr to genome" matches
-#'         add_genome_matches(spacers, genomedir, outdir)
-#'     # Add "crispr to target" matches
-#'         add_target_matches(spacers, targetdir, outdir)
+#'  seqs <- paste0(spacers$spacer, spacers$pam)
+#'  match_seqs(seqs,       genomedir, norc=FALSE, outfile=outfile)
+#'  match_crisprs(spacers, genomedir, norc=FALSE, outfile=outfile)
+#'  add_genome_matches(spacers, genomedir, outdir)
 #'     
 #' # TFBS example
 #' #-------------
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     gdir <- '~/.multicrispr/bowtie/genome/BSgenome.Mmusculus.UCSC.mm10'
-#'     # index_genome(bsgenome, gdir) # one time effort - takes few h
-#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     targets0 <- bed_to_granges(bedfile, genome = 'mm10')
-#'     targets  <- double_flank(targets0)
-#'     tdir <- index_targets(targets, bsgenome)
-#'     spacers <- find_spacers(targets, bsgenome)
-#'     spacers %<>% extract(1:10) # only to keep example fast, works also else
-#'     outdir <- '~/.multicrispr/bowtie'
-#'     outfile <- file.path(outdir, 'crispr_to_ref.txt')
+#'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'  gdir <- '~/.multicrispr/bowtie/genome/BSgenome.Mmusculus.UCSC.mm10'
+#'  # index_genome(bsgenome, gdir) # one time effort - takes few h
+#'  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'  targets0 <- bed_to_granges(bedfile, genome = 'mm10')
+#'  targets  <- double_flank(targets0)
+#'  
+#'  tdir <- index_targets(targets, bsgenome)
+#'  spacers <- find_spacers(targets, bsgenome)
+#'  spacers %<>% extract(1:10) # only to keep example fast, works also else
+#'  outdir <- '~/.multicrispr/bowtie'
+#'  outfile <- file.path(outdir, 'crispr_to_ref.txt')
 #'     
-#'     # Match sequences
-#'         crisprseqs <- unique(paste0(spacers$spacer, spacers$pam))
-#'         match_seqs(crisprseqs, gdir, norc=FALSE, outfile=outfile)
-#'     # Match crisprs (i.e. spacer + alternate pams)
-#'         match_crisprs(spacers, gdir, norc = FALSE, outfile = outfile)
-#'     # Add "crispr to genome" matches
-#'         add_genome_matches(spacers, gdir, outdir)
-#'     # Add "crispr to target" matches
-#'         add_target_matches(spacers, tdir, outdir)
+#'  crisprseqs <- unique(paste0(spacers$spacer, spacers$pam))
+#'  match_seqs(crisprseqs, gdir, norc=FALSE, outfile=outfile)
+#'  match_crisprs(spacers, gdir, norc = FALSE, outfile = outfile)
+#'  spacers %<>% add_target_matches(tdir, outdir)
+#'  spacers %<>% add_genome_matches(gdir, outdir)
 #' @export
 match_seqs <- function(
     seqs, 
@@ -292,14 +301,13 @@ add_target_matches <- function(
     indexdir, 
     outdir, 
     pam       = 'NGG',
-    norc      = TRUE,
     verbose   = TRUE
 ){
 
     outfile <- file.path(outdir, 'crispr_to_targets.txt')
     count_vars <- c('T0', 'T1', 'T2')
     matches <- match_crisprs(
-                    spacers, indexdir, norc = norc, outfile = outfile,
+                    spacers, indexdir, norc = TRUE, outfile = outfile,
                     pam = pam, count_vars = count_vars, verbose = verbose)
     
     spacers %>% 
@@ -308,5 +316,61 @@ add_target_matches <- function(
     GRanges(seqinfo = seqinfo(spacers))
 }
 
-
-
+#' Filter target-specific spacers
+#' @param spacers    \code{\link[GenomicRanges]{GRanges-class}}
+#' @param genomedir  directory with bowtie-indexed genome
+#' @param targetdir  directory with bowtie-indexed targets
+#' @param outdir     directory where output is written to
+#' @param pam        string (default 'NGG'): pam sequence
+#' @param verbose    TRUE (default) or FALSE
+#' @examples 
+#'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
+#'  spacers <- find_spacers(targets, bsgenome)
+#'  #spacers %<>% extract(1:10) # only to keep example fast, works also else
+#'  
+#'  tdir <- index_targets(targets, bsgenome)
+#'  gdir <- '~/.multicrispr/bowtie/genome/BSgenome.Mmusculus.UCSC.mm10'
+#'  # index_genome(bsgenome, gdir) # one time effort - takes few h
+#'  outdir <- '~/.multicrispr/bowtie'
+#'    
+#'  spacers %<>% add_target_matches(tdir, outdir)
+#'  spacers %<>% add_genome_matches(gdir, outdir)
+#'  spacers %<>% filter_target_specific(tdir, gdir, outdir)
+#' @export
+filter_target_specific <- function(
+    spacers, 
+    targetdir, 
+    genomedir, 
+    outdir, 
+    pam       = 'NGG', 
+    verbose   = TRUE
+){
+    # Add target matches
+    if (verbose) message('\tAdd target match counts')
+    spacers %<>% add_target_matches(targetdir, outdir, pam=pam, verbose=FALSE)
+    
+    # Add genome matches
+    if (verbose) message('\t    genome match counts')
+    spacers %<>% add_genome_matches(genomedir, outdir, pam=pam, verbose=FALSE)
+    
+    # Sanity check
+    assertive::assert_is_of_length(subset(spacers, T0>G0), 0)
+    assertive::assert_is_of_length(subset(spacers, T1>G1), 0)
+    assertive::assert_is_of_length(subset(spacers, T2>G2), 0)
+    
+    # Filter for specificity
+    digits <- ceiling(log10(length(spacers)))
+    if (verbose) cmessage('\tFilter %d spacers', length(spacers))
+    for (mis in 0:2){
+        idx <-  mcols(spacers)[[paste0('T', mis)]] == 
+                mcols(spacers)[[paste0('G', mis)]]
+        spacers %<>% subset(idx)
+        if (verbose) cmessage('\t       %s T%d==G%d', 
+                                format(sum(idx), width = digits), mis, mis)
+    }
+    
+    # Return
+    spacers
+}
