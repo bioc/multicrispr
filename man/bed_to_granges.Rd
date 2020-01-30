@@ -34,13 +34,10 @@ bed_to_granges(
 Read bedfile into GRanges
 }
 \examples{
-# TFBS example
-#-------------
-    bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-    (gr <- bed_to_granges(bedfile, 'mm10'))
+bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+(gr <- bed_to_granges(bedfile, genome='mm10'))
 }
 \seealso{
-\code{rtracklayer::import.bed} (see 
-\code{\link[rtracklayer]{BEDFile-class}}), which is used by this function
+\code{\link{char_to_granges}}, \code{\link{genes_to_granges}}
 }

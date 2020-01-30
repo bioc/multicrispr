@@ -6,8 +6,8 @@
 \usage{
 filter_target_specific(
   spacers,
+  targetdir,
   genomedir,
-  targetdir = NULL,
   outdir,
   pam = "NGG",
   verbose = TRUE
@@ -16,9 +16,9 @@ filter_target_specific(
 \arguments{
 \item{spacers}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{genomedir}{directory with bowtie-indexed genome}
-
 \item{targetdir}{directory with bowtie-indexed targets}
+
+\item{genomedir}{directory with bowtie-indexed genome}
 
 \item{outdir}{directory where output is written to}
 
@@ -41,7 +41,7 @@ Filter target-specific spacers
  # index_genome(bsgenome, gdir) # one time effort - takes few h
  outdir <- '~/.multicrispr/bowtie'
    
- spacers \%<>\% add_target_matches(tdir, outdir)
- spacers \%<>\% add_genome_matches(gdir, outdir)
- spacers \%<>\% filter_target_specific(gdir, tdir, outdir)
+ spacers \%>\% add_target_matches(tdir, outdir)
+ spacers \%>\% add_genome_matches(gdir, outdir)
+ spacers \%>\% filter_target_specific(tdir, gdir, outdir)
 }

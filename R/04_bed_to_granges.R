@@ -86,24 +86,21 @@ annotate_granges <- function(gr, txdb){
 }
 
 
+
 #' Read bedfile into GRanges
-#' 
-#' @param bedfile    file path
-#' @param genome     string: UCSC genome name (e.g. 'mm10')
+#' @param bedfile   file path
+#' @param genome    string: UCSC genome name (e.g. 'mm10')
 #' @param txdb      NULL (default) or \code{\link[GenomicFeatures]{TxDb-class}}
-#'                   (used for gene annotation)
-#' @param do_order   TRUE (default) or FALSE: order on seqnames and star?
-#' @param plot       TRUE (default) or FALSE: plot karyogram?
-#' @param verbose    TRUE (default) or FALSE
+#'                  (used for gene annotation)
+#' @param do_order  TRUE (default) or FALSE: order on seqnames and star?
+#' @param plot      TRUE (default) or FALSE: plot karyogram?
+#' @param verbose   TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
+#' @seealso \code{\link{char_to_granges}}, \code{\link{genes_to_granges}}
 #' @examples
-#' # TFBS example
-#' #-------------
-#'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     (gr <- bed_to_granges(bedfile, 'mm10'))
-#' @seealso \code{rtracklayer::import.bed} (see 
-#' \code{\link[rtracklayer]{BEDFile-class}}), which is used by this function
+#' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' (gr <- bed_to_granges(bedfile, genome='mm10'))
 #' @export
 bed_to_granges <- function(
     bedfile,
@@ -143,15 +140,40 @@ bed_to_granges <- function(
     # Order
     if (do_order)  gr %<>% sort(ignore.strand = TRUE)
                      #%<>% extract( order(seqnames(.), start(.)))
-    
+
+    # Record    
+       names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
+       gr$targetstart <- GenomicRanges::start(gr)
+       gr$targetend   <- GenomicRanges::end(gr)
+       
     # Return
     gr
 }
 
 
-#=============================================================================
-# genes_to_granges
-#=============================================================================
+#' Convert character vector into GRanges
+#' @param x character vector
+#' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
+#' @return \code{\link[GenomicRanges]{GRanges-class}}
+#' @examples 
+#' require(magrittr)
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#' x <- c(PRNP  = 'chr20:4699600:+',            # snp
+#'        HBB  = 'chr11:5227002:-',            # snp
+#'        HEXA = 'chr15:72346580-72346583:-',  # del
+#'        CFTR = 'chr7:117559593-117559595:+') # ins
+#' char_to_granges(x, bsgenome)
+#' @seealso \code{\link{bed_to_granges}}, \code{\link{genes_to_granges}}
+#' @export
+char_to_granges <- function(x, bsgenome){
+   gr <- GenomicRanges::GRanges(x, seqinfo  = BSgenome::seqinfo(bsgenome))
+   names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
+   gr$targetstart <- GenomicRanges::start(gr)
+   gr$targetend   <- GenomicRanges::end(gr)
+   gr
+}
+
+
 
 #' Convert geneids into GRanges
 #' @param file       Gene identifier file (one per row)
@@ -162,23 +184,24 @@ bed_to_granges <- function(
 #' @param plot       TRUE (default) or FALSE
 #' @param verbose    TRUE (default) or FALSE
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
+#' @seealso \code{\link{char_to_granges}}, \code{\link{bed_to_granges}}
 #' @examples
 #' # Entrez
 #' #-------
-#' genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
-#' geneids  <- as.character(read.table(genefile)[[1]])
-#' txdb     <- getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
+#'     genefile <- system.file('extdata/SRF.entrez', package='multicrispr')
+#'     geneids  <- as.character(read.table(genefile)[[1]])
+#'     txdb     <- getFromNamespace('TxDb.Mmusculus.UCSC.mm10.knownGene',
 #'                              'TxDb.Mmusculus.UCSC.mm10.knownGene')
-#' gr <- genes_to_granges(geneids, txdb)
-#' gr <- genefile_to_granges(genefile, txdb)
+#'     (gr <- genes_to_granges(geneids, txdb))
+#'     (gr <- genefile_to_granges(genefile, txdb))
 #'
 #' # Ensembl
 #' #--------
-#' txdb <- EnsDb.Mmusculus.v98()
-#' genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
-#' geneids <- as.character(read.table(genefile)[[1]])
-#' gr <- genes_to_granges(geneids, txdb)
-#' gr <- genefile_to_granges(genefile, txdb)
+#'     txdb <- EnsDb.Mmusculus.v98()
+#'     genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
+#'     geneids <- as.character(read.table(genefile)[[1]])
+#'     (gr <- genes_to_granges(geneids, txdb))
+#'     (gr <- genefile_to_granges(genefile, txdb))
 #' @export
 genes_to_granges <- function(
     geneids, 
@@ -207,6 +230,11 @@ genes_to_granges <- function(
     # Plot
     if (plot) plot_karyogram(gr)
     
+    # Record    
+       names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
+       gr$targetstart <- GenomicRanges::start(gr)
+       gr$targetend   <- GenomicRanges::end(gr)
+       
     # Return
     gr
 }

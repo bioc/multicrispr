@@ -9,8 +9,6 @@
 #' @param ir \code{\link[IRanges]{IRanges-class}}: subranges to be extracted
 #' @param plot TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}. 
-#' Details regarding original GRanges are included in mcols 
-#' 'tname', 'tstart', and 'tend' (target name, start, and end positions)
 #' @examples 
 #' gr <- GenomicRanges::GRanges(c(A = 'chr1:1-100:+', B = 'chr1:1-100:-'))
 #' ir <- IRanges::IRanges(c(A = '1-10', A = '11-20', B = '1-10', B = '11-20'))
@@ -18,44 +16,41 @@
 #' @export
 extract_subranges <- function(gr, ir, plot = FALSE){
   
-    # Comply
-    tstart <- tend <- substart <- subwidth <- NULL
-    # Assert
+    # Comply / Assert
+    substart <- subwidth <- NULL
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(ir, 'IRanges')
+    assert_has_names(gr)
+    assert_has_names(ir)
+    assert_is_subset(unique(names(ir)), names(gr))
     assert_is_a_bool(plot)
     
     # Convert and merge
-    gr %<>% name_uniquely()
-    gr$tname <- names(gr)
-    gdt <- data.table::as.data.table(gr)
-    gdt$width <- NULL
     idt <- data.table::as.data.table(ir)
-    setnames(idt, c(   'start',    'end',    'width',     'names'), 
-                  c('substart', 'subend', 'subwidth', 'tname'))
-    mdt <- merge(gdt, idt, by = 'tname')
-    
+    gdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
+    gdt$width <- NULL
+    setnames(idt, c(   'start',    'end',    'width'), 
+                  c('substart', 'subend', 'subwidth'))
+    mdt <- merge(gdt, idt, by = 'names')
+
     # Extract
-    mdt[, tstart := start]
-    mdt[, tend   := end  ]
     mdt[strand=='+', start := start-1+substart]
     mdt[strand=='+', end   := start-1+subwidth]
     mdt[strand=='-', end   := end+1-substart]
     mdt[strand=='-', start := end+1-subwidth]
     mdt[, c('substart', 'subend', 'subwidth') := NULL]
     mr <- GRanges(mdt, seqinfo = seqinfo(gr))
-
+    names(mr) <- uniquify(mr$names)
     # Plot    
     if (plot){
-        gr$set <- 'original'
-        mr$set <- 'extracted'
-        plot_intervals( c(gr, mr), color_var = 'set', size_var = 'set', 
-                        facet_var = c('seqnames', 'tname'))
-        mr$set <- NULL
+        mr$rangename <- names(mr)
+        plot_intervals( mr, color_var = 'names', 
+                    facet_var = c('seqnames'), yby = 'rangename')
     }
     
     # Return
-    names(mr) <- uniquify(mr$tname)
+    mr$rangename <- NULL
+    mr$names <- NULL
     mr
 }
 
@@ -69,27 +64,35 @@ extract_subranges <- function(gr, ir, plot = FALSE){
 #' @param plot     TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
+#' # PE example
+#' #------------
 #' require(magrittr)
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#' gr <- GenomicRanges::GRanges(
-#'           c(PRNP = 'chr20:4699600:+',             # snp
-#'             HBB  = 'chr11:5227002:-',             # snp
-#'             HEXA = 'chr15:72346580-72346583:-',   # del
-#'             CFTR = 'chr7:117559593-117559595:+'), # ins
-#'           seqinfo  = BSgenome::seqinfo(bsgenome))
+#' gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                         HBB  = 'chr11:5227002:-',             # snp
+#'                         HEXA = 'chr15:72346580-72346583:-',   # del
+#'                         CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                       bsgenome)
 #' gr %<>% extend_for_pe()
 #' pattern <- strrep('N',20) %>% paste0('NGG')
 #' extract_matchranges(gr, bsgenome, pattern, plot = TRUE)
+#' 
+#' # TFBS examples
+#' #--------------
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+#' gr <- bed_to_granges(bedfile, 'mm10') %>% extend()
+#' extract_matchranges(gr, bsgenome, pattern = strrep('N',20) %>% paste0('NGG'))
 #' @export
 extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
   
     # Assert
     assert_is_all_of(gr, 'GRanges')
+    assert_has_names(gr)
     assert_is_all_of(bsgenome, 'BSgenome')
     assert_is_a_string(pattern)
 
     # Extract
-    gr %<>% name_uniquely()
     matches <- unlist(vmatchPattern(pattern, getSeq(bsgenome, gr), fixed=FALSE))
     extract_subranges(gr, matches, plot = plot) %>% sort(ignore.strand = TRUE)
     
@@ -110,12 +113,11 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               c(PRNP = 'chr20:4699600:+',             # snp
-#'                 HBB  = 'chr11:5227002:-',             # snp
-#'                 HEXA = 'chr15:72346580-72346583:-',   # del
-#'                 CFTR = 'chr7:117559593-117559595:+'), # ins
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome)
 #'     plot_intervals(gr)
 #'     find_pe_spacers(gr, bsgenome)
 #'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
@@ -127,8 +129,8 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' #-------------
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#'     gr <- bed_to_granges(bedfile, 'mm10')
-#'     find_spacers(extend(gr), bsgenome)
+#'     gr <- bed_to_granges(bedfile, 'mm10') %>% extend()
+#'     find_spacers(gr, bsgenome)
 #' @seealso \code{\link{find_pe_spacers}} to find prime editing spacers 
 #' @export 
 find_spacers <- function(
@@ -137,16 +139,16 @@ find_spacers <- function(
 ){
     if (complement){
         gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
-        gr %<>% sort(ignore.strand = TRUE)
     }
     sites   <- extract_matchranges(gr, bsgenome, paste0(spacer, pam))
     spacers <-     extend(sites,  0, -3, bsgenome = bsgenome)
     pams    <- down_flank(sites, -2,  0, bsgenome = bsgenome)
-    spacers$spacer <- BSgenome::getSeq(bsgenome, spacers, as.character=TRUE)
-    spacers$pam    <- BSgenome::getSeq(bsgenome, pams,    as.character=TRUE)
+    spacers$crisprname   <- names(spacers)
+    spacers$crisprspacer <- BSgenome::getSeq(bsgenome, spacers, as.character=TRUE)
+    spacers$crisprpam    <- BSgenome::getSeq(bsgenome, pams,    as.character=TRUE)
+    spacers %>% sort(ignore.strand = TRUE)
     if (plot){
-        spacers$sitename <- names(spacers)
-        plot_intervals(spacers, yby='sitename')
+        plot_intervals(spacers, yby='crisprname')
         spacers$sitename <- NULL
     }
     spacers

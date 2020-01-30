@@ -90,14 +90,6 @@ index_targets <- function(
 }
 
 
-name_elements <- function(x, prefix = 'x'){
-    names1 <- paste0(prefix, formatC(seq_along(x), 
-                                digits = floor(log10(length(x))), 
-                                flag = 0))
-    names(x) <- names1
-    x
-}
-
 run_bowtie <- function(crisprfa, indexdir, outfile, norc){
     Rbowtie::bowtie(
         sequences = crisprfa,
@@ -155,18 +147,15 @@ read_bowtie_results <- function(outfile){
 #'  bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #'  genomedir <- '~/.multicrispr/bowtie/genome/BSgenome.Hsapiens.UCSC.hg38'
 #'  # index_genome(bsgenome, genomedir) # one time effort - takes few h
-#'  gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'  gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                          HBB  = 'chr11:5227002:-',             # snp
+#'                          HEXA = 'chr15:72346580-72346583:-',   # del
+#'                          CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                        bsgenome)
 #'  spacers <- find_pe_spacers(gr, bsgenome)
 #'  outdir <- '~/.multicrispr/bowtie'
 #'  outfile <- file.path(outdir, 'crispr_to_ref.txt')
-#'     
-#'  seqs <- paste0(spacers$spacer, spacers$pam)
+#'  seqs <- paste0(spacers$crisprspacer, spacers$crisprpam)
 #'  match_seqs(seqs,       genomedir, norc=FALSE, outfile=outfile)
 #'  match_crisprs(spacers, genomedir, norc=FALSE, outfile=outfile)
 #'  add_genome_matches(spacers, genomedir, outdir)
@@ -186,11 +175,11 @@ read_bowtie_results <- function(outfile){
 #'  outdir <- '~/.multicrispr/bowtie'
 #'  outfile <- file.path(outdir, 'crispr_to_ref.txt')
 #'     
-#'  crisprseqs <- unique(paste0(spacers$spacer, spacers$pam))
+#'  crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
 #'  match_seqs(crisprseqs, gdir, norc=FALSE, outfile=outfile)
 #'  match_crisprs(spacers, gdir, norc = FALSE, outfile = outfile)
-#'  spacers %<>% add_target_matches(tdir, outdir)
-#'  spacers %<>% add_genome_matches(gdir, outdir)
+#'  spacers %>% add_target_matches(tdir, outdir)
+#'  spacers %>% add_genome_matches(gdir, outdir)
 #' @export
 match_seqs <- function(
     seqs, 
@@ -206,7 +195,7 @@ match_seqs <- function(
     
     # Write reads to fasta
     reads <- Biostrings::DNAStringSet(unique(seqs))
-    reads %<>% name_elements('read')
+    reads %<>% name_uniquely('read')
     readfa <- file.path(outdir, 'reads.fa')
     dir.create(dirname(readfa), recursive = TRUE, showWarnings = FALSE)
     if (verbose) cmessage('\t\tWrite reads to %s', readfa)
@@ -252,11 +241,11 @@ match_crisprs <- function(
     
     # Expand pams
     if (verbose) cmessage('\t\tExpand iupac ambiguities in pam')
-    spacerseqs <- unique(spacers$spacer)
+    spacerseqs <- unique(spacers$crisprspacer)
     pamseqs <- expand_iupac_ambiguities(pam)
-    crisprdt <- data.table(spacer = rep(spacerseqs, each = length(pamseqs)), 
-                        pam     = rep(pamseqs, times = length(spacerseqs))) %>% 
-              extract(, crispr := paste0(spacer, pamseqs))
+    crisprdt <- data.table(crisprspacer = rep(spacerseqs, each = length(pamseqs)), 
+                        crisprpam     = rep(pamseqs, times = length(spacerseqs))) %>% 
+              extract(, crispr := paste0(crisprspacer, pamseqs))
     crisprseqs <- unique(crisprdt$crispr)
     
     # Count matches
@@ -268,9 +257,9 @@ match_crisprs <- function(
                             verbose    = verbose)
     matches %<>% merge(crisprdt, by.x = 'readseq', by.y = 'crispr', all = TRUE)
     matches %<>% extract(, list(MM0 = sum(MM0), MM1 = sum(MM1), MM2 = sum(MM2)), 
-                               by = 'spacer')
+                               by = 'crisprspacer')
     matches %>% setnames(c('MM0', 'MM1', 'MM2'), count_vars)
-    matches[spacerseqs, on = 'spacer']
+    matches[spacerseqs, on = 'crisprspacer']
 }
 
 #' @rdname match_seqs
@@ -282,15 +271,25 @@ add_genome_matches <- function(
     pam        = 'NGG', 
     verbose    = TRUE
 ){
+    # Add genome matches
     outfile <- file.path(outdir, 'crispr_to_genome.txt')
     count_vars <- c('G0', 'G1', 'G2')
     matches <- match_crisprs(
                         spacers, indexdir, norc = FALSE, outfile = outfile, 
                         pam = pam, count_vars = count_vars, verbose = verbose)
-    spacers %>% 
-    as.data.table() %>% 
-    merge(matches, by = 'spacer', sort = FALSE) %>% 
-    GRanges(seqinfo = seqinfo(spacers))
+    dt <- spacers %>% 
+        as.data.table() %>% 
+        merge(matches, by = 'crisprspacer', sort = FALSE)
+    
+    # Organize columns
+    targetvars <- names(dt) %>% extract(stringi::stri_startswith_fixed(., 'target'))
+    crisprvars <- c('crisprname', 'crisprspacer', 'crisprpam', 'crisprext') %>% 
+                    intersect(names(dt))
+    othervars <- setdiff(names(dt), c(targetvars, crisprvars))
+    dt %<>% extract(, c(targetvars, crisprvars, othervars), with = FALSE)
+    
+    # Return GRanges
+    GRanges(dt, seqinfo = seqinfo(spacers))
 }
 
 
@@ -304,16 +303,26 @@ add_target_matches <- function(
     verbose   = TRUE
 ){
 
+    # Add matches
     outfile <- file.path(outdir, 'crispr_to_targets.txt')
     count_vars <- c('T0', 'T1', 'T2')
     matches <- match_crisprs(
                     spacers, indexdir, norc = TRUE, outfile = outfile,
                     pam = pam, count_vars = count_vars, verbose = verbose)
+    dt <- spacers %>% 
+        as.data.table() %>% 
+        merge(matches, by = 'crisprspacer', sort = FALSE)
     
-    spacers %>% 
-    as.data.table() %>% 
-    merge(matches, by = 'spacer', sort = FALSE) %>% 
-    GRanges(seqinfo = seqinfo(spacers))
+    # Organize columns
+    targetvars <- names(dt) %>% extract(stringi::stri_startswith_fixed(., 'target'))
+    crisprvars <- c('crisprname', 'crisprspacer', 'crisprpam', 'crisprext') %>% 
+                    intersect(names(dt))
+    othervars <- setdiff(names(dt), c(targetvars, crisprvars))
+    dt %<>% extract(, c(targetvars, crisprvars, othervars), with = FALSE)
+
+    # Return GRanges
+    GRanges(dt, seqinfo = seqinfo(spacers))
+    
 }
 
 #' Filter target-specific spacers
@@ -335,9 +344,9 @@ add_target_matches <- function(
 #'  # index_genome(bsgenome, gdir) # one time effort - takes few h
 #'  outdir <- '~/.multicrispr/bowtie'
 #'    
-#'  spacers %<>% add_target_matches(tdir, outdir)
-#'  spacers %<>% add_genome_matches(gdir, outdir)
-#'  spacers %<>% filter_target_specific(tdir, gdir, outdir)
+#'  spacers %>% add_target_matches(tdir, outdir)
+#'  spacers %>% add_genome_matches(gdir, outdir)
+#'  spacers %>% filter_target_specific(tdir, gdir, outdir)
 #' @export
 filter_target_specific <- function(
     spacers, 

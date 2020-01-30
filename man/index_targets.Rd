@@ -26,5 +26,6 @@ require(magrittr)
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targets0 <- bed_to_granges(bedfile, genome = 'mm10')
 targets  <- double_flank(targets0)
-index_targets(targets, bsgenome, outdir = outdir)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+index_targets(targets, bsgenome)
 }

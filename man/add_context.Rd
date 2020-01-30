@@ -24,25 +24,19 @@ Add context for Doench2016 scoring
 #-----------
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    gr <- GenomicRanges::GRanges(
-             seqnames = c(PRNP = 'chr20:4699600',             # snp
-                          HBB  = 'chr11:5227002',             # snp
-                          HEXA = 'chr15:72346580-72346583',   # del
-                          CFTR = 'chr7:117559593-117559595'), # ins
-             strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-             seqinfo  = BSgenome::seqinfo(bsgenome))
-    spacers <- find_spacers(extend_for_pe(gr), bsgenome)
-    add_context(spacers, bsgenome)
+    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                            HBB  = 'chr11:5227002:-',             # snp
+                            HEXA = 'chr15:72346580-72346583:-',   # del
+                            CFTR = 'chr7:117559593-117559595:+'), # ins
+                          bsgenome)
+    spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement=FALSE)
+    (add_context(spacers, bsgenome))
 
 # TFBS example
 #-------------
     bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-    targets  <- bed_to_granges(bedfile, 'mm10')  \%>\% 
-                extend() \%>\% 
-                add_seq(bsgenome)
+    targets  <- extend(bed_to_granges(bedfile, 'mm10'))
     spacers    <- find_spacers(targets, bsgenome)
-    spacers \%<>\% add_context(bsgenome)
-    spacers[1:3]$seq
-    spacers[1:3]$contextseq
+    (spacers \%<>\% add_context(bsgenome))
 }

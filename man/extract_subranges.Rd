@@ -14,9 +14,7 @@ extract_subranges(gr, ir, plot = FALSE)
 \item{plot}{TRUE or FALSE (default)}
 }
 \value{
-\code{\link[GenomicRanges]{GRanges-class}}. 
-Details regarding original GRanges are included in mcols 
-'tname', 'tstart', and 'tend' (target name, start, and end positions)
+\code{\link[GenomicRanges]{GRanges-class}}.
 }
 \description{
 Extract subranges from a \code{\link{GRanges-class}} object

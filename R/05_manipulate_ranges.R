@@ -9,21 +9,19 @@
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
-#'    add_seq(gr, bsgenome)
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome)
+#'    (gr %<>% add_seq(bsgenome))
 #'    
 #' # TFBS example
 #' #-------------
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10')
-#'     add_seq(gr, bsgenome)
+#'     (gr %<>% add_seq(bsgenome))
 #' @export
 add_seq <- function(gr, bsgenome, verbose = FALSE, as.character = TRUE){
     
@@ -61,7 +59,6 @@ summarize_loci <- function(gr){
             end(gr))
 }
 
-
 #' Extend or Flank GRanges
 #' 
 #' Returns extensions, upstream flanks, or downstream flanks
@@ -72,7 +69,7 @@ summarize_loci <- function(gr){
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
 #' @param start     (pos or neg) number: relative start position (see details)
 #' @param end       (pos or neg) number: relative end position   (see details)
-#' @param stranded  TRUE (default) or FALSE: consider strand information?
+#' @param strandaware  TRUE (default) or FALSE: consider strand information?
 #' @param bsgenome  NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                  Required to update gr$seq if present.
 #' @param verbose   TRUE or FALSE (default)
@@ -82,35 +79,33 @@ summarize_loci <- function(gr){
 #' @examples 
 #' # PE example
 #' #-----------
-#'     require(magrittr)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
-#'       up_flank(gr, -22,  -1, plot = TRUE)
-#'       up_flank(gr, -22,  -1, plot = TRUE, stranded = FALSE)
-#'     down_flank(gr,  +1, +22, plot = TRUE)
-#'     down_flank(gr,  +1, +22, plot = TRUE, stranded = FALSE)
-#'         extend(gr, -10, +20, plot = TRUE)
-#'         extend(gr, -10, +20, plot = TRUE, stranded = FALSE)
+#'    require(magrittr)
+#'    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'    gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
+#'                          HBB  = 'chr11:5227002:-',            # snp
+#'                          HEXA = 'chr15:72346580-72346583:-',  # del
+#'                          CFTR = 'chr7:117559593-117559595:+'),# ins
+#'                       bsgenome = bsgenome)
+#'    gr %>% up_flank(-22,  -1, plot = TRUE)
+#'    gr %>% up_flank(-22,  -1, plot = TRUE, strandaware = FALSE)
+#'    gr %>% down_flank(+1, +22, plot = TRUE)
+#'    gr %>% down_flank(+1, +22, plot = TRUE, strandaware = FALSE)
+#'    gr %>% extend(-10, +20, plot = TRUE)
+#'    gr %>% extend(-10, +20, plot = TRUE, strandaware = FALSE)
+#'    
 #' # TFBS example
 #' #-------------
 #'     bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
 #'     gr <- bed_to_granges(bedfile, genome = 'mm10')
+#'     gr %>% extend(plot = TRUE)
 #'     gr %>% up_flank(plot = TRUE)
 #'     gr %>% down_flank(plot = TRUE)
-#'     gr %>% double_flank()
-#'     gr %>% extend(plot = TRUE)
 #' @export
 up_flank <- function(
   gr, 
   start    = -200,
   end      = -1,
-  stranded = TRUE,
+  strandaware = TRUE,
   bsgenome = NULL,
   verbose  = FALSE,
   plot     = FALSE,
@@ -122,20 +117,24 @@ up_flank <- function(
     assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
-    # Left flank
+    # Record
     newgr <- gr
+    shift <- sprintf('(%s%d,%s%d)', 
+                                csign(start), abs(start), csign(end), abs(end))
+    txt <- sprintf('\t\t%d%supstream %s flanks', 
+                   length(newgr), 
+                   ifelse(!strandaware, ' (strandagnostic) ', ' '),
+                   shift)
+    
+    # Flank
     GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
     GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + end
-    formatstr <- '\t\t%d left  flanks: [start%s%d, start%s%d]'
-    if (stranded){
+    if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx]   - start  # do not switch these lines
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx]   - end    # to avoid integrity errors
-        formatstr <- '\t\t%d up   flanks: [seqstart%s%d, seqstart%s%d]'
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start  # do not switch these lines
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end    # to avoid integrity errors
     }
-    txt <- sprintf(formatstr, 
-                   length(newgr), csign(start), abs(start), csign(end), abs(end))
-    
+
     # Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
@@ -145,10 +144,11 @@ up_flank <- function(
     # Plot, Message, Return
     if (plot){
         gr$set    <- 'original'
-        newgr$set <- 'up flanks'
+        newgr$set <- 'upstream flanks'
         allgr <- c(gr, newgr)
-        allgr$set %<>% factor(c('original', 'up flanks'))
+        allgr$set %<>% factor(c('original', 'upstream flanks'))
         plot_intervals(allgr, color_var = 'set', ..., title = txt)
+        newgr$set <- NULL
     }
     if (verbose) message(txt)
     newgr
@@ -161,7 +161,7 @@ down_flank <- function(
     gr,
     start = 1, 
     end   = 200,
-    stranded   = TRUE,
+    strandaware   = TRUE,
     bsgenome   = NULL,
     verbose    = FALSE,
     plot       = FALSE,
@@ -173,20 +173,24 @@ down_flank <- function(
     assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
-    # Flank
+    # Record 
     newgr <- gr
+    shift <- sprintf('(%s%d,%s%d)', 
+                                csign(start), abs(start), csign(end), abs(end))
+    txt <- sprintf('\t\t%d%sdownstream %s flanks', 
+                   length(newgr), 
+                   ifelse(!strandaware, ' (strandagnostic) ', ' '),
+                   shift)
+    
+    # Flank
     GenomicRanges::start(newgr) <- GenomicRanges::end(newgr) + start
     GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr) + end
-    formatstr <- '\t\t%d right flanks : [end%s%d, end%s%d]'
-    if (stranded){
+    if (strandaware){
       idx <- as.logical(strand(newgr)=='-')
       GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
       GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx] - start
-      formatstr <- '\t\t%d down flanks: [seqstart%s%d, seqstart%s%d]'
     }
-    txt <- sprintf(formatstr, length(newgr), csign(start), abs(start), 
-                    csign(end), abs(end))
-    
+
     # Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
@@ -196,11 +200,12 @@ down_flank <- function(
     # Plot, Message, Return
     if (plot){
         gr$set <- 'original'
-        newgr$set <- 'down flanks'
+        newgr$set <- 'downstream flanks'
         allgr <- c(gr, newgr)
-        allgr$set %<>% factor(c('original', 'down flanks'))
+        allgr$set %<>% factor(c('original', 'downstream flanks'))
         plot_intervals(allgr, color_var = 'set', ..., title=txt)
-    }
+        newgr$set <- NULL
+   }
     if (verbose) message(txt)
     newgr
 }
@@ -212,7 +217,7 @@ extend <- function(
     gr, 
     start = -22, 
     end  =  22,
-    stranded  = TRUE,
+    strandaware  = TRUE,
     bsgenome  = NULL,
     verbose   = FALSE,
     plot      = FALSE,
@@ -225,19 +230,24 @@ extend <- function(
     assert_is_a_number(end)
     assert_is_a_bool(verbose)
     
-    # extend
+    # Record
     newgr <- gr
+    shift <- sprintf('(%s%d,%s%d)', 
+                          csign(start), abs(start), csign(end), abs(end))
+    txt <- sprintf('\t\t%d%sextensions %s', 
+                   length(newgr), 
+                   ifelse(!strandaware, ' (strandagnostic) ', ' '),
+                   shift)
+
+    # Extend
     GenomicRanges::start(newgr) <- GenomicRanges::start(newgr) + start
     GenomicRanges::end(  newgr) <- GenomicRanges::end(  newgr) + end
-    formatstr <- '\t\t%d extended ranges: [start%s%d, end%s%d]'
-    if (stranded){
+    if (strandaware){
       idx <- as.logical(strand(newgr)=='-')
       GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
       GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx]   - start
     }
-    txt <- sprintf(formatstr, length(newgr), csign(start), abs(start), 
-                    csign(end), abs(end))
-    
+
     # Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
@@ -251,6 +261,7 @@ extend <- function(
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'extensions'))
         plot_intervals(allgr, color_var = 'set', ..., title=txt)
+        newgr$set <- NULL
     }
     if (verbose) message(txt)
     newgr
@@ -271,14 +282,17 @@ extend <- function(
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome)
 #'     add_inverse_strand(gr, plot = TRUE)
+#' # TFBS example
+#' #-------------
+#'     bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
+#'     gr <- bed_to_granges(bedfile, genome = 'mm10')
+#'     add_inverse_strand(gr)
 #' @export
 add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     
@@ -297,7 +311,9 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     
     # Sort
     newgr <- sortSeqlevels(newgr)
-    newgr <- GenomicRanges::sort(newgr)
+    newgr <- GenomicRanges::sort(newgr, ignore.strand = TRUE)
+    names(newgr) %<>% paste0('_', 
+                            c('+'='f', '-'='r')[as.character(strand(newgr))])
     
     # Plot
     if (plot){
@@ -315,27 +331,30 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 
 #' Double flank
 #' 
-#' Double flanks, reduce overlaps, add reverse complement
-#' 
-#' This function is created for crispr in the context of crisprapex.
-#' It converts a set of crisprapex targets into a set of ranges in which to 
-#' search for crispr spacers. This involves (1) agnostifying the strand, 
-#' (2) calcuting up and down flanks, (3) merging overlapping ranges, and 
-#' (4) extending each range to both strands
-#' 
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
 #' @param upstart      upstream flank start in relation to start(gr)
 #' @param upend        upstream flank end   in relation to start(gr)
 #' @param downstart    downstream flank start in relation to end(gr)
 #' @param downend      downstream flank end   in relation to end(gr)
-#' @param do_reduce    TRUE(default) or FALSE: merge overlapping ranges?
-#' @param add_inverse  TRUE (default) or FALSE: add inverse strand?
 #' @param plot         TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
-#' bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#' gr  <-  bed_to_granges(bedfile, genome = 'mm10')
-#' double_flank(gr, plot = TRUE)
+#' # Prime Editing example
+#' #----------------------
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome)
+#'     double_flank(gr, -10,  -1, +1, +20, plot = TRUE)
+#'       
+#' # TFBS example
+#' #-------------
+#'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+#'     gr  <-  bed_to_granges(bedfile, genome = 'mm10')
+#'     double_flank(gr, plot = TRUE)
 #' @export
 double_flank <- function(
   gr, 
@@ -343,44 +362,31 @@ double_flank <- function(
   upend       = -1, 
   downstart   = 1, 
   downend     = 200, 
-  do_reduce   = TRUE,
-  add_inverse = TRUE, 
   plot        = FALSE
 ){
 
-    # Agnostify strand
-    targets <- copy(gr, strand = '+')
-    cmessage('\t\t%d original ranges', length(targets))
-    
-    # Split into GRangesist
-    split(gr, seq_along(gr))
-
     # Up flank, down flank, concatenate
-    up <- up_flank(  targets,   upstart,   upend, verbose = FALSE)
-    dn <- down_flank(targets, downstart, downend, verbose = FALSE)
-    targets  <- c(up, dn)
-    cmessage('\t\t%d flank ranges (%d up + %d down)', 
-             length(targets), length(up), length(dn))
-    
-    # Add inverse    
-    if (add_inverse) targets %<>% add_inverse_strand(verbose = TRUE)
-    
-    # Reduce
-    if (do_reduce) targets %<>% reduce()
-    cmessage('\t\t%d ranges after merging overlaps', length(targets))
+    up <- up_flank(  gr,   upstart,   upend, verbose = FALSE)
+    dn <- down_flank(gr, downstart, downend, verbose = FALSE)
+    names(up) %<>% paste0('_u') # ensure unique names
+    names(dn) %<>% paste0('_d')
+    newgr  <- c(up, dn)
+    txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
+             length(newgr), length(up), length(dn))
+    message(txt)
 
-    # Plot 
+    # Plot    
     if (plot){
       gr$set <- 'original'
-      targets$set <- 'flanks'
-      allgr <- c(gr, targets)
+      newgr$set <- 'flanks'
+      allgr <- c(gr, newgr)
       allgr$set %<>% factor(c('original', 'flanks'))
-      plot_intervals(allgr, color_var = 'set')
-      targets$set <- NULL
+      plot_intervals(allgr, color_var = 'set', title = txt)
+      newgr$set <- NULL
     }
     
     # Return
-    targets
+    newgr
 }
 
 

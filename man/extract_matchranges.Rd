@@ -22,15 +22,23 @@ extract_matchranges(gr, bsgenome, pattern, plot = FALSE)
 Extract subranges that match pattern
 }
 \examples{
+# PE example
+#------------
 require(magrittr)
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-gr <- GenomicRanges::GRanges(
-          c(PRNP = 'chr20:4699600:+',             # snp
-            HBB  = 'chr11:5227002:-',             # snp
-            HEXA = 'chr15:72346580-72346583:-',   # del
-            CFTR = 'chr7:117559593-117559595:+'), # ins
-          seqinfo  = BSgenome::seqinfo(bsgenome))
+gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                        HBB  = 'chr11:5227002:-',             # snp
+                        HEXA = 'chr15:72346580-72346583:-',   # del
+                        CFTR = 'chr7:117559593-117559595:+'), # ins
+                      bsgenome)
 gr \%<>\% extend_for_pe()
 pattern <- strrep('N',20) \%>\% paste0('NGG')
 extract_matchranges(gr, bsgenome, pattern, plot = TRUE)
+
+# TFBS examples
+#--------------
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+gr <- bed_to_granges(bedfile, 'mm10') \%>\% extend()
+extract_matchranges(gr, bsgenome, pattern = strrep('N',20) \%>\% paste0('NGG'))
 }

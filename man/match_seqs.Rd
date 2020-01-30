@@ -70,18 +70,15 @@ adds match counts to GRanges object, and then returns it
  bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
  genomedir <- '~/.multicrispr/bowtie/genome/BSgenome.Hsapiens.UCSC.hg38'
  # index_genome(bsgenome, genomedir) # one time effort - takes few h
- gr <- GenomicRanges::GRanges(
-              seqnames = c(PRNP = 'chr20:4699600',             # snp
-                           HBB  = 'chr11:5227002',             # snp
-                           HEXA = 'chr15:72346580-72346583',   # del
-                           CFTR = 'chr7:117559593-117559595'), # ins
-              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-              seqinfo  = BSgenome::seqinfo(bsgenome))
+ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                         HBB  = 'chr11:5227002:-',             # snp
+                         HEXA = 'chr15:72346580-72346583:-',   # del
+                         CFTR = 'chr7:117559593-117559595:+'), # ins
+                       bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
  outdir <- '~/.multicrispr/bowtie'
  outfile <- file.path(outdir, 'crispr_to_ref.txt')
-    
- seqs <- paste0(spacers$spacer, spacers$pam)
+ seqs <- paste0(spacers$crisprspacer, spacers$crisprpam)
  match_seqs(seqs,       genomedir, norc=FALSE, outfile=outfile)
  match_crisprs(spacers, genomedir, norc=FALSE, outfile=outfile)
  add_genome_matches(spacers, genomedir, outdir)
@@ -101,11 +98,11 @@ adds match counts to GRanges object, and then returns it
  outdir <- '~/.multicrispr/bowtie'
  outfile <- file.path(outdir, 'crispr_to_ref.txt')
     
- crisprseqs <- unique(paste0(spacers$spacer, spacers$pam))
+ crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
  match_seqs(crisprseqs, gdir, norc=FALSE, outfile=outfile)
  match_crisprs(spacers, gdir, norc = FALSE, outfile = outfile)
- spacers \%<>\% add_target_matches(tdir, outdir)
- spacers \%<>\% add_genome_matches(gdir, outdir)
+ spacers \%>\% add_target_matches(tdir, outdir)
+ spacers \%>\% add_genome_matches(gdir, outdir)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

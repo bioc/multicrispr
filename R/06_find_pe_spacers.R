@@ -45,13 +45,11 @@ copy <- function(
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                            HBB  = 'chr11:5227002:-',              # snp
+#'                            HEXA = 'chr15:72346580-72346583:-',    # del
+#'                            CFTR = 'chr7:117559593-117559595:+'),  # ins
+#'                           bsgenome)
 #'     extend_pe_to_gg(gr, plot = TRUE)
 #' @export
 extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
@@ -59,9 +57,9 @@ extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
     # Extend
     fw <- copy(gr, strand='+', start = end(gr) - nrt + 5, end = start(gr) + 5)
     rv <- copy(gr, strand='-', start = end(gr) - 5, end = start(gr) + nrt - 5)
-    fw$tstart  <- rv$tstart   <- start(gr)
-    fw$tend    <- rv$tend     <- end(gr)
-    fw$tstrand <- rv$tstrand  <- strand(gr)
+    #fw$tstart  <- rv$tstart   <- start(gr)
+    #fw$tend    <- rv$tend     <- end(gr)
+    #fw$tstrand <- rv$tstrand  <- strand(gr)
     ext <- sort(c(fw, rv))
 
     # Plot    
@@ -85,14 +83,13 @@ extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
-#'     gr %>% extend_pe_to_gg(plot = TRUE) %>% add_seq(bsgenome) %>% find_gg()
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',            # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome)
+#'     gr %<>% extend_pe_to_gg(plot = TRUE) %>% add_seq(bsgenome) 
+#'     find_gg(gr)
 #' @export
 find_gg <- function(gr){
     
@@ -117,13 +114,19 @@ find_gg <- function(gr){
             extract(strand=='+', start := windowstart + substart - 1)  %>% 
             extract(strand=='+', end   := windowstart + subend   - 1)  %>% 
             extract(strand=='-', end   := windowend   - substart + 1)  %>% 
-            extract(strand=='-', start := windowend   - subend   + 1)
+            extract(strand=='-', start := windowend   - subend   + 1)  %>% 
+            extract()
     gg_dt %<>% setorderv(c('seqnames', 'start', 'strand'))
     gg_dt[, c('windowstart', 'windowend', 'seq', 'substart', 'subend') := NULL]
     gg_ranges   <- GRanges(gg_dt, seqinfo = seqinfo(gr))
     #gg_ranges %<>% add_seq(bsgenome, verbose = FALSE)
     return(gg_ranges)
 }
+
+# gr2dt <- function(gr){
+#     cbind(  as.data.table(GenomicRanges::granges(gr)), 
+#             as.data.table(lapply(mcols(gr), as.character)))
+# }
 
 
 #' Find prime editing spacers
@@ -152,21 +155,19 @@ find_gg <- function(gr){
 #' Additionally, three sequence mcols are returned:
 #'   * spacer: N20 spacers
 #'   * pam:    NGG PAMs
-#'   * extension: 3' extension of gRNA (RTtemplate + primerbindingsite)
+#'   * 3pext:  3' extension of gRNA (RTtemplate + primerbindingsite)
 #' @examples
 #' # PE example
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome)
 #'     find_pe_spacers(gr, bsgenome)
-#'     find_spacers(extend_for_pe(gr), bsgenome)
+#'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
@@ -183,54 +184,39 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
 
     # Find GG in nrt window around target site
     gr %<>% name_uniquely()
-    gr$tname <- names(gr)
     gg  <-  gr %>% extend_pe_to_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
-    gg$site <- uniquify(gg$tname)
+    names(gg) <- gg$crisprname <- uniquify(gg$targetname)
     
     # Extract from these other components
-    spacer        <- up_flank(gg, -21,        -2)     %>% add_seq(bsgenome)
-    pam           <- up_flank(gg,  -1,        +1)     %>% add_seq(bsgenome) 
-    extension     <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand()
-    extension$seq <- get_plus_seq(bsgenome, extension)  # Get "+" seq
-    substr( extension$seq, 
-            extension$tstart-start(extension)+1, 
-            extension$tend  -start(extension)+1) <- fixes[extension$tname]
-    extension$seq[as.logical(strand(extension)=='-')] %<>% revcomp() 
+    spacer  <- up_flank(gg, -21,        -2)       %>% add_seq(bsgenome)
+    pam     <- up_flank(gg,  -1,        +1)       %>% add_seq(bsgenome) 
+    ext <- up_flank(gg, -4-nprimer, -5+nrt)   %>% invertStrand()
+    ext$seq <- get_plus_seq(bsgenome, ext)  # Get "+" seq
+    substr( ext$seq, 
+            ext$targetstart - start(ext)+1, 
+            ext$targetend   - start(ext)+1) <- fixes[ext$targetname]
+    ext$seq[as.logical(strand(ext)=='-')] %<>% revcomp() 
                                                         # Revcomp for "-" seqs
     # Plot
     if (plot){
         spacer$part<-'spacer'
-        extension$part <- 'extension'
-        allranges <- c(spacer, extension)
-        allranges$part %<>% factor(rev(c('spacer', 'extension')))
-        plot_intervals(allranges, yby = 'site', color_var = 'part', 
-            size_var = 'part', facet_var = c('seqnames', 'tname'))
+        ext$part  <- "3' extension"
+        allranges <- c(spacer, ext)
+        allranges$part %<>% factor(rev(c("spacer", "3' extension")))
+        plot_intervals(allranges, yby = 'crisprname', color_var = 'part', 
+            size_var = 'part', facet_var = c('seqnames', 'targetname'))
         spacer$part <- NULL
     }
     
     # Add sequences and return
-    names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'spacer')
-    spacer$pam           <- pam$seq 
-    spacer$extension     <- extension$seq
+    names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'crisprspacer')
+    spacer$crisprpam <- pam$seq 
+    spacer$crisprext <- ext$seq
     spacer
  }
 
 
-# name_uniquely <- function(gr){
-#     assertive::assert_has_no_duplicates(gr)
-#     if (has_names(gr)){  names(gr) %<>% uniquify()
-#     } else {             names(gr) <- as.character(gr)
-#     }
-#     gr
-# }
-name_uniquely <- function(gr){
-    if (has_names(gr)){ 
-        names(gr) %<>% uniquify()
-    } else {
-        gr %<>% name_elements('T')
-    }
-    gr
-}
+
 
 
 get_plus_seq <- function(bsgenome, gr){
@@ -250,15 +236,4 @@ revcomp <- function(y)  y %>%
                         Biostrings::DNAStringSet() %>% 
                         Biostrings::reverseComplement() %>% 
                         as.character()
-
-uniquify <- function(x){
-    
-    .N <- N <- suffix <- NULL
-    
-    dt <- data.table::data.table(x = x)
-    dt[, N := 1:.N, by='x']
-    dt[N==1, suffix := '']
-    dt[ N>1, suffix := paste0('_', as.character(N))]
-    dt[, paste0(x, suffix)]
-}
 

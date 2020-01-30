@@ -15,3 +15,29 @@ num2scalarstr <- function(x){
 
 csign <- function(x) if (sign(x)==-1) '-' else '+'
 
+uniquify <- function(x){
+    .N <- N <- suffix <- NULL
+    dt <- data.table::data.table(x = x)
+    dt[, N := .N, by='x']
+    dt[N==1, xunique := x]
+    dt[N>1, xunique := paste0(x, '_', 1:.N), by = 'x']
+    dt[, xunique]
+}
+
+#' Make unique names
+#' @param x vector
+#' @return character vector with unique names
+make_unique_names <- function(x, prefix='T'){
+    
+    if (has_names(x)) return(uniquify(names(x)))
+    
+    paste0(prefix, formatC(seq_along(x), 
+                                digits = floor(log10(length(x))), 
+                                flag = 0))
+}
+
+name_uniquely <- function(gr, prefix = 'x'){
+    names(gr) <- make_unique_names(gr, prefix)
+    gr
+}
+

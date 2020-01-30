@@ -32,7 +32,7 @@ Each prime editing range is defined in terms of its N20NGG spacer.
 Additionally, three sequence mcols are returned:
   * spacer: N20 spacers
   * pam:    NGG PAMs
-  * extension: 3' extension of gRNA (RTtemplate + primerbindingsite)
+  * 3pext:  3' extension of gRNA (RTtemplate + primerbindingsite)
 }
 \description{
 Find prime editing spacers around target ranges
@@ -54,15 +54,13 @@ Fixes can be performed anywhere in the revtranscript area.
 #-----------
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    gr <- GenomicRanges::GRanges(
-              seqnames = c(PRNP = 'chr20:4699600',             # snp
-                           HBB  = 'chr11:5227002',             # snp
-                           HEXA = 'chr15:72346580-72346583',   # del
-                           CFTR = 'chr7:117559593-117559595'), # ins
-              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-              seqinfo  = BSgenome::seqinfo(bsgenome))
+    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                            HBB  = 'chr11:5227002:-',             # snp
+                            HEXA = 'chr15:72346580-72346583:-',   # del
+                            CFTR = 'chr7:117559593-117559595:+'), # ins
+                          bsgenome)
     find_pe_spacers(gr, bsgenome)
-    find_spacers(extend_for_pe(gr), bsgenome)
+    find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 }
 \seealso{
 \code{\link{find_spacers}} to find standard crispr sites

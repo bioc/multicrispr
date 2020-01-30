@@ -26,12 +26,15 @@ Add inverse strand
 #-----------
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    gr <- GenomicRanges::GRanges(
-              seqnames = c(PRNP = 'chr20:4699600',             # snp
-                           HBB  = 'chr11:5227002',             # snp
-                           HEXA = 'chr15:72346580-72346583',   # del
-                           CFTR = 'chr7:117559593-117559595'), # ins
-              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-              seqinfo  = BSgenome::seqinfo(bsgenome))
+    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                            HBB  = 'chr11:5227002:-',             # snp
+                            HEXA = 'chr15:72346580-72346583:-',   # del
+                            CFTR = 'chr7:117559593-117559595:+'), # ins
+                          bsgenome)
     add_inverse_strand(gr, plot = TRUE)
+# TFBS example
+#-------------
+    bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
+    gr <- bed_to_granges(bedfile, genome = 'mm10')
+    add_inverse_strand(gr)
 }

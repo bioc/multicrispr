@@ -10,8 +10,6 @@ double_flank(
   upend = -1,
   downstart = 1,
   downend = 200,
-  do_reduce = TRUE,
-  add_inverse = TRUE,
   plot = FALSE
 )
 }
@@ -26,27 +24,29 @@ double_flank(
 
 \item{downend}{downstream flank end   in relation to end(gr)}
 
-\item{do_reduce}{TRUE(default) or FALSE: merge overlapping ranges?}
-
-\item{add_inverse}{TRUE (default) or FALSE: add inverse strand?}
-
 \item{plot}{TRUE or FALSE (default)}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}
 }
 \description{
-Double flanks, reduce overlaps, add reverse complement
-}
-\details{
-This function is created for crispr in the context of crisprapex.
-It converts a set of crisprapex targets into a set of ranges in which to 
-search for crispr spacers. This involves (1) agnostifying the strand, 
-(2) calcuting up and down flanks, (3) merging overlapping ranges, and 
-(4) extending each range to both strands
+Double flank
 }
 \examples{
-bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-gr  <-  bed_to_granges(bedfile, genome = 'mm10')
-double_flank(gr, plot = TRUE)
+# Prime Editing example
+#----------------------
+    require(magrittr)
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                            HBB  = 'chr11:5227002:-',             # snp
+                            HEXA = 'chr15:72346580-72346583:-',   # del
+                            CFTR = 'chr7:117559593-117559595:+'), # ins
+                          bsgenome)
+    double_flank(gr, -10,  -1, +1, +20, plot = TRUE)
+      
+# TFBS example
+#-------------
+    bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+    gr  <-  bed_to_granges(bedfile, genome = 'mm10')
+    double_flank(gr, plot = TRUE)
 }

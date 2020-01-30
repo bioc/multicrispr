@@ -2,7 +2,7 @@
 #' @importFrom  assertive.base        assert_all_are_false
 #' @importFrom  assertive.files       assert_all_are_existing_files
 #' @importFrom  assertive.numbers     assert_all_are_less_than
-#' @importFrom  assertive.properties  has_names
+#' @importFrom  assertive.properties  has_names   assert_has_names
 #' @importFrom  assertive.sets        assert_is_subset
 #' @importFrom  assertive.strings     assert_all_are_matching_regex
 #' @importFrom  assertive.types       assert_is_all_of    assert_is_any_of  

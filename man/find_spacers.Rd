@@ -40,12 +40,11 @@ Find crispr spacers in targetranges
 #-----------
     require(magrittr)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    gr <- GenomicRanges::GRanges(
-              c(PRNP = 'chr20:4699600:+',             # snp
-                HBB  = 'chr11:5227002:-',             # snp
-                HEXA = 'chr15:72346580-72346583:-',   # del
-                CFTR = 'chr7:117559593-117559595:+'), # ins
-              seqinfo  = BSgenome::seqinfo(bsgenome))
+    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+                            HBB  = 'chr11:5227002:-',             # snp
+                            HEXA = 'chr15:72346580-72346583:-',   # del
+                            CFTR = 'chr7:117559593-117559595:+'), # ins
+                          bsgenome)
     plot_intervals(gr)
     find_pe_spacers(gr, bsgenome)
     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
@@ -57,8 +56,8 @@ Find crispr spacers in targetranges
 #-------------
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-    gr <- bed_to_granges(bedfile, 'mm10')
-    find_spacers(extend(gr), bsgenome)
+    gr <- bed_to_granges(bedfile, 'mm10') \%>\% extend()
+    find_spacers(gr, bsgenome)
 }
 \seealso{
 \code{\link{find_pe_spacers}} to find prime editing spacers

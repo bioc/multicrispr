@@ -10,7 +10,7 @@ up_flank(
   gr,
   start = -200,
   end = -1,
-  stranded = TRUE,
+  strandaware = TRUE,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -21,7 +21,7 @@ down_flank(
   gr,
   start = 1,
   end = 200,
-  stranded = TRUE,
+  strandaware = TRUE,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -32,7 +32,7 @@ extend(
   gr,
   start = -22,
   end = 22,
-  stranded = TRUE,
+  strandaware = TRUE,
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
@@ -46,7 +46,7 @@ extend(
 
 \item{end}{(pos or neg) number: relative end position   (see details)}
 
-\item{stranded}{TRUE (default) or FALSE: consider strand information?}
+\item{strandaware}{TRUE (default) or FALSE: consider strand information?}
 
 \item{bsgenome}{NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 Required to update gr$seq if present.}
@@ -71,27 +71,25 @@ Returns extensions, upstream flanks, or downstream flanks
 \examples{
 # PE example
 #-----------
-    require(magrittr)
-    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    gr <- GenomicRanges::GRanges(
-              seqnames = c(PRNP = 'chr20:4699600',             # snp
-                           HBB  = 'chr11:5227002',             # snp
-                           HEXA = 'chr15:72346580-72346583',   # del
-                           CFTR = 'chr7:117559593-117559595'), # ins
-              strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-              seqinfo  = BSgenome::seqinfo(bsgenome))
-      up_flank(gr, -22,  -1, plot = TRUE)
-      up_flank(gr, -22,  -1, plot = TRUE, stranded = FALSE)
-    down_flank(gr,  +1, +22, plot = TRUE)
-    down_flank(gr,  +1, +22, plot = TRUE, stranded = FALSE)
-        extend(gr, -10, +20, plot = TRUE)
-        extend(gr, -10, +20, plot = TRUE, stranded = FALSE)
+   require(magrittr)
+   bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+   gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
+                         HBB  = 'chr11:5227002:-',            # snp
+                         HEXA = 'chr15:72346580-72346583:-',  # del
+                         CFTR = 'chr7:117559593-117559595:+'),# ins
+                      bsgenome = bsgenome)
+   gr \%>\% up_flank(-22,  -1, plot = TRUE)
+   gr \%>\% up_flank(-22,  -1, plot = TRUE, strandaware = FALSE)
+   gr \%>\% down_flank(+1, +22, plot = TRUE)
+   gr \%>\% down_flank(+1, +22, plot = TRUE, strandaware = FALSE)
+   gr \%>\% extend(-10, +20, plot = TRUE)
+   gr \%>\% extend(-10, +20, plot = TRUE, strandaware = FALSE)
+   
 # TFBS example
 #-------------
     bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
     gr <- bed_to_granges(bedfile, genome = 'mm10')
+    gr \%>\% extend(plot = TRUE)
     gr \%>\% up_flank(plot = TRUE)
     gr \%>\% down_flank(plot = TRUE)
-    gr \%>\% double_flank()
-    gr \%>\% extend(plot = TRUE)
 }
