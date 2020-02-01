@@ -295,17 +295,19 @@ extend <- function(
 #'     add_inverse_strand(gr)
 #' @export
 add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
-    
+
+    # Assert
+    assertive::assert_is_all_of(gr, 'GRanges')
+      
     # Invert
-    complements <- invertStrand(gr)
-    
-    # Add seq
+    revcomps <- invertStrand(gr)
     if ('seq' %in% names(mcols(gr))){
-        complements$seq <- as.character(complement(DNAStringSet(gr$seq)))
+        revcomps$seq <- as.character(Biostrings::reverseComplement(
+                          DNAStringSet(gr$seq)))
     }
     
     # Concatenate
-    newgr <- c(gr, complements)
+    newgr <- c(gr, revcomps)
     newgr %<>% unique()
     txt <- sprintf('\t\t%d ranges after adding inverse strands', length(newgr))
     
@@ -318,9 +320,9 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     # Plot
     if (plot){
         gr$set    <- 'original'
-        complements$set <- 'inverse'
+        revcomps$set <- 'inverse'
         plot_intervals(
-          c(gr, complements), color_var = 'set', size_var = 'set', ..., title = txt)
+          c(gr, revcomps), color_var = 'set', size_var = 'set', ..., title = txt)
         gr$set <- NULL
     }
     
