@@ -4,12 +4,15 @@
 \alias{index_genome}
 \title{Index genome}
 \usage{
-index_genome(bsgenome, outdir = "~/.multicrispr/bowtie/genome")
+index_genome(
+  bsgenome,
+  indexedgenome = file.path("~/.multicrispr/bowtie", bsgenome@pkgname)
+)
 }
 \arguments{
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{outdir}{string: output directory}
+\item{indexedgenome}{string: index directory}
 }
 \value{
 string: directory with indexed genome

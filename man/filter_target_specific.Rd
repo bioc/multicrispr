@@ -2,23 +2,24 @@
 % Please edit documentation in R/08_add_genome_matches.R
 \name{filter_target_specific}
 \alias{filter_target_specific}
-\title{Filter target-specific spacers}
+\title{Filter for target-specific spacers}
 \usage{
 filter_target_specific(
   spacers,
-  targetdir,
-  genomedir,
-  outdir,
+  targets,
+  bsgenome,
+  indexedgenome,
+  outdir = default_outdir(),
   pam = "NGG",
   verbose = TRUE
 )
 }
 \arguments{
-\item{spacers}{\code{\link[GenomicRanges]{GRanges-class}}}
+\item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{targetdir}{directory with bowtie-indexed targets}
+\item{targets}{target \code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{genomedir}{directory with bowtie-indexed genome}
+\item{indexedgenome}{bowtie indexed genome dir}
 
 \item{outdir}{directory where output is written to}
 
@@ -27,21 +28,16 @@ filter_target_specific(
 \item{verbose}{TRUE (default) or FALSE}
 }
 \description{
-Filter target-specific spacers
+Filter for target-specific spacers
 }
 \examples{
+# TFBS example
+#-------------
  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
  spacers <- find_spacers(targets, bsgenome)
- #spacers \%<>\% extract(1:10) # only to keep example fast, works also else
- 
- tdir <- index_targets(targets, bsgenome)
- gdir <- '~/.multicrispr/bowtie/genome/BSgenome.Mmusculus.UCSC.mm10'
- # index_genome(bsgenome, gdir) # one time effort - takes few h
- outdir <- '~/.multicrispr/bowtie'
-   
- spacers \%>\% add_target_matches(tdir, outdir)
- spacers \%>\% add_genome_matches(gdir, outdir)
- spacers \%>\% filter_target_specific(tdir, gdir, outdir)
+ indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
+ # index_genome(indexedgenome)
+ # filter_target_specific(spacers, targets, bsgenome, indexedgenome)
 }

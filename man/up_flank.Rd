@@ -78,7 +78,7 @@ Returns extensions, upstream flanks, or downstream flanks
                          HEXA = 'chr15:72346580-72346583:-',  # del
                          CFTR = 'chr7:117559593-117559595:+'),# ins
                       bsgenome = bsgenome)
-   gr \%>\% up_flank(-22,  -1, plot = TRUE)
+   gr \%>\% up_flank(-22,  -1, plot = TRUE, facet_var = c('targetname', 'seqnames'))
    gr \%>\% up_flank(-22,  -1, plot = TRUE, strandaware = FALSE)
    gr \%>\% down_flank(+1, +22, plot = TRUE)
    gr \%>\% down_flank(+1, +22, plot = TRUE, strandaware = FALSE)

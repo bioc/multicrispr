@@ -4,16 +4,19 @@
 \alias{index_targets}
 \title{Index targets}
 \usage{
-index_targets(targets, bsgenome, outdir = "~/.multicrispr/bowtie/target")
+index_targets(
+  targets,
+  bsgenome,
+  indexedtargets = paste0(default_outdir(), "/targets"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{targets}{\code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{outdir}{string: output directory}
-
-\item{complement}{TRUE (default) or FALSE}
+\item{indexedtargets}{string: output directory}
 }
 \value{
 
@@ -23,9 +26,8 @@ Bowtie index targets
 }
 \examples{
 require(magrittr)
-bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-targets0 <- bed_to_granges(bedfile, genome = 'mm10')
-targets  <- double_flank(targets0)
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
 index_targets(targets, bsgenome)
 }

@@ -41,12 +41,13 @@ Interval plot GRanges
     require(magrittr)
     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
     sites   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+    sites \%<>\% subset(seqnames \%in\% c('chr1', 'chr2', 'chr3', 'chr4'))
     plot_intervals(sites)
     
-    flanks  <- up_flank(sites, stranded = FALSE)
+    flanks  <- up_flank(sites, -10, -1)
     sites$color <- 'sites'
     flanks$color <- 'flanks'
-    plot_intervals(c(sites, flanks))
+    plot_intervals(c(sites, flanks), color_var = 'color')
     
 # PE targets
     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
