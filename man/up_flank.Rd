@@ -36,6 +36,7 @@ extend(
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
+  linetype_var = "set",
   ...
 )
 }

@@ -104,22 +104,20 @@ doench2016 <- function(
 }
 
 
-#' Score spacers
+#' Add efficiency scores
 #' 
-#' Score spacers with Doench2014 or Doench2016
+#' Add Doench2014 or Doench2016 efficiency scores
 #' 
-#' Doench2014 is readily available. 
-#' Doench2016 is available after installing python module 
-#' [azimuth](https://github.com/MicrosoftResearch/Azimuth) (see examples).
-#' 
-#' @param spacers   \code{\link[GenomicRanges]{GRanges-class}}: spacers
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
+#' @param spacers  \code{\link[GenomicRanges]{GRanges-class}}: spacers
+#' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
 #' @param python     NULL (default) or python binary path with module azimuth
 #' @param virtualenv NULL (default) or python virtualenv with module azimuth
 #' @param condaenv   NULL (default) or python condaenv with module azimuth
 #' @param verbose    TRUE (default) or FALSE
+#' @param plot       TRUE (default) or FALSE
+#' @param alpha_var  NULL or string: var mapped to alpha in plot
 #' @return numeric vector
 #' @examples
 #' # PE example
@@ -132,22 +130,23 @@ doench2016 <- function(
 #'                             CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                           bsgenome)
 #'     spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
-#'     score_spacers(spacers, bsgenome, 'Doench2014')
+#'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
 #'         # conda create --name azimuthenv python=2.7
 #'         # conda activate azimuthenv
 #'         # pip install azimuth
 #'         # pip install scikit-learn==0.17.1
-#'     # score_spacers(spacers, bsgenome, 'Doench2016', condaenv = 'azimuthenv')
-#' 
+#'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azimuthenv')
+#'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azimuthenv')
 #' # TFBS example
 #' #-------------
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     gr <- extend(bed_to_granges(bedfile, 'mm10'))
-#'     spacers <- find_spacers(gr, bsgenome)
-#'     (spacers %<>% score_spacers(bsgenome, 'Doench2014'))
-#'     # (spacers %<>% score_spacers(bsgenome, 'Doench2016'))
-#' 
+#'     targets <- extend(bed_to_granges(bedfile, 'mm10'))
+#'     spacers <- find_spacers(targets, bsgenome)
+#'     # (spacers %<>% add_specificity(targets, bsgenome))
+#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2014'))
+#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016'))
+#'     # spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4)
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
 #' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
@@ -159,14 +158,11 @@ doench2016 <- function(
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
 #' @export
-score_spacers <- function(
-    spacers,
-    bsgenome, 
-    method     = c('Doench2014', 'Doench2016')[1],
-    python     = NULL,
-    virtualenv = NULL,
-    condaenv   = NULL,
-    verbose    = TRUE
+add_efficiency <- function(
+    spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
+    python = NULL, virtualenv = NULL, condaenv = NULL, 
+    verbose = TRUE, plot = TRUE, 
+    alpha_var = default_alpha_var(spacers)
 ){
     # Assert
     assert_is_all_of(spacers, 'GRanges')
@@ -176,14 +172,65 @@ score_spacers <- function(
     # Add contextseq
     if (verbose)  cmessage('\tScore crispr spacers')
     spacers %<>% add_context(bsgenome, verbose = verbose)
-    spacerdt  <- as.data.table(spacers)
+    spacerdt  <- gr2dt(spacers)
     scoredt <- data.table(crisprcontext = unique(spacerdt$crisprcontext))
     
     # Score
     scorefun <- switch(method, Doench2014 = doench2014, Doench2016 = doench2016)
     scoredt[ , (method) := scorefun(scoredt$crisprcontext, verbose=verbose) ]
 
-    # Merge back in and Return
+    # Merge back in
     mergedt  <- merge(spacerdt, scoredt, by='crisprcontext', sort=FALSE, all.x=TRUE)
-    GRanges(mergedt, seqinfo = seqinfo(spacers))
+    spacers <- dt2gr(mergedt, seqinfo = seqinfo(spacers))
+    
+    # Plot
+    if (plot){
+        scores   <- mcols(spacers)[[method]]
+        tertiles <- quantile(scores, c(0.33, 0.66, 1))
+        labels   <- sprintf('%s < %s (%s)', 
+                        method, as.character(round(tertiles, 2)), names(tertiles))
+        spacers$efficiency <- cut(scores, c(0, tertiles), labels)
+        p <- plot_intervals(
+                spacers, size_var = 'efficiency', alpha_var = 'specific') + 
+            ggplot2::scale_size_manual(values = c(0.1, 1, 2))
+        print(p)
+        spacers$efficiency <- NULL
+    }
+    
+    # Return
+    spacers
+}
+
+#' @rdname add_efficiency
+#' @export
+filter_efficient <- function(
+    spacers, 
+    bsgenome,  
+    method= c('Doench2014', 'Doench2016')[1],
+    cutoff,
+    python     = NULL, 
+    virtualenv = NULL, 
+    condaenv   = NULL, 
+    verbose    = TRUE, 
+    plot       = TRUE,
+    alpha_var  = default_alpha_var(gr)
+){
+    spacers %<>% add_efficiency(
+                    bsgenome = bsgenome,  method = method, python = python, 
+                    virtualenv = virtualenv, condaenv = condaenv, 
+                    verbose = verbose, plot = plot, alpha_var = alpha_var)
+
+    idx <- mcols(spacers)[[method]] > cutoff
+    if (verbose){
+        width <- nchar(length(idx))
+        cmessage('\t\t%s ranges', formatC(length(idx), width = width))
+        cmessage('\t\t%s ranges after filtering for %s > %s',
+                 formatC(sum(idx), width = width), method, as.character(cutoff))
+    }
+    
+    spacers %>% extract(idx)
+}
+
+default_alpha_var <- function(gr){
+    if ('specific' %in% names(mcols(gr))) 'specific' else NULL
 }

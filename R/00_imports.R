@@ -34,4 +34,5 @@
 #' @importFrom  stringi               stri_detect_regex  stri_locate_all_fixed
 #' @importFrom  stringi               stri_locate_all_regex   
 #' @importFrom  stringi               stri_replace_first_fixed
+#' @importFrom  stringi               stri_startswith_fixed
 NULL

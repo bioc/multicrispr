@@ -86,7 +86,7 @@ summarize_loci <- function(gr){
 #'                          HEXA = 'chr15:72346580-72346583:-',  # del
 #'                          CFTR = 'chr7:117559593-117559595:+'),# ins
 #'                       bsgenome = bsgenome)
-#'    gr %>% up_flank(-22,  -1, plot = TRUE)
+#'    gr %>% up_flank(-22,  -1, plot = TRUE, facet_var = c('targetname', 'seqnames'))
 #'    gr %>% up_flank(-22,  -1, plot = TRUE, strandaware = FALSE)
 #'    gr %>% down_flank(+1, +22, plot = TRUE)
 #'    gr %>% down_flank(+1, +22, plot = TRUE, strandaware = FALSE)
@@ -103,12 +103,12 @@ summarize_loci <- function(gr){
 #' @export
 up_flank <- function(
   gr, 
-  start    = -200,
-  end      = -1,
+  start       = -200,
+  end         = -1,
   strandaware = TRUE,
-  bsgenome = NULL,
-  verbose  = FALSE,
-  plot     = FALSE,
+  bsgenome    = NULL,
+  verbose     = FALSE,
+  plot        = FALSE,
   ...
 ){
     # Assert
@@ -215,12 +215,13 @@ down_flank <- function(
 #' @export
 extend <- function(
     gr, 
-    start = -22, 
-    end  =  22,
+    start        = -22, 
+    end          =  22,
     strandaware  = TRUE,
-    bsgenome  = NULL,
-    verbose   = FALSE,
-    plot      = FALSE,
+    bsgenome     = NULL,
+    verbose      = FALSE,
+    plot         = FALSE,
+    linetype_var = 'set',
     ...
 ){
 
@@ -260,7 +261,7 @@ extend <- function(
         newgr$set <- 'extensions'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'extensions'))
-        plot_intervals(allgr, color_var = 'set', ..., title=txt)
+        plot_intervals(allgr, linetype_var = 'set', ..., title=txt)
         newgr$set <- NULL
     }
     if (verbose) message(txt)

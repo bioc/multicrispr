@@ -106,7 +106,7 @@ to_megabase <- function(y){
 
 #' Interval plot GRanges
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
-#' @param yby        'contig' (default) or name of gr variable
+#' @param y        'contig' (default) or name of gr variable
 #' @param color_var   'seqnames' (default) or other gr variable
 #' @param linetype_var NULL (default) or gr variable mapped to linetype
 #' @param size_var     NULL (default) or gr variable mapped to size
@@ -117,51 +117,62 @@ to_megabase <- function(y){
 #' @examples 
 #' # SRF sites
 #'     require(magrittr)
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-#'     sites   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'     plot_intervals(sites)
-#'     
-#'     flanks  <- up_flank(sites, stranded = FALSE)
-#'     sites$color <- 'sites'
-#'     flanks$color <- 'flanks'
-#'     plot_intervals(c(sites, flanks))
+#'     targets   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+#'     plot_intervals(targets)
+#'     targets %<>% extend(plot = TRUE)
+#'     spacers <- find_spacers(targets, bsgenome)
+#'     specific <- filter_target_specific(spacers, targets, bsgenome)
+#'     efficient <- filter_efficient(spacers, targets, )
 #'     
 #' # PE targets
-#'     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     sites <- GenomicRanges::GRanges(
-#'                seqnames= c(PRNP = 'chr20:4699600:+',
-#'                            HBB  = 'chr11:5227002:-',
-#'                            HEXA = 'chr15:72346580-72346583:-',
-#'                            CFTR = 'chr7:117559593-117559595:+'), 
-#'                seqinfo  = BSgenome::seqinfo(bs))
-#'     sites$color <- names(sites)
-#'     plot_intervals(sites)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',
+#'                             HBB  = 'chr11:5227002:-',
+#'                             HEXA = 'chr15:72346580-72346583:-',
+#'                             CFTR = 'chr7:117559593-117559595:+'), 
+#'                           bsgenome)
+#'     plot_intervals(gr)
+#'     plot_intervals(extend_for_pe(gr))
+#'     
 #' @export
 plot_intervals <- function(
-    gr, yby = 'contig', color_var = 'seqnames', linetype_var = NULL, 
-    size_var = NULL, facet_var = 'seqnames', title = NULL, scales = 'free'
+    gr, 
+    xref         = 'targetname',
+    y            = 'names',
+    nperchrom    = 1,
+    color_var    = 'targetname', 
+    facet_var    = 'seqnames', 
+    linetype_var = NULL, 
+    size_var     = NULL, 
+    alpha_var    = NULL,
+    title        = NULL, 
+    scales       = 'free'
 ){
     # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
-    assert_is_a_string(color_var)
+    if (!is.null(color_var)) assert_is_a_string(color_var)
     assert_is_subset(color_var, names(as.data.table(gr)))
-    contig <- group <- .N <- .SD <- seqnames <- start <- NULL
-    strand <- tmp <- width <- xstart <- xend <- y <- . <- NULL
+    contig <- .N <- .SD <- seqnames <- start <- NULL
+    strand <- tmp <- width <- xstart <- xend <- . <- NULL
 
     # Identify contigs and order on them
-    gr$contig <- GenomicRanges::findOverlaps(
-                    gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
-    gr %<>% extract(order(.$contig))
+    # gr$contig <- GenomicRanges::findOverlaps(
+    #                 gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
+    # gr %<>% extract(order(.$contig))
     
     # Prepare plotdt
-    plotdt <- as.data.table(gr)
-    head_tail <- function(x, n=1) x %in% c(head(x, n), tail(x, n))
-    plotdt %<>% extract( , .SD[head_tail(contig)], by = c('seqnames'))
+    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
     plotdt %<>% extract(order(seqnames, start))
-    plotdt %>%  extract(, y      := min(start), by = yby)
+    head_tail <- function(x, n=nperchrom) x [ x %in% c(head(x, n), tail(x, n)) ]
+    plotdt %<>% extract(, edge := targetname %in% head_tail(unique(targetname)), by = 'seqnames')
+    plotdt %<>% extract(edge==TRUE)
+    #plotdt %<>% extract( , .SD[head_tail(contig)], by = c('seqnames'))
+    plotdt %>%  extract(, y      := min(start), by = y)
     plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
-    #plotdt %>%  extract(, y      := factor(round(y*1e-6)))
-    plotdt %>%  extract(, xstart := start-min(start), by = 'contig')
+    #plotdt %>%  extract(, xstart := start-min(start), by = 'contig')
+    plotdt %>%  extract(, xstart := start-min(start), by = xref)
     plotdt %>%  extract(, xend   := xstart + width)
     plotdt %>%  extract(strand=='-', tmp    := xend)
     plotdt %>%  extract(strand=='-', xend   := xstart)
@@ -173,12 +184,13 @@ plot_intervals <- function(
                 aes_string(
                     x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
                     color = color_var, linetype = linetype_var, 
-                    size = size_var)) + 
+                    size = size_var, alpha = alpha_var)) + 
         facet_wrap(facet_var, scales = scales) + 
         geom_segment(arrow = arrow(length = unit(0.1, "inches"))) + 
         theme_bw() + 
-        xlab('Offset') + ylab('Start') + ggtitle(title) #+
-
+        #xlab('Offset') + ylab('Start') + ggtitle(title) #+
+        xlab(NULL) + ylab(NULL) + ggtitle(title) #+
+    
     # Print and return
     print(p)
     p

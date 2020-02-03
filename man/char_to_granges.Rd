@@ -25,7 +25,7 @@ x <- c(PRNP  = 'chr20:4699600:+',            # snp
        HEXA = 'chr15:72346580-72346583:-',  # del
        CFTR = 'chr7:117559593-117559595:+') # ins
 gr <- char_to_granges(x, bsgenome)
-plot_intervals(gr, facet_var = c('seqnames', 'targetname'))
+plot_intervals(gr, facet_var = c('targetname', 'seqnames'))
 }
 \seealso{
 \code{\link{bed_to_granges}}, \code{\link{genes_to_granges}}

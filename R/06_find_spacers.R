@@ -45,7 +45,7 @@ extract_subranges <- function(gr, ir, plot = FALSE){
     if (plot){
         mr$rangename <- names(mr)
         plot_intervals( mr, color_var = 'names', 
-                    facet_var = c('seqnames'), yby = 'rangename')
+                    facet_var = c('seqnames'), y = 'rangename')
     }
     
     # Return
@@ -149,7 +149,7 @@ find_spacers <- function(
     spacers$crisprpam    <- BSgenome::getSeq(bsgenome, pams,    as.character=TRUE)
     spacers %>% sort(ignore.strand = TRUE)
     if (plot){
-        plot_intervals(spacers, yby='crisprname')
+        plot_intervals(spacers, y='crisprname')
         spacers$sitename <- NULL
     }
     spacers
@@ -170,19 +170,22 @@ find_spacers <- function(
 #' @examples
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- GenomicRanges::GRanges(
-#'               seqnames = c(PRNP = 'chr20:4699600',             # snp
-#'                            HBB  = 'chr11:5227002',             # snp
-#'                            HEXA = 'chr15:72346580-72346583',   # del
-#'                            CFTR = 'chr7:117559593-117559595'), # ins
-#'               strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#'               seqinfo  = BSgenome::seqinfo(bsgenome))
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                             HBB  = 'chr11:5227002:-',             # snp
+#'                             HEXA = 'chr15:72346580-72346583:-',   # del
+#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                           bsgenome = bsgenome)
 #'     find_pe_spacers(gr, bsgenome)
 #'     (grext <- extend_for_pe(gr))
 #'     find_spacers(grext, bsgenome, complement = FALSE)
 #' @export
 extend_for_pe <- function(
-    gr, bsgenome, nrt = 16, spacer = strrep('N', 20), pam = 'NGG', plot = TRUE
+    gr, 
+    bsgenome, 
+    nrt    = 16, 
+    spacer = strrep('N', 20), 
+    pam    = 'NGG', 
+    plot   = TRUE
 ){
     fw <- copy( gr, start=end(gr)+1-nrt-17, end=start(gr)-1+6,      strand='+')
     rv <- copy( gr, start=end(gr)+1-6,      end=start(gr)-1+nrt+17, strand='-')
@@ -190,10 +193,10 @@ extend_for_pe <- function(
     names(rv) %<>% paste0('_r')
     ext <- c(fw, rv)
     if (plot){
-      gr$set <- 'original'
-      fw$set <- 'fw'
-      rv$set <- 'rv'
-      plot_intervals(c(fw, gr, rv), color_var = 'set', yby = 'set')
+      gr$set <- 'PE target'
+      fw$set <- "potential '+' spacers"
+      rv$set <- "potential '-' spacers"
+      plot_intervals(c(fw, gr, rv), color_var = 'set', y = 'set')
     }
     ext
 }
@@ -275,7 +278,7 @@ extend_for_pe <- function(
 #         original$set <- 'target'
 #         spacer$set <- 'spacer'
 #         plot_intervals(c(original, spacer), color_var = 'set',
-#                        size_var = 'set', yby = 'site')
+#                        size_var = 'set', y = 'site')
 #         sites$set <- NULL
 #     }
 #     if (verbose)   cmessage('\t\t%d cas9 spacers across %d ranges',
@@ -344,7 +347,8 @@ extend_for_pe <- function(
 #     assert_is_a_number(nprimer)
 #     assert_is_a_number(nrt)
 #     assert_all_are_less_than(nprimer, 17)
-# 
+# .
+
 #     # Extensions
 #     extension <- invertStrand(down_flank(spacers, -2-nprimer, -3+nrt))
 #     extension$seq  <- get_plus_seq(bsgenome, extension)              # Get "+" seq
@@ -358,7 +362,7 @@ extend_for_pe <- function(
 #         spacer$part<-'spacer'; primer$part<-'primer'; rtranscripts$part<-'rtranscripts'
 #         allranges <- c(spacer, primer, rtranscripts)
 #         allranges$part %<>% factor(rev(c('spacer', 'rtranscripts', 'primer')))
-#         plot_intervals(allranges, yby = 'site', color_var = 'part', 
+#         plot_intervals(allranges, y = 'site', color_var = 'part', 
 #             size_var = 'part', facet_var = c('seqnames', 'targetname'))
 #         spacer$part <- primer$part <- rtranscripts$part <- NULL
 #     }

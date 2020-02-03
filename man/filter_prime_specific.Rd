@@ -6,7 +6,7 @@
 \usage{
 filter_prime_specific(
   spacers,
-  genomedir,
+  indexedgenome = default_indexedgenome(spacers),
   outdir = default_outdir(),
   pam = "NGG",
   verbose = TRUE
@@ -15,6 +15,8 @@ filter_prime_specific(
 \arguments{
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
+\item{indexedgenome}{bowtie indexed genome dir}
+
 \item{outdir}{directory where output is written to}
 
 \item{pam}{string (default 'NGG'): pam sequence}
@@ -22,8 +24,6 @@ filter_prime_specific(
 \item{verbose}{TRUE (default) or FALSE}
 
 \item{targets}{target \code{\link[GenomicRanges]{GRanges-class}}}
-
-\item{indexedgenome}{bowtie indexed genome dir}
 }
 \description{
 Filters for spacers which hit a single prime editing site

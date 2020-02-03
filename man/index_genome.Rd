@@ -4,10 +4,7 @@
 \alias{index_genome}
 \title{Index genome}
 \usage{
-index_genome(
-  bsgenome,
-  indexedgenome = file.path("~/.multicrispr/bowtie", bsgenome@pkgname)
-)
+index_genome(bsgenome, indexedgenome = default_indexedgenome(bsgenome))
 }
 \arguments{
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}

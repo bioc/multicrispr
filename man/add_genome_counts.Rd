@@ -6,7 +6,7 @@
 \usage{
 add_genome_counts(
   spacers,
-  indexedgenome,
+  indexedgenome = default_indexedgenome(spacers),
   outdir = default_outdir(),
   pam = "NGG",
   verbose = TRUE

@@ -6,11 +6,14 @@
 \usage{
 plot_intervals(
   gr,
-  yby = "contig",
-  color_var = "seqnames",
+  xref = "targetname",
+  y = "names",
+  nperchrom = 1,
+  color_var = "targetname",
+  facet_var = "seqnames",
   linetype_var = NULL,
   size_var = NULL,
-  facet_var = "seqnames",
+  alpha_var = NULL,
   title = NULL,
   scales = "free"
 )
@@ -18,15 +21,15 @@ plot_intervals(
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{yby}{'contig' (default) or name of gr variable}
+\item{y}{'contig' (default) or name of gr variable}
 
 \item{color_var}{'seqnames' (default) or other gr variable}
+
+\item{facet_var}{NULL(default)  or gr variable mapped to facet}
 
 \item{linetype_var}{NULL (default) or gr variable mapped to linetype}
 
 \item{size_var}{NULL (default) or gr variable mapped to size}
-
-\item{facet_var}{NULL(default)  or gr variable mapped to facet}
 
 \item{title}{NULL or string: plot title}
 }
@@ -39,26 +42,25 @@ Interval plot GRanges
 \examples{
 # SRF sites
     require(magrittr)
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-    sites   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-    sites \%<>\% subset(seqnames \%in\% c('chr1', 'chr2', 'chr3', 'chr4'))
-    plot_intervals(sites)
-    
-    flanks  <- up_flank(sites, -10, -1)
-    sites$color <- 'sites'
-    flanks$color <- 'flanks'
-    plot_intervals(c(sites, flanks), color_var = 'color')
+    targets   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+    plot_intervals(targets)
+    targets \%<>\% extend(plot = TRUE)
+    spacers <- find_spacers(targets, bsgenome)
+    specific <- filter_target_specific(spacers, targets, bsgenome)
+    efficient <- filter_efficient(spacers, targets, )
     
 # PE targets
-    bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    sites <- GenomicRanges::GRanges(
-               seqnames= c(PRNP = 'chr20:4699600:+',
-                           HBB  = 'chr11:5227002:-',
-                           HEXA = 'chr15:72346580-72346583:-',
-                           CFTR = 'chr7:117559593-117559595:+'), 
-               seqinfo  = BSgenome::seqinfo(bs))
-    sites$color <- names(sites)
-    plot_intervals(sites)
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',
+                            HBB  = 'chr11:5227002:-',
+                            HEXA = 'chr15:72346580-72346583:-',
+                            CFTR = 'chr7:117559593-117559595:+'), 
+                          bsgenome)
+    plot_intervals(gr)
+    plot_intervals(extend_for_pe(gr))
+    
 }
 \seealso{
 \code{\link{plot_karyogram}}

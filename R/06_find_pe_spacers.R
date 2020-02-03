@@ -67,7 +67,7 @@ extend_pe_to_gg <- function(gr, nrt=16, plot = FALSE){
         gr$set <- 'targets'
         fw$set <- 'possible GG of fwd strand'
         rv$set <- 'possible GG on rev strand'
-        plot_intervals(c(gr, fw, rv), color_var = 'set', yby = 'set')
+        plot_intervals(c(gr, fw, rv), color_var = 'set', y = 'set')
     }
     
     # Return
@@ -203,7 +203,7 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
         ext$part  <- "3' extension"
         allranges <- c(spacer, ext)
         allranges$part %<>% factor(rev(c("spacer", "3' extension")))
-        plot_intervals(allranges, yby = 'crisprname', color_var = 'part', 
+        plot_intervals(allranges, y = 'crisprname', color_var = 'part', 
             size_var = 'part', facet_var = c('seqnames', 'targetname'))
         spacer$part <- NULL
     }

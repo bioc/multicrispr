@@ -162,7 +162,8 @@ bed_to_granges <- function(
 #'        HBB  = 'chr11:5227002:-',            # snp
 #'        HEXA = 'chr15:72346580-72346583:-',  # del
 #'        CFTR = 'chr7:117559593-117559595:+') # ins
-#' char_to_granges(x, bsgenome)
+#' gr <- char_to_granges(x, bsgenome)
+#' plot_intervals(gr, facet_var = c('targetname', 'seqnames'))
 #' @seealso \code{\link{bed_to_granges}}, \code{\link{genes_to_granges}}
 #' @export
 char_to_granges <- function(x, bsgenome){

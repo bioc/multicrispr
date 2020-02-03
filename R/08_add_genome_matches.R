@@ -1,3 +1,11 @@
+default_outdir <- function() paste0(tempdir(), '/multicrispr/bowtie')
+
+default_indexedgenome <- function(x){
+    bsgenome <- if (is(x, 'BSgenome')){ x 
+                } else if (is(x, 'GRanges')){ getBSgenome(genome(x)[1]) }
+    file.path('~/.multicrispr/bowtie', bsgenome@pkgname)
+}
+
 #' Index genome
 #' 
 #' Bowtie index genome
@@ -10,7 +18,7 @@
 #' @export
 index_genome <- function(
     bsgenome, 
-    indexedgenome = file.path('~/.multicrispr/bowtie', bsgenome@pkgname)
+    indexedgenome = default_indexedgenome(bsgenome)
 ){
 
     # Assert
@@ -317,15 +325,19 @@ add_target_counts <- function(
                     spacers, indexedtargets, norc = TRUE, outfile = outfile,
                     pam = pam, count_vars = count_vars, verbose = verbose)
     
-    # Add counts to spacers. Return.
-    dt <- as.data.table(spacers) %>% 
-        merge(matches, by = 'crisprspacer', sort = FALSE)
+    # Add counts to spacers
+    dt  <-  gr2dt(spacers) %>%
+            merge(matches, by = 'crisprspacer', sort = FALSE)
+    
+    # Organize columns and return
     targetvars <- names(dt) %>% extract(stri_startswith_fixed(., 'target'))
     crisprvars <- c('crisprname', 'crisprspacer', 'crisprpam', 'crisprext') %>% 
                     intersect(names(dt))
     othervars <- setdiff(names(dt), c(targetvars, crisprvars))
-    dt %<>% extract(, c(targetvars, crisprvars, othervars), with = FALSE)
-    GRanges(dt, seqinfo = seqinfo(spacers))
+    
+    dt %>% 
+    extract(, c(targetvars, crisprvars, othervars), with = FALSE) %>% 
+    dt2gr(seqinfo(spacers))
     
 }
 #' Add genome counts
@@ -367,10 +379,10 @@ add_target_counts <- function(
 #' @export
 add_genome_counts <- function(
     spacers, 
-    indexedgenome,
-    outdir  = default_outdir(),
-    pam     = 'NGG', 
-    verbose = TRUE
+    indexedgenome = default_indexedgenome(spacers),
+    outdir        = default_outdir(),
+    pam           = 'NGG', 
+    verbose       = TRUE
 ){
     # Add genome matches
     if (verbose) message('\tAdd genome match counts')
@@ -379,79 +391,126 @@ add_genome_counts <- function(
     matches <- match_spacers(
                         spacers, indexedgenome, norc = FALSE, outfile = outfile, 
                         pam = pam, count_vars = count_vars, verbose = verbose)
-    dt <- spacers %>% 
-        as.data.table() %>% 
-        merge(matches, by = 'crisprspacer', sort = FALSE)
+    dt <- gr2dt(spacers) %>%
+            merge(matches, by = 'crisprspacer', sort = FALSE)
     
-    # Organize columns
+    # Organize columns and return
     targetvars <- names(dt) %>% extract(stringi::stri_startswith_fixed(., 'target'))
     crisprvars <- c('crisprname', 'crisprspacer', 'crisprpam', 'crisprext') %>% 
                     intersect(names(dt))
     othervars <- setdiff(names(dt), c(targetvars, crisprvars))
-    dt %<>% extract(, c(targetvars, crisprvars, othervars), with = FALSE)
     
-    # Return GRanges
-    GRanges(dt, seqinfo = seqinfo(spacers))
+    dt %>% 
+    extract(, c(targetvars, crisprvars, othervars), with = FALSE) %>% 
+    dt2gr(seqinfo(spacers))
 }
 
-default_outdir <- function() paste0(tempdir(), '/multicrispr/bowtie')
 
-
-
-#' Filter for target-specific spacers
-#' 
-#' @param spacers   spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param targets   target \code{\link[GenomicRanges]{GRanges-class}}
-#' @param indexedgenome  bowtie indexed genome dir
-#' @param outdir    directory where output is written to
-#' @param pam       string (default 'NGG'): pam sequence
-#' @param verbose   TRUE (default) or FALSE
-#' @examples
-#' # TFBS example
-#' #-------------
-#'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-#'  spacers <- find_spacers(targets, bsgenome)
-#'  indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
-#'  # index_genome(indexedgenome)
-#'  # filter_target_specific(spacers, targets, bsgenome, indexedgenome)
+#' @rdname filter_target_specific
 #' @export
-filter_target_specific <- function(
+add_specificity <- function(
     spacers,
     targets,
     bsgenome, 
-    indexedgenome, 
-    outdir = default_outdir(), 
-    pam       = 'NGG', 
-    verbose   = TRUE
+    indexedgenome = default_indexedgenome(spacers), 
+    outdir        = default_outdir(), 
+    pam           = 'NGG',
+    plot          = TRUE,
+    verbose       = TRUE, 
+    filter        = TRUE
 ){
     # Add target matches
     spacers %<>% add_target_counts(
                     targets, bsgenome, outdir, pam=pam, verbose=verbose)
     
     # Add genome matches
-    spacers %<>% add_genome_counts(indexedgenome, outdir, pam=pam, verbose=verbose)
+    spacers %<>% add_genome_counts(
+                    indexedgenome, outdir, pam=pam, verbose=verbose)
     
     # Sanity check
     assertive::assert_is_of_length(subset(spacers, T0>G0), 0)
     assertive::assert_is_of_length(subset(spacers, T1>G1), 0)
     assertive::assert_is_of_length(subset(spacers, T2>G2), 0)
     
-    # Filter for specificity
+    # Add specificity info
     digits <- ceiling(log10(length(spacers)))
     if (verbose) cmessage('\tFilter %d spacers', length(spacers))
+    spacers$specific <- FALSE
+    idx <- rep(TRUE, length(spacers))
     for (mis in 0:2){
-        idx <-  mcols(spacers)[[paste0('T', mis)]] == 
-                mcols(spacers)[[paste0('G', mis)]]
-        spacers %<>% subset(idx)
+        idx %<>% and(mcols(spacers)[[paste0('T', mis)]] == 
+                     mcols(spacers)[[paste0('G', mis)]])
         if (verbose) cmessage('\t       %s T%d==G%d', 
                                 format(sum(idx), width = digits), mis, mis)
+    }
+    spacers$specific <- idx
+    
+    # Plot
+    if (plot){
+        grplot <- gr2dt(spacers) %>% 
+                    extract(, if(any(specific)) .SD, by = 'targetname') %>% 
+                    dt2gr(seqinfo(spacers))
+        p <- plot_intervals(grplot, alpha_var = 'specific') + 
+            ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25))
+        print(p)
     }
     
     # Return
     spacers
 }
+
+
+#' Filter for target-specific spacers
+#' 
+#' @param spacers   spacer \code{\link[GenomicRanges]{GRanges-class}}
+#' @param targets   target \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
+#' @param indexedgenome  bowtie indexed genome dir
+#' @param outdir    directory where output is written to
+#' @param pam       string (default 'NGG'): pam sequence
+#' @param plot      TRUE (default) or FALSE
+#' @param verbose   TRUE (default) or FALSE
+#' @examples
+#' # TFBS example
+#' #-------------
+#'  require(magrittr)
+#'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
+#'  spacers <- find_spacers(targets, bsgenome)
+#'  indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
+#'  # index_genome(indexedgenome)
+#'  # spacers %<>% add_specificity(targets, bsgenome, indexedgenome)
+#'  # spacers %>% filter_target_specific(targets, bsgenome, indexedgenome)
+#' @export
+filter_target_specific <- function(
+    spacers,
+    targets,
+    bsgenome, 
+    indexedgenome = default_indexedgenome(spacers), 
+    outdir        = default_outdir(), 
+    pam           = 'NGG',
+    plot          = TRUE,
+    verbose       = TRUE
+){
+    # Add specificty info
+    spacers %<>% add_specificity(
+                    targets       = targets, 
+                    bsgenome      = bsgenome, 
+                    indexedgenome = indexedgenome, 
+                    outdir        = outdir, 
+                    pam           = pam, 
+                    plot          = plot,
+                    verbose       = verbose)
+    
+    # Subset
+    spacers %<>% subset(specific==TRUE)
+    spacers$specific <- FALSE
+    
+    # Return
+    return(spacers)
+}
+
 
 
 #' Filter for PE-specific spacers
@@ -480,10 +539,14 @@ filter_target_specific <- function(
 #'  # filter_prime_specific(spacers, indexedgenome)
 #' @export
 filter_prime_specific <- function(
-    spacers, genomedir, outdir = default_outdir(), pam = 'NGG', verbose = TRUE
+    spacers, 
+    indexedgenome = default_indexedgenome(spacers),
+    outdir        = default_outdir(), 
+    pam           = 'NGG', 
+    verbose       = TRUE
 ){
     # Add genome matches
-    spacers %<>% add_genome_counts(genomedir, outdir, pam=pam, verbose=verbose)
+    spacers %<>% add_genome_counts(indexedgenome, outdir, pam=pam, verbose=verbose)
     
     # Filter for specificity
     digits <- ceiling(log10(length(spacers)))
