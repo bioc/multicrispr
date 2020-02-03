@@ -7,7 +7,7 @@ bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 spacers <- find_spacers(targets, bsgenome, plot = FALSE)
 indexedgenome <- "~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10"
     # Change this to path of bowtie indexed genome on your system
-spacers %<>% add_genome_counts(indexedgenome, plot = FALSE)
+spacers %<>% add_genome_counts(indexedgenome, mismatches = 2)
 
 #'         # conda create --name azimuthenv python=2.7
 #'         # conda activate azimuthenv
