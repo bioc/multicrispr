@@ -124,12 +124,13 @@ doench2016 <- function(
 #' #-----------
 #'     require(magrittr)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-#'                             HBB  = 'chr11:5227002:-',             # snp
-#'                             HEXA = 'chr15:72346580-72346583:-',   # del
-#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
-#'                           bsgenome)
-#'     spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+#'     targets <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#'                                  HBB  = 'chr11:5227002:-',             # snp
+#'                                  HEXA = 'chr15:72346580-72346583:-',   # del
+#'                                  CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                                bsgenome)
+#'     spacers <- find_pe_spacers(targets, bsgenome)
+#'    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
 #'         # conda create --name azimuthenv python=2.7
 #'         # conda activate azimuthenv
@@ -168,6 +169,7 @@ add_efficiency <- function(
     assert_is_all_of(spacers, 'GRanges')
     assert_is_a_string(method)
     assert_is_subset(method, c('Doench2014', 'Doench2016'))
+    if (method %in% names(mcols(spacers))) mcols(spacers)[[method]] <- NULL
 
     # Add contextseq
     if (verbose)  cmessage('\tScore crispr spacers')
@@ -191,7 +193,7 @@ add_efficiency <- function(
                         method, as.character(round(tertiles, 2)), names(tertiles))
         spacers$efficiency <- cut(scores, c(0, tertiles), labels)
         p <- plot_intervals(
-                spacers, size_var = 'efficiency', alpha_var = 'specific') + 
+                spacers, size_var = 'efficiency', alpha_var = alpha_var) + 
             ggplot2::scale_size_manual(values = c(0.1, 1, 2))
         print(p)
         spacers$efficiency <- NULL
