@@ -7,6 +7,7 @@
 add_genome_counts(
   spacers,
   indexedgenome = default_indexedgenome(spacers),
+  mismatches = 2,
   outdir = default_outdir(),
   pam = "NGG",
   verbose = TRUE
@@ -16,6 +17,8 @@ add_genome_counts(
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{indexedgenome}{dir with bowtie-indexed genome}
+
+\item{mismatches}{number (default 2): max number of mismatches to consider}
 
 \item{outdir}{dir where output is written to}
 
@@ -43,7 +46,7 @@ Adds match counts to GRanges object, and then returns it.
  spacers <- find_pe_spacers(gr, bsgenome)
  indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Hsapiens.UCSC.hg38'
  # index_genome(bsgenome, indexedgenome)
- # add_genome_counts(spacers, indexedgenome)
+ # add_genome_counts(spacers, indexedgenome, mismatches=1)
     
 # TFBS example
 #-------------
@@ -53,7 +56,8 @@ Adds match counts to GRanges object, and then returns it.
  spacers <- find_spacers(targets, bsgenome)
  indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
  # index_genome(bsgenome, indexedgenome)
- # add_genome_counts(spacers, genome)
+ # add_genome_counts(spacers, indexedgenome)
+ # add_genome_counts(spacers, indexedgenome, mismatches=3)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

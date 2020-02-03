@@ -8,9 +8,9 @@ match_spacers(
   spacers,
   indexdir,
   norc,
+  mismatches = 2,
   outfile = paste0(default_outdir(), "/match_", basename(indexdir), ".txt"),
   pam = "NGG",
-  count_vars = c("MM0", "MM1", "MM2"),
   verbose = TRUE
 )
 }
@@ -25,13 +25,15 @@ It can also be indexed targets (\code{\link{index_targets}})}
 Generally TRUE for genome and FALSE for target matches, 
 because target ranges generally include both strands.}
 
+\item{mismatches}{number (default 2): max number of mismatches to consider}
+
 \item{outfile}{string: file where to output bowtie results}
 
 \item{pam}{string (default 'NGG') pam pattern to expand}
 
-\item{count_vars}{character(3): how to name count variables}
-
 \item{verbose}{TRUE (default) or FALSE}
+
+\item{count_vars}{character(3): how to name count variables}
 }
 \description{
 Count matches to indexed target/genome and add to GRanges
@@ -50,6 +52,7 @@ targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
 indexedtargets <- index_targets(targets, bsgenome, indexedtargets)
 spacers <- find_spacers(targets, bsgenome)
 match_spacers(spacers, indexedtargets, norc=FALSE)
+match_spacers(spacers, indexedtargets, norc=FALSE, mismatches = 3)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

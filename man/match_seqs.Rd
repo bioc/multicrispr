@@ -8,8 +8,8 @@ match_seqs(
   seqs,
   indexdir,
   norc,
+  mismatches = 2,
   outfile = paste0(default_outdir(), "/match_", basename(indexdir), ".txt"),
-  count_vars = c("MM0", "MM1", "MM2"),
   verbose = TRUE
 )
 }
@@ -24,9 +24,9 @@ It can also be indexed targets (\code{\link{index_targets}})}
 Generally TRUE for genome and FALSE for target matches, 
 because target ranges generally include both strands.}
 
-\item{outfile}{string: file where to output bowtie results}
+\item{mismatches}{max number of mismatches to consider}
 
-\item{count_vars}{character(3): how to name count variables}
+\item{outfile}{string: file where to output bowtie results}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
@@ -45,10 +45,11 @@ adds match counts to GRanges object, and then returns it
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-indexedtargets <- index_targets(targets, bsgenome, indexedtargets)
+indexedtargets <- index_targets(targets, bsgenome)
 spacers <- find_spacers(targets, bsgenome)
 crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
 match_seqs(crisprseqs, indexedtargets, norc=FALSE)
+match_seqs(crisprseqs, indexedtargets, norc=FALSE, mismatch=3)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

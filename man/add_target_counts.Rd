@@ -8,6 +8,7 @@ add_target_counts(
   spacers,
   targets,
   bsgenome,
+  mismatches = 2,
   outdir = default_outdir(),
   pam = "NGG",
   verbose = TRUE
@@ -19,6 +20,8 @@ add_target_counts(
 \item{targets}{target \code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
+
+\item{mismatches}{number (default 2): max number of mismatches to consider}
 
 \item{outdir}{dir where output is written to}
 
