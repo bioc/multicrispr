@@ -17,6 +17,7 @@ RoxygenNote: 7.0.2
 Depends:
     R (>= 3.6.0)
 Imports:
+    assertive,
     assertive.base,
     assertive.files,
     assertive.numbers,
@@ -41,6 +42,7 @@ Imports:
     magrittr,
     methods,
     plyranges,
+    Rbowtie,
     reticulate,
     rtracklayer,
     stringi, 
