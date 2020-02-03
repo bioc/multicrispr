@@ -44,8 +44,8 @@ extract_subranges <- function(gr, ir, plot = FALSE){
     # Plot    
     if (plot){
         mr$rangename <- names(mr)
-        plot_intervals( mr, color_var = 'names', 
-                    facet_var = c('seqnames'), y = 'rangename')
+        print(plot_intervals( mr, color_var = 'names', 
+                    facet_var = c('seqnames'), y = 'rangename'))
     }
     
     # Return
@@ -149,7 +149,7 @@ find_spacers <- function(
     spacers$crisprpam    <- BSgenome::getSeq(bsgenome, pams,    as.character=TRUE)
     spacers %>% sort(ignore.strand = TRUE)
     if (plot){
-        plot_intervals(spacers, y='crisprname')
+        print(plot_intervals(spacers, y='crisprname'))
         spacers$sitename <- NULL
     }
     spacers
@@ -196,7 +196,7 @@ extend_for_pe <- function(
       gr$set <- 'PE target'
       fw$set <- "potential '+' spacers"
       rv$set <- "potential '-' spacers"
-      plot_intervals(c(fw, gr, rv), color_var = 'set', y = 'set')
+      print(plot_intervals(c(fw, gr, rv), color_var = 'set', y = 'set'))
     }
     ext
 }

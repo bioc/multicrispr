@@ -147,7 +147,7 @@ up_flank <- function(
         newgr$set <- 'upstream flanks'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'upstream flanks'))
-        plot_intervals(allgr, color_var = 'set', ..., title = txt)
+        print(plot_intervals(allgr, color_var = 'set', ..., title = txt))
         newgr$set <- NULL
     }
     if (verbose) message(txt)
@@ -203,7 +203,7 @@ down_flank <- function(
         newgr$set <- 'downstream flanks'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'downstream flanks'))
-        plot_intervals(allgr, color_var = 'set', ..., title=txt)
+        print(plot_intervals(allgr, color_var = 'set', ..., title=txt))
         newgr$set <- NULL
    }
     if (verbose) message(txt)
@@ -261,7 +261,7 @@ extend <- function(
         newgr$set <- 'extensions'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'extensions'))
-        plot_intervals(allgr, linetype_var = 'set', ..., title=txt)
+        print(plot_intervals(allgr, linetype_var = 'set', ..., title=txt))
         newgr$set <- NULL
     }
     if (verbose) message(txt)
@@ -322,8 +322,9 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     if (plot){
         gr$set    <- 'original'
         revcomps$set <- 'inverse'
-        plot_intervals(
-          c(gr, revcomps), color_var = 'set', size_var = 'set', ..., title = txt)
+        print(plot_intervals(
+                c(gr, revcomps), 
+                color_var = 'set', size_var = 'set', ..., title = txt))
         gr$set <- NULL
     }
     
@@ -384,7 +385,7 @@ double_flank <- function(
       newgr$set <- 'flanks'
       allgr <- c(gr, newgr)
       allgr$set %<>% factor(c('original', 'flanks'))
-      plot_intervals(allgr, color_var = 'set', title = txt)
+      print(plot_intervals(allgr, color_var = 'set', title = txt))
       newgr$set <- NULL
     }
     

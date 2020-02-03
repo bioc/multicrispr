@@ -202,9 +202,12 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
         spacer$part<-'spacer'
         ext$part  <- "3' extension"
         allranges <- c(spacer, ext)
-        allranges$part %<>% factor(rev(c("spacer", "3' extension")))
-        plot_intervals(allranges, y = 'crisprname', color_var = 'part', 
-            size_var = 'part', facet_var = c('seqnames', 'targetname'))
+        #allranges$part %<>% factor(rev(c("spacer", "3' extension")))
+        allranges$part %<>% factor((c("spacer", "3' extension")))
+        # print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part', 
+        #     size_var = 'part', facet_var = c('seqnames', 'targetname')))
+        print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part', 
+             facet_var = c('seqnames', 'targetname')))
         spacer$part <- NULL
     }
     

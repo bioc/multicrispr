@@ -192,6 +192,6 @@ plot_intervals <- function(
         xlab(NULL) + ylab(NULL) + ggtitle(title) #+
     
     # Print and return
-    print(p)
+    #print(p)
     p
 }
