@@ -25,4 +25,3 @@ test_that('extend warns for coordinates < 1', {
 test_that('extend warns for coordinates > chrlength', {
     expect_warning(extend(granges, 1, 1 + chrlength, plot = FALSE))
 })
-r

@@ -249,10 +249,9 @@ expand_iupac_ambiguities <- function(x){
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-#' indexedtargets <- index_targets(targets, bsgenome, indexedtargets)
+#' indexedtargets <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
-#' match_spacers(spacers, indexedtargets, norc=FALSE)
-#' match_spacers(spacers, indexedtargets, norc=FALSE, mismatches = 3)
+#' match_spacers(spacers, indexedtargets, norc=FALSE, mismatches = 1)
 #' @export
 match_spacers <- function(
     spacers, 

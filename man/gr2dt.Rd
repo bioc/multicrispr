@@ -27,5 +27,5 @@ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                             CFTR = 'chr7:117559593-117559595:+'), # ins
                           bsgenome)
 (dt <- gr2dt(gr))
-(gr <- dt2gr(dt, seqinfo(bsgenome)))
+(gr <- dt2gr(dt, BSgenome::seqinfo(bsgenome)))
 }

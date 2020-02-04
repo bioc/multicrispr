@@ -57,12 +57,12 @@ filter_prime_specific(spacers, genomedir, outdir)
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targets  <- bed_to_granges(bedfile, genome='mm10', plot = FALSE)
 png('graphs/srf.png')
-plot_karyogram(targets)
+plot_karyogram(targets, title = NULL)
 dev.off()
 
 # Process
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 targets %<>% extend()
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 targets %>% find_spacers(bsgenome) %>% filter_target_specific(targets, bsgenome) %>% filter_efficient()
 
 targets %<>% subset(targetname %in% c('T0018', 'T1042'))

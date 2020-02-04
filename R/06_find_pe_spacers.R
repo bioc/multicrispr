@@ -123,11 +123,6 @@ find_gg <- function(gr){
     return(gg_ranges)
 }
 
-# gr2dt <- function(gr){
-#     cbind(  as.data.table(GenomicRanges::granges(gr)), 
-#             as.data.table(lapply(mcols(gr), as.character)))
-# }
-
 
 #' Find prime editing spacers
 #' 

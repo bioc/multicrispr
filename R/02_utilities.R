@@ -56,7 +56,7 @@ name_uniquely <- function(gr, prefix = 'x'){
 #'                             CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                           bsgenome)
 #' (dt <- gr2dt(gr))
-#' (gr <- dt2gr(dt, seqinfo(bsgenome)))
+#' (gr <- dt2gr(dt, BSgenome::seqinfo(bsgenome)))
 #' @export
 gr2dt <- function(gr){
     dt <- as.data.table(gr)
