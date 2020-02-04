@@ -14,6 +14,7 @@ up_flank(
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
+  linetype_var = "set",
   ...
 )
 
@@ -25,6 +26,7 @@ down_flank(
   bsgenome = NULL,
   verbose = FALSE,
   plot = FALSE,
+  linetype_var = "set",
   ...
 )
 
@@ -55,6 +57,8 @@ Required to update gr$seq if present.}
 \item{verbose}{TRUE or FALSE (default)}
 
 \item{plot}{TRUE or FALSE (default)}
+
+\item{linetype_var}{string: gr var mapped to linetype}
 
 \item{...}{passed to \code{\link{plot_intervals}}}
 }

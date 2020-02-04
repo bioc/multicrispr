@@ -39,18 +39,13 @@ extract_subranges <- function(gr, ir, plot = FALSE){
     mdt[strand=='-', end   := end+1-substart]
     mdt[strand=='-', start := end+1-subwidth]
     mdt[, c('substart', 'subend', 'subwidth') := NULL]
-    mr <- GRanges(mdt, seqinfo = seqinfo(gr))
-    names(mr) <- uniquify(mr$names)
+    mr <- dt2gr(mdt, seqinfo = seqinfo(gr))
+    names(mr) %<>% uniquify()
+    
     # Plot    
-    if (plot){
-        mr$rangename <- names(mr)
-        print(plot_intervals( mr, color_var = 'names', 
-                    facet_var = c('seqnames'), y = 'rangename'))
-    }
+    if (plot)  print(plot_intervals(mr))
     
     # Return
-    mr$rangename <- NULL
-    mr$names <- NULL
     mr
 }
 

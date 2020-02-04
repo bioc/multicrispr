@@ -45,7 +45,7 @@ Adds match counts to GRanges object, and then returns it.
  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
  targets  <- extend(bed_to_granges(bedfile, genome = 'mm10'))
  spacers <- find_spacers(targets, bsgenome)
- spacers \%>\% add_target_counts(targets, bsgenome)
+ add_target_counts(spacers, targets, bsgenome)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

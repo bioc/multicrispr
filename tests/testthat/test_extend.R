@@ -11,10 +11,10 @@ context('extend')
 
 test_that('extend works', {
     expect_equal(
-        start(extend(granges, -5, 5, stranded = FALSE)),  
+        start(extend(granges, -5, 5)),  
         start(granges) - 5)
     expect_equal(  
-        end(extend(granges, -5, 5, stranded = FALSE)),
+        end(extend(granges, -5, 5)),
         end(granges) + 5)
 })
 
@@ -25,3 +25,4 @@ test_that('extend warns for coordinates < 1', {
 test_that('extend warns for coordinates > chrlength', {
     expect_warning(extend(granges, 1, 1 + chrlength, plot = FALSE))
 })
+r

@@ -10,7 +10,9 @@ double_flank(
   upend = -1,
   downstart = 1,
   downend = 200,
-  plot = FALSE
+  plot = FALSE,
+  linetype_var = "set",
+  ...
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ double_flank(
 \item{downend}{downstream flank end   in relation to end(gr)}
 
 \item{plot}{TRUE or FALSE (default)}
+
+\item{linetype_var}{gr var mapped to linetype}
+
+\item{...}{passed to plot_intervals}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

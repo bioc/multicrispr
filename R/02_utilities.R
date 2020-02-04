@@ -16,7 +16,7 @@ num2scalarstr <- function(x){
 csign <- function(x) if (sign(x)==-1) '-' else '+'
 
 uniquify <- function(x){
-    .N <- N <- suffix <- NULL
+    .N <- N <- suffix <- xunique <- NULL
     dt <- data.table::data.table(x = x)
     dt[, N := .N, by='x']
     dt[N==1, xunique := x]
@@ -26,6 +26,7 @@ uniquify <- function(x){
 
 #' Make unique names
 #' @param x vector
+#' @param prefix string: prefix with which to start names
 #' @return character vector with unique names
 make_unique_names <- function(x, prefix='T'){
     

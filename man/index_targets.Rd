@@ -17,9 +17,11 @@ index_targets(
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{indexedtargets}{string: output directory}
+
+\item{verbose}{TRUE (default) or FALSE}
 }
 \value{
-
+indextargets: output directory
 }
 \description{
 Bowtie index targets

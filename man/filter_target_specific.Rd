@@ -14,8 +14,7 @@ add_specificity(
   outdir = default_outdir(),
   pam = "NGG",
   plot = TRUE,
-  verbose = TRUE,
-  filter = TRUE
+  verbose = TRUE
 )
 
 filter_target_specific(
@@ -38,6 +37,8 @@ filter_target_specific(
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{indexedgenome}{bowtie indexed genome dir}
+
+\item{mismatches}{number (default 2): max number of mismatches to consider}
 
 \item{outdir}{directory where output is written to}
 

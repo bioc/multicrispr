@@ -8,6 +8,8 @@ make_unique_names(x, prefix = "T")
 }
 \arguments{
 \item{x}{vector}
+
+\item{prefix}{string: prefix with which to start names}
 }
 \value{
 character vector with unique names

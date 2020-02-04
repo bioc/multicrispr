@@ -106,12 +106,17 @@ to_megabase <- function(y){
 
 #' Interval plot GRanges
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
-#' @param y        'contig' (default) or name of gr variable
+#' @param xref        gr var used for scaling x axis
+#' @param y           'contig' (default) or name of gr variable
+#' @param nperchrom    number (default 1): n head (and n tail) targets 
+#'                     shown per chromosome
 #' @param color_var   'seqnames' (default) or other gr variable
 #' @param linetype_var NULL (default) or gr variable mapped to linetype
 #' @param size_var     NULL (default) or gr variable mapped to size
 #' @param facet_var    NULL(default)  or gr variable mapped to facet
+#' @param alpha_var    NULL or gr variable mapped to alpha
 #' @param title        NULL or string: plot title
+#' @param scales       'free', 'fixed', etc
 #' @return ggplot object
 #' @seealso  \code{\link{plot_karyogram}}
 #' @examples 
@@ -150,6 +155,9 @@ plot_intervals <- function(
     title        = NULL, 
     scales       = 'free'
 ){
+    # Comply
+    edge <- targetname <- NULL
+    
     # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
     if (!is.null(color_var)) assert_is_a_string(color_var)

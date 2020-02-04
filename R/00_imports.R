@@ -12,9 +12,9 @@
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
-#' @importFrom  BSgenome              getSeq
+#' @importFrom  BSgenome              getSeq   getBSgenome
 #' @importFrom  data.table            :=  data.table  as.data.table  setnames
-#' @importFrom  data.table            setnames  setorderv   setnafill
+#' @importFrom  data.table            setnames  setorderv   setnafill    .SD
 #' @importFrom  GenomeInfoDb          genome
 #' @importFrom  GenomeInfoDb          seqinfo   seqinfo<-
 #' @importFrom  GenomeInfoDb          seqlevels  seqlevels<-  seqlevelsInUse
@@ -26,7 +26,8 @@
 #' @importFrom  ggplot2               ggplot  ggtitle  scale_x_continuous
 #' @importFrom  ggplot2               theme_bw  unit  xlab  ylab
 #' @importFrom  grid                  arrow
-#' @importFrom  magrittr              %>%   %<>%   extract  extract2  set_names
+#' @importFrom  magrittr              %>%   %<>%   and
+#' @importFrom  magrittr              extract  extract2  set_names
 #' @importFrom  methods               as
 #' @importFrom  tidyr                 separate_rows
 #' @importFrom  utils                 getFromNamespace  head  tail

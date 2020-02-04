@@ -22,8 +22,6 @@ filter_prime_specific(
 \item{pam}{string (default 'NGG'): pam sequence}
 
 \item{verbose}{TRUE (default) or FALSE}
-
-\item{targets}{target \code{\link[GenomicRanges]{GRanges-class}}}
 }
 \description{
 Filters for spacers which hit a single prime editing site

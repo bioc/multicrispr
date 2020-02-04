@@ -32,8 +32,6 @@ because target ranges generally include both strands.}
 \item{pam}{string (default 'NGG') pam pattern to expand}
 
 \item{verbose}{TRUE (default) or FALSE}
-
-\item{count_vars}{character(3): how to name count variables}
 }
 \description{
 Count matches to indexed target/genome and add to GRanges

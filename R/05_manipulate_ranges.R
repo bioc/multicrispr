@@ -74,6 +74,7 @@ summarize_loci <- function(gr){
 #'                  Required to update gr$seq if present.
 #' @param verbose   TRUE or FALSE (default)
 #' @param plot      TRUE or FALSE (default)
+#' @param linetype_var string: gr var mapped to linetype
 #' @param ...       passed to \code{\link{plot_intervals}}
 #' @return a \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
@@ -109,6 +110,7 @@ up_flank <- function(
   bsgenome    = NULL,
   verbose     = FALSE,
   plot        = FALSE,
+  linetype_var = 'set',
   ...
 ){
     # Assert
@@ -147,7 +149,7 @@ up_flank <- function(
         newgr$set <- 'upstream flanks'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'upstream flanks'))
-        print(plot_intervals(allgr, color_var = 'set', ..., title = txt))
+        print(plot_intervals(allgr, linetype_var = linetype_var, ..., title = txt))
         newgr$set <- NULL
     }
     if (verbose) message(txt)
@@ -165,6 +167,7 @@ down_flank <- function(
     bsgenome   = NULL,
     verbose    = FALSE,
     plot       = FALSE,
+    linetype_var = 'set',
     ...
 ){
     # Assert
@@ -203,7 +206,7 @@ down_flank <- function(
         newgr$set <- 'downstream flanks'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'downstream flanks'))
-        print(plot_intervals(allgr, color_var = 'set', ..., title=txt))
+        print(plot_intervals(allgr, linetype_var = linetype_var, ..., title=txt))
         newgr$set <- NULL
    }
     if (verbose) message(txt)
@@ -261,7 +264,7 @@ extend <- function(
         newgr$set <- 'extensions'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'extensions'))
-        print(plot_intervals(allgr, linetype_var = 'set', ..., title=txt))
+        print(plot_intervals(allgr, linetype_var = linetype_var, ..., title=txt))
         newgr$set <- NULL
     }
     if (verbose) message(txt)
@@ -341,6 +344,8 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 #' @param downstart    downstream flank start in relation to end(gr)
 #' @param downend      downstream flank end   in relation to end(gr)
 #' @param plot         TRUE or FALSE (default)
+#' @param linetype_var gr var mapped to linetype
+#' @param ...          passed to plot_intervals
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples 
 #' # Prime Editing example
@@ -366,7 +371,9 @@ double_flank <- function(
   upend       = -1, 
   downstart   = 1, 
   downend     = 200, 
-  plot        = FALSE
+  plot        = FALSE, 
+  linetype_var = 'set',
+  ...
 ){
 
     # Up flank, down flank, concatenate
@@ -385,7 +392,7 @@ double_flank <- function(
       newgr$set <- 'flanks'
       allgr <- c(gr, newgr)
       allgr$set %<>% factor(c('original', 'flanks'))
-      print(plot_intervals(allgr, color_var = 'set', title = txt))
+      print(plot_intervals(allgr, linetype_var = linetype_var, title = txt, ...))
       newgr$set <- NULL
     }
     

@@ -21,7 +21,12 @@ plot_intervals(
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
+\item{xref}{gr var used for scaling x axis}
+
 \item{y}{'contig' (default) or name of gr variable}
+
+\item{nperchrom}{number (default 1): n head (and n tail) targets 
+shown per chromosome}
 
 \item{color_var}{'seqnames' (default) or other gr variable}
 
@@ -31,7 +36,11 @@ plot_intervals(
 
 \item{size_var}{NULL (default) or gr variable mapped to size}
 
+\item{alpha_var}{NULL or gr variable mapped to alpha}
+
 \item{title}{NULL or string: plot title}
+
+\item{scales}{'free', 'fixed', etc}
 }
 \value{
 ggplot object

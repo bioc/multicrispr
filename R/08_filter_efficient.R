@@ -104,14 +104,18 @@ doench2016 <- function(
 }
 
 
-#' Add efficiency scores
+#' Add efficiency scores and filter
 #' 
-#' Add Doench2014 or Doench2016 efficiency scores
+#' Add Doench2014 or Doench2016 efficiency scores and filter on them
+#' 
+#' \code{add_efficiency} adds efficiency scores
+#' \code{filter_efficiency} adds efficiency scores and filters on them
 #' 
 #' @param spacers  \code{\link[GenomicRanges]{GRanges-class}}: spacers
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
+#' @param cutoff     number: cutoff value
 #' @param python     NULL (default) or python binary path with module azimuth
 #' @param virtualenv NULL (default) or python virtualenv with module azimuth
 #' @param condaenv   NULL (default) or python condaenv with module azimuth
@@ -188,7 +192,7 @@ add_efficiency <- function(
     # Plot
     if (plot){
         scores   <- mcols(spacers)[[method]]
-        tertiles <- quantile(scores, c(0.33, 0.66, 1))
+        tertiles <- stats::quantile(scores, c(0.33, 0.66, 1))
         labels   <- sprintf('%s < %s (%s)', 
                         method, as.character(round(tertiles, 2)), names(tertiles))
         spacers$efficiency <- cut(scores, c(0, tertiles), labels)
@@ -215,7 +219,7 @@ filter_efficient <- function(
     condaenv   = NULL, 
     verbose    = TRUE, 
     plot       = TRUE,
-    alpha_var  = default_alpha_var(gr)
+    alpha_var  = default_alpha_var(spacers)
 ){
     spacers %<>% add_efficiency(
                     bsgenome = bsgenome,  method = method, python = python, 

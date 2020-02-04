@@ -3,7 +3,7 @@
 \name{add_efficiency}
 \alias{add_efficiency}
 \alias{filter_efficient}
-\title{Add efficiency scores}
+\title{Add efficiency scores and filter}
 \usage{
 add_efficiency(
   spacers,
@@ -27,7 +27,7 @@ filter_efficient(
   condaenv = NULL,
   verbose = TRUE,
   plot = TRUE,
-  alpha_var = default_alpha_var(gr)
+  alpha_var = default_alpha_var(spacers)
 )
 }
 \arguments{
@@ -49,12 +49,18 @@ filter_efficient(
 \item{plot}{TRUE (default) or FALSE}
 
 \item{alpha_var}{NULL or string: var mapped to alpha in plot}
+
+\item{cutoff}{number: cutoff value}
 }
 \value{
 numeric vector
 }
 \description{
-Add Doench2014 or Doench2016 efficiency scores
+Add Doench2014 or Doench2016 efficiency scores and filter on them
+}
+\details{
+\code{add_efficiency} adds efficiency scores
+\code{filter_efficiency} adds efficiency scores and filters on them
 }
 \examples{
 # PE example
