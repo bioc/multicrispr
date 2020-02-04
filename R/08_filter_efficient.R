@@ -136,12 +136,12 @@ doench2016 <- function(
 #'     spacers <- find_pe_spacers(targets, bsgenome)
 #'    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
-#'         # conda create --name azimuthenv python=2.7
-#'         # conda activate azimuthenv
+#'         # conda create --name azienv python=2.7
+#'         # conda activate azienv
 #'         # pip install azimuth
 #'         # pip install scikit-learn==0.17.1
-#'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azimuthenv')
-#'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azimuthenv')
+#'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
+#'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azienv')
 #' # TFBS example
 #' #-------------
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
@@ -150,8 +150,8 @@ doench2016 <- function(
 #'     spacers <- find_spacers(targets, bsgenome)
 #'     # (spacers %<>% add_specificity(targets, bsgenome))
 #'     # (spacers %>% add_efficiency(bsgenome, 'Doench2014'))
-#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016'))
-#'     # spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4)
+#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016', condaenv='azienv'))
+#'     # spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4, condaenv='azienv')
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
 #' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
@@ -182,8 +182,12 @@ add_efficiency <- function(
     scoredt <- data.table(crisprcontext = unique(spacerdt$crisprcontext))
     
     # Score
-    scorefun <- switch(method, Doench2014 = doench2014, Doench2016 = doench2016)
-    scoredt[ , (method) := scorefun(scoredt$crisprcontext, verbose=verbose) ]
+    scores <- switch(
+        method, 
+        Doench2014 = doench2014(scoredt$crisprcontext, verbose=verbose), 
+        Doench2016 = doench2016(scoredt$crisprcontext, verbose=verbose, 
+                    python=python, virtualenv=virtualenv, condaenv=condaenv))
+    scoredt[ , (method) := scores ]
 
     # Merge back in
     mergedt  <- merge(spacerdt, scoredt, by='crisprcontext', sort=FALSE, all.x=TRUE)

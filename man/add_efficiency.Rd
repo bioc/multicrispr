@@ -75,12 +75,12 @@ Add Doench2014 or Doench2016 efficiency scores and filter on them
     spacers <- find_pe_spacers(targets, bsgenome)
    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
     (spacers \%<>\% add_efficiency(bsgenome, 'Doench2014'))
-        # conda create --name azimuthenv python=2.7
-        # conda activate azimuthenv
+        # conda create --name azienv python=2.7
+        # conda activate azienv
         # pip install azimuth
         # pip install scikit-learn==0.17.1
-    # spacers \%<>\% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azimuthenv')
-    # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azimuthenv')
+    # spacers \%<>\% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
+    # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azienv')
 # TFBS example
 #-------------
     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
@@ -89,8 +89,8 @@ Add Doench2014 or Doench2016 efficiency scores and filter on them
     spacers <- find_spacers(targets, bsgenome)
     # (spacers \%<>\% add_specificity(targets, bsgenome))
     # (spacers \%>\% add_efficiency(bsgenome, 'Doench2014'))
-    # (spacers \%>\% add_efficiency(bsgenome, 'Doench2016'))
-    # spacers \%>\% filter_efficient(bsgenome, 'Doench2016', 0.4)
+    # (spacers \%>\% add_efficiency(bsgenome, 'Doench2016', condaenv='azienv'))
+    # spacers \%>\% filter_efficient(bsgenome, 'Doench2016', 0.4, condaenv='azienv')
 }
 \references{
 Doench 2014, Rational design of highly active sgRNAs for 

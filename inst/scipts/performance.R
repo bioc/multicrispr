@@ -14,4 +14,4 @@ spacers %<>% add_genome_counts(indexedgenome, mismatches = 2)
 #'         # pip install azimuth
 #'         # pip install scikit-learn==0.17.1
 spacers %<>% add_efficiency(
-                bsgenome, method = 'Doench2016', condaenv = 'azimuthenv')
+                bsgenome, method = 'Doench2016', condaenv = 'azienv')
