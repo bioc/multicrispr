@@ -11,6 +11,7 @@
 #' @return \code{\link[GenomicRanges]{GRanges-class}}. 
 #' @examples 
 #' gr <- GenomicRanges::GRanges(c(A = 'chr1:1-100:+', B = 'chr1:1-100:-'))
+#' gr$targetname <- 'AB'
 #' ir <- IRanges::IRanges(c(A = '1-10', A = '11-20', B = '1-10', B = '11-20'))
 #' extract_subranges(gr, ir, plot = TRUE)
 #' @export
