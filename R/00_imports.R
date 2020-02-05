@@ -22,7 +22,8 @@
 #' @importFrom  GenomeInfoDb          seqnames  seqnames<-   
 #' @importFrom  GenomeInfoDb          sortSeqlevels  standardChromosomes
 #' @importFrom  GenomicRanges         GRanges  mcols  mcols<-
-#' @importFrom  ggplot2               aes_string  facet_wrap  geom_segment  
+#' @importFrom  ggplot2               aes   aes_string
+#' @importFrom  ggplot2               facet_wrap  geom_point  geom_segment  
 #' @importFrom  ggplot2               ggplot  ggtitle  scale_x_continuous
 #' @importFrom  ggplot2               theme_bw  unit  xlab  ylab
 #' @importFrom  grid                  arrow

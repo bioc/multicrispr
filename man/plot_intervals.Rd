@@ -67,8 +67,10 @@ Interval plot GRanges
                             HEXA = 'chr15:72346580-72346583:-',
                             CFTR = 'chr7:117559593-117559595:+'), 
                           bsgenome)
+    spacers <- find_pe_spacers(gr, bsgenome)
     plot_intervals(gr)
     plot_intervals(extend_for_pe(gr))
+    plot_intervals(spacers)
     
 }
 \seealso{

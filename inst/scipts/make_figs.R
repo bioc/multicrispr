@@ -1,7 +1,63 @@
-# Load
-require(magrittr)
+#=============
+# TFBS
+#=============
+
+# Decide which to keep
 require(multicrispr)
-devtools::load_all()
+require(magrittr)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+targets  <- bed_to_granges(bedfile, genome='mm10', plot = FALSE)
+png('graphs/srf_karyogram.png')
+plot_karyogram(targets, title = NULL)
+dev.off()
+
+extended <- extend(targets)
+spacers  <- extended %>% 
+            find_spacers(bsgenome) %>% 
+            add_specificity(extended, bsgenome) %>% 
+            add_efficiency(bsgenome, method = 'Doench2016', condaenv='azienv')
+spacers %>% subset(seqnames == 'chr1') %>% 
+            subset(specific == TRUE)   %>% 
+            gr2dt() %>%
+            extract(,.SD[.N>2] ,by = 'targetname') %>% 
+            dt2gr(seqinfo(spacers))
+
+targets %<>% subset(targetname %in% c('T0050', 'T0151'))
+extended%<>% subset(targetname %in% c('T0050', 'T0151'))
+spacers %<>% subset(targetname %in% c('T0050', 'T0151'))
+
+# Create plots: original
+p <- plot_intervals(targets) + 
+    ggplot2::guides(color = FALSE, linetype = FALSE)
+ggplot2::ggsave('graphs/srf.png', p, width = 2.5, height = 2)
+
+targets$set <- 'target'
+extended$set <- 'extended'
+plotgr <- c(targets, extended)
+plotgr$set %<>% factor(c('target', 'extended'))
+p <- plot_intervals(plotgr, linetype_var = 'set') + 
+    ggplot2::guides(color = FALSE, linetype = FALSE)
+ggplot2::ggsave('graphs/srf_extended.png', p, width = 2.5, height = 2)
+
+
+p <- plot_intervals(spacers) + 
+    ggplot2::guides(color = FALSE)
+ggplot2::ggsave('graphs/srf_spacers.png', p, width = 2.5, height = 2)
+
+p <- plot_intervals(spacers, alpha_var = 'specific') + 
+    ggplot2::scale_alpha_manual(values = c(`TRUE`=1, `FALSE`=0.20)) + 
+    ggplot2::guides(color = FALSE, alpha = FALSE)
+ggplot2::ggsave('graphs/srf_specific.png', p, width = 2.5, height = 2)
+
+
+quantiles <- round(quantile(spacers$Doench2016, c(.33, .66, 1)), 2)
+spacers$efficiency <- spacers$Doench2016 %>% cut(c(0, quantiles), labels = as.character(quantiles))
+p <- plot_intervals(spacers, size_var = 'efficiency', alpha_var = 'specific') + 
+    ggplot2::scale_size_manual(values = c(0.2, 1.5, 3) %>% set_names(quantiles)) + 
+    ggplot2::scale_alpha_manual(values = c(`TRUE`=1, `FALSE`=0.25)) + 
+    ggplot2::guides(color = FALSE, alpha = FALSE, size = FALSE)
+ggplot2::ggsave('graphs/srf_efficient.png', p, width = 2.5, height = 2)
 
 # PE
 #=====
@@ -11,6 +67,55 @@ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                         HEXA = 'chr15:72346580-72346583:-',    # del
                         CFTR = 'chr7:117559593-117559595:+'),  # ins
                        bsgenome)
+p <- plot_intervals(subset(gr, targetname=='HBB'), facet_var = c('seqnames', 'targetname')) + 
+    ggplot2::guides(color = FALSE)
+ggplot2::ggsave('graphs/hbb.png', p, width=2.5, height=2)
+
+extended <- extend_for_pe(gr, nrt = 48)
+gr$set <- 'target'
+grf <- grr <- gr
+names(grf) %<>% paste0('_f')
+names(grr) %<>% paste0('_r')
+extended$set <- 'extension'
+plotgr <- c(grf, grr, extended)
+plotgr$set %<>% factor(c('target', 'extension'))
+
+p <- plot_intervals(subset(plotgr, targetname=='HBB'), 
+                    linetype_var = 'set', 
+                    facet_var = c('seqnames', 'targetname')) + 
+     ggplot2::guides(color = FALSE, linetype = FALSE)
+ggplot2::ggsave('graphs/hbb_extended.png', p, width=2.5, height=2)
+
+
+spacers <- gr %>% find_pe_spacers(bsgenome, nrt=48)
+
+spacers %<>% add_genome_counts() %>%
+            add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
+spacers$specific <- spacers$G0==1
+quantiles <- round(quantile(spacers$Doench2016, c(0.33, 0.66, 1)), 2)
+spacers$efficiency <- cut(spacers$Doench2016, c(0, quantiles), labels = quantiles) %>% 
+                        as.character()
+
+spacers %<>% subset(targetname == 'HBB')
+p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname')) + 
+     ggplot2::guides(color = FALSE, size = FALSE)
+ggplot2::ggsave('graphs/hbb_spacers.png', p, width=2.5, height=2)
+
+
+p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname'), 
+                    alpha_var = 'specific') + 
+    ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25)) + 
+    ggplot2::guides(color = FALSE, size = FALSE, alpha = FALSE)
+ggplot2::ggsave('graphs/hbb_specific.png', p, width=2.5, height=2)
+
+p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname'), 
+               alpha_var = 'specific', size_var  = 'efficiency') + 
+    ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25)) + 
+    ggplot2::scale_size_manual(values = c(0.2, 1.5, 3) %>% set_names(quantiles)) + 
+    ggplot2::guides(color = FALSE, size = FALSE, alpha = FALSE)
+ggplot2::ggsave('graphs/hbb_efficient.png', p, width=2.5, height=2)
+
+
 gr %<>% extract('HBB')
 plot_intervals(gr, facet_var = c('targetname', 'seqnames'), color_var = NULL) + 
     #ggplot2::guides(color=FALSE) + 
@@ -49,20 +154,27 @@ outdir <- '~/.multicrispr/bowtie'
 filter_prime_specific(spacers, genomedir, outdir)
 
 
-#=============
-# TFBS
-#=============
 
-# Read
-bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-targets  <- bed_to_granges(bedfile, genome='mm10', plot = FALSE)
-png('graphs/srf.png')
-plot_karyogram(targets, title = NULL)
-dev.off()
+# quantiles <- round(quantile(spacers$Doench2016, c(.33, .66, 1)), 2)
+# spacers$efficiency <- spacers$Doench2016 %>% cut(c(0, quantiles), labels = as.character(quantiles))
+# p <- plot_intervals(spacers, size_var = 'efficiency') + 
+#     ggplot2::scale_size_manual(values = c(0.2, 1.5, 4) %>% set_names(quantiles)) + 
+#     ggplot2::guides(color = FALSE, alpha = FALSE, size = FALSE) 
+# ggplot2::ggsave('graphs/srf_efficient.png', p, width = 3, height = 2.5)
+
+p <- plot_intervals(spacers, size_var = 'efficiency', alpha_var = 'specific') + 
+    ggplot2::scale_size_manual(values = c(0.2, 1.5, 3) %>% set_names(quantiles)) + 
+    ggplot2::scale_alpha_manual(values = c(`TRUE`=1, `FALSE`=0.25)) + 
+    ggplot2::guides(color = FALSE, alpha = FALSE, size = FALSE)
+ggplot2::ggsave('graphs/srf_efficient.png', p, width = 2.5, height = 2)
+
 
 # Process
-targets %<>% extend()
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+png('graphs/srf_extended.png')
+targets %<>% extend(plot = TRUE)
+dev.off()
+
+
 targets %>% find_spacers(bsgenome) %>% filter_target_specific(targets, bsgenome) %>% filter_efficient()
 
 targets %<>% subset(targetname %in% c('T0018', 'T1042'))

@@ -138,8 +138,10 @@ to_megabase <- function(y){
 #'                             HEXA = 'chr15:72346580-72346583:-',
 #'                             CFTR = 'chr7:117559593-117559595:+'), 
 #'                           bsgenome)
+#'     spacers <- find_pe_spacers(gr, bsgenome)
 #'     plot_intervals(gr)
 #'     plot_intervals(extend_for_pe(gr))
+#'     plot_intervals(spacers)
 #'     
 #' @export
 plot_intervals <- function(
@@ -171,35 +173,82 @@ plot_intervals <- function(
     # gr %<>% extract(order(.$contig))
     
     # Prepare plotdt
-    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
-    plotdt %<>% extract(order(seqnames, start))
-    head_tail <- function(x, n=nperchrom) x [ x %in% c(head(x, n), tail(x, n)) ]
-    plotdt %<>% extract(, edge := targetname %in% head_tail(unique(targetname)), by = 'seqnames')
-    plotdt %<>% extract(edge==TRUE)
-    #plotdt %<>% extract( , .SD[head_tail(contig)], by = c('seqnames'))
-    plotdt %>%  extract(, y      := min(start), by = y)
-    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
-    #plotdt %>%  extract(, xstart := start-min(start), by = 'contig')
-    plotdt %>%  extract(, xstart := start-min(start), by = xref)
-    plotdt %>%  extract(, xend   := xstart + width)
-    plotdt %>%  extract(strand=='-', tmp    := xend)
-    plotdt %>%  extract(strand=='-', xend   := xstart)
-    plotdt %>%  extract(strand=='-', xstart := tmp)
-    plotdt %>%  extract(, tmp := NULL)
+    plotdt <- prepare_plot_intervals(gr, xref, y, nperchrom)
     
-    # Plot
+    # Core Ranges
     p <-ggplot( plotdt, 
                 aes_string(
                     x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
                     color = color_var, linetype = linetype_var, 
                     size = size_var, alpha = alpha_var)) + 
         facet_wrap(facet_var, scales = scales) + 
-        geom_segment(arrow = arrow(length = unit(0.1, "inches"))) + 
-        theme_bw() + 
-        #xlab('Offset') + ylab('Start') + ggtitle(title) #+
-        xlab(NULL) + ylab(NULL) + ggtitle(title) #+
+        geom_segment(
+            arrow = arrow(length = unit(0.1, "inches")))
     
-    # Print and return
-    #print(p)
+    # Targets
+    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
+        p <-p + 
+            geom_point(aes_string(
+                x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
+            geom_point(aes_string(
+                x = 'xtargetend',   y = 'y'), shape = '|', size = 4)
+    }
+    
+    # Extensions
+    if ('extension' %in% names(mcols(gr))){
+        p <-p + geom_segment(aes_string(x='extstart', xend='extend', size = NULL), 
+                            linetype = 'dotted',
+                arrow = arrow(length = unit(0.1, "inches")))
+    }
+    p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
+    
+    # Return
+    # print(p)
     p
+}
+
+prepare_plot_intervals <- function(gr, xref, y, nperchrom){
+    
+    # Comply
+    edge <- targetname <- xstart <- xend <- width <- NULL
+    targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
+    extstart <- primer <- revtranscript <- extension <- tmp <- NULL
+    
+    # Main Ranges
+    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
+    plotdt %<>% extract(order(seqnames, start))
+    head_tail <- function(x, n=nperchrom) x [ x %in% c(head(x, n), tail(x, n)) ]
+    plotdt %<>% extract(, edge := targetname %in% head_tail(unique(targetname)), by = 'seqnames')
+    plotdt %<>% extract(edge==TRUE)
+    plotdt %>%  extract(, y      := min(start), by = y)
+    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
+    plotdt %>%  extract(, xstart := start-min(start), by = xref)
+    plotdt %>%  extract(, xend   := xstart + width)
+    
+    # Target marks
+    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
+        plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
+        plotdt %>% extract(, xtargetend   := xend   + targetend-end  )
+    }
+    
+    # Extensions
+    if ('extension' %in% names(mcols(gr))){
+        plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
+        plotdt %>% extract(strand=='-', extstart := xend-16-(nchar(revtranscript)[1]-1))
+        plotdt %>% extract(           , extend   := extstart + nchar(extension)[1]-1)
+    }
+
+    # Flip for arrow direction    
+    plotdt %>%  extract(strand=='-', tmp    := xend)
+    plotdt %>%  extract(strand=='-', xend   := xstart)
+    plotdt %>%  extract(strand=='-', xstart := tmp)
+    if ('extension' %in% names(mcols(gr))){
+        plotdt %>%  extract(strand=='+', tmp := extend)
+        plotdt %>%  extract(strand=='+', extend := extstart)
+        plotdt %>%  extract(strand=='+', extstart := tmp)
+    }
+    plotdt %>%  extract(, tmp := NULL)
+    
+    # Return
+    plotdt
 }
