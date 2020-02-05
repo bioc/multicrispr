@@ -183,14 +183,20 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     names(gg) <- gg$crisprname <- uniquify(gg$targetname)
     
     # Extract from these other components
-    spacer  <- up_flank(gg, -21,        -2)       %>% add_seq(bsgenome)
-    pam     <- up_flank(gg,  -1,        +1)       %>% add_seq(bsgenome) 
-    ext <- up_flank(gg, -4-nprimer, -5+nrt)   %>% invertStrand()
-    ext$seq <- get_plus_seq(bsgenome, ext)  # Get "+" seq
-    substr( ext$seq, 
-            ext$targetstart - start(ext)+1, 
-            ext$targetend   - start(ext)+1) <- fixes[ext$targetname]
-    ext$seq[as.logical(strand(ext)=='-')] %<>% revcomp() 
+    bs <- bsgenome; invstr <- invertStrand
+    add_fixed_seqs <- function(gr, bsgenome, fixes){
+        # Get '+' seq
+        gr$seq <- get_plus_seq(bsgenome, gr)
+        substr(gr$seq, gr$targetstart - start(gr)+1, 
+                        gr$targetend  - start(gr)+1) <- fixes[gr$targetname]
+        gr$seq[as.logical(strand(gr)=='-')] %<>% revcomp()     
+        gr
+    }
+    spacer       <- up_flank(gg, -21,        -2)    %>% add_seq(bs)
+    pam          <- up_flank(gg,  -1,        +1)    %>% add_seq(bs) 
+    primer       <- up_flank(gg, -4-nprimer, -5)    %>% add_seq(bs)
+    revtranscript<- up_flank(gg, -4, -5+nrt) %>% add_fixed_seqs(bs, fixes)
+    ext  <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand() %>% add_fixed_seqs(bs, fixes)
                                                         # Revcomp for "-" seqs
     # Plot
     if (plot){
@@ -208,8 +214,10 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     
     # Add sequences and return
     names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'crisprspacer')
-    spacer$crisprpam <- pam$seq 
-    spacer$crisprext <- ext$seq
+    spacer$crisprpam     <- pam$seq
+    spacer$primer        <- primer$seq
+    spacer$revtranscript <- revtranscript$seq
+    spacer$extension     <- ext$seq
     spacer
  }
 
