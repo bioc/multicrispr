@@ -562,9 +562,9 @@ filter_target_specific <- function(
 
 
 
-#' Filter for PE-specific spacers
+#' Filter for specific prime editing spacers
 #' 
-#' Filters for spacers which hit a single prime editing site
+#' Filters spacers which are specific for prime editing site
 #' 
 #' @param spacers   spacer \code{\link[GenomicRanges]{GRanges-class}}
 #' @param indexedgenome  bowtie indexed genome dir
@@ -589,14 +589,15 @@ filter_target_specific <- function(
 filter_prime_specific <- function(
     spacers, 
     indexedgenome = default_indexedgenome(spacers),
+    mismatches    = 2,
     outdir        = default_outdir(), 
     pam           = 'NGG', 
     verbose       = TRUE
 ){
     # Add genome matches
     spacers %<>% add_genome_counts(
-                    indexedgenome, mismatches = 1, outdir = outdir, 
-                    pam = pam, verbose = verbose)
+                    indexedgenome, mismatches = max(1, mismatches), 
+                    outdir = outdir, pam = pam, verbose = verbose)
     
     # Filter for specificity
     digits <- ceiling(log10(length(spacers)))
