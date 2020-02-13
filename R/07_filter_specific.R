@@ -20,12 +20,21 @@ default_indexedgenome <- function(x){
 #' @export
 index_genome <- function(
     bsgenome, 
-    indexedgenome = default_indexedgenome(bsgenome)
+    indexedgenome = default_indexedgenome(bsgenome), 
+    overwrite = FALSE
 ){
 
     # Assert
     assert_is_all_of(bsgenome, 'BSgenome')
-
+    
+    # Return if already exists
+    if (!overwrite & 
+        dir.exists(indexedgenome) & length(list.files(indexedgenome))!=0){
+        cmessage('%s already contains index - set overwrite=TRUE to overwrite', 
+                 indexedgenome)
+        return(indexedgenome)
+    }
+    
     # Create Names
     dir.create(indexedgenome, showWarnings = FALSE, recursive = TRUE)
     genomefa <- paste0(dirname(indexedgenome), '/', bsgenome@pkgname, '.fa')
