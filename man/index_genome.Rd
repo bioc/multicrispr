@@ -4,7 +4,11 @@
 \alias{index_genome}
 \title{Index genome}
 \usage{
-index_genome(bsgenome, indexedgenome = default_indexedgenome(bsgenome))
+index_genome(
+  bsgenome,
+  indexedgenome = default_indexedgenome(bsgenome),
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}

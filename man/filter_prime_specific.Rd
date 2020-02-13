@@ -2,11 +2,12 @@
 % Please edit documentation in R/07_filter_specific.R
 \name{filter_prime_specific}
 \alias{filter_prime_specific}
-\title{Filter for PE-specific spacers}
+\title{Filter for specific prime editing spacers}
 \usage{
 filter_prime_specific(
   spacers,
   indexedgenome = default_indexedgenome(spacers),
+  mismatches = 2,
   outdir = default_outdir(),
   pam = "NGG",
   verbose = TRUE
@@ -24,7 +25,7 @@ filter_prime_specific(
 \item{verbose}{TRUE (default) or FALSE}
 }
 \description{
-Filters for spacers which hit a single prime editing site
+Filters spacers which are specific for prime editing site
 }
 \examples{
 # PE example
