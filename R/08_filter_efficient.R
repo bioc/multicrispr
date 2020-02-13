@@ -69,16 +69,8 @@ doench2014 <- function(
 
 doench2016 <- function(
     contextseqs, 
-    python     = NULL, 
-    virtualenv = NULL, 
-    condaenv   = NULL,
     verbose    = TRUE 
 ){
-    
-    # Set python environment
-    if (!is.null(python))       reticulate::use_python(python)
-    if (!is.null(virtualenv))   reticulate::use_virtualenv(virtualenv)
-    if (!is.null(condaenv))     reticulate::use_condaenv(condaenv)
     
     # Assert
     is_identical_to_true(reticulate::py_module_available('azimuth'))
@@ -116,17 +108,14 @@ doench2016 <- function(
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
 #' @param cutoff     number: cutoff value
-#' @param python     NULL (default) or python binary path with module azimuth
-#' @param virtualenv NULL (default) or python virtualenv with module azimuth
-#' @param condaenv   NULL (default) or python condaenv with module azimuth
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
 #' @param alpha_var  NULL or string: var mapped to alpha in plot
 #' @return numeric vector
 #' @examples
 #' 
-#' # Install azimuth (Doench2016)
-#' #-----------------------------
+#' # Install azimuth 
+#' #----------------
 #'     ## With reticulate
 #'     # require(reticulate)
 #'     # conda_create('azienv', c('python=2.7'))
@@ -151,19 +140,21 @@ doench2016 <- function(
 #'     spacers <- find_pe_spacers(targets, bsgenome)
 #'    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
+#'     # reticulate::use_condaenv('azienv')
+#'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016')
+#'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4)
 #'     
-#'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
-#'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azienv')
 #' # TFBS example
 #' #-------------
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets <- extend(bed_to_granges(bedfile, 'mm10'))
 #'     spacers <- find_spacers(targets, bsgenome)
+#'     # reticulate::use_condaenv('azienv')
 #'     # (spacers %<>% add_specificity(targets, bsgenome))
 #'     # (spacers %>% add_efficiency(bsgenome, 'Doench2014'))
-#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016', condaenv='azienv'))
-#'     # spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4, condaenv='azienv')
+#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016'))
+#'     #  spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4)
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
 #' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
@@ -177,7 +168,6 @@ doench2016 <- function(
 #' @export
 add_efficiency <- function(
     spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
-    python = NULL, virtualenv = NULL, condaenv = NULL, 
     verbose = TRUE, plot = TRUE, 
     alpha_var = default_alpha_var(spacers)
 ){
@@ -197,8 +187,7 @@ add_efficiency <- function(
     scores <- switch(
         method, 
         Doench2014 = doench2014(scoredt$crisprcontext, verbose=verbose), 
-        Doench2016 = doench2016(scoredt$crisprcontext, verbose=verbose, 
-                    python=python, virtualenv=virtualenv, condaenv=condaenv))
+        Doench2016 = doench2016(scoredt$crisprcontext, verbose=verbose))
     scoredt[ , (method) := scores ]
 
     # Merge back in
@@ -230,16 +219,12 @@ filter_efficient <- function(
     bsgenome,  
     method= c('Doench2014', 'Doench2016')[1],
     cutoff,
-    python     = NULL, 
-    virtualenv = NULL, 
-    condaenv   = NULL, 
     verbose    = TRUE, 
     plot       = TRUE,
     alpha_var  = default_alpha_var(spacers)
 ){
     spacers %<>% add_efficiency(
-                    bsgenome = bsgenome,  method = method, python = python, 
-                    virtualenv = virtualenv, condaenv = condaenv, 
+                    bsgenome = bsgenome,  method = method, 
                     verbose = verbose, plot = plot, alpha_var = alpha_var)
 
     idx <- mcols(spacers)[[method]] > cutoff
