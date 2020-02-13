@@ -124,6 +124,21 @@ doench2016 <- function(
 #' @param alpha_var  NULL or string: var mapped to alpha in plot
 #' @return numeric vector
 #' @examples
+#' 
+#' # Install azimuth (Doench2016)
+#' #-----------------------------
+#'     ## With reticulate
+#'     # require(reticulate)
+#'     # conda_create('azienv', c('python=2.7'))
+#'     # use_condaenv('azienv')
+#'     # py_install(c('azimuth', 'scikit-learn==0.17.1'), 'azienv', pip = TRUE)
+#'     
+#'     ## Directly
+#'     # conda create --name azienv python=2.7
+#'     # conda activate azienv
+#'     # pip install azimuth
+#'     # pip install scikit-learn==0.17.1
+#'     
 #' # PE example
 #' #-----------
 #'     require(magrittr)
@@ -136,10 +151,7 @@ doench2016 <- function(
 #'     spacers <- find_pe_spacers(targets, bsgenome)
 #'    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
-#'         # conda create --name azienv python=2.7
-#'         # conda activate azienv
-#'         # pip install azimuth
-#'         # pip install scikit-learn==0.17.1
+#'     
 #'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
 #'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4, condaenv='azienv')
 #' # TFBS example
