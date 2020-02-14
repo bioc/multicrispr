@@ -6,8 +6,8 @@
 \usage{
 index_targets(
   targets,
-  bsgenome,
-  indexedtargets = paste0(default_outdir(), "/targets"),
+  bsgenome = getBSgenome(genome(targets)[1]),
+  outdir = OUTDIR,
   verbose = TRUE
 )
 }
@@ -16,12 +16,12 @@ index_targets(
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{indexedtargets}{string: output directory}
+\item{outdir}{string: output directory}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
 \value{
-indextargets: output directory
+invisible(targetdir)
 }
 \description{
 Bowtie index targets

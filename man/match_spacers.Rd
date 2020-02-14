@@ -9,7 +9,7 @@ match_spacers(
   indexdir,
   norc,
   mismatches = 2,
-  outfile = paste0(default_outdir(), "/match_", basename(indexdir), ".txt"),
+  outdir = OUTDIR,
   pam = "NGG",
   verbose = TRUE
 )
@@ -27,7 +27,7 @@ because target ranges generally include both strands.}
 
 \item{mismatches}{number (default 2): max number of mismatches to consider}
 
-\item{outfile}{string: file where to output bowtie results}
+\item{outdir}{string: file where to output bowtie results}
 
 \item{pam}{string (default 'NGG') pam pattern to expand}
 
@@ -47,9 +47,9 @@ Adds match counts to GRanges object, and then returns it.
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-indexedtargets <- index_targets(targets, bsgenome)
+indexdir <- index_targets(targets, bsgenome)
 spacers <- find_spacers(targets, bsgenome)
-match_spacers(spacers, indexedtargets, norc=FALSE, mismatches = 1)
+match_spacers(spacers, indexdir, norc=FALSE, mismatches = 1)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

@@ -9,8 +9,8 @@ add_target_counts(
   targets,
   bsgenome,
   mismatches = 2,
-  outdir = default_outdir(),
   pam = "NGG",
+  outdir = OUTDIR,
   verbose = TRUE
 )
 }
@@ -23,9 +23,9 @@ add_target_counts(
 
 \item{mismatches}{number (default 2): max number of mismatches to consider}
 
-\item{outdir}{dir where output is written to}
-
 \item{pam}{string (default 'NGG') pam pattern to expand}
+
+\item{outdir}{dir where output is written to}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
@@ -41,7 +41,6 @@ Adds match counts to GRanges object, and then returns it.
 # TFBS example
 #-------------
  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
- genome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
  targets  <- extend(bed_to_granges(bedfile, genome = 'mm10'))
  spacers <- find_spacers(targets, bsgenome)

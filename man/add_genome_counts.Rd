@@ -6,23 +6,26 @@
 \usage{
 add_genome_counts(
   spacers,
-  indexedgenome = default_indexedgenome(spacers),
+  bsgenome = getBSgenome(genome(spacers)[1]),
   mismatches = 2,
-  outdir = default_outdir(),
   pam = "NGG",
+  outdir = OUTDIR,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
   verbose = TRUE
 )
 }
 \arguments{
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{indexedgenome}{dir with bowtie-indexed genome}
+\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{mismatches}{number (default 2): max number of mismatches to consider}
 
+\item{pam}{string (default 'NGG') pam pattern to expand}
+
 \item{outdir}{dir where output is written to}
 
-\item{pam}{string (default 'NGG') pam pattern to expand}
+\item{indexedgenomesdir}{string: dir with indexed genomes}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
@@ -45,9 +48,8 @@ Adds match counts to GRanges object, and then returns it.
                          CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
- indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Hsapiens.UCSC.hg38'
- # index_genome(bsgenome, indexedgenome)
- # add_genome_counts(spacers, indexedgenome, mismatches=1)
+ # index_genome(bsgenome)
+ # add_genome_counts(spacers, bsgenome, mismatches=1)
     
 # TFBS example
 #-------------
@@ -55,10 +57,9 @@ Adds match counts to GRanges object, and then returns it.
  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
  spacers <- find_spacers(targets, bsgenome)
- indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
- # index_genome(bsgenome, indexedgenome)
- # add_genome_counts(spacers, indexedgenome)
- # add_genome_counts(spacers, indexedgenome, mismatches=3)
+ # index_genome(bsgenome)
+ # add_genome_counts(spacers, bsgenome)
+ # add_genome_counts(spacers, bsgenome, mismatches=3)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

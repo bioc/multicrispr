@@ -6,22 +6,26 @@
 \usage{
 index_genome(
   bsgenome,
-  indexedgenome = default_indexedgenome(bsgenome),
+  indexedgenomesdir = INDEXEDGENOMESDIR,
   overwrite = FALSE
 )
 }
 \arguments{
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{indexedgenome}{string: directory with bowtie-indexed genome}
+\item{indexedgenomesdir}{string: directory with bowtie-indexed genome}
+
+\item{overwrite}{logical(1)}
 }
 \value{
-string: directory with indexed genome
+invisible(genomdir)
 }
 \description{
 Bowtie index genome
 }
 \examples{
-# index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
-# index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+index_genome(bsgenome)
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+index_genome(bsgenome)
 }

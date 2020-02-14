@@ -2,14 +2,14 @@
 % Please edit documentation in R/07_filter_specific.R
 \name{match_seqs}
 \alias{match_seqs}
-\title{Add match counts}
+\title{Match spacer sequences}
 \usage{
 match_seqs(
   seqs,
   indexdir,
   norc,
   mismatches = 2,
-  outfile = paste0(default_outdir(), "/match_", basename(indexdir), ".txt"),
+  outdir = OUTDIR,
   verbose = TRUE
 )
 }
@@ -26,18 +26,12 @@ because target ranges generally include both strands.}
 
 \item{mismatches}{max number of mismatches to consider}
 
-\item{outfile}{string: file where to output bowtie results}
+\item{outdir}{string: multicrispr output directory}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
 \description{
-Count matches to indexed target/genome and add to GRanges
-}
-\details{
-\code{match_seqs} matches sequences against (indexed) target and genome
-\code{add_crispr_matches} expands iupac amgiguities in the pam sequence, 
-matches all resulting sequences against (indexes) target and genome, 
-adds match counts to GRanges object, and then returns it
+Count matches to indexed target/genome
 }
 \examples{
 # TFBS example
@@ -45,11 +39,11 @@ adds match counts to GRanges object, and then returns it
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-indexedtargets <- index_targets(targets, bsgenome)
+indexdir <- index_targets(targets, bsgenome)
 spacers <- find_spacers(targets, bsgenome)
-crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
-match_seqs(crisprseqs, indexedtargets, norc=FALSE)
-match_seqs(crisprseqs, indexedtargets, norc=FALSE, mismatch=3)
+seqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
+match_seqs(seqs, indexdir, norc=FALSE)
+match_seqs(seqs, indexdir, norc=FALSE, mismatches=3)
 }
 \seealso{
 \code{\link{index_genome}}, \code{\link{index_targets}}

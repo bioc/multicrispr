@@ -9,10 +9,10 @@ add_specificity(
   spacers,
   targets,
   bsgenome,
-  indexedgenome = default_indexedgenome(spacers),
   mismatches = 2,
-  outdir = default_outdir(),
   pam = "NGG",
+  outdir = OUTDIR,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
   plot = TRUE,
   verbose = TRUE
 )
@@ -20,11 +20,11 @@ add_specificity(
 filter_target_specific(
   spacers,
   targets,
-  bsgenome,
-  indexedgenome = default_indexedgenome(spacers),
+  bsgenome = getBSgenome(genome(spacers)[1]),
   mismatches = 2,
-  outdir = default_outdir(),
   pam = "NGG",
+  outdir = OUTDIR,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
   plot = TRUE,
   verbose = TRUE
 )
@@ -36,13 +36,11 @@ filter_target_specific(
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{indexedgenome}{bowtie indexed genome dir}
-
 \item{mismatches}{number (default 2): max number of mismatches to consider}
 
-\item{outdir}{directory where output is written to}
-
 \item{pam}{string (default 'NGG'): pam sequence}
+
+\item{outdir}{directory where output is written to}
 
 \item{plot}{TRUE (default) or FALSE}
 
@@ -59,8 +57,7 @@ Filter for target-specific spacers
  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
  spacers <- find_spacers(targets, bsgenome)
- indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Mmusculus.UCSC.mm10'
- # index_genome(indexedgenome)
- # spacers \%<>\% add_specificity(targets, bsgenome, indexedgenome)
- # spacers \%>\% filter_target_specific(targets, bsgenome, indexedgenome)
+ # index_genome(bsgenome)
+ # spacers \%<>\% add_specificity(targets, bsgenome)
+ # spacers \%>\% filter_target_specific(targets, bsgenome)
 }

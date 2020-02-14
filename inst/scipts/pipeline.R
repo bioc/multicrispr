@@ -8,25 +8,47 @@
     # py_install(c('azimuth', 'scikit-learn==0.17.1'), 'azienv', pip = TRUE)
     # reticulate::use_condaenv('azienv')
 
-    # Load packages and genome. Index genome.
-    #----------------------------------------
-    require(magrittr)
+    # Index genome
+    #-------------
     require(multicrispr)
-    require(BSgenome.Mmusculus.UCSC.mm10) 
-    require(BSgenome.Hsapiens.UCSC.hg38)  # human genome
-    indexedhuman <- index_genome(BSgenome.Mmusculus.UCSC.mm10)
-    indexedmouse <- index_genome(BSgenome.Hsapiens.UCSC.hg38) 
-    
+    indexedhuman <- index_genome(
+        BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
+    indexedmouse <- index_genome(
+        BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38) 
+        
 # Parallel Targeting
 #===================
-    # Define targets for blocking
+    
+    # Define targets to block TFBS
+    require(magrittr)
+    require(multicrispr)
     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
     targets  <- bed_to_granges(bedfile, 'mm10') %>% 
                 extend(-22, +22)
             
     # Find specific, efficient spacers
-    spacers <-  targets %>% 
-                find_spacers(bsgenome) %>% 
-                filter_target_specific(targets, bsgenome, indexedgenome) %>% 
-                add_efficiency(method = 'Doench2016', condaenv = 'azienv')
-            
+    bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+    spacers <-  find_spacers(targets, bsgenome)
+    spacers %<>% filter_target_specific(targets, bsgenome)
+    reticulate::use_condaenv('azienv')
+    spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
+    spacers
+    
+# Prime Editing
+#==============
+    
+    # Define target for editing
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    targets  <- char_to_granges(c(  PRNP = 'chr20:4699600:+',             # snp
+                                    HBB  = 'chr11:5227002:-',              # snp
+                                    HEXA = 'chr15:72346580-72346583:-',    # del
+                                    CFTR = 'chr7:117559593-117559595:+'),  # ins
+                                bsgenome)
+    
+    # Find specific, efficient spacers
+    spacers <-  find_pe_spacers(targets, bsgenome)
+    spacers %<>% filter_prime_specific(bsgenome)
+    reticulate::use_condaenv('azienv')
+    spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
+    spacers
+    

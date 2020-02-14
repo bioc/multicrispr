@@ -6,21 +6,21 @@
 \usage{
 filter_prime_specific(
   spacers,
-  indexedgenome = default_indexedgenome(spacers),
-  mismatches = 2,
-  outdir = default_outdir(),
+  bsgenome = getBSgenome(genome(spacers)[1]),
   pam = "NGG",
+  outdir = OUTDIR,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
   verbose = TRUE
 )
 }
 \arguments{
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{indexedgenome}{bowtie indexed genome dir}
-
-\item{outdir}{directory where output is written to}
+\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
 \item{pam}{string (default 'NGG'): pam sequence}
+
+\item{outdir}{directory where output is written to}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
@@ -38,7 +38,6 @@ Filters spacers which are specific for prime editing site
                          CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
- indexedgenome <- '~/.multicrispr/bowtie/BSgenome.Hsapiens.UCSC.hg38'
- # index_genome(bsgenome, indexedgenome) # one time effort - takes few h
- # filter_prime_specific(spacers, indexedgenome)
+ # index_genome(bsgenome) # one time effort - takes few h
+ # filter_prime_specific(spacers, bsgenome)
 }
