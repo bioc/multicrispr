@@ -42,6 +42,8 @@ filter_target_specific(
 
 \item{outdir}{directory where output is written to}
 
+\item{indexedgenomesdir}{string: dir with indexed genomes}
+
 \item{plot}{TRUE (default) or FALSE}
 
 \item{verbose}{TRUE (default) or FALSE}

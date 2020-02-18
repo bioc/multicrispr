@@ -20,7 +20,9 @@ filter_prime_specific(
 
 \item{pam}{string (default 'NGG'): pam sequence}
 
-\item{outdir}{directory where output is written to}
+\item{outdir}{string: dir to which output is written}
+
+\item{indexedgenomesdir}{dir with bowtie-indexed genomes}
 
 \item{verbose}{TRUE (default) or FALSE}
 }

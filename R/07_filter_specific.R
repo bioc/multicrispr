@@ -496,14 +496,15 @@ add_specificity <- function(
 
 #' Filter for target-specific spacers
 #' 
-#' @param spacers   spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param targets   target \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
+#' @param spacers    spacer \code{\link[GenomicRanges]{GRanges-class}}
+#' @param targets    target \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #' @param mismatches number (default 2): max number of mismatches to consider
-#' @param outdir    directory where output is written to
-#' @param pam       string (default 'NGG'): pam sequence
-#' @param plot      TRUE (default) or FALSE
-#' @param verbose   TRUE (default) or FALSE
+#' @param pam        string (default 'NGG'): pam sequence
+#' @param outdir     directory where output is written to
+#' @param indexedgenomesdir string: dir with indexed genomes
+#' @param plot       TRUE (default) or FALSE
+#' @param verbose    TRUE (default) or FALSE
 #' @examples
 #' # TFBS example
 #' #-------------
@@ -519,13 +520,13 @@ add_specificity <- function(
 filter_target_specific <- function(
     spacers,
     targets,
-    bsgenome      = getBSgenome(genome(spacers)[1]),
-    mismatches    = 2,
-    pam           = 'NGG',
-    outdir        = OUTDIR, 
+    bsgenome          = getBSgenome(genome(spacers)[1]),
+    mismatches        = 2,
+    pam               = 'NGG',
+    outdir            = OUTDIR, 
     indexedgenomesdir = INDEXEDGENOMESDIR,
-    plot          = TRUE,
-    verbose       = TRUE
+    plot              = TRUE,
+    verbose           = TRUE
 ){
     # Add specificty info
     spacers %<>% add_specificity(
@@ -553,11 +554,13 @@ filter_target_specific <- function(
 #' 
 #' Filters spacers which are specific for prime editing site
 #' 
-#' @param spacers     spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome    \code{\link[BSgenome]{BSgenome-class}}
-#' @param outdir      directory where output is written to
-#' @param pam         string (default 'NGG'): pam sequence
-#' @param verbose     TRUE (default) or FALSE
+#' @param spacers           spacer \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome          \code{\link[BSgenome]{BSgenome-class}}
+#' @param outdir            directory where output is written to
+#' @param pam               string (default 'NGG'): pam sequence
+#' @param outdir            string: dir to which output is written
+#' @param indexedgenomesdir dir with bowtie-indexed genomes
+#' @param verbose           TRUE (default) or FALSE
 #' @examples
 #' # PE example
 #' #-----------

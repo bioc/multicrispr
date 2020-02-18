@@ -129,7 +129,7 @@ to_megabase <- function(y){
 #'     targets %<>% extend(plot = TRUE)
 #'     spacers <- find_spacers(targets, bsgenome)
 #'     specific <- filter_target_specific(spacers, targets, bsgenome)
-#'     efficient <- filter_efficient(spacers, targets, )
+#'     efficient <- filter_efficient(spacers, bsgenome, cutoff = 0.4)
 #'     
 #' # PE targets
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
