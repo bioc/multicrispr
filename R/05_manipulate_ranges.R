@@ -186,8 +186,8 @@ down_flank <- function(
                    shift)
     
     # Flank
-    GenomicRanges::start(newgr) <- GenomicRanges::end(newgr) + start
-    GenomicRanges::end(newgr)   <- GenomicRanges::end(newgr) + end
+    GenomicRanges::end(newgr)   <- GenomicRanges::end(gr) + end
+    GenomicRanges::start(newgr) <- GenomicRanges::end(gr) + start
     if (strandaware){
       idx <- as.logical(strand(newgr)=='-')
       GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
