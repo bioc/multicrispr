@@ -11,17 +11,18 @@
     # Index genome
     #-------------
     require(multicrispr)
-    indexedhuman <- index_genome(
-        BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
-    indexedmouse <- index_genome(
-        BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38) 
+    index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
+    index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38) 
+    
+    # Load packages
+    require(magrittr)
+    require(multicrispr)
+    reticulate::use_condaenv('azienv')
         
 # Parallel Targeting
 #===================
     
     # Define targets to block TFBS
-    require(magrittr)
-    require(multicrispr)
     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
     targets  <- bed_to_granges(bedfile, 'mm10') %>% 
                 extend(-22, +22)
@@ -30,7 +31,6 @@
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     spacers <-  find_spacers(targets, bsgenome)
     spacers %<>% filter_target_specific(targets, bsgenome)
-    reticulate::use_condaenv('azienv')
     spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
     spacers
     
@@ -48,7 +48,6 @@
     # Find specific, efficient spacers
     spacers <-  find_pe_spacers(targets, bsgenome)
     spacers %<>% filter_prime_specific(bsgenome)
-    reticulate::use_condaenv('azienv')
     spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
     spacers
     
