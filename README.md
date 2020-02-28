@@ -1,4 +1,3 @@
-
 <center> <h1> multicrispr </h1> </center>
 
 
@@ -21,3 +20,6 @@
    
         + as determined by Doench 2016 ontargetscore (interfacing to original python module **azimuth** when available)
         + or Doench 2014 ontargetscore otherwise
+
+remotes::install_git('https://gitlab.gwdg.de/loosolab/software/multicrispr.git', 
+    			    repos = BiocManager::repositories())
