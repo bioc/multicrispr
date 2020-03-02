@@ -150,12 +150,13 @@ read_bowtie_results <- function(outfile){
             col.names = c('readname', 'strand', 'target', 'position', 
                           'readseq', 'quality', 'matches', 'mismatches'))
     dt[ , mismatch := stringi::stri_count_fixed(mismatches, '>')]
-    counts <- data.table::data.table(readname = unique(dt$readname))
-    for (mis in sort(unique(dt$mismatch))){
-        counts %<>% merge( dt[ , list(counts = sum(mismatch==mis)), by = 'readname'] )
-        counts %>% data.table::setnames('counts', paste0('MM', mis))
-    }
-    counts
+    
+    results <-  dt %>% 
+            extract( , .N, keyby = .(readname, mismatch)) %>% 
+            data.table::dcast(readname ~ mismatch,  value.var = 'N') %>% 
+            data.table::setnames(names(.)[-1], paste0('MM', names(.)[-1]))
+    results <- cbind(results[, 1], setnafill(results[, -1], fill = 0))
+    results
 }
 
 
@@ -216,10 +217,6 @@ match_seqs <- function(seqs, indexdir, norc, mismatches = 2,
     readdt <- data.table(readname = names(reads), 
                         readseq   = unname(as.character(reads)))
     readdt %<>% merge(matches, by='readname', all=TRUE, sort=FALSE)
-
-    # Turn NA into 0
-    readdt <- cbind(readdt[, 1:2], 
-                    setnafill(readdt[, 3:ncol(readdt)], fill = 0))
 
     # Return
     readdt[, 'readname' := NULL]
