@@ -141,6 +141,7 @@ doench2016 <- function(
 #'    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
 #'     # reticulate::use_condaenv('azienv')
+#'     # reticulate::import('azimuth')
 #'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016')
 #'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4)
 #'     
@@ -151,6 +152,7 @@ doench2016 <- function(
 #'     targets <- extend(bed_to_granges(bedfile, 'mm10'))
 #'     spacers <- find_spacers(targets, bsgenome)
 #'     # reticulate::use_condaenv('azienv')
+#'     # reticulate::import('azienv')
 #'     # (spacers %<>% add_specificity(targets, bsgenome))
 #'     # (spacers %>% add_efficiency(bsgenome, 'Doench2014'))
 #'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016'))
