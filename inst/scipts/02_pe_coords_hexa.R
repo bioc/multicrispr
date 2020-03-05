@@ -29,5 +29,3 @@
     gr <- GenomicRanges::GRanges('chr15:72346580-72346583', strand = '-', 
                                  seqinfo = seqinfo(bsgenome))
     BSgenome::getSeq(bsgenome, gr)
-
-    

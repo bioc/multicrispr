@@ -20,7 +20,7 @@ uniquify <- function(x){
     dt <- data.table::data.table(x = x)
     dt[, N := .N, by='x']
     dt[N==1, xunique := x]
-    dt[N>1, xunique := paste0(x, '_', 1:.N), by = 'x']
+    dt[N>1, xunique := paste0(x, '_', seq_len(.N)), by = 'x']
     dt[, xunique]
 }
 
@@ -48,6 +48,7 @@ name_uniquely <- function(gr, prefix = 'x'){
 #' @param dt      data.table
 #' @param seqinfo \code{\link[GenomeInfoDb]{Seqinfo-class}}
 #' @aliases dt2gr
+#' @return data.table (gr2dt) or GRanges (dt2gr)
 #' @examples
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp

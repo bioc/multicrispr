@@ -141,8 +141,8 @@ find_spacers <- function(
     spacers <-     extend(sites,  0, -3, bsgenome = bsgenome)
     pams    <- down_flank(sites, -2,  0, bsgenome = bsgenome)
     spacers$crisprname   <- names(spacers)
-    spacers$crisprspacer <- BSgenome::getSeq(bsgenome, spacers, as.character=TRUE)
-    spacers$crisprpam    <- BSgenome::getSeq(bsgenome, pams,    as.character=TRUE)
+    spacers$crisprspacer <- getSeq(bsgenome, spacers, as.character=TRUE)
+    spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
     spacers %>% sort(ignore.strand = TRUE)
     if (plot){
         print(plot_intervals(spacers, y='crisprname'))
@@ -238,7 +238,8 @@ extend_for_pe <- function(
 #     # Rm crispr-free targetranges
 #     idx <- targetdt[, substart == 'NA']
 #     if (sum(idx)>0){
-#         if (verbose)  cmessage('\t\tRm %d ranges with no crispr site', sum(idx))
+#         if (verbose)  cmessage('\t\tRm %d ranges with no crispr site', 
+#                                 sum(idx))
 #         targetdt %<>% extract(!idx)
 #     }
 # 
@@ -246,31 +247,31 @@ extend_for_pe <- function(
 #     targetdt[, targetstart  := start]
 #     targetdt[, targetend    := end  ]
 # 
-#     sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend)          %>%
-#                 data.table()                                                %>%
-#                 extract(, substart := as.numeric(substart))                 %>%
-#                 extract(, subend   := as.numeric(subend))                   %>%
-#                 extract(, seq      := substr(seq, substart, subend))        %>%
-#                 extract( strand=='+', crispr_start := start + substart - 1) %>%
-#                 extract( strand=='+', crispr_end   := start + subend   - 1) %>%
-#                 extract( strand=='-', crispr_start := end   - subend   + 1) %>%
-#                 extract( strand=='-', crispr_end   := end   - substart + 1) %>%
-#                 extract(, list(
-#                             seqnames = seqnames, start = crispr_start,
-#                             end = crispr_end,  strand = strand,  seq = seq,
-#                             targetname = targetname, targetstart = targetstart,
-#                             targetend = targetend))
+#     sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend)        %>%
+#               data.table()                                                %>%
+#               extract(, substart := as.numeric(substart))                 %>%
+#               extract(, subend   := as.numeric(subend))                   %>%
+#               extract(, seq      := substr(seq, substart, subend))        %>%
+#               extract( strand=='+', crispr_start := start + substart - 1) %>%
+#               extract( strand=='+', crispr_end   := start + subend   - 1) %>%
+#               extract( strand=='-', crispr_start := end   - subend   + 1) %>%
+#               extract( strand=='-', crispr_end   := end   - substart + 1) %>%
+#               extract(, 
+#                 list(seqnames = seqnames, start = crispr_start,
+#                      end = crispr_end,  strand = strand,  seq = seq,
+#                      targetname = targetname, targetstart = targetstart,
+#                      targetend = targetend))
 #     sites <- GRanges(unique(sites_dt), seqinfo =  seqinfo(gr))
 #     sites$site <- uniquify(sites$targetname)
-#     spacer <- sites %>%     extend( 0, -3, stranded=TRUE, bsgenome = bsgenome)
-#     pam    <- sites %>% down_flank(-2,  0, stranded=TRUE, bsgenome = bsgenome)
+#     spacer <- sites %>%     extend( 0, -3, stranded=TRUE, bsgenome=bsgenome)
+#     pam    <- sites %>% down_flank(-2,  0, stranded=TRUE, bsgenome=bsgenome)
 #     spacer$spacer <- spacer$seq
 #     spacer$seq <- NULL
 #     spacer$pam <- pam$seq
 # 
 #     # Plot. Message. Return
 #     if (plot){
-#         original  <- copy(sites, start=sites$targetstart, end=sites$targetend)
+#         original <- copy(sites, start=sites$targetstart, end=sites$targetend)
 #         original$set <- 'target'
 #         spacer$set <- 'spacer'
 #         plot_intervals(c(original, spacer), color_var = 'set',
@@ -282,92 +283,5 @@ extend_for_pe <- function(
 #     return(sites)
 # }
 
-
-
-# Add three prime extensions
-# 
-# Add three prime extensions for prime editing
-# 
-# A prime editor contains spacer and 3'extensions
-# This function adds these extension seqs for the specified spacer(range)s
-# 
-#   ====== spacer =====>.........................
-#   1--------------17----GG--------->           .
-#   <--------------------CC----------           .
-#       <======  extension ==========............
-#       <====pbs=====<===rttemplate==
-#                    
-# @param spacers   \code{\link[GenomicRanges]{GRanges-class}}: spacers
-# @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-# @param fixes     character vector: '+' strand fix seqs
-# @param nprimer   n primer nucleotides (default 13, max 17)
-# @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
-# @param spacer    string: spacer pattern in extended IUPAC alphabet
-# @param pam       string: pam pattern in extended IUPAC alphabet
-# @param plot      TRUE (default) or FALSE
-# @return  Prime editing spacer \code{\link[GenomicRanges]{GRanges-class}}, 
-# with 3' extension sequences (required for cloning) added.
-# @examples
-# require(magrittr)
-# bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-# gr <- GenomicRanges::GRanges(
-#         seqnames = c(PRNP = 'chr20:4699600',             # snp
-#                      HBB  = 'chr11:5227002',             # snp
-#                      HEXA = 'chr15:72346580-72346583',   # del
-#                      CFTR = 'chr7:117559593-117559595'), # ins
-#         strand   = c(PRNP = '+', HBB = '-', HEXA = '-', CFTR = '+'), 
-#         seqinfo  = BSgenome::seqinfo(bsgenome))
-#         
-# spacers <- gr %>%  extend_for_pe() %>% find_spacers(bsgenome)
-#         
-# BSgenome::getSeq(bsgenome, gr)
-# add_prime_extensions(gr, bsgenome)
-# @seealso \code{\link{find_spacers}} to find standard crispr sites
-# @export
-# add_prime_extensions <- function(
-#   spacers, 
-#   bsgenome, 
-#   rttemplate = getSeq(bsgenome, down_flank(spacers, -2, -3+nrt), as.character = TRUE), 
-#   nprimer = 13, 
-#   nrt = 16, 
-#   spacer =  strrep('N', 20), 
-#   pam = 'NGG', 
-#   plot = TRUE
-# ){
-#     
-#     # Assert
-#     assert_is_all_of(spacers, 'GRanges')
-#     assert_is_all_of(bsgenome, 'BSgenome')
-#     assert_is_character(fixes)
-#     assert_all_are_matching_regex(fixes, '^[ACGTacgt]+$')
-#     assert_is_a_number(nprimer)
-#     assert_is_a_number(nrt)
-#     assert_all_are_less_than(nprimer, 17)
-# .
-
-#     # Extensions
-#     extension <- invertStrand(down_flank(spacers, -2-nprimer, -3+nrt))
-#     extension$seq  <- get_plus_seq(bsgenome, extension)              # Get "+" seq
-#     substr( extension$seq, 
-#             extension$tstart-start(extension)+1, 
-#             extension$tend  -start(extension)+1) <- fixes[extension$tname]
-#     extension$seq[as.logical(strand(extension)=='-')] %<>% revcomp() # Revcomp for "-" seqs
-# 
-#     # Plot
-#     if (plot){
-#         spacer$part<-'spacer'; primer$part<-'primer'; rtranscripts$part<-'rtranscripts'
-#         allranges <- c(spacer, primer, rtranscripts)
-#         allranges$part %<>% factor(rev(c('spacer', 'rtranscripts', 'primer')))
-#         plot_intervals(allranges, y = 'site', color_var = 'part', 
-#             size_var = 'part', facet_var = c('seqnames', 'targetname'))
-#         spacer$part <- primer$part <- rtranscripts$part <- NULL
-#     }
-#     
-#     # Add sequences and return
-#     names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'spacer')
-#     spacer$pam <- pam$seq 
-#     spacer$extension <- extension$seq
-#     spacer
-# }
 
 

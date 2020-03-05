@@ -76,20 +76,20 @@ Returns extensions, upstream flanks, or downstream flanks
 \examples{
 # PE example
 #-----------
-   require(magrittr)
-   bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-   gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
+require(magrittr)
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
                          HBB  = 'chr11:5227002:-',            # snp
                          HEXA = 'chr15:72346580-72346583:-',  # del
                          CFTR = 'chr7:117559593-117559595:+'),# ins
                       bsgenome = bsgenome)
-   gr \%>\% up_flank(-22,  -1, plot = TRUE, facet_var = c('targetname', 'seqnames'))
-   gr \%>\% up_flank(-22,  -1, plot = TRUE, strandaware = FALSE)
-   gr \%>\% down_flank(+1, +22, plot = TRUE)
-   gr \%>\% down_flank(+1, +22, plot = TRUE, strandaware = FALSE)
-   gr \%>\% extend(-10, +20, plot = TRUE)
-   gr \%>\% extend(-10, +20, plot = TRUE, strandaware = FALSE)
-   
+gr \%>\% up_flank( -22,  -1, plot=TRUE, facet_var=c('targetname', 'seqnames'))
+gr \%>\% up_flank( -22,  -1, plot=TRUE, strandaware=FALSE)
+gr \%>\% down_flank(+1, +22, plot=TRUE)
+gr \%>\% down_flank(+1, +22, plot=TRUE, strandaware=FALSE)
+gr \%>\% extend(   -10, +20, plot=TRUE)
+gr \%>\% extend(   -10, +20, plot=TRUE, strandaware=FALSE)
+
 # TFBS example
 #-------------
     bedfile <- system.file('extdata/SRF.bed', package='multicrispr')

@@ -184,30 +184,19 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     
     # Extract from these other components
     bs <- bsgenome; invstr <- invertStrand
-    add_fixed_seqs <- function(gr, bsgenome, fixes){
-        # Get '+' seq
-        gr$seq <- get_plus_seq(bsgenome, gr)
-        substr(gr$seq, gr$targetstart - start(gr)+1, 
-                        gr$targetend  - start(gr)+1) <- fixes[gr$targetname]
-        gr$seq[as.logical(strand(gr)=='-')] %<>% revcomp()     
-        gr
-    }
     spacer       <- up_flank(gg, -21,        -2)    %>% add_seq(bs)
     pam          <- up_flank(gg,  -1,        +1)    %>% add_seq(bs) 
     primer       <- up_flank(gg, -4-nprimer, -5)    %>% add_seq(bs)
     revtranscript<- up_flank(gg, -4, -5+nrt) %>% add_fixed_seqs(bs, fixes)
-    ext  <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand() %>% add_fixed_seqs(bs, fixes)
-                                                        # Revcomp for "-" seqs
+    ext  <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand() %>% 
+            add_fixed_seqs(bs, fixes) # Revcomp for "-" seqs
     # Plot
     if (plot){
         spacer$part<-'spacer'
         ext$part  <- "3' extension"
         allranges <- c(spacer, ext)
-        #allranges$part %<>% factor(rev(c("spacer", "3' extension")))
         allranges$part %<>% factor((c("spacer", "3' extension")))
-        # print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part', 
-        #     size_var = 'part', facet_var = c('seqnames', 'targetname')))
-        print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part', 
+        print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part',
              facet_var = c('seqnames', 'targetname')))
         spacer$part <- NULL
     }
@@ -221,9 +210,14 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     spacer
  }
 
-
-
-
+add_fixed_seqs <- function(gr, bsgenome, fixes){
+    # Get '+' seq
+    gr$seq <- get_plus_seq(bsgenome, gr)
+    substr(gr$seq, gr$targetstart - start(gr)+1, 
+                    gr$targetend  - start(gr)+1) <- fixes[gr$targetname]
+    gr$seq[as.logical(strand(gr)=='-')] %<>% revcomp()     
+    gr
+}
 
 get_plus_seq <- function(bsgenome, gr){
     seqs1  <-  BSgenome::getSeq(bsgenome, 

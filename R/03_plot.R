@@ -145,17 +145,9 @@ to_megabase <- function(y){
 #'     
 #' @export
 plot_intervals <- function(
-    gr, 
-    xref         = 'targetname',
-    y            = 'names',
-    nperchrom    = 1,
-    color_var    = 'targetname', 
-    facet_var    = 'seqnames', 
-    linetype_var = NULL, 
-    size_var     = NULL, 
-    alpha_var    = NULL,
-    title        = NULL, 
-    scales       = 'free'
+    gr, xref = 'targetname', y = 'names', nperchrom = 1, 
+    color_var = 'targetname', facet_var = 'seqnames', linetype_var = NULL, 
+    size_var = NULL, alpha_var = NULL, title = NULL, scales= 'free'
 ){
     # Comply
     edge <- targetname <- NULL
@@ -167,45 +159,45 @@ plot_intervals <- function(
     contig <- .N <- .SD <- seqnames <- start <- NULL
     strand <- tmp <- width <- xstart <- xend <- . <- NULL
 
-    # Identify contigs and order on them
-    # gr$contig <- GenomicRanges::findOverlaps(
-    #                 gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
-    # gr %<>% extract(order(.$contig))
-    
     # Prepare plotdt
     plotdt <- prepare_plot_intervals(gr, xref, y, nperchrom)
     
     # Core Ranges
     p <-ggplot( plotdt, 
-                aes_string(
-                    x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
-                    color = color_var, linetype = linetype_var, 
-                    size = size_var, alpha = alpha_var)) + 
+                aes_string(x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
+                            color = color_var, linetype = linetype_var, 
+                            size = size_var, alpha = alpha_var)) + 
         facet_wrap(facet_var, scales = scales) + 
-        geom_segment(
-            arrow = arrow(length = unit(0.1, "inches")))
+        geom_segment(arrow = arrow(length = unit(0.1, "inches")))
     
     # Targets
     if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
-        p <-p + 
-            geom_point(aes_string(
-                x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
-            geom_point(aes_string(
-                x = 'xtargetend',   y = 'y'), shape = '|', size = 4)
+        p <-p + geom_point(aes_string(
+                    x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
+                geom_point(aes_string(
+                    x = 'xtargetend',   y = 'y'), shape = '|', size = 4)
     }
     
     # Extensions
     if ('extension' %in% names(mcols(gr))){
-        p <-p + geom_segment(aes_string(x='extstart', xend='extend', size = NULL), 
-                            linetype = 'dotted',
+        p <-p + geom_segment(
+                    aes_string( x = 'extstart', xend = 'extend', size = NULL), 
+                                linetype = 'dotted',
                 arrow = arrow(length = unit(0.1, "inches")))
     }
     p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
     
     # Return
-    # print(p)
-    p
+    p # print(p)
 }
+
+# Identify contigs and order on them
+# gr$contig <- GenomicRanges::findOverlaps(
+#                 gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
+# gr %<>% extract(order(.$contig))
+
+
+
 
 prepare_plot_intervals <- function(gr, xref, y, nperchrom){
     
@@ -218,7 +210,8 @@ prepare_plot_intervals <- function(gr, xref, y, nperchrom){
     plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
     plotdt %<>% extract(order(seqnames, start))
     head_tail <- function(x, n=nperchrom) x [ x %in% c(head(x, n), tail(x, n)) ]
-    plotdt %<>% extract(, edge := targetname %in% head_tail(unique(targetname)), by = 'seqnames')
+    plotdt %<>% extract(, edge := targetname %in% head_tail(unique(targetname)),
+                        by = 'seqnames')
     plotdt %<>% extract(edge==TRUE)
     plotdt %>%  extract(, y      := min(start), by = y)
     plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
@@ -234,8 +227,9 @@ prepare_plot_intervals <- function(gr, xref, y, nperchrom){
     # Extensions
     if ('extension' %in% names(mcols(gr))){
         plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
-        plotdt %>% extract(strand=='-', extstart := xend-16-(nchar(revtranscript)[1]-1))
-        plotdt %>% extract(           , extend   := extstart + nchar(extension)[1]-1)
+        plotdt %>% extract(strand=='-',
+                            extstart := xend-16-(nchar(revtranscript)[1]-1))
+        plotdt %>% extract(, extend   := extstart + nchar(extension)[1]-1)
     }
 
     # Flip for arrow direction    

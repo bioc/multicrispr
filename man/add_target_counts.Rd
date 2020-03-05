@@ -29,6 +29,9 @@ add_target_counts(
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+updated spacer \code{\link[GenomicRanges]{GRanges-class}}
+}
 \description{
 Count spacer matches among targets
 }

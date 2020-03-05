@@ -33,6 +33,9 @@ because target ranges generally include both strands.}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+data.table
+}
 \description{
 Count matches to indexed target/genome and add to GRanges
 }

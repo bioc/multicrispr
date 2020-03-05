@@ -48,6 +48,9 @@ filter_target_specific(
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
+}
 \description{
 Filter for target-specific spacers
 }

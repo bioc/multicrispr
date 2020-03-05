@@ -29,6 +29,9 @@ add_genome_counts(
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+spacer GRanges with additional mcols
+}
 \description{
 Count spacer matches to genome and add to GRanges
 }

@@ -26,6 +26,9 @@ filter_prime_specific(
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
+}
 \description{
 Filters spacers which are specific for prime editing site
 }

@@ -9,8 +9,8 @@ require(stringi)
 
 # Load Brunello library
 brunello_url <- 'https://www.addgene.org/static/cms/filer_public/8b/4c/8b4c89d9-eac1-44b2-bb2f-8fea95672705/broadgpp-brunello-library-contents.txt'
-brunello_file <- '~/multicrisprout/brunello/brunello.txt'
-    #download.file(brunello_url, brunello_file)
+brunello_file <- '../multicrisprout/brunello/brunello.txt'
+download.file(brunello_url, brunello_file)
 brunello <- data.table::fread(brunello_file)
 brunello %<>% extract(!is.na(`Target Gene ID`)) # rm pos controls
 brunello[, .(N = length(unique(`Target Transcript`))), by = 'Target Gene ID'][, table(N)]    #   1 transcr per gene
@@ -112,7 +112,8 @@ autonomics.plot::plot_venn(list(brunello = brunellocoords, multicrispr = exonspa
 
 exonspacers$in_brunello <- exonspacercoords %in% brunellocoords
 exonspacers %>% subset(in_brunello==TRUE)
-reticulate::use_condaenv('azienv')
+reticulate::use_condaenv('azienv'); #reticulate::use_condaenv('r3.6_python2.7')
+reticulate::import('azimuth')
 exonspacers %<>% add_efficiency(bsgenome, 'Doench2016')
 
 

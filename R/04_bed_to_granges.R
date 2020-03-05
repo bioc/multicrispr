@@ -139,13 +139,13 @@ bed_to_granges <- function(
     
     # Order
     if (do_order)  gr %<>% sort(ignore.strand = TRUE)
-                     #%<>% extract( order(seqnames(.), start(.)))
+                    #%<>% extract( order(seqnames(.), start(.)))
 
     # Record    
-       names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
-       gr$targetstart <- GenomicRanges::start(gr)
-       gr$targetend   <- GenomicRanges::end(gr)
-       
+    names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
+    gr$targetstart <- GenomicRanges::start(gr)
+    gr$targetend   <- GenomicRanges::end(gr)
+
     # Return
     gr
 }
@@ -167,11 +167,11 @@ bed_to_granges <- function(
 #' @seealso \code{\link{bed_to_granges}}, \code{\link{genes_to_granges}}
 #' @export
 char_to_granges <- function(x, bsgenome){
-   gr <- GenomicRanges::GRanges(x, seqinfo  = BSgenome::seqinfo(bsgenome))
-   names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
-   gr$targetstart <- GenomicRanges::start(gr)
-   gr$targetend   <- GenomicRanges::end(gr)
-   gr
+    gr <- GenomicRanges::GRanges(x, seqinfo  = BSgenome::seqinfo(bsgenome))
+    names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
+    gr$targetstart <- GenomicRanges::start(gr)
+    gr$targetend   <- GenomicRanges::end(gr)
+    gr
 }
 
 
@@ -232,10 +232,10 @@ genes_to_granges <- function(
     if (plot) plot_karyogram(gr)
     
     # Record    
-       names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
-       gr$targetstart <- GenomicRanges::start(gr)
-       gr$targetend   <- GenomicRanges::end(gr)
-       
+    names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
+    gr$targetstart <- GenomicRanges::start(gr)
+    gr$targetend   <- GenomicRanges::end(gr)
+
     # Return
     gr
 }

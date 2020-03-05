@@ -80,20 +80,20 @@ summarize_loci <- function(gr){
 #' @examples 
 #' # PE example
 #' #-----------
-#'    require(magrittr)
-#'    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'    gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
+#' require(magrittr)
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#' gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
 #'                          HBB  = 'chr11:5227002:-',            # snp
 #'                          HEXA = 'chr15:72346580-72346583:-',  # del
 #'                          CFTR = 'chr7:117559593-117559595:+'),# ins
 #'                       bsgenome = bsgenome)
-#'    gr %>% up_flank(-22,  -1, plot = TRUE, facet_var = c('targetname', 'seqnames'))
-#'    gr %>% up_flank(-22,  -1, plot = TRUE, strandaware = FALSE)
-#'    gr %>% down_flank(+1, +22, plot = TRUE)
-#'    gr %>% down_flank(+1, +22, plot = TRUE, strandaware = FALSE)
-#'    gr %>% extend(-10, +20, plot = TRUE)
-#'    gr %>% extend(-10, +20, plot = TRUE, strandaware = FALSE)
-#'    
+#' gr %>% up_flank( -22,  -1, plot=TRUE, facet_var=c('targetname', 'seqnames'))
+#' gr %>% up_flank( -22,  -1, plot=TRUE, strandaware=FALSE)
+#' gr %>% down_flank(+1, +22, plot=TRUE)
+#' gr %>% down_flank(+1, +22, plot=TRUE, strandaware=FALSE)
+#' gr %>% extend(   -10, +20, plot=TRUE)
+#' gr %>% extend(   -10, +20, plot=TRUE, strandaware=FALSE)
+#'
 #' # TFBS example
 #' #-------------
 #'     bedfile <- system.file('extdata/SRF.bed', package='multicrispr')
@@ -103,15 +103,8 @@ summarize_loci <- function(gr){
 #'     gr %>% down_flank(plot = TRUE)
 #' @export
 up_flank <- function(
-  gr, 
-  start       = -200,
-  end         = -1,
-  strandaware = TRUE,
-  bsgenome    = NULL,
-  verbose     = FALSE,
-  plot        = FALSE,
-  linetype_var = 'set',
-  ...
+    gr, start = -200, end = -1, strandaware = TRUE, bsgenome = NULL, 
+    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
 ){
     # Assert
     assert_is_all_of(gr, 'GRanges')
@@ -124,17 +117,18 @@ up_flank <- function(
     shift <- sprintf('(%s%d,%s%d)', 
                                 csign(start), abs(start), csign(end), abs(end))
     txt <- sprintf('\t\t%d%supstream %s flanks', 
-                   length(newgr), 
-                   ifelse(!strandaware, ' (strandagnostic) ', ' '),
-                   shift)
+                    length(newgr), 
+                    ifelse(!strandaware, ' (strandagnostic) ', ' '),
+                    shift)
     
     # Flank
     GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
     GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + end
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start  # do not switch these lines
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end    # to avoid integrity errors
+        # do not switch following lines to avoid integrity errors !
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end
     }
 
     # Add seq
@@ -149,7 +143,8 @@ up_flank <- function(
         newgr$set <- 'upstream flanks'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'upstream flanks'))
-        print(plot_intervals(allgr, linetype_var = linetype_var, ..., title = txt))
+        print(plot_intervals(
+                allgr, linetype_var = linetype_var, ..., title = txt))
         newgr$set <- NULL
     }
     if (verbose) message(txt)
@@ -160,15 +155,8 @@ up_flank <- function(
 #' @rdname up_flank
 #' @export
 down_flank <- function(
-    gr,
-    start = 1, 
-    end   = 200,
-    strandaware   = TRUE,
-    bsgenome   = NULL,
-    verbose    = FALSE,
-    plot       = FALSE,
-    linetype_var = 'set',
-    ...
+    gr, start = 1,  end = 200, strandaware = TRUE, bsgenome = NULL,
+    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
 ){
     # Assert
     assert_is_any_of(gr, 'GRanges')
@@ -181,17 +169,17 @@ down_flank <- function(
     shift <- sprintf('(%s%d,%s%d)', 
                                 csign(start), abs(start), csign(end), abs(end))
     txt <- sprintf('\t\t%d%sdownstream %s flanks', 
-                   length(newgr), 
-                   ifelse(!strandaware, ' (strandagnostic) ', ' '),
-                   shift)
+                    length(newgr), 
+                    ifelse(!strandaware, ' (strandagnostic) ', ' '),
+                    shift)
     
     # Flank
     GenomicRanges::end(newgr)   <- GenomicRanges::end(gr) + end
     GenomicRanges::start(newgr) <- GenomicRanges::end(gr) + start
     if (strandaware){
-      idx <- as.logical(strand(newgr)=='-')
-      GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
-      GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx] - start
+        idx <- as.logical(strand(newgr)=='-')
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx]-end
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx]-start
     }
 
     # Add seq
@@ -206,9 +194,10 @@ down_flank <- function(
         newgr$set <- 'downstream flanks'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'downstream flanks'))
-        print(plot_intervals(allgr, linetype_var = linetype_var, ..., title=txt))
+        print(plot_intervals(
+                allgr, linetype_var = linetype_var, ..., title=txt))
         newgr$set <- NULL
-   }
+    }
     if (verbose) message(txt)
     newgr
 }
@@ -217,15 +206,8 @@ down_flank <- function(
 #' @rdname up_flank
 #' @export
 extend <- function(
-    gr, 
-    start        = -22, 
-    end          =  22,
-    strandaware  = TRUE,
-    bsgenome     = NULL,
-    verbose      = FALSE,
-    plot         = FALSE,
-    linetype_var = 'set',
-    ...
+    gr, start = -22, end = 22, strandaware = TRUE, bsgenome = NULL,
+    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
 ){
 
     # Assert
@@ -264,7 +246,8 @@ extend <- function(
         newgr$set <- 'extensions'
         allgr <- c(gr, newgr)
         allgr$set %<>% factor(c('original', 'extensions'))
-        print(plot_intervals(allgr, linetype_var = linetype_var, ..., title=txt))
+        print(plot_intervals(
+                allgr, linetype_var = linetype_var, ..., title=txt))
         newgr$set <- NULL
     }
     if (verbose) message(txt)
@@ -392,7 +375,8 @@ double_flank <- function(
       newgr$set <- 'flanks'
       allgr <- c(gr, newgr)
       allgr$set %<>% factor(c('original', 'flanks'))
-      print(plot_intervals(allgr, linetype_var = linetype_var, title = txt, ...))
+      print(plot_intervals(
+                allgr, linetype_var = linetype_var, title = txt, ...))
       newgr$set <- NULL
     }
     

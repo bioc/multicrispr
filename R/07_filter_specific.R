@@ -176,6 +176,7 @@ read_bowtie_results <- function(outfile){
 #' @param mismatches max number of mismatches to consider
 #' @param outdir    string: multicrispr output directory
 #' @param verbose   TRUE (default) or FALSE
+#' @return data.table 
 #' @seealso \code{\link{index_genome}}, \code{\link{index_targets}}
 #' @examples
 #' # TFBS example
@@ -251,6 +252,7 @@ expand_iupac_ambiguities <- function(x){
 #' @param outdir    string: file where to output bowtie results
 #' @param pam        string (default 'NGG') pam pattern to expand
 #' @param verbose    TRUE (default) or FALSE
+#' @return data.table
 #' @seealso \code{\link{index_genome}}, \code{\link{index_targets}}
 #' @examples
 #' # TFBS example
@@ -316,6 +318,7 @@ match_spacers <- function(
 #' @param outdir   dir where output is written to
 #' @param pam      string (default 'NGG') pam pattern to expand
 #' @param verbose  TRUE (default) or FALSE
+#' @return updated spacer \code{\link[GenomicRanges]{GRanges-class}}
 #' @seealso \code{\link{index_genome}}, \code{\link{index_targets}}
 #' @examples
 #' # TFBS example
@@ -368,13 +371,14 @@ add_target_counts <- function(
 #' Expands iupac amgiguities in the pam sequence.
 #' Matches all resulting sequences against (indexes) target and genome.
 #' Adds match counts to GRanges object, and then returns it.
-#' @param spacers           spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome          \code{\link[BSgenome]{BSgenome-class}}
-#' @param mismatches        number (default 2): max number of mismatches to consider
-#' @param pam               string (default 'NGG') pam pattern to expand
-#' @param outdir            dir where output is written to
+#' @param spacers    spacer \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
+#' @param mismatches number (default 2): max number of mismatches to consider
+#' @param pam        string (default 'NGG') pam pattern to expand
+#' @param outdir     dir where output is written to
 #' @param indexedgenomesdir string: dir with indexed genomes
-#' @param verbose           TRUE (default) or FALSE
+#' @param verbose       TRUE (default) or FALSE
+#' @return spacer GRanges with additional mcols
 #' @seealso \code{\link{index_genome}}, \code{\link{index_targets}}
 #' @examples
 #' # PE example
@@ -422,7 +426,7 @@ add_genome_counts <- function(
             merge(matches, by = 'crisprspacer', sort = FALSE)
     
     # Organize columns and return
-    targetvars <- names(dt) %>% extract(stringi::stri_startswith_fixed(., 'target'))
+    targetvars <- names(dt) %>% extract(stri_startswith_fixed(., 'target'))
     crisprvars <- c('crisprname', 'crisprspacer', 'crisprpam', 'crisprext') %>% 
                     intersect(names(dt))
     othervars <- setdiff(names(dt), c(targetvars, crisprvars))
@@ -436,15 +440,8 @@ add_genome_counts <- function(
 #' @rdname filter_target_specific
 #' @export
 add_specificity <- function(
-    spacers,
-    targets,
-    bsgenome, 
-    mismatches    = 2,
-    pam           = 'NGG',
-    outdir        = OUTDIR,
-    indexedgenomesdir = INDEXEDGENOMESDIR,
-    plot          = TRUE,
-    verbose       = TRUE
+    spacers, targets, bsgenome, mismatches = 2, pam = 'NGG', outdir = OUTDIR,
+    indexedgenomesdir = INDEXEDGENOMESDIR, plot = TRUE, verbose= TRUE
 ){
     # Comply
     specific <- NULL
@@ -461,7 +458,7 @@ add_specificity <- function(
     # Sanity check
     for (mis in 0:mismatches){
             assertive.base::assert_all_are_true(
-                mcols(spacers)[[paste0('T', mis)]] <=
+                mcols(spacers)[[paste0('T', mis)]] <= 
                 mcols(spacers)[[paste0('G', mis)]])
     }
 
@@ -504,6 +501,7 @@ add_specificity <- function(
 #' @param indexedgenomesdir string: dir with indexed genomes
 #' @param plot       TRUE (default) or FALSE
 #' @param verbose    TRUE (default) or FALSE
+#' @return  filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # TFBS example
 #' #-------------
@@ -560,6 +558,7 @@ filter_target_specific <- function(
 #' @param outdir            string: dir to which output is written
 #' @param indexedgenomesdir dir with bowtie-indexed genomes
 #' @param verbose           TRUE (default) or FALSE
+#' @return filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # PE example
 #' #-----------
