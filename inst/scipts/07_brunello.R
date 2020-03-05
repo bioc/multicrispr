@@ -5,62 +5,134 @@ require(multicrispr)
 require(magrittr)
 require(biomaRt)
 require(data.table)
+require(stringi)
 
 # Load Brunello library
 brunello_url <- 'https://www.addgene.org/static/cms/filer_public/8b/4c/8b4c89d9-eac1-44b2-bb2f-8fea95672705/broadgpp-brunello-library-contents.txt'
-brunello <- data.table::fread(brunello_url)
-brunello[, .(N = length(unique(`Target Transcript`))), by = 'Target Gene ID'][, table(N)] #   1 transcript per gene
-brunello[, .(N = length(unique(`Exon Number`))),       by = 'Target Gene ID'][, table(N)] # 1-4 exons      per gene
-brunello %<>% extract(!is.na(`Target Gene ID`))
+brunello_file <- '~/multicrisprout/brunello/brunello.txt'
+    #download.file(brunello_url, brunello_file)
+brunello <- data.table::fread(brunello_file)
+brunello %<>% extract(!is.na(`Target Gene ID`)) # rm pos controls
+brunello[, .(N = length(unique(`Target Transcript`))), by = 'Target Gene ID'][, table(N)]    #   1 transcr per gene
+brunello[, .(N = length(unique(`Exon Number`))),       by = 'Target Gene ID'][, table(N)]    #   1-4 exons per gene
+brunello[, .(N = length(unique(`Exon Number`))),       by = 'Target Transcript'][, table(N)] #             per transcript
+brunello[`Target Gene ID`==1]
+brunello$`Target Transcript` %<>% substr(1, nchar(.)-2)
 
-# Keep ensdb genes
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene 
-ensdb <- multicrispr::EnsDb.Hsapiens.v98()
-autonomics.plot::plot_venn(list(brunello = unique(as.character(brunello$`Target Gene ID`)), 
-                                txdb     = unique(keys(txdb, keytype = 'GENEID')), 
-                                ensdb    = unique(as.character(keys(ensdb, keytype = 'ENTREZID')))))
+# Add strand
+ensmart <- biomaRt::useMart('ensembl', dataset = 'hsapiens_gene_ensembl')
+strandt <- getBM(attributes = c('refseq_mrna', 'strand'), filters = 'refseq_mrna', values = unique(brunello$`Target Transcript`), mart = ensmart)
+strandt %<>% as.data.table()
+strandt %<>% extract(, .SD[.N==1], by = 'refseq_mrna') # rm the ones that don't map uniquely to a strand
+brunello %<>% merge.data.table(strandt, by.x = 'Target Transcript', by.y = 'refseq_mrna') # 76 441 -> 75 260
+
 # Add seqnames
-brunello %>% setkey('Target Gene ID')
-brunello %<>% extract(`Target Gene ID` %in% keys(ensdb, keytype = 'ENTREZID'))
-chroms <- select(ensdb, as.character(brunello$`Target Gene ID`), keytype = 'ENTREZID', columns = 'SEQNAME')
-chroms %<>% data.table::as.data.table()
-chroms[, table(SEQNAME)]
-chroms %<>% extract( , .SD[nchar(SEQNAME) == min(nchar(SEQNAME))], by = 'ENTREZID')
-chroms[, table(SEQNAME)]
-chroms[,  .SD[.N>1],by = 'ENTREZID' ]
-chroms %<>% extract(!(ENTREZID == 266 & SEQNAME=='Y'))
-brunello %<>% merge(chroms, by.x = 'Target Gene ID', by.y = 'ENTREZID', all.x=TRUE, sort = FALSE)
+brunello$`Target Gene ID`
+chromdt <- getBM(attributes = c('refseq_mrna', 'chromosome_name'), filters = 'refseq_mrna', values = unique(brunello$`Target Transcript`), mart = ensmart)
+chromdt %<>% as.data.table()
+chromdt %<>% extract(, .SD[nchar(chromosome_name) == min(nchar(chromosome_name))], by = 'refseq_mrna')
+chromdt[, table(chromosome_name)]
+chromdt %<>% extract(, .SD[.N>1], by = 'chromosome_name')
+chromdt
+brunello %<>% merge.data.table(chromdt, by.x = 'Target Transcript', by.y = 'refseq_mrna') # 76 441 -> 75 260 -> 75 244
 
-# Overlap with exons
-brunello %>% setnames('Position of Base After Cut (1-based)', 'start')
-brunello[, end:=start]
-brunello %>% setnames('SEQNAME', 'seqnames')
-brunello$Strand <- '*'
-brunellogr <- brunello %>% as('GRanges')
-exons1 <- exons(ensdb)
+# Find spacer ranges
+brunello %>% setnames(c('Strand', 'strand', 'chromosome_name'), c('sense', 'numericstrand', 'seqnames'))
+brunello[, strand := vapply(numericstrand, multicrispr:::csign, character(1)) ]
+brunello[numericstrand==+1 & brunello$sense=='antisense', strand := '-']
+brunello[numericstrand==-1 & brunello$sense=='antisense', strand := '+']
 
-exons_in_brunello <- unique(queryHits(findOverlaps(exons1, brunellogr)))
-brunello_in_exons <- unique(subjectHits(findOverlaps(ensex, brunellogr)))
-exons1[exons_in_brunello]
-brunellogr[brunello_in_exons]
-brunello_not_in_exons <- seq_along(brunellogr) %>% setdiff(brunello_in_exons)
-brunellogr %<>% extract(-brunello_not_in_exons)
-exons1 %<>% extract(exons_in_brunello)
+brunello %>% setnames(c('Position of Base After Cut (1-based)'), c( 'start'))
+brunello %>% extract(, end := start)
+brunello$cutsite <- brunello$start
+bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
 
-# Find crispr in brunello exons
+br <- brunello %>% dt2gr(seqinfo(bsgenome)[standardChromosomes(bsgenome)]) %>% as('GRanges')
+br[strand(br)=='+'] %<>% extend(-17, +2)
+br[strand(br)=='-'] %<>% extend(-16, +3)
+br$crisprspacer <- BSgenome::getSeq(bsgenome, br, as.character=TRUE)
+br %<>% subset(`sgRNA Target Sequence`==crisprspacer) # Drop 12 non-matches (due to sequence changes). 75 244 -> 75 232
+
+# Are context seqs identical? Yes!
+br$context <- br %>% extend(-4,+6) %>% getSeq(bsgenome, ., as.character=TRUE)
+subset(br, context == `Target Context Sequence`)
+
+# find_spacers
+br$`Target Gene ID` <- br$`Genomic Sequence` <- br$sense <- br$`sgRNA Target Sequence` <- br$`Target Context Sequence` <- NULL
+br$numericstrand <- br$cutsite <- br$`Exon Number` <- br$context <- NULL
+names(mcols(br)) %<>% stringi::stri_replace_first_fixed('PAM Sequence', 'crisprpam')
+names(mcols(br)) %<>% stringi::stri_replace_first_fixed('Rule Set 2 score', 'Doench2016')
+
+br %<>% sort(ignore.strand=TRUE)
+br$targetname <- names(br) <- sprintf('br%05d', seq_along(br))
+
+spacers <- br %>% extend(0, +3) %>% multicrispr::find_spacers(bsgenome, plot = FALSE)
+
+    # All brunello spacers are found
+    # 4 813 additional spacers are found on rev strands
+    spcoords <- unname(as.character(granges(spacers)))
+    brcoords <- unname(as.character(granges(br)))
+    setdiff(brcoords, spcoords) %>% length()
+    setdiff(spcoords, brcoords) %>% length()
+    autonomics.plot::plot_venn(list(multicrispr = spcoords, brunello = brcoords))
+
+# Find overlapping exons
+ensdb <- multicrispr::EnsDb.Hsapiens.v98()
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+exons1 <- ensembldb::exons(ensdb)
+#exons1 <- exons(txdb)
+chromosomes <- setdiff(standardChromosomes(exons1), 'MT')
+exons1 %<>% subset(seqnames(exons1) %in% chromosomes)
+exons1 %<>% gr2dt() %>% dt2gr(seqinfo(exons1)[chromosomes])
+br %<>% gr2dt() %>% dt2gr(seqinfo(br)[chromosomes])
+
+res <- findOverlaps(exons1, extend(br, 0, +3), ignore.strand = TRUE, minoverlap = 23)
+exons1 %<>% extract(queryHits(res))
+exons1$targetname <- names(br)[subjectHits(res)]
+length(unique(exons1$targetname))
+br %<>% extract(unique(subjectHits(res)))
+length(br)
+
+exonsdt <- gr2dt(exons1) 
+exonsdt[, length(unique(targetname))]
+exonsdt %<>% extract(, .SD[width == min(width)], by = 'targetname')  # 75 229 / 
+exonsdt %<>% extract(, .SD[1], by = 'targetname')
+
+exons1 <- exonsdt %>% dt2gr(seqinfo(exons1))
+
+all(start(exons1) <= start(extend(br, 0, +3)))
+all(  end(exons1) >=   end(extend(br, 0, +3)))
+exons1
+br
+
+exonspacers <- find_spacers(exons1, bsgenome, plot = FALSE) # 2 552 511
+brunellocoords   <- unname(as.character(granges(br)))
+exonspacercoords <- unname(as.character(granges(exonspacers)))
+autonomics.plot::plot_venn(list(brunello = brunellocoords, multicrispr = exonspacercoords))
+
+exonspacers$in_brunello <- exonspacercoords %in% brunellocoords
+exonspacers %>% subset(in_brunello==TRUE)
+reticulate::use_condaenv('azienv')
+exonspacers %<>% add_efficiency(bsgenome, 'Doench2016')
+
+
+# add_genome_counts
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-seqlevelsStyle(bsgenome) <- 'NCBI'
-dt <- gr2dt(exons1)
-dt$seqnames %<>% droplevels()
-exons1 <- dt2gr(dt, seqinfo(exons1)[levels(droplevels(seqnames(exons1)))])
-genome(exons1)[] <- 'hg38'
-spacers <- multicrispr::find_spacers(exons1, bsgenome, plot = FALSE)
-spacers %<>% add_genome_counts(bsgenome, )
+seqlevelsStyle(br) <- 'UCSC'
+br %<>% add_genome_counts(bsgenome, outdir = '~/multicrisprout/brunello')
+length(unique(br$G0))
+table(br$G0)
+barplot(table(br$G0), log = "y", xlab = '# Exact genome matches')
+
+
 
 brunello #    76 065
 spacers  # 4 374 614
-spacers %<>% add_genome_counts(mismatches=1)
-
+spacers %<>% add_genome_counts(  # works (also) on vm!
+                mismatches=1, 
+                indexedgenomesdir = '../../multicrisprout/indexedgenomes', 
+                outdir = '../../multicrisprout')
+spacerdt <- as.data.table(spacers)
 
 seqinfo(exons1) <- seqinfo(bsgenome)
 bsgenome
