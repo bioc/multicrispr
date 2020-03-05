@@ -142,6 +142,8 @@ run_bowtie <- function(spacerfasta, indexdir, outfile, norc, mismatches = 2){
 
 read_bowtie_results <- function(outfile){
     
+    .N <- . <- readname <- NULL
+    
     assertive::assert_all_are_existing_files(outfile)
     mismatch <- mismatches <- NULL
     
