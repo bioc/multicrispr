@@ -66,12 +66,19 @@ doench2014 <- function(
     magrittr::extract(, 1)
 }
 
-
+# Note: mclapply vs. bplapply
+#     I first used BiocParallel::bplapply().
+#     That works great on linux, but it fails on windows.
+#     support.bioconductor.org/p/92587/ explains likely why
+#     Windows doensn't allow forking (where a child process inherits parent env)
+#     Instead bplapply defaults to multithreading.
+#     In that scenario, the reticulation env is not correctly passed.
+#    mclapply seems like best choice: fork on linux - execute serially on win
 doench2016 <- function(
     contextseqs, 
-    verbose    = TRUE 
+    chunksize = 10000,
+    verbose   = TRUE
 ){
-    
     # Assert
     is_identical_to_true(reticulate::py_module_available('azimuth'))
     assert_is_character(contextseqs)
@@ -84,16 +91,20 @@ doench2016 <- function(
     
     # Score
     azi <- reticulate::import('azimuth.model_comparison', delay_load = TRUE)
-    azi$predict(
-        reticulate::np_array(contextseqs), 
-        aa_cut                 = NULL, 
-        percent_peptide        = NULL, 
-        model                  = NULL, 
-        model_file             = NULL, 
-        pam_audit              = TRUE, 
-        length_audit           = TRUE, 
-        learn_options_override = NULL)
-}
+    nchunks <- ceiling(length(contextseqs) / chunksize)
+    contextchunks <- split(contextseqs, ceiling(seq_along(contextseqs)/chunksize))
+    cmessage('\t\tRun Doench2016 %d times on %d-seq chunks and concatenate (to preserve memory)', length(contextchunks), chunksize)
+    unlist(mclapply(contextchunks, 
+           function(x){
+               azi$predict( reticulate::np_array(x), 
+                            aa_cut                 = NULL, 
+                            percent_peptide        = NULL, 
+                            model                  = NULL, 
+                            model_file             = NULL, 
+                            pam_audit              = TRUE, 
+                            length_audit           = TRUE, 
+                            learn_options_override = NULL)}))
+} 
 
 
 #' Add efficiency scores and filter
@@ -107,7 +118,7 @@ doench2016 <- function(
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
-#' @param cutoff     number: cutoff value
+#' @param chunksize Doench2016 is executed in chunks of chunksize
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
 #' @param alpha_var  NULL or string: var mapped to alpha in plot
@@ -170,6 +181,7 @@ doench2016 <- function(
 #' @export
 add_efficiency <- function(
     spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
+    chunksize = 10000,
     verbose = TRUE, plot = TRUE, 
     alpha_var = default_alpha_var(spacers)
 ){
@@ -189,7 +201,8 @@ add_efficiency <- function(
     scores <- switch(
         method, 
         Doench2014 = doench2014(scoredt$crisprcontext, verbose=verbose), 
-        Doench2016 = doench2016(scoredt$crisprcontext, verbose=verbose))
+        Doench2016 = doench2016(scoredt$crisprcontext, chunksize=chunksize, 
+                                verbose=verbose))
     scoredt[ , (method) := scores ]
 
     # Merge back in

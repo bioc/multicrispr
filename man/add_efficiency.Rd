@@ -9,6 +9,7 @@ add_efficiency(
   spacers,
   bsgenome,
   method = c("Doench2014", "Doench2016")[1],
+  chunksize = 10000,
   verbose = TRUE,
   plot = TRUE,
   alpha_var = default_alpha_var(spacers)
@@ -32,13 +33,13 @@ filter_efficient(
 \item{method}{'Doench2014' (default) or 'Doench2016'
 (requires non-NULL argument python, virtualenv, or condaenv)}
 
+\item{chunksize}{Doench2016 is executed in chunks of chunksize}
+
 \item{verbose}{TRUE (default) or FALSE}
 
 \item{plot}{TRUE (default) or FALSE}
 
 \item{alpha_var}{NULL or string: var mapped to alpha in plot}
-
-\item{cutoff}{number: cutoff value}
 }
 \value{
 numeric vector

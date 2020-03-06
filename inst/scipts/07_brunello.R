@@ -1,4 +1,7 @@
 # Load functions
+require(reticulate)
+use_condaenv('azienv')
+import('azimuth')
 require(AnnotationDbi)
 require(BSgenome)
 require(multicrispr)
@@ -10,7 +13,7 @@ require(stringi)
 # Load Brunello library
 brunello_url <- 'https://www.addgene.org/static/cms/filer_public/8b/4c/8b4c89d9-eac1-44b2-bb2f-8fea95672705/broadgpp-brunello-library-contents.txt'
 brunello_file <- '../multicrisprout/brunello/brunello.txt'
-download.file(brunello_url, brunello_file)
+#download.file(brunello_url, brunello_file)
 brunello <- data.table::fread(brunello_file)
 brunello %<>% extract(!is.na(`Target Gene ID`)) # rm pos controls
 brunello[, .(N = length(unique(`Target Transcript`))), by = 'Target Gene ID'][, table(N)]    #   1 transcr per gene
@@ -75,6 +78,14 @@ spacers <- br %>% extend(0, +3) %>% multicrispr::find_spacers(bsgenome, plot = F
     setdiff(brcoords, spcoords) %>% length()
     setdiff(spcoords, brcoords) %>% length()
     autonomics.plot::plot_venn(list(multicrispr = spcoords, brunello = brcoords))
+    brunello_spacers <- spacers[spcoords %in% brcoords]
+    names(mcols(brunello_spacers)) %<>% stringi::stri_replace_first_fixed('Doench2016', 'BrunelloDoench2016')
+    
+    brunello_spacers[1:10] %>% add_efficiency(bsgenome, 'Doench2016', plot = FALSE)
+    brunello_spacers %<>% add_efficiency(bsgenome, 'Doench2016', plot = FALSE)
+    plot(brunello_spacers$BrunelloDoench2016, brunello_spacers$Doench2016)
+    plot(density(brunello_spacers$Doench2016))
+
 
 # Find overlapping exons
 ensdb <- multicrispr::EnsDb.Hsapiens.v98()
@@ -112,9 +123,33 @@ autonomics.plot::plot_venn(list(brunello = brunellocoords, multicrispr = exonspa
 
 exonspacers$in_brunello <- exonspacercoords %in% brunellocoords
 exonspacers %>% subset(in_brunello==TRUE)
-reticulate::use_condaenv('azienv'); #reticulate::use_condaenv('r3.6_python2.7')
-reticulate::import('azimuth')
+exonspacers %<>% add_context(bsgenome)
+
 exonspacers %<>% add_efficiency(bsgenome, 'Doench2016')
+
+contextseqs <- exonspacers$crisprcontext[1:1000]
+
+score_doench2016_parallel <- function(contextseqs, chunksize = 100){
+    
+    nchunks <- ceiling(length(contextseqs) / chunksize)
+    scores<-BiocParallel::bplapply(
+                seq_len(nchunks), 
+                function(i){
+                   chunkstart <- (i-1)*chunksize + 1
+                   chunkend   <- min(i*chunksize, length(contextseqs))
+                   multicrispr:::doench2016(contextseqs[chunkstart:chunkend])
+                }) %>% 
+            unlist()
+}
+
+
+
+parallel::mclapply()
+exonspacers$Doench2016 <- 0
+exonspacers$Doench2016[     1:100000] <- multicrispr:::doench2016(exonspacers$crisprcontext[     1:100000])
+exonspacers$Doench2016[100001:200000] <- multicrispr:::doench2016(exonspacers$crisprcontext[100001:200000])
+tmp <- exonspacers[1:100000]
+tmp %<>% add_efficiency(bsgenome, 'Doench2016')
 
 
 # add_genome_counts
