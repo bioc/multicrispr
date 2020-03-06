@@ -94,6 +94,7 @@ doench2016 <- function(
     nchunks <- ceiling(length(contextseqs) / chunksize)
     contextchunks <- split(contextseqs, ceiling(seq_along(contextseqs)/chunksize))
     cmessage('\t\tRun Doench2016 %d times on %d-seq chunks and concatenate (to preserve memory)', length(contextchunks), chunksize)
+    mc.cores <- if (assertive.reflection::is_windows()) 1 else parallel::detectCores()-2
     unlist(mclapply(contextchunks, 
            function(x){
                azi$predict( reticulate::np_array(x), 
@@ -103,7 +104,8 @@ doench2016 <- function(
                             model_file             = NULL, 
                             pam_audit              = TRUE, 
                             length_audit           = TRUE, 
-                            learn_options_override = NULL)}))
+                            learn_options_override = NULL)}, 
+           mc.cores = mc.cores))
 } 
 
 
