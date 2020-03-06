@@ -76,7 +76,7 @@ doench2014 <- function(
 #    mclapply seems like best choice: fork on linux - execute serially on win
 doench2016 <- function(
     contextseqs, 
-    chunksize = 10000,
+    chunksize = 100000,
     verbose   = TRUE
 ){
     # Assert
@@ -95,7 +95,7 @@ doench2016 <- function(
     contextchunks <- split(contextseqs, ceiling(seq_along(contextseqs)/chunksize))
     cmessage('\t\tRun Doench2016 %d times on %d-seq chunks and concatenate (to preserve memory)', length(contextchunks), chunksize)
     mc.cores <- if (assertive.reflection::is_windows()) 1 else parallel::detectCores()-2
-    unlist(mclapply(contextchunks, 
+    unlist(parallel::mclapply(contextchunks, 
            function(x){
                azi$predict( reticulate::np_array(x), 
                             aa_cut                 = NULL, 
@@ -183,7 +183,7 @@ doench2016 <- function(
 #' @export
 add_efficiency <- function(
     spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
-    chunksize = 10000,
+    chunksize = 100000,
     verbose = TRUE, plot = TRUE, 
     alpha_var = default_alpha_var(spacers)
 ){

@@ -9,7 +9,7 @@ add_efficiency(
   spacers,
   bsgenome,
   method = c("Doench2014", "Doench2016")[1],
-  chunksize = 10000,
+  chunksize = 1e+05,
   verbose = TRUE,
   plot = TRUE,
   alpha_var = default_alpha_var(spacers)
