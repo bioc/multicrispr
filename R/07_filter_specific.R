@@ -151,7 +151,8 @@ read_bowtie_results <- function(outfile){
             outfile,
             col.names = c('readname', 'strand', 'target', 'position', 
                           'readseq', 'quality', 'matches', 'mismatches'))
-    dt[ , mismatch := stringi::stri_count_fixed(mismatches, '>')]
+    dt[ is.na(mismatches), mismatch := 0]
+    dt[!is.na(mismatches), mismatch := stringi::stri_count_fixed(mismatches, '>')]
     
     results <-  dt %>% 
             extract( , .N, keyby = .(readname, mismatch)) %>% 
