@@ -97,19 +97,20 @@ doench2016 <- function(
     mc.cores <- if (assertive.reflection::is_windows()) 1 else parallel::detectCores()-2
     doench2016scores <- unlist(parallel::mclapply(contextchunks, 
            function(x){
-               azi$predict( reticulate::np_array(x), 
+               reticulate::py_suppress_warnings(
+                   azi$predict( reticulate::np_array(x), 
                             aa_cut                 = NULL, 
                             percent_peptide        = NULL, 
                             model                  = NULL, 
                             model_file             = NULL, 
                             pam_audit              = TRUE, 
                             length_audit           = TRUE, 
-                            learn_options_override = NULL)}, 
+                            learn_options_override = NULL))}, 
            mc.cores = mc.cores))
     
     # Return
     end_time <- Sys.time()
-    if (verbose) cmessage('\t\tCompleted in %d s', 
+    if (verbose) cmessage('\t\tCompleted in %s', 
                           format(end_time - start_time, digits = 2))
     doench2016scores
 } 
