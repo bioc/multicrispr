@@ -86,8 +86,8 @@ doench2016 <- function(
     assert_is_a_bool(verbose)
     
     # Message
-    if (verbose)  message(  '\t\tScore contextseqs with Doench2016',
-                            ' (https://github.com/MicrosoftResearch/Azimuth)')
+    if (verbose)  message('\t\tScore contextseqs with Doench2016 (azimuth)')
+    start_time <- Sys.time()
     
     # Score
     azi <- reticulate::import('azimuth.model_comparison', delay_load = TRUE)
@@ -95,7 +95,7 @@ doench2016 <- function(
     contextchunks <- split(contextseqs, ceiling(seq_along(contextseqs)/chunksize))
     cmessage('\t\tRun Doench2016 %d times on %d-seq chunks and concatenate (to preserve memory)', length(contextchunks), chunksize)
     mc.cores <- if (assertive.reflection::is_windows()) 1 else parallel::detectCores()-2
-    unlist(parallel::mclapply(contextchunks, 
+    doench2016scores <- unlist(parallel::mclapply(contextchunks, 
            function(x){
                azi$predict( reticulate::np_array(x), 
                             aa_cut                 = NULL, 
@@ -106,6 +106,12 @@ doench2016 <- function(
                             length_audit           = TRUE, 
                             learn_options_override = NULL)}, 
            mc.cores = mc.cores))
+    
+    # Return
+    end_time <- Sys.time()
+    if (verbose) cmessage('\t\tCompleted in %d s', 
+                          format(end_time - start_time, digits = 2))
+    doench2016scores
 } 
 
 
