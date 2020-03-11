@@ -15,11 +15,12 @@ EnsDb.Mmusculus.v98 <- function(){
 #' @return \code{\link[ensembldb]{EnsDb-class}}
 #' @export
 #' @examples 
-#' EnsDb.Hsapiens.v98()
-EnsDb.Hsapiens.v98 <- function(){
+#' EnsDb.Hsapiens.v99()
+EnsDb.Hsapiens.v99 <- function(){
     hub <- AnnotationHub::AnnotationHub()
     #hub <- hub[hub$species == 'Homo sapiens' & hub$rdataclass == 'EnsDb']
     #sort(hub$title)
     #AnnotationHub::query(hub, '98') # 'AH75011'
-    hub[["AH75011"]]
+    #AnnotationHub::query(hub, '99') # 'AH78783'
+    hub[["AH78783"]]
 }
