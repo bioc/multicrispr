@@ -99,9 +99,9 @@ doench2016 <- function(
     cmessage(txt, length(contextchunks), chunksize)
     mc.cores <- if (is_windows()) 1 else parallel::detectCores()-2
     doench2016scores <- unlist(parallel::mclapply(contextchunks, 
-           function(x){
-               reticulate::py_suppress_warnings(
-                   azi$predict( reticulate::np_array(x), 
+            function(x){
+                reticulate::py_suppress_warnings(
+                    azi$predict( reticulate::np_array(x), 
                             aa_cut                 = NULL, 
                             percent_peptide        = NULL, 
                             model                  = NULL, 
@@ -109,12 +109,12 @@ doench2016 <- function(
                             pam_audit              = TRUE, 
                             length_audit           = TRUE, 
                             learn_options_override = NULL))}, 
-           mc.cores = mc.cores))
+            mc.cores = mc.cores))
     
     # Return
     end_time <- Sys.time()
     if (verbose) cmessage('\t\tCompleted in %s', 
-                          format(end_time - start_time, digits = 2))
+                        format(end_time - start_time, digits = 2))
     doench2016scores
 } 
 
@@ -220,7 +220,7 @@ add_efficiency <- function(
 
     # Merge back in
     mergedt  <- merge(spacerdt, scoredt,
-                      by='crisprcontext', sort=FALSE, all.x=TRUE)
+                    by='crisprcontext', sort=FALSE, all.x=TRUE)
     spacers <- dt2gr(mergedt, seqinfo = seqinfo(spacers))
     
     # Plot
@@ -261,7 +261,7 @@ filter_efficient <- function(
         width <- nchar(length(idx))
         cmessage('\t\t%s ranges', formatC(length(idx), width = width))
         cmessage('\t\t%s ranges after filtering for %s > %s',
-                 formatC(sum(idx), width = width), method, as.character(cutoff))
+                formatC(sum(idx), width = width), method, as.character(cutoff))
     }
     
     spacers %>% extract(idx)

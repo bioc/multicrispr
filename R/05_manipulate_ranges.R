@@ -366,7 +366,7 @@ double_flank <- function(
     names(dn) %<>% paste0('_d')
     newgr  <- c(up, dn)
     txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
-             length(newgr), length(up), length(dn))
+                    length(newgr), length(up), length(dn))
     message(txt)
 
     # Plot    

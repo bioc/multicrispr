@@ -99,7 +99,7 @@
 #' extract_subranges(gr, ir, plot = TRUE)
 #' @export
 extract_subranges <- function(gr, ir, plot = FALSE){
-  
+
     # Comply / Assert
     substart <- subwidth <- NULL
     assert_is_all_of(gr, 'GRanges')
@@ -113,8 +113,8 @@ extract_subranges <- function(gr, ir, plot = FALSE){
     idt <- data.table::as.data.table(ir)
     gdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
     gdt$width <- NULL
-    setnames(idt, c(   'start',    'end',    'width'), 
-                  c('substart', 'subend', 'subwidth'))
+    setnames(idt,   c(   'start',    'end',    'width'), 
+                    c('substart', 'subend', 'subwidth'))
     mdt <- merge(gdt, idt, by = 'names')
 
     # Extract
@@ -164,7 +164,7 @@ extract_subranges <- function(gr, ir, plot = FALSE){
 #' extract_matchranges(gr, bsgenome, pattern = strrep('N',20) %>% paste0('NGG'))
 #' @export
 extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
-  
+
     # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_has_names(gr)
@@ -272,10 +272,10 @@ extend_for_pe <- function(
     names(rv) %<>% paste0('_r')
     ext <- c(fw, rv)
     if (plot){
-      gr$set <- 'PE target'
-      fw$set <- "potential '+' spacers"
-      rv$set <- "potential '-' spacers"
-      print(plot_intervals(c(fw, gr, rv), color_var = 'set', y = 'set'))
+        gr$set <- 'PE target'
+        fw$set <- "potential '+' spacers"
+        rv$set <- "potential '-' spacers"
+        print(plot_intervals(c(fw, gr, rv), color_var = 'set', y = 'set'))
     }
     ext
 }

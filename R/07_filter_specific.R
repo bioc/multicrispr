@@ -45,7 +45,7 @@ index_genome <- function(
     if (!overwrite & 
         dir.exists(genomedir) & length(list.files(genomedir))!=0){
         cmessage('%s already contains index - set overwrite=TRUE to overwrite', 
-                 genomedir)
+                genomedir)
         return(invisible(genomedir))
     }
     
@@ -148,8 +148,8 @@ read_bowtie_results <- function(outfile){
     
     dt <- data.table::fread(
             outfile,
-            col.names = c('readname', 'strand', 'target', 'position', 
-                          'readseq', 'quality', 'matches', 'mismatches'))
+            col.names = c(  'readname', 'strand', 'target', 'position', 
+                            'readseq', 'quality', 'matches', 'mismatches'))
     dt[ is.na(mismatches), mismatch := 0]
     dt[!is.na(mismatches), mismatch := stringi::stri_count_fixed(
                                         mismatches, '>')]
@@ -280,7 +280,7 @@ match_spacers <- function(
     crisprdt <- data.table(
                     crisprspacer = rep(spacerseqs, each=length(pamseqs)), 
                     crisprpam    = rep(pamseqs, times=length(spacerseqs))) %>% 
-              extract(, crispr := paste0(crisprspacer, pamseqs))
+                extract(, crispr := paste0(crisprspacer, pamseqs))
     crisprseqs <- unique(crisprdt$crispr)
     
     # Count matches
@@ -297,7 +297,7 @@ match_spacers <- function(
     spacer_dt <- data.table(crisprspacer = unique(matches$crisprspacer))
     for (var in count_vars){
         spacer_dt %<>% merge(matches[ , list(counts = sum(get(var))), 
-                                     by = 'crisprspacer'], 
+                                        by = 'crisprspacer'], 
                             by = 'crisprspacer')
         setnames(spacer_dt, 'counts', var)
     }
@@ -470,8 +470,8 @@ add_specificity <- function(
     spacers$specific <- FALSE
     idx <- rep(TRUE, length(spacers))
     for (mis in 0:2){
-        idx %<>% and(mcols(spacers)[[paste0('T', mis)]] == 
-                     mcols(spacers)[[paste0('G', mis)]])
+        idx %<>% and(   mcols(spacers)[[paste0('T', mis)]] == 
+                        mcols(spacers)[[paste0('G', mis)]])
         if (verbose) cmessage('\t       %s T%d==G%d', 
                                 format(sum(idx), width = digits), mis, mis)
     }
