@@ -219,19 +219,19 @@ extend <- function(
     # Record
     newgr <- gr
     shift <- sprintf('(%s%d,%s%d)', 
-                          csign(start), abs(start), csign(end), abs(end))
+                    csign(start), abs(start), csign(end), abs(end))
     txt <- sprintf('\t\t%d%sextensions %s', 
-                   length(newgr), 
-                   ifelse(!strandaware, ' (strandagnostic) ', ' '),
-                   shift)
+                    length(newgr), 
+                    ifelse(!strandaware, ' (strandagnostic) ', ' '),
+                    shift)
 
     # Extend
     GenomicRanges::start(newgr) <- GenomicRanges::start(newgr) + start
     GenomicRanges::end(  newgr) <- GenomicRanges::end(  newgr) + end
     if (strandaware){
-      idx <- as.logical(strand(newgr)=='-')
-      GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
-      GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx]   - start
+        idx <- as.logical(strand(newgr)=='-')
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start
     }
 
     # Add seq
@@ -285,12 +285,12 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 
     # Assert
     assertive::assert_is_all_of(gr, 'GRanges')
-      
+
     # Invert
     revcomps <- invertStrand(gr)
     if ('seq' %in% names(mcols(gr))){
         revcomps$seq <- as.character(Biostrings::reverseComplement(
-                          DNAStringSet(gr$seq)))
+                            DNAStringSet(gr$seq)))
     }
     
     # Concatenate
@@ -349,14 +349,14 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 #'     double_flank(gr, plot = TRUE)
 #' @export
 double_flank <- function(
-  gr, 
-  upstart     = -200, 
-  upend       = -1, 
-  downstart   = 1, 
-  downend     = 200, 
-  plot        = FALSE, 
-  linetype_var = 'set',
-  ...
+    gr, 
+    upstart     = -200, 
+    upend       = -1, 
+    downstart   = 1, 
+    downend     = 200, 
+    plot        = FALSE, 
+    linetype_var = 'set',
+    ...
 ){
 
     # Up flank, down flank, concatenate
@@ -371,13 +371,13 @@ double_flank <- function(
 
     # Plot    
     if (plot){
-      gr$set <- 'original'
-      newgr$set <- 'flanks'
-      allgr <- c(gr, newgr)
-      allgr$set %<>% factor(c('original', 'flanks'))
-      print(plot_intervals(
+        gr$set <- 'original'
+        newgr$set <- 'flanks'
+        allgr <- c(gr, newgr)
+        allgr$set %<>% factor(c('original', 'flanks'))
+        print(plot_intervals(
                 allgr, linetype_var = linetype_var, title = txt, ...))
-      newgr$set <- NULL
+        newgr$set <- NULL
     }
     
     # Return

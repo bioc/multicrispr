@@ -91,18 +91,17 @@ index_targets <- function(
 
     # Reduce
     targets %<>% GenomicRanges::reduce()
-    if (verbose) cmessage('\t\t%d ranges after merging overlaps', length(targets))
+    if (verbose) cmessage(
+                    '\t\t%d ranges after merging overlaps', length(targets))
     
     # Write to fasta
     targetdir   <- target_dir(outdir)
     targetfasta <- target_fasta(outdir)
     targetseqs  <- BSgenome::getSeq(bsgenome, targets)
     names(targetseqs) <- sprintf(
-                          '%s:%s-%s:%s',
-                          as.character(seqnames(targets)),
-                          start(targets),
-                          end(targets),
-                          strand(targets))
+        '%s:%s-%s:%s',
+        as.character(seqnames(targets)), start(targets), end(targets), 
+        strand(targets))
     if (verbose) cmessage('\t\tWrite seqs  to %s', targetfasta)
     dir.create(dirname(targetfasta), showWarnings = FALSE, recursive = TRUE)
     Biostrings::writeXStringSet(targetseqs, targetfasta)
@@ -152,7 +151,8 @@ read_bowtie_results <- function(outfile){
             col.names = c('readname', 'strand', 'target', 'position', 
                           'readseq', 'quality', 'matches', 'mismatches'))
     dt[ is.na(mismatches), mismatch := 0]
-    dt[!is.na(mismatches), mismatch := stringi::stri_count_fixed(mismatches, '>')]
+    dt[!is.na(mismatches), mismatch := stringi::stri_count_fixed(
+                                        mismatches, '>')]
     
     results <-  dt %>% 
             extract( , .N, keyby = .(readname, mismatch)) %>% 
@@ -210,7 +210,8 @@ match_seqs <- function(seqs, indexdir, norc, mismatches = 2,
     # Map reads
     outfile <- spacer_matchfile(outdir, indexdir)
     if (verbose) cmessage('\t\tMap reads: %s', outfile)
-    run_bowtie(readfasta, indexdir, outfile, norc = norc, mismatches = mismatches)
+    run_bowtie(
+        readfasta, indexdir, outfile, norc = norc, mismatches = mismatches)
 
     # Load results
     if (verbose) cmessage('\t\tLoad results')
@@ -277,8 +278,8 @@ match_spacers <- function(
     spacerseqs <- unique(spacers$crisprspacer)
     pamseqs <- expand_iupac_ambiguities(pam)
     crisprdt <- data.table(
-                    crisprspacer = rep(spacerseqs, each = length(pamseqs)), 
-                    crisprpam    = rep(pamseqs, times = length(spacerseqs))) %>% 
+                    crisprspacer = rep(spacerseqs, each=length(pamseqs)), 
+                    crisprpam    = rep(pamseqs, times=length(spacerseqs))) %>% 
               extract(, crispr := paste0(crisprspacer, pamseqs))
     crisprseqs <- unique(crisprdt$crispr)
     

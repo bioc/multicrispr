@@ -1,10 +1,93 @@
+# Convert PAM into regex format
+# @examples
+# x <- 'NGG'
+# pam_to_regex <- function(x){
+#     assert_is_a_string(x)
+#     x %>% stringi::stri_replace_all_fixed('N', '[ACGT]')
+# }
+
+
+# This regex-based function fails to find all crispr spacers
+# It is, therefore, no longer used, just kept for reference purposes.
+# Example explanation of why it fails
+#     x <- Biostrings::DNAString('AGCAGCTGGGGCAGTGGTGGGGGGCCTTGGCGGCTACA')
+#     stringi::stri_locate_all_regex(as.character(x), '[ACGT]{21}GG')
+#     Biostrings::matchPattern('NNNNNNNNNNNNNNNNNNNNNGG', x, fixed = FALSE)
+# regex_based_find_crispr_spacers <- function(
+#   gr, bsgenome, pam = 'NGG', plot = TRUE, verbose = TRUE){
+# 
+#     # Assert. Import. Comply
+#     assert_is_all_of(gr, 'GRanges')
+#     assert_is_all_of(bsgenome, 'BSgenome')
+#     assert_is_a_bool(verbose)
+#     start <- substart <- crispr_start <- NULL
+#     end <- subend <- crispr_end <- strand <- seqnames <- NULL
+#     gr %<>% add_seq(bsgenome)
+#     gr %<>% name_uniquely()
+# 
+#     # Find crispr sites in targetranges
+#     pattern <- paste0('[ACGT]{20}', pam_to_regex(pam))
+#     if (verbose) cmessage('\tFind %s crispr sites', pattern)
+#     targetdt <- as.data.table(gr)
+#     res <- targetdt$seq %>% stri_locate_all_regex(pattern)
+#     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
+#     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
+#     targetdt [ , substart := vapply( res, cextract1, character(1)) ]
+#     targetdt [ , subend   := vapply( res, cextract2, character(1)) ]
+# 
+#     # Rm crispr-free targetranges
+#     idx <- targetdt[, substart == 'NA']
+#     if (sum(idx)>0){
+#         if (verbose)  cmessage('\t\tRm %d ranges with no crispr site', 
+#                                 sum(idx))
+#         targetdt %<>% extract(!idx)
+#     }
+# 
+#     # Transform into crispr ranges
+#     targetdt[, targetstart  := start]
+#     targetdt[, targetend    := end  ]
+# 
+#     sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend)        %>%
+#               data.table()                                                %>%
+#               extract(, substart := as.numeric(substart))                 %>%
+#               extract(, subend   := as.numeric(subend))                   %>%
+#               extract(, seq      := substr(seq, substart, subend))        %>%
+#               extract( strand=='+', crispr_start := start + substart - 1) %>%
+#               extract( strand=='+', crispr_end   := start + subend   - 1) %>%
+#               extract( strand=='-', crispr_start := end   - subend   + 1) %>%
+#               extract( strand=='-', crispr_end   := end   - substart + 1) %>%
+#               extract(, 
+#                 list(seqnames = seqnames, start = crispr_start,
+#                      end = crispr_end,  strand = strand,  seq = seq,
+#                      targetname = targetname, targetstart = targetstart,
+#                      targetend = targetend))
+#     sites <- GRanges(unique(sites_dt), seqinfo =  seqinfo(gr))
+#     sites$site <- uniquify(sites$targetname)
+#     spacer <- sites %>%     extend( 0, -3, stranded=TRUE, bsgenome=bsgenome)
+#     pam    <- sites %>% down_flank(-2,  0, stranded=TRUE, bsgenome=bsgenome)
+#     spacer$spacer <- spacer$seq
+#     spacer$seq <- NULL
+#     spacer$pam <- pam$seq
+# 
+#     # Plot. Message. Return
+#     if (plot){
+#         original <- copy(sites, start=sites$targetstart, end=sites$targetend)
+#         original$set <- 'target'
+#         spacer$set <- 'spacer'
+#         plot_intervals(c(original, spacer), color_var = 'set',
+#                        size_var = 'set', y = 'site')
+#         sites$set <- NULL
+#     }
+#     if (verbose)   cmessage('\t\t%d cas9 spacers across %d ranges',
+#                         length(unique(spacer$spacer)), length(spacer))
+#     return(sites)
+# }
+
+
+
 #' Extract subranges
 #' 
 #' Extract subranges from a \code{\link[GenomicRanges]{GRanges-class}} object
-#' 
-#' Extract subranges (defined \code{\link[IRanges]{IRanges-class}} format) from a
-#' \code{\link{GRanges}} object
-#' 
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
 #' @param ir \code{\link[IRanges]{IRanges-class}}: subranges to be extracted
 #' @param plot TRUE or FALSE (default)
@@ -196,92 +279,5 @@ extend_for_pe <- function(
     }
     ext
 }
-
-
-# Convert PAM into regex format
-# @examples
-# x <- 'NGG'
-# pam_to_regex <- function(x){
-#     assert_is_a_string(x)
-#     x %>% stringi::stri_replace_all_fixed('N', '[ACGT]')
-# }
-
-
-# This regex-based function fails to find all crispr spacers
-# It is, therefore, no longer used, just kept for reference purposes.
-# Example explanation of why it fails
-#     x <- Biostrings::DNAString('AGCAGCTGGGGCAGTGGTGGGGGGCCTTGGCGGCTACA')
-#     stringi::stri_locate_all_regex(as.character(x), '[ACGT]{21}GG')
-#     Biostrings::matchPattern('NNNNNNNNNNNNNNNNNNNNNGG', x, fixed = FALSE)
-# regex_based_find_crispr_spacers <- function(
-#   gr, bsgenome, pam = 'NGG', plot = TRUE, verbose = TRUE){
-# 
-#     # Assert. Import. Comply
-#     assert_is_all_of(gr, 'GRanges')
-#     assert_is_all_of(bsgenome, 'BSgenome')
-#     assert_is_a_bool(verbose)
-#     start <- substart <- crispr_start <- NULL
-#     end <- subend <- crispr_end <- strand <- seqnames <- NULL
-#     gr %<>% add_seq(bsgenome)
-#     gr %<>% name_uniquely()
-# 
-#     # Find crispr sites in targetranges
-#     pattern <- paste0('[ACGT]{20}', pam_to_regex(pam))
-#     if (verbose) cmessage('\tFind %s crispr sites', pattern)
-#     targetdt <- as.data.table(gr)
-#     res <- targetdt$seq %>% stri_locate_all_regex(pattern)
-#     cextract1 <- function(y) y[, 1] %>% paste0(collapse=';')
-#     cextract2 <- function(y) y[, 2] %>% paste0(collapse=';')
-#     targetdt [ , substart := vapply( res, cextract1, character(1)) ]
-#     targetdt [ , subend   := vapply( res, cextract2, character(1)) ]
-# 
-#     # Rm crispr-free targetranges
-#     idx <- targetdt[, substart == 'NA']
-#     if (sum(idx)>0){
-#         if (verbose)  cmessage('\t\tRm %d ranges with no crispr site', 
-#                                 sum(idx))
-#         targetdt %<>% extract(!idx)
-#     }
-# 
-#     # Transform into crispr ranges
-#     targetdt[, targetstart  := start]
-#     targetdt[, targetend    := end  ]
-# 
-#     sites_dt  <-  tidyr::separate_rows(targetdt, substart, subend)        %>%
-#               data.table()                                                %>%
-#               extract(, substart := as.numeric(substart))                 %>%
-#               extract(, subend   := as.numeric(subend))                   %>%
-#               extract(, seq      := substr(seq, substart, subend))        %>%
-#               extract( strand=='+', crispr_start := start + substart - 1) %>%
-#               extract( strand=='+', crispr_end   := start + subend   - 1) %>%
-#               extract( strand=='-', crispr_start := end   - subend   + 1) %>%
-#               extract( strand=='-', crispr_end   := end   - substart + 1) %>%
-#               extract(, 
-#                 list(seqnames = seqnames, start = crispr_start,
-#                      end = crispr_end,  strand = strand,  seq = seq,
-#                      targetname = targetname, targetstart = targetstart,
-#                      targetend = targetend))
-#     sites <- GRanges(unique(sites_dt), seqinfo =  seqinfo(gr))
-#     sites$site <- uniquify(sites$targetname)
-#     spacer <- sites %>%     extend( 0, -3, stranded=TRUE, bsgenome=bsgenome)
-#     pam    <- sites %>% down_flank(-2,  0, stranded=TRUE, bsgenome=bsgenome)
-#     spacer$spacer <- spacer$seq
-#     spacer$seq <- NULL
-#     spacer$pam <- pam$seq
-# 
-#     # Plot. Message. Return
-#     if (plot){
-#         original <- copy(sites, start=sites$targetstart, end=sites$targetend)
-#         original$set <- 'target'
-#         spacer$set <- 'spacer'
-#         plot_intervals(c(original, spacer), color_var = 'set',
-#                        size_var = 'set', y = 'site')
-#         sites$set <- NULL
-#     }
-#     if (verbose)   cmessage('\t\t%d cas9 spacers across %d ranges',
-#                         length(unique(spacer$spacer)), length(spacer))
-#     return(sites)
-# }
-
 
 

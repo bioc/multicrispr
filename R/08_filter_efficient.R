@@ -92,9 +92,12 @@ doench2016 <- function(
     # Score
     azi <- reticulate::import('azimuth.model_comparison', delay_load = TRUE)
     nchunks <- ceiling(length(contextseqs) / chunksize)
-    contextchunks <- split(contextseqs, ceiling(seq_along(contextseqs)/chunksize))
-    cmessage('\t\tRun Doench2016 %d times on %d-seq chunks and concatenate (to preserve memory)', length(contextchunks), chunksize)
-    mc.cores <- if (assertive.reflection::is_windows()) 1 else parallel::detectCores()-2
+    contextchunks <- split(
+                        contextseqs, ceiling(seq_along(contextseqs)/chunksize))
+    txt <- paste0('\t\tRun Doench2016 %d times on %d-seq chunks ', 
+                'and concatenate (to preserve memory)')
+    cmessage(txt, length(contextchunks), chunksize)
+    mc.cores <- if (is_windows()) 1 else parallel::detectCores()-2
     doench2016scores <- unlist(parallel::mclapply(contextchunks, 
            function(x){
                reticulate::py_suppress_warnings(
@@ -216,15 +219,16 @@ add_efficiency <- function(
     scoredt[ , (method) := scores ]
 
     # Merge back in
-    mergedt  <- merge(spacerdt, scoredt, by='crisprcontext', sort=FALSE, all.x=TRUE)
+    mergedt  <- merge(spacerdt, scoredt,
+                      by='crisprcontext', sort=FALSE, all.x=TRUE)
     spacers <- dt2gr(mergedt, seqinfo = seqinfo(spacers))
     
     # Plot
     if (plot){
         scores   <- mcols(spacers)[[method]]
         tertiles <- stats::quantile(scores, c(0.33, 0.66, 1))
-        labels   <- sprintf('%s < %s (%s)', 
-                        method, as.character(round(tertiles, 2)), names(tertiles))
+        labels   <- sprintf('%s < %s (%s)', method, 
+                            as.character(round(tertiles, 2)), names(tertiles))
         spacers$efficiency <- cut(scores, c(0, tertiles), labels)
         p <- plot_intervals(
                 spacers, size_var = 'efficiency', alpha_var = alpha_var) + 

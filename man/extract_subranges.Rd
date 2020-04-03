@@ -19,10 +19,6 @@ extract_subranges(gr, ir, plot = FALSE)
 \description{
 Extract subranges from a \code{\link[GenomicRanges]{GRanges-class}} object
 }
-\details{
-Extract subranges (defined \code{\link[IRanges]{IRanges-class}} format) from a
-\code{\link{GRanges}} object
-}
 \examples{
 gr <- GenomicRanges::GRanges(c(A = 'chr1:1-100:+', B = 'chr1:1-100:-'))
 gr$targetname <- 'AB'
