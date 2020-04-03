@@ -1,3 +1,7 @@
+require(magrittr)
+require(data.table)
+require(multicrispr)
+
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38 
 x <- multicrispr::char_to_granges(
         c(  PRNP  = 'chr20:4699600:+',  # snp
@@ -16,11 +20,57 @@ spacers['PRNP_4']
     # GCAGTGGTGGGGGGCCTTGG # Anzalone
 
 spacers %<>% sort(ignore.strand=TRUE)
-spacers$anzalone <- names(spacers) %in% c('HBB_1', 'HEXA_3', 'PRNP_4')
+spacers$set <- ifelse(names(spacers) %in% c('HBB_1', 'HEXA_3', 'PRNP_4'), 'anzalone', 'multicrispr')
+
+x <- list(multicrispr = names(subset(spacers, targetname=='HBB')), 
+        anzalone = names(subset(spacers, targetname=='HBB' & set=='anzalone')))
+plot_venn <- function(x, title=''){
+    names(x) %<>% paste0(' (', vapply(x, length, integer(1)), ')')
+    p <- VennDiagram::venn.diagram(
+        x, 
+        filename = NULL, 
+        fill     = c("#00BFC4", "#F8766D", "#00BA38")[seq_along(x)], 
+        col      = c("#00BFC4", "#F8766D", "#00BA38")[seq_along(x)], 
+        cat.pos  = rep( 0,   length(x)),
+        cat.dist = rep(-0.1, length(x)),
+        #cat.col  = c(multicrispr = "#00BFC4", anzalone = "#F8766D"), 
+        scaled   = FALSE, 
+        main     = title, 
+        main.pos = c(0.5, 1.06))
+    grid::grid.draw(p)
+    p
+}
+
+do_plot_venn <- function(selectedtarget){
+    grid::grobTree(
+        plot_venn(
+            list(multicrispr = names(subset(spacers, targetname==selectedtarget)), 
+                 Anzalone    = names(subset(spacers, targetname==selectedtarget & set=='anzalone'))),  
+            title = selectedtarget))
+}
+
+p1 <- grid::grobTree(do_plot_venn('HBB'))
+p2 <- grid::grobTree(do_plot_venn('HEXA'))
+p3 <- grid::grobTree(do_plot_venn('PRNP'))
+p_pe_venn <- gridExtra::grid.arrange(p1, p2, p3, layout_matrix = matrix(1:3, nrow=1))
+grid::grid.draw(p_pe_venn)
+
 multicrispr::plot_intervals(spacers, facet_var = c('seqnames','targetname'), 
-                            size_var = 'anzalone')
+                            size_var = 'in_anzalone')
+
+spacers %<>% add_efficiency(bsgenome, 'Doench2016')
+ggplot2::ggplot(as.data.table(spacers), ggplot2::aes(x=in_anzalone, y = Doench2016, color=set)) + 
+ggplot2::geom_point() + ggplot2::facet_wrap(~ targetname) + ggplot2::theme_bw()
+
 
 spacers %<>% add_genome_counts(bsgenome)
+p_pe_on <-  ggplot2::ggplot(as.data.table(spacers), ggplot2::aes(y=as.factor(as.character(G0-1)), x = Doench2016, color=set)) + 
+                    ggplot2::geom_point(size = 4, shape = 15, alpha=0.6) + 
+                    ggplot2::facet_wrap(~ targetname) + 
+                    ggplot2::theme_bw() + 
+                    ggplot2::ylab('Offtarget matches') + 
+                    ggplot2::guides(color = FALSE)
+
 spacers$unique <- spacers$G0==1
 reticulate::use_condaenv('azienv')
 spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')

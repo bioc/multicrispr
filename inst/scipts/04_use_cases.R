@@ -1,15 +1,17 @@
+require(magrittr)
+require(multicrispr)
+
 #=============
 # TFBS
 #=============
 
 # Decide which to keep
-require(multicrispr)
-require(magrittr)
+reticulate::use_condaenv('azienv')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-targets  <- bed_to_granges(bedfile, genome='mm10', plot = FALSE)
+targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10', plot = FALSE)
 png('graphs/srf_karyogram.png')
-plot_karyogram(targets, title = NULL)
+multicrispr::plot_karyogram(targets, title = NULL)
 dev.off()
 
 extended <- extend(targets, -22, +22)
@@ -23,7 +25,7 @@ targets['T0151'] %>% down_flank() %>% plot_intervals()
 spacers  <- extended %>% 
             find_spacers(bsgenome) %>% 
             add_specificity(extended, bsgenome) %>% 
-            add_efficiency(bsgenome, method = 'Doench2016', condaenv='azienv')
+            add_efficiency(bsgenome, method = 'Doench2016')
 spacers %>% subset(seqnames == 'chr1') %>% 
             subset(specific == TRUE)   %>% 
             gr2dt() %>%
@@ -35,65 +37,77 @@ spacers2 %<>% subset(specific==TRUE)
 spacers2$score <- spacers2$name <- spacers2$crisprcontext <- spacers2$specific <- NULL
 spacers2
 
-targets %<>% subset(targetname %in% c('T0050', 'T0151'))
-extended%<>% subset(targetname %in% c('T0050', 'T0151'))
-spacers %<>% subset(targetname %in% c('T0050', 'T0151'))
+targets %<>% subset(targetname %in% c('T0050')) # T0151
+extended%<>% subset(targetname %in% c('T0050'))
+spacers %<>% subset(targetname %in% c('T0050'))
 
 # Create plots: original
-p <- plot_intervals(targets) + 
+p <- plot_intervals(targets, color_var = 'targetname') +
+    ggplot2::scale_color_manual(values = c(T0050 = "#00BFC4")) +
     ggplot2::guides(color = FALSE, linetype = FALSE)
-ggplot2::ggsave('graphs/srf.png', p, width = 2.5, height = 2)
+ggplot2::ggsave('graphs/srf01.pdf',   p, width =2.2, height = 1.5, device = grDevices::cairo_pdf)
+#ggplot2::ggsave('graphs/srf01.png', p, width = 2.2, height = 1.5)
 
 
 p <- plot_intervals(extended) + 
+    ggplot2::scale_color_manual(values = c(T0050 = "#00BFC4")) +
     ggplot2::guides(color = FALSE, linetype = FALSE)
-ggplot2::ggsave('graphs/srf_extended.png', p, width = 2.5, height = 2)
+ggplot2::ggsave('graphs/srf02_extended.pdf', p, width =2.2, height = 1.5, device = grDevices::cairo_pdf)
+#ggplot2::ggsave('graphs/srf02_extended.png', p, width = 2.2, height = 1.5)
 
 p <- plot_intervals(spacers) + 
+    ggplot2::scale_color_manual(values = c(T0050 = "#00BFC4")) +
     ggplot2::guides(color = FALSE)
-ggplot2::ggsave('graphs/srf_spacers.png', p, width = 2.5, height = 2)
+ggplot2::ggsave('graphs/srf03_spacers.pdf', p, width =2.2, height = 1.5, device = grDevices::cairo_pdf)
+#ggplot2::ggsave('graphs/srf03_spacers.png', p, width = 2.2, height = 1.5)
 
 p <- plot_intervals(spacers, alpha_var = 'specific') + 
+    ggplot2::scale_color_manual(values = c(T0050 = "#00BFC4")) +
     ggplot2::scale_alpha_manual(values = c(`TRUE`=1, `FALSE`=0.20)) + 
     ggplot2::guides(color = FALSE, alpha = FALSE)
-ggplot2::ggsave('graphs/srf_specific.png', p, width = 2.5, height = 2)
+ggplot2::ggsave('graphs/srf04_specific.pdf', p, width = 2.2, height = 1.5, device = grDevices::cairo_pdf)
+#ggplot2::ggsave('graphs/srf04_specific.png', p, width = 2.2, height = 1.5)
 
-quantiles <- round(quantile(spacers$Doench2016, c(.33, .66, 1)), 2)
+quantiles <- round(quantile(spacers2$Doench2016, c(.33, .66, 1)), 2)
 spacers$efficiency <- spacers$Doench2016 %>% cut(c(0, quantiles), labels = as.character(quantiles))
 p <- plot_intervals(spacers, size_var = 'efficiency', alpha_var = 'specific') + 
+    ggplot2::scale_color_manual(values = c(T0050 = "#00BFC4")) +
     ggplot2::scale_size_manual(values = c(0.2, 1.5, 3) %>% set_names(quantiles)) + 
     ggplot2::scale_alpha_manual(values = c(`TRUE`=1, `FALSE`=0.25)) + 
     ggplot2::guides(color = FALSE, alpha = FALSE, size = FALSE)
-ggplot2::ggsave('graphs/srf_efficient.png', p, width = 2.5, height = 2)
+ggplot2::ggsave('graphs/srf05_efficient.pdf', p, width = 2.2, height = 1.5, device = grDevices::cairo_pdf)
+#ggplot2::ggsave('graphs/srf05_efficient.png', p, width = 2.2, height = 1.5)
 
 # PE
 #=====
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-                        HBB  = 'chr11:5227002:-',              # snp
-                        HEXA = 'chr15:72346580-72346583:-',    # del
-                        CFTR = 'chr7:117559593-117559595:+'),  # ins
-                       bsgenome)
+# gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
+#                         HBB  = 'chr11:5227002:-',              # snp
+#                         HEXA = 'chr15:72346580-72346583:-',    # del
+#                         CFTR = 'chr7:117559593-117559595:+'),  # ins
+#                        bsgenome)
+gr <- char_to_granges(c(HBB  = 'chr11:5227002:-'), bsgenome)
+plot_intervals(gr, facet_var = c('seqnames', 'targetname'))
 
 spacers <-  gr %>% find_pe_spacers(bsgenome, nrt=48) %>% add_genome_counts()
 spacers$specific <- spacers$G0==1
-spacers %>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
+spacers %>% add_efficiency(bsgenome, 'Doench2016')
     # Select HBB
 
 gr %<>% extract('HBB')
 p <- plot_intervals(gr, facet_var = c('seqnames', 'targetname')) + 
     ggplot2::guides(color = FALSE)
-ggplot2::ggsave('graphs/hbb.png', p, width=2.2, height=1.8)
+ggplot2::ggsave('graphs/hbb01.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
 
 extended <- extend_for_pe(gr, nrt = 48)
 p <- plot_intervals(extended, facet_var = c('seqnames', 'targetname')) + 
     ggplot2::guides(color = FALSE)
-ggplot2::ggsave('graphs/hbb_extended.png', p, width=2.1, height=1.8)
+ggplot2::ggsave('graphs/hbb02_extended.pdf', p, width=2.1, height=1.8, device = grDevices::cairo_pdf)
 
 spacers <- gr %>% find_pe_spacers(bsgenome, nrt=48)
 p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname')) + 
      ggplot2::guides(color = FALSE, size = FALSE)
-ggplot2::ggsave('graphs/hbb_spacers.png', p, width=2.2, height=1.8)
+ggplot2::ggsave('graphs/hbb03_spacers.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
 
 spacers %<>% add_genome_counts()
 spacers$specific <- spacers$G0==1
@@ -101,9 +115,9 @@ p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname'),
                     alpha_var = 'specific') + 
     ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25)) + 
     ggplot2::guides(color = FALSE, size = FALSE, alpha = FALSE)
-ggplot2::ggsave('graphs/hbb_specific.png', p, width=2.2, height=1.8)
+ggplot2::ggsave('graphs/hbb04_specific.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
 
-spacers %<>% add_efficiency(bsgenome, 'Doench2016', condaenv = 'azienv')
+spacers %<>% add_efficiency(bsgenome, 'Doench2016')
 quantiles <- round(quantile(spacers$Doench2016, c(0.33, 0.66, 1)), 2)
 spacers$efficiency <- cut(spacers$Doench2016, c(0, quantiles), labels = quantiles) %>% 
                         as.character()
@@ -112,7 +126,7 @@ p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname'),
     ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25)) + 
     ggplot2::scale_size_manual(values = c(0.2, 1.5, 3) %>% set_names(quantiles)) + 
     ggplot2::guides(color = FALSE, size = FALSE, alpha = FALSE)
-ggplot2::ggsave('graphs/hbb_efficient.png', p, width=2.2, height=1.8)
+ggplot2::ggsave('graphs/hbb05_efficient.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
 
 
 gr %<>% extract('HBB')
