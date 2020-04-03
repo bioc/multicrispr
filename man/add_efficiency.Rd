@@ -40,6 +40,8 @@ filter_efficient(
 \item{plot}{TRUE (default) or FALSE}
 
 \item{alpha_var}{NULL or string: var mapped to alpha in plot}
+
+\item{cutoff}{value to filter on}
 }
 \value{
 numeric vector

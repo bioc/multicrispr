@@ -1,8 +1,8 @@
 #' Extract subranges
 #' 
-#' Extract subranges from a \code{\link{GRanges-class}} object
+#' Extract subranges from a \code{\link[GenomicRanges]{GRanges-class}} object
 #' 
-#' Extract subranges (defined \code{\link{IRanges-class}} format) from a
+#' Extract subranges (defined \code{\link[IRanges]{IRanges-class}} format) from a
 #' \code{\link{GRanges}} object
 #' 
 #' @param gr \code{\link[GenomicRanges]{GRanges-class}}
