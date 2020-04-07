@@ -326,6 +326,7 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 #' @param upend        upstream flank end   in relation to start(gr)
 #' @param downstart    downstream flank start in relation to end(gr)
 #' @param downend      downstream flank end   in relation to end(gr)
+#' @param strandaware  TRUE (default) or FALSE
 #' @param plot         TRUE or FALSE (default)
 #' @param linetype_var gr var mapped to linetype
 #' @param ...          passed to plot_intervals
@@ -345,7 +346,7 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 #' # TFBS example
 #' #-------------
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-#'     gr  <-  bed_to_granges(bedfile, genome = 'mm10')
+#'     gr  <-  bed_to_granges(bedfile, genome = 'mm10', plot = FALSE)
 #'     double_flank(gr, plot = TRUE)
 #' @export
 double_flank <- function(
@@ -353,15 +354,16 @@ double_flank <- function(
     upstart     = -200, 
     upend       = -1, 
     downstart   = 1, 
-    downend     = 200, 
+    downend     = 200,
+    strandaware = TRUE,
     plot        = FALSE, 
     linetype_var = 'set',
     ...
 ){
 
     # Up flank, down flank, concatenate
-    up <- up_flank(  gr,   upstart,   upend, verbose = FALSE)
-    dn <- down_flank(gr, downstart, downend, verbose = FALSE)
+    up <- up_flank(gr,   upstart,   upend,   strandaware, verbose = FALSE)
+    dn <- down_flank(gr, downstart, downend, strandaware, verbose = FALSE)
     names(up) %<>% paste0('_u') # ensure unique names
     names(dn) %<>% paste0('_d')
     newgr  <- c(up, dn)
@@ -373,13 +375,13 @@ double_flank <- function(
         dn$set <- 'downstream flank'
         allgr <- c(gr, up, dn)
         allgr$set %<>% factor(c('original', 'upstream flank', 'downstream flank'))
+        txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
+                        length(newgr), length(up), length(dn))
         print(plot_intervals(
                 allgr, linetype_var = linetype_var, title = txt, y = 'targetname', ...))
     }
     
     # Return
-    txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
-                    length(newgr), length(up), length(dn))
     message(txt)
     newgr
 }

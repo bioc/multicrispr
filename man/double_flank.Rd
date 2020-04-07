@@ -10,6 +10,7 @@ double_flank(
   upend = -1,
   downstart = 1,
   downend = 200,
+  strandaware = TRUE,
   plot = FALSE,
   linetype_var = "set",
   ...
@@ -25,6 +26,8 @@ double_flank(
 \item{downstart}{downstream flank start in relation to end(gr)}
 
 \item{downend}{downstream flank end   in relation to end(gr)}
+
+\item{strandaware}{TRUE (default) or FALSE}
 
 \item{plot}{TRUE or FALSE (default)}
 
@@ -53,6 +56,6 @@ Double flank
 # TFBS example
 #-------------
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-    gr  <-  bed_to_granges(bedfile, genome = 'mm10')
+    gr  <-  bed_to_granges(bedfile, genome = 'mm10', plot = FALSE)
     double_flank(gr, plot = TRUE)
 }
