@@ -110,6 +110,7 @@ to_megabase <- function(y){
 #' @param y           'contig' (default) or name of gr variable
 #' @param nperchrom    number (default 1): n head (and n tail) targets 
 #'                     shown per chromosome
+#' @param nchrom       number (default 6) of chromosomes shown
 #' @param color_var   'seqnames' (default) or other gr variable
 #' @param linetype_var NULL (default) or gr variable mapped to linetype
 #' @param size_var     NULL (default) or gr variable mapped to size
@@ -145,7 +146,7 @@ to_megabase <- function(y){
 #'     
 #' @export
 plot_intervals <- function(
-    gr, xref = 'targetname', y = 'names', nperchrom = 1, 
+    gr, xref = 'targetname', y = 'names', nperchrom = 2, nchrom = 4, 
     color_var = 'targetname', facet_var = 'seqnames', linetype_var = NULL, 
     size_var = NULL, alpha_var = NULL, title = NULL, scales= 'free'
 ){
@@ -160,7 +161,7 @@ plot_intervals <- function(
     strand <- tmp <- width <- xstart <- xend <- . <- NULL
 
     # Prepare plotdt
-    plotdt <- prepare_plot_intervals(gr, xref, y, nperchrom)
+    plotdt <- prepare_plot_intervals(gr, xref, y, nperchrom, nchrom)
     
     # Core Ranges
     p <-ggplot( plotdt, 
@@ -198,21 +199,30 @@ plot_intervals <- function(
 
 
 
+head_tail <- function(x, n){
+    idx <- x %in% unique( c(head(x, ceiling(n/2)), tail(x, floor(n/2))))
+    x[idx]
+}
 
-prepare_plot_intervals <- function(gr, xref, y, nperchrom){
+prepare_plot_intervals <- function(gr, xref, y, nperchrom, nchrom){
     
     # Comply
     edge <- targetname <- xstart <- xend <- width <- NULL
     targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
     extstart <- primer <- revtranscript <- extension <- tmp <- NULL
     
-    # Main Ranges
+    # Prepare data.table. Select chromosomes/targets to plot.
     plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
     plotdt %<>% extract(order(seqnames, start))
-    head_tail <- function(x, n=nperchrom) x [ x %in% c(head(x, n), tail(x, n)) ]
-    plotdt %<>% extract(, edge := targetname %in% head_tail(unique(targetname)),
-                        by = 'seqnames')
-    plotdt %<>% extract(edge==TRUE)
+    plotdt$seqnames %<>% droplevels()
+    headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
+    plotdt %<>% extract(headtailchroms, on = 'seqnames')
+    plotdt$seqnames %<>% factor(headtailchroms)
+    plotdt %<>% extract( # targets
+        , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
+        by = 'seqnames')
+    
+    # Main ranges
     plotdt %>%  extract(, y      := min(start), by = y)
     plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
     plotdt %>%  extract(, xstart := start-min(start), by = xref)

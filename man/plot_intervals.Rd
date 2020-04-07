@@ -8,7 +8,8 @@ plot_intervals(
   gr,
   xref = "targetname",
   y = "names",
-  nperchrom = 1,
+  nperchrom = 2,
+  nchrom = 4,
   color_var = "targetname",
   facet_var = "seqnames",
   linetype_var = NULL,
@@ -27,6 +28,8 @@ plot_intervals(
 
 \item{nperchrom}{number (default 1): n head (and n tail) targets 
 shown per chromosome}
+
+\item{nchrom}{number (default 6) of chromosomes shown}
 
 \item{color_var}{'seqnames' (default) or other gr variable}
 
