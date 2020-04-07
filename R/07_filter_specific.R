@@ -18,6 +18,17 @@ OUTDIR <- '~/multicrisprout'
     spacer_fasta <- function(outdir = OUTDIR){
             paste0(outdir, '/spacers.fa') }
 
+#' Has been indexed?
+#' @param bsgenome BSgenome
+#' @param indexedgenomesir directory with indexed genomes
+#' @examples 
+#' bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+#' has_been_indexed(bsgenome)
+#' @export
+has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
+    dir.exists(multicrispr:::genome_dir(bsgenome = bsgenome))
+}
+
 
 #' Index genome
 #' 
