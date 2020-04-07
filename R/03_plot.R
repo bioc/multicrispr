@@ -107,7 +107,7 @@ to_megabase <- function(y){
 #' Interval plot GRanges
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
 #' @param xref        gr var used for scaling x axis
-#' @param y           'contig' (default) or name of gr variable
+#' @param y           'names' (default) or name of gr variable
 #' @param nperchrom    number (default 1): n head (and n tail) targets 
 #'                     shown per chromosome
 #' @param nchrom       number (default 6) of chromosomes shown

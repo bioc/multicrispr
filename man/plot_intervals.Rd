@@ -24,7 +24,7 @@ plot_intervals(
 
 \item{xref}{gr var used for scaling x axis}
 
-\item{y}{'contig' (default) or name of gr variable}
+\item{y}{'names' (default) or name of gr variable}
 
 \item{nperchrom}{number (default 1): n head (and n tail) targets 
 shown per chromosome}

@@ -365,22 +365,22 @@ double_flank <- function(
     names(up) %<>% paste0('_u') # ensure unique names
     names(dn) %<>% paste0('_d')
     newgr  <- c(up, dn)
-    txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
-                    length(newgr), length(up), length(dn))
-    message(txt)
-
+    
     # Plot    
     if (plot){
         gr$set <- 'original'
-        newgr$set <- 'flanks'
-        allgr <- c(gr, newgr)
-        allgr$set %<>% factor(c('original', 'flanks'))
+        up$set <- 'upstream flank'
+        dn$set <- 'downstream flank'
+        allgr <- c(gr, up, dn)
+        allgr$set %<>% factor(c('original', 'upstream flank', 'downstream flank'))
         print(plot_intervals(
-                allgr, linetype_var = linetype_var, title = txt, ...))
-        newgr$set <- NULL
+                allgr, linetype_var = linetype_var, title = txt, y = 'targetname', ...))
     }
     
     # Return
+    txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
+                    length(newgr), length(up), length(dn))
+    message(txt)
     newgr
 }
 
