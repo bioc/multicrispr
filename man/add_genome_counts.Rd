@@ -39,6 +39,11 @@ add_genome_counts(
 \arguments{
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
+\item{indexdir}{string: dir with indexed reference}
+
+\item{norc}{TRUE or FALSE: whether to search reverse complement of 
+reference seqs}
+
 \item{mismatches}{number (default 2): max number of mismatches to consider}
 
 \item{outdir}{dir where output is written to}

@@ -9,12 +9,12 @@ has_been_indexed(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR)
 \arguments{
 \item{bsgenome}{BSgenome}
 
-\item{indexedgenomesir}{directory with indexed genomes}
+\item{indexedgenomesdir}{directory with indexed genomes}
 }
 \description{
 Has been indexed?
 }
 \examples{
-bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 has_been_indexed(bsgenome)
 }

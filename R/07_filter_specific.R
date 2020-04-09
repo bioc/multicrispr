@@ -1,9 +1,9 @@
 INDEXEDGENOMESDIR <- '~/multicrisprout/indexedgenomes'
-    genome_dir <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){
-            paste0(indexedgenomesdir, '/', bsgenome@pkgname)}
-    
-    genome_fasta <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){ 
-            paste0(indexedgenomesdir, '/', bsgenome@pkgname, '.fa')}
+genome_dir <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){
+        paste0(indexedgenomesdir, '/', bsgenome@pkgname)}
+
+genome_fasta <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){ 
+        paste0(indexedgenomesdir, '/', bsgenome@pkgname, '.fa')}
 
 OUTDIR <- '~/multicrisprout'
 target_dir      <- function(outdir = OUTDIR){
@@ -20,13 +20,13 @@ crispr_fasta <- function(outdir = OUTDIR){
 
 #' Has been indexed?
 #' @param bsgenome BSgenome
-#' @param indexedgenomesir directory with indexed genomes
+#' @param indexedgenomesdir directory with indexed genomes
 #' @examples 
-#' bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' has_been_indexed(bsgenome)
 #' @export
 has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
-    dir.exists(multicrispr:::genome_dir(bsgenome = bsgenome))
+    dir.exists(genome_dir(bsgenome = bsgenome))
 }
 
 
@@ -126,6 +126,7 @@ index_targets <- function(
 }
 
 rm_pam_mismatches <- function(dt, pam){
+    mismatches <- NULL
     if (pam=='NGG'){
         pattern <- '20:[ACGT][>][ACGT]'
         dt %<>% extract(!stri_detect_regex(mismatches, pattern))
@@ -146,7 +147,7 @@ run_bowtie <- function(
     assert_is_a_number(mismatches)
     assert_is_subset(mismatches, 1:3) # 1 for alternate pams
     assert_is_a_string(pam)
-    .N <- . <- spacername <- crisprname <- mismatch <- mismatches <- NULL
+    .N <- . <- spacername <- crisprname <- mismatch <- NULL
     
     # Run bowtie
     dir.create(dirname(outfile), recursive = TRUE, showWarnings = FALSE)
@@ -191,6 +192,7 @@ expand_pam <- function(pam){
 }
 
 factorcode <- function(x, prefix = 's'){
+    . <- NULL
     x %>% 
     factor(unique(.)) %>% 
     as.integer() %>% 
@@ -206,7 +208,7 @@ add_match_counts <- function(spacers, indexdir, norc, mismatches = 2,
     assert_is_all_of(spacers, 'GRanges')
     assert_all_are_dirs(c(indexdir, outdir))
     assert_is_a_bool(verbose)
-    crispr <- crisprspacer <- . <- NULL
+    crispr <- crisprspacer <- crisprpam <- crisprname <- spacername <- . <- NULL
 
     # Get spacers. Expands pams. Construct crisprseqs.    
     spacerdt <- data.table(crisprspacer = unique(spacers$crisprspacer))
@@ -255,9 +257,7 @@ add_target_counts <- function(
 ){
     
     # Index targets
-    targetdir <- target_dir(outdir)
-    dir.create(targetdir, showWarnings = FALSE, recursive = FALSE)
-    index_targets(targets, bsgenome, targetdir)
+    targetdir <- index_targets(targets, bsgenome, outdir = outdir)
 
     # Match spacers to targets
     if (verbose) cmessage('\tAdd target match counts')
@@ -282,7 +282,10 @@ add_target_counts <- function(
 #' @param mismatches number (default 2): max number of mismatches to consider
 #' @param pam        string (default 'NGG') pam pattern to expand
 #' @param outdir     dir where output is written to
+#' @param indexdir   string: dir with indexed reference
 #' @param indexedgenomesdir string: dir with indexed genomes
+#' @param norc       TRUE or FALSE: whether to search reverse complement of 
+#'                   reference seqs
 #' @param verbose       TRUE (default) or FALSE
 #' @return spacer GRanges with additional mcols
 #' @seealso \code{\link{index_genome}}, \code{\link{index_targets}}
@@ -323,7 +326,7 @@ add_genome_counts <- function(
     spacers %<>% add_match_counts(genomedir, norc = FALSE, 
                         mismatches = mismatches, outdir = outdir, 
                         pam = pam, verbose = verbose)
-    names(spacers) %<>% stringi::stri_replace_first_regex('^MM', 'G')
+    names(mcols(spacers)) %<>% stringi::stri_replace_first_regex('^MM', 'G')
     spacers
 }
 
