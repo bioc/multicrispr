@@ -1,0 +1,18 @@
+Package: BSgenome.SarsCov2.UCSC.wuhCor1
+Title: Full genome sequence for SARS-Cov-2 (UCSC version wuhCor1)
+Description: Contains sequence of Wuhan Coronavirus.
+Version: 0.0.1
+Author: Aditya Bhagwat
+Maintainer: Aditya Bhagwat <aditya.bhagwat@mpi-bn.mpg.de>
+Depends: BSgenome (>= 1.54.0)
+Imports: BSgenome
+Suggests: 
+License: Artistic-2.0
+organism: SARS-Cov-2
+common_name: Wuhan Coronavirus
+provider: UCSC
+provider_version: wuhCor1
+release_date: Jan. 2020
+release_name: wuhCor1
+source_url: http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/bigZips
+biocViews: AnnotationData, Genetics, BSgenome, SarsCov2

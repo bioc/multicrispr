@@ -1,6 +1,8 @@
 #' @importFrom  assertive.base        assert_all_are_true  is_identical_to_true
 #' @importFrom  assertive.base        assert_all_are_false
+#' @importFrom  assertive.files       assert_all_are_dirs
 #' @importFrom  assertive.files       assert_all_are_existing_files
+#' @importFrom  assertive.numbers     assert_all_are_greater_than_or_equal_to
 #' @importFrom  assertive.numbers     assert_all_are_less_than
 #' @importFrom  assertive.properties  has_names   assert_has_names
 #' @importFrom  assertive.reflection  is_windows
@@ -16,6 +18,7 @@
 #' @importFrom  BSgenome              getSeq   getBSgenome
 #' @importFrom  data.table            :=  data.table  as.data.table  setnames
 #' @importFrom  data.table            setnames  setorderv   setnafill    .SD
+#' @importFrom  data.table            tstrsplit   fread
 #' @importFrom  GenomeInfoDb          genome
 #' @importFrom  GenomeInfoDb          seqinfo   seqinfo<-
 #' @importFrom  GenomeInfoDb          seqlevels  seqlevels<-  seqlevelsInUse
@@ -31,9 +34,11 @@
 #' @importFrom  magrittr              %>%   %<>%   and
 #' @importFrom  magrittr              extract  extract2  set_names
 #' @importFrom  methods               as
+#' @importFrom  Rbowtie               bowtie
 #' @importFrom  tidyr                 separate_rows
 #' @importFrom  utils                 getFromNamespace  head  tail
 #' @importFrom  utils                 read.csv  read.table
+#' @importFrom  stringi               stri_count_fixed
 #' @importFrom  stringi               stri_detect_regex  stri_locate_all_fixed
 #' @importFrom  stringi               stri_locate_all_regex   
 #' @importFrom  stringi               stri_replace_first_fixed

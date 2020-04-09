@@ -18,13 +18,37 @@ The task of designing a Crispr/Cas9 gRNA library to target a set of genomic loci
 1. Define genomic targets
 2. Extend or flank targets (e.g. extend to ensure 23-bp width, flank to target promotors/enhancers)
 3. Find potential N20NGG Cas9 sites within target loci
-4. Predict targeting efficiency and filter for expected efficiency.
-5. Find offtarget (mis)matches and filter for offtarget-free Cas9
+4. Find offtarget (mis)matches and filter for offtarget-free Cas9
+5. Predict targeting efficiency and filter for expected efficiency.
 6. Return offtarget-free, expectedly efficient Crispr/Cas9 gRNA site/sequence library
 
 
 ```{r setup, include=FALSE, results='hide'}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE)
+```
+
+# Install and load package azimuth (for on-target scoring)
+
+To enable Doench2016 computation, first install the (python) packag azimuth from Doench et al. (2016). This can be easily done using reticulate:
+
+```{r, eval = FALSE}
+# Install azimuth
+# Important: run R(Studio) with admin privileges for this to work
+  install_azimuth <- FALSE
+  if (install_azimuth){
+    reticulate::conda_create('azienv', 'python=2.7')                         # Create condaenv 'azimuth'
+    reticulate::conda_install('azienv', 'azimuth', pip = TRUE)               # Install azimuth
+    reticulate::conda_install('azienv', 'scikit-learn==0.17.1', pip = TRUE)  # Install scikit-learn
+  }
+```
+
+Once installed, make sure for this R session to use this conda environment:
+
+```{r}
+require(reticulate)
+if ('azienv' %in% conda_list()){
+  use_condaenv('azienv')
+}
 ```
 
 # Define targets
@@ -69,21 +93,21 @@ targets0 <- bed_to_granges(bedfile, genome = 'mm10')
 As a second step, extension or flanking may be required. The functions `left_flank`, `right_flank`, and `double_flank` flank target ranges, e.g. in order to target promoters or enhancers rather than TSS:
 
 ```{r}
-# Left flank
-targets <- left_flank(  targets0, leftstart =-200, leftend = -1)
+# Upstream flank
+targets <- up_flank(  targets0, -200, -1, plot = TRUE)
 
-# Right flank
-targets <- right_flank( targets0, rightstart=   1, rightend=200)
+# Downstream flank
+targets <- down_flank( targets0, +1, +200, plot = TRUE)
 
 # Double flank
-targets <- double_flank(targets0, leftstart = -200, leftend=-1, rightstart=1, rightend=200)
+targets <- double_flank(targets0, -200, -1, +1, +200, plot = TRUE)
 ```
 
 
 The function `extend` expands target ranges in either (or both) direction(s), ensuring proper width to contain 23 base Cas9 sites.
 
 ```{r}
-targets <- extend(targets0, leftstart=-22, rightend=22)
+targets <- extend(targets0, -22, 22, plot = TRUE)
 ```
 
 
@@ -96,8 +120,20 @@ The associated plot shows that (nearly) all targets have Cas9 sites.
 
 ```{r}
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-targets <- add_seq(targets, bsgenome)
-cas9s <- find_crisprsites(targets)
+spacers <- find_spacers(targets, bsgenome)
+```
+
+# Prevent offtarget effects
+
+We can restrict the Cas9 sites to only those that have no offtarget effects. 
+For purposes of demonstration, let us restrict ourselves to Y-chromosome targets.
+
+
+```{r}
+if (has_been_indexed(bsgenome)){
+  spacers %<>% add_specificity(targets, bsgenome)
+  spacers %<>% subset(specific==TRUE)
+}
 ```
 
 # Predict targeting efficiency
@@ -105,8 +141,8 @@ cas9s <- find_crisprsites(targets)
 Not all N~20~NGG gRNA sequences target equally well (even when matching sequence perfectly). For each position in the 23-bp gRNA sequence, the  nucleotide present in current, previous and next position has an effect on targeting efficiency. Doench et al. (2014) were the first to systematically investigate the relationship between sequence and targeting efficiency, which they summarized in their 2014 prediction model. The function `score_cas9s` uses this model to compute the Doench 2014 targeting efficiency predictions:
 
 ```{r}
-cas9s <- score_crisprsites(cas9s, bsgenome, method = 'Doench2014')
-cas9s
+method <- if ('azienv' %in% conda_list()$name) 'Doench2016' else 'Doench2014'
+spacers %<>% add_efficiency(bsgenome, method)
 ```
 
 The same authors later developed an updated model (Doench et al., 2016), which to-date remains the most comprehensive prediction model developed and the current community standard. The prediction model was implemented as a python module, which the authors freely share on github (github/MicrosoftResearch/azimuth). The installation of this python module is fairly straightforward:
@@ -119,67 +155,8 @@ The same authors later developed an updated model (Doench et al., 2016), which t
 
 Once azimuth is installed, `score_cas9s` can compute the Doench2016 score as well, under the hood calling the python module azimuth with a little help from the amazing R-to-python reticulate package.
 
-```{r}
-# Install azimuth
-# Important: run R(Studio) with admin privileges for this to work
-  install_azimuth <- FALSE
-  if (install_azimuth){
-    reticulate::conda_create('azienv', 'python=2.7')                         # Create condaenv 'azimuth'
-    reticulate::conda_install('azienv', 'azimuth', pip = TRUE)               # Install azimuth
-    reticulate::conda_install('azienv', 'scikit-learn==0.17.1', pip = TRUE)  # Install scikit-learn
-  }
-
-# Score Doench2016
-  if (reticulate::py_module_available('azimuth')){
-      cas9s <- score_cas9s(cas9s, bsgenome, method = 'Doench2016', condaenv = 'azienv')
-      cas9s
-  }
-
-# Filter
-cas9s <- cas9s[cas9s$Doench2016 > 0.5]
-
-```
 
 
-# Prevent offtarget effects
-
-Finally, we can restrict the Cas9 sites further to only those that have no offtarget effects. 
-For purposes of demonstration, let us restrict ourselves to Y-chromosome targets.
-
-
-```{r}
-cas9s   %<>% magrittr::extract(GenomicRanges::seqnames(.) == 'chrY')
-targets %<>% magrittr::extract(GenomicRanges::seqnames(.) == 'chrY')
-offtargetfree_cas9s <- filter_no_offtargets(cas9s, targets, bsgenome, offtargetchr = 'chrY')
-offtargetfree_cas9s
-```
-
-
-```{r quasr, eval = FALSE}
-
-  # cas9seqs
-  cas9seqs   <- unique(cas9s$seq)
-  Biostrings::writeXStringSet(Biostrings::DNAStringSet(cas9seqs), 'cas9s.fa')
-  cas9seqdt <- data.table::data.table(cas9 = cas9seqs)
-
-  # targets0
-  trgts <- targets
-  trgts <- trgts[strand(trgts)=='+']
-  trgtseqs <- Biostrings::DNAStringSet(trgts$seq)
-  names(trgtseqs) <- sprintf('%s:%s-%s', seqnames(trgts), start(trgts), end(trgts))
-  Biostrings::writeXStringSet(trgtseqs, 'targets.fa')
-  for (mis in 0:2){
-      alignmentpar <- sprintf('-m 10000 -v %d -a', mis)
-      res <- QuasR::qAlign('samples.txt', genome = 'targets.fa', alignmentParameter = alignmentpar)
-      res <- QuasR::qAlign('samples.txt', genome = 'BSgenome.Mmusculus.UCSC.mm10', alignmentParameter = alignmentpar)
-      ba <- Rsamtools::scanBam(res@alignments$FileName)[[1]]
-      dt <- data.table::data.table(cas9 = as.character(ba$seq))
-      varname <- sprintf('targets%d', mis)
-      dt[, (varname) := .N, by = 'cas9']
-      dt <- unique(dt)
-      cas9seqdt %<>% merge(dt, by = 'cas9', sort = FALSE)
-  }
-```
 
 
 

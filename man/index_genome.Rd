@@ -25,7 +25,7 @@ Bowtie index genome
 }
 \examples{
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-index_genome(bsgenome)
+#index_genome(bsgenome)
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-index_genome(bsgenome)
+#index_genome(bsgenome)
 }
