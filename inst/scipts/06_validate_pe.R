@@ -55,6 +55,7 @@ p3 <- grid::grobTree(do_plot_venn('PRNP'))
 p_pe_venn <- gridExtra::grid.arrange(p1, p2, p3, layout_matrix = matrix(1:3, nrow=1))
 grid::grid.draw(p_pe_venn)
 
+spacers$in_anzalone <- spacers$set=='anzalone'
 multicrispr::plot_intervals(spacers, facet_var = c('seqnames','targetname'), 
                             size_var = 'in_anzalone')
 
