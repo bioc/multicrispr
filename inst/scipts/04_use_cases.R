@@ -23,7 +23,6 @@ extended <- extend(targets, -22, +22)
 
 spacers  <- extended %>% find_spacers(bsgenome)
 spacers %<>% add_specificity(extended, bsgenome)
-
 spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
 
 spacers %>% subset(seqnames == 'chr1') %>% 
@@ -40,6 +39,7 @@ spacers2
 targets %<>% subset(targetname %in% c('T0050')) # T0151
 extended%<>% subset(targetname %in% c('T0050'))
 spacers %<>% subset(targetname %in% c('T0050'))
+spacers %>% extract(c(length(.), 1))
 
 # Create plots: original
 p <- plot_intervals(targets, color_var = 'targetname') +
@@ -91,7 +91,7 @@ plot_intervals(gr, facet_var = c('seqnames', 'targetname'))
 
 spacers <-  gr %>% find_pe_spacers(bsgenome, nrt=48) %>% add_genome_counts()
 spacers$specific <- spacers$G0==1
-spacers %>% add_efficiency(bsgenome, 'Doench2016')
+spacers %<>% add_efficiency(bsgenome, 'Doench2016')
     # Select HBB
 
 gr %<>% extract('HBB')
