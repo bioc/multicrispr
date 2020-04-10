@@ -125,18 +125,6 @@ index_targets <- function(
     
 }
 
-rm_pam_mismatches <- function(dt, pam){
-    mismatches <- NULL
-    if (pam=='NGG'){
-        pattern <- '20:[ACGT][>][ACGT]'
-        dt %<>% extract(!stri_detect_regex(mismatches, pattern))
-    } else {
-        message('\t\tOfftarget analysis requires additional work ', 
-                'for pam patterns other than NGG ')
-    }
-    return(dt)
-}
-
 run_bowtie <- function(
     crisprfasta, indexdir, outfile, norc, mismatches = 2, pam = 'NGG'
 ){
@@ -160,16 +148,24 @@ run_bowtie <- function(
             norc      = norc,        # no reverse complement
             outfile   = outfile,
             force     = TRUE)
+}
 
-    # Read results
+aggregate_bowtie_results <- function(outfile, pam){
     dt <- fread(outfile,
                 col.names = c('crisprname', 'strand', 'target', 'position', 
                             'crisprseq', 'quality', 'matches', 'mismatches'))
     dt[, spacername := crisprname %>% tstrsplit('.', fixed=TRUE) %>% extract(1)]
     dt[, pam        := crisprname %>% tstrsplit('.', fixed=TRUE) %>% extract(2)]
-    
+
+    # Rm pam mismatches
+    if (pam=='NGG'){
+        pattern <- '20:[ACGT][>][ACGT]'
+        dt %<>% extract(!stri_detect_regex(mismatches, pattern))
+    } else {
+        message('\t\tOfftarget analysis requires additional work ', 
+                'for pam patterns other than NGG ')
+    }
     # Count matches
-    dt %<>% rm_pam_mismatches(pam) # dont double count pams!
     dt[ is.na(mismatches), mismatch := 0]
     dt[!is.na(mismatches), mismatch := stri_count_fixed(mismatches, '>')]
     results <-  dt[ , .N, keyby = .(spacername, mismatch)] %>% 
@@ -233,8 +229,10 @@ add_match_counts <- function(spacers, indexdir, norc, mismatches = 2,
     outfile <- crisprseq_matchfile(outdir, indexdir)
     if (verbose) cmessage('\t\tBowtie crisprseqs to %s: %s', 
                         basename(indexdir), outfile)
-    matches <- run_bowtie(
-        crisprfasta, indexdir, outfile, norc = norc, mismatches = mismatches, pam = pam)
+    run_bowtie( crisprfasta, indexdir, outfile, norc = norc, 
+                mismatches = mismatches, pam = pam)
+    if (verbose) cmessage('\t\tAggregate Bowtie results')
+    matches <- aggregate_bowtie_results(outfile, pam)
     spacerdt %<>% merge(matches, by='spacername', all=TRUE, sort=FALSE)
     mcols(spacers) %<>% merge(spacerdt[, -1], by = 'crisprspacer', all = TRUE,
                             sort = FALSE)
