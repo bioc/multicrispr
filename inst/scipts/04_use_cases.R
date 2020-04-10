@@ -10,22 +10,22 @@ reticulate::use_condaenv('azienv')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10', plot = FALSE)
-png('graphs/srf_karyogram.png')
-multicrispr::plot_karyogram(targets, title = NULL)
-dev.off()
+#png('graphs/srf_karyogram.png')
+#multicrispr::plot_karyogram(targets, title = NULL)
+#dev.off()
 
 extended <- extend(targets, -22, +22)
 
-targets['T0151'] %>% plot_intervals()
-targets['T0151'] %>% extend()     %>% plot_intervals()
-targets['T0151'] %>% up_flank()   %>% plot_intervals()
-targets['T0151'] %>% down_flank() %>% plot_intervals()
+# targets['T0151'] %>% plot_intervals()
+# targets['T0151'] %>% extend()     %>% plot_intervals()
+# targets['T0151'] %>% up_flank()   %>% plot_intervals()
+# targets['T0151'] %>% down_flank() %>% plot_intervals()
 
+spacers  <- extended %>% find_spacers(bsgenome)
+spacers %<>% add_specificity(extended, bsgenome)
 
-spacers  <- extended %>% 
-            find_spacers(bsgenome) %>% 
-            add_specificity(extended, bsgenome) %>% 
-            add_efficiency(bsgenome, method = 'Doench2016')
+spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
+
 spacers %>% subset(seqnames == 'chr1') %>% 
             subset(specific == TRUE)   %>% 
             gr2dt() %>%

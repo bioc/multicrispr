@@ -161,6 +161,10 @@ read_bowtie_results <- function(outfile){
             outfile,
             col.names = c(  'readname', 'strand', 'target', 'position', 
                             'readseq', 'quality', 'matches', 'mismatches'))
+
+    pattern <- '20:[ACGT][>][ACGT]'
+    dt %<>% extract(!stri_detect_regex(mismatches, pattern))
+
     dt[ is.na(mismatches), mismatch := 0]
     dt[!is.na(mismatches), mismatch := stringi::stri_count_fixed(
                                         mismatches, '>')]
@@ -233,6 +237,8 @@ match_seqs <- function(seqs, indexdir, norc, mismatches = 2,
     readdt <- data.table(readname = names(reads), 
                         readseq   = unname(as.character(reads)))
     readdt %<>% merge(matches, by='readname', all=TRUE, sort=FALSE)
+    readdt <- cbind(readdt[, c(1, 2)], 
+                    data.table::setnafill(readdt[, -c(1, 2)], fill = 0))
 
     # Return
     readdt[, 'readname' := NULL]
