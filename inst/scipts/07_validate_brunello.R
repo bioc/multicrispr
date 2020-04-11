@@ -1,5 +1,6 @@
 # Load functions
 #===============
+    require(magrittr)
     require(reticulate)
     use_condaenv('azienv')
     import('azimuth')
@@ -10,7 +11,8 @@
     # require(biomaRt)
     # require(data.table)
     # require(stringi)
-
+cmessage<- multicrispr:::cmessage
+csign <- multicrispr:::csign
 
 read_brunello_dt <- function(){
     
@@ -20,7 +22,7 @@ read_brunello_dt <- function(){
                            '8b/4c/8b4c89d9-eac1-44b2-bb2f-8fea95672705/', 
                            'broadgpp-brunello-library-contents.txt')
     if (!file.exists(local_brunello_file)){
-        download.file(brunello_url, brunello_file)}
+        download.file(brunello_url, local_brunello_file)}
     brunello <- data.table::fread(local_brunello_file)
     cmessage('\t%d gRNAs described in Brunello txt file', nrow(brunello))
     
@@ -206,29 +208,56 @@ find_enclosing_exons <- function(spacers){
     brunello_exons   <- find_enclosing_exons(brunello)
     brunello %<>% extract(brunello_exons$targetname)
 
-# Analyze Brunello exons
-#=======================
+# Find exon spacers
+#==================
     bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
     exonspacers <- find_spacers(brunello_exons, bsgenome, plot = FALSE) # 2 583 378
-    exonspacers %<>% add_efficiency(bsgenome, 'Doench2016', chunksize=100000, plot = FALSE)
+    saveRDS(exonspacers, '../multicrisprout/brunello/exonspacers0.rds')
+    saveRDS(exonspacers, 'Z:/abhagwa/multicrisprout/brunello/exonspacers0.rds')
+    
+# Score exon spacers
+#===================
+    require(reticulate)
+    use_condaenv('azienv')
+    import('azimuth')
+    require(multicrispr)
+    require(magrittr)
+    exonspacers <- readRDS('../multicrisprout/brunello/exonspacers0.rds')
+    bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+    exonspacers %<>% add_efficiency(bsgenome, 'Doench2016', chunksize=50000, plot = FALSE)
+    saveRDS(exonspacers, '../multicrisprout/brunello/exonspacers1.rds')
+    
+# (Mis)match exon spacers. Execute in two disjunct chunks to save memory.
+#========================================================================
+    exonspacers <- readRDS('../multicrisprout/brunello/exonspacers1.rds')
+    exonspacers <- readRDS('Z:/abhagwa/multicrisprout/brunello/exonspacers1.rds')
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-    seqlevelsStyle(exonspacers) <- 'UCSC'
-    exonspacers %<>% add_genome_counts(
-                        bsgenome, outdir = '../multicrisprout/brunello', 
-                        indexedgenomesdir = '../multicrisprout/indexedgenomes', 
-                        mismatches = 1)
-    seqlevelsStyle(exonspacers) <- 'NCBI'
-    #saveRDS(exonspacers, '../multicrisprout/brunello/exonspacers.rds')
+    GenomeInfoDb::seqlevelsStyle(exonspacers) <- 'UCSC'
+    outdir = '../multicrisprout/brunello'
+    exonspacers %<>% extract(order(.$crisprspacer))
+    xsp1 <- exonspacers[seq(1,2583378/2)]
+    xsp2 <- exonspacers[seq(2583378/2+1, 2583378)]
+    autonomics.plot::plot_venn(list(xsp1=xsp1$crisprspacer, xsp2=xsp2$crisprspacer))
+    xsp1 %<>% add_genome_counts(bsgenome, outdir = outdir, mismatches = 1,
+                        indexedgenomesdir = '../multicrisprout/indexedgenomes')
+    xsp2 %<>% add_genome_counts(bsgenome, outdir = outdir, mismatches = 1, 
+                        indexedgenomesdir = '../multicrisprout/indexedgenomes')
+    exonspacers <- c(xsp1, xsp2)
+    GenomeInfoDb::seqlevelsStyle(exonspacers) <- 'NCBI'
+    #saveRDS(exonspacers, '../multicrisprout/brunello/exonspacers2.rds')
     #exonspacers <- readRDS('../multicrisprout/brunello/exonspacers.rds')
     
 # Plot validation results
 #========================
     # Venn
+        exonspacers <- readRDS('Z:/abhagwa/multicrisprout/brunello/exonspacers.rds')
         brunellocoords   <- unname(as.character(granges(brunello)))
         exonspacercoords <- unname(as.character(granges(exonspacers)))
         x <- list(multicrispr = exonspacercoords, Brunello = brunellocoords)
-        p_brunello_venn <- autonomics::plot_venn(x, title = 'Brunello')
-    
+        p_brunello_venn <- autonomics::plot_venn(x, title = 'Brunello spacer ranges')
+        x <- list(multicrispr = unique(exonspacers$crisprspacer), Brunello = unique(brunello$crisprspacer))
+        p_brunello_venn2 <- autonomics::plot_venn(x, title = 'Brunello spacer seqs')
+
     # Densities
         # multicrispr::plot_intervals(subset(exonspacers, seqnames==1))
         exonspacers$set <- ifelse(exonspacers$in_brunello, 'brunello', 'multicrispr')
