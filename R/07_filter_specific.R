@@ -20,13 +20,13 @@ OUTDIR <- '~/multicrisprout'
 
 #' Has been indexed?
 #' @param bsgenome BSgenome
-#' @param indexedgenomesir directory with indexed genomes
+#' @param indexedgenomesdir directory with indexed genomes
 #' @examples 
-#' bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' has_been_indexed(bsgenome)
 #' @export
 has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
-    dir.exists(multicrispr:::genome_dir(bsgenome = bsgenome))
+    dir.exists(genome_dir(bsgenome = bsgenome))
 }
 
 
