@@ -29,46 +29,81 @@ has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
     dir.exists(genome_dir(bsgenome = bsgenome))
 }
 
+multicrispr_bucket <- function(){
+    Sys.setenv('AWS_S3_ENDPOINT' = 's3.mpi-bn.mpg.de')
+    contents <- aws.s3::get_bucket(bucket = 'data-multicrispr-2020', region="")
+    bsgenomes <- unname(vapply(contents, extract2, character(1), 'Key'))
+    Sys.setenv('AWS_S3_ENDPOINT' = 's3.amazonaws.com')
+}
+
+indexed_genomes_s3 <- c("BSgenome.Hsapiens.UCSC.hg38", 
+                        "BSgenome.Mmusculus.UCSC.mm10")
 
 #' Index genome
 #' 
 #' Bowtie index genome
+#' 
+#' Checks whether already available locally. If not, checks whether indexed
+#' version can be downloaded from our s3 storage. If not, builds the
+#' index with bowtie. This can take a few hours, but is a one-time operation.
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param indexedgenomesdir  string: directory with bowtie-indexed genome
-#' @param overwrite logical(1)
+#' @param download TRUE (default) or FALSE: whether to download pre-indexed 
+#'                 version if available
+#' @param overwrite TRUE or FALSE (default)
 #' @return invisible(genomdir)
 #' @examples
-#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' index_genome(bsgenome)
-#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#' index_genome(bsgenome)
+#' #bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' #index_genome(bsgenome)
+#' #bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#' #index_genome(bsgenome)
+#' #bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+#' #index_genome(bsgenome)
 #' @export
 index_genome <- function(
-    bsgenome, indexedgenomesdir=INDEXEDGENOMESDIR, overwrite=FALSE
+    bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR, 
+    download = TRUE, overwrite = FALSE
 ){
-
     # Assert
     assert_is_all_of(bsgenome, 'BSgenome')
+    bsname <- GenomeInfoDb::bsgenomeName(bsgenome)
     
-    # Return if subdir exists
+    # Return if already available
     genomedir    <- genome_dir(  indexedgenomesdir, bsgenome)
-    genomefasta  <- genome_fasta(indexedgenomesdir, bsgenome)
+    message('\tIndex ', bsname)
     if (!overwrite & 
         dir.exists(genomedir) & length(list.files(genomedir))!=0){
-        cmessage('%s already contains index - set overwrite=TRUE to overwrite', 
-                genomedir)
+        message('\t\tNot required: ', genomedir, ' already exists', '
+                Set overwrite=TRUE to overwrite')
         return(invisible(genomedir))
     }
-    
-    # Create subdir and write fastafile and genomeindex
+
+    # Download if present on s3 storage
+    if (download & (bsname %in% indexed_genomes_s3)){
+        url <- paste0('https://s3.mpi-bn.mpg.de/data-multicrispr-2020/', 
+                    bsname, '.zip')
+        zipfile <- paste0(genomedir, '.zip')
+        message('\t\tDownload pre-indexed version
+                For a fresh build instead, set download = FALSE')
+        res <- tryCatch(download.file(url, zipfile), error = function(e) 1)
+        if (res==0){
+            message('\t\tUnzip ')
+            utils::unzip(zipfile, exdir = dirname(genomedir))
+            unlink(zipfile)
+            return(invisible(genomedir))
+        }
+        message('\t\t\tfailed')
+    }
+
+    # Index using Bowtie
     dir.create(genomedir, showWarnings = FALSE, recursive = TRUE)
+    genomefasta  <- genome_fasta(indexedgenomesdir, bsgenome)
     BSgenome::writeBSgenomeToFasta(bsgenome, genomefasta)
     Rbowtie::bowtie_build(
         genomefasta, genomedir, prefix = basename(genomedir), force = TRUE)
     return(invisible(genomedir))
     
 }
-
 
 #' Index targets
 #' 

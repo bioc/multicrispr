@@ -7,6 +7,7 @@
 index_genome(
   bsgenome,
   indexedgenomesdir = INDEXEDGENOMESDIR,
+  download = TRUE,
   overwrite = FALSE
 )
 }
@@ -15,7 +16,10 @@ index_genome(
 
 \item{indexedgenomesdir}{string: directory with bowtie-indexed genome}
 
-\item{overwrite}{logical(1)}
+\item{download}{TRUE (default) or FALSE: whether to download pre-indexed 
+version if available}
+
+\item{overwrite}{TRUE or FALSE (default)}
 }
 \value{
 invisible(genomdir)
@@ -23,9 +27,16 @@ invisible(genomdir)
 \description{
 Bowtie index genome
 }
+\details{
+Checks whether already available locally. If not, checks whether indexed
+version can be downloaded from our s3 storage. If not, builds the
+index with bowtie. This can take a few hours, but is a one-time operation.
+}
 \examples{
-bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-index_genome(bsgenome)
-bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-index_genome(bsgenome)
+#bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#index_genome(bsgenome)
+#bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#index_genome(bsgenome)
+#bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
+#index_genome(bsgenome)
 }
