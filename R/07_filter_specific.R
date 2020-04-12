@@ -29,12 +29,12 @@ has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
     dir.exists(genome_dir(bsgenome = bsgenome))
 }
 
-multicrispr_bucket <- function(){
-    Sys.setenv('AWS_S3_ENDPOINT' = 's3.mpi-bn.mpg.de')
-    contents <- aws.s3::get_bucket(bucket = 'data-multicrispr-2020', region="")
-    bsgenomes <- unname(vapply(contents, extract2, character(1), 'Key'))
-    Sys.setenv('AWS_S3_ENDPOINT' = 's3.amazonaws.com')
-}
+# multicrispr_bucket <- function(){
+#     Sys.setenv('AWS_S3_ENDPOINT' = 's3.mpi-bn.mpg.de')
+#     contents <- aws.s3::get_bucket(bucket = 'data-multicrispr-2020', region="")
+#     bsgenomes <- unname(vapply(contents, extract2, character(1), 'Key'))
+#     Sys.setenv('AWS_S3_ENDPOINT' = 's3.amazonaws.com')
+# }
 
 indexed_genomes_s3 <- c("BSgenome.Hsapiens.UCSC.hg38", 
                         "BSgenome.Mmusculus.UCSC.mm10")
