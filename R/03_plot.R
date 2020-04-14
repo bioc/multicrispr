@@ -205,54 +205,47 @@ head_tail <- function(x, n){
 }
 
 prepare_plot_intervals <- function(gr, xref, y, nperchrom, nchrom){
-    
     # Comply
-    edge <- targetname <- xstart <- xend <- width <- NULL
-    targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
-    extstart <- primer <- revtranscript <- extension <- tmp <- NULL
-    
+        edge <- targetname <- xstart <- xend <- width <- NULL
+        targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
+        extstart <- primer <- revtranscript <- extension <- tmp <- NULL
     # Prepare data.table. Select chromosomes/targets to plot.
-    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
-    plotdt %<>% extract(order(seqnames, start))
-    plotdt$seqnames %<>% droplevels()
-    headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
-    plotdt %<>% extract(headtailchroms, on = 'seqnames')
-    plotdt$seqnames %<>% factor(headtailchroms)
-    plotdt %<>% extract( # targets
-        , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
-        by = 'seqnames')
-    
+        plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
+        plotdt %<>% extract(order(seqnames, start))
+        plotdt$seqnames %<>% droplevels()
+        headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
+        plotdt %<>% extract(headtailchroms, on = 'seqnames')
+        plotdt$seqnames %<>% factor(headtailchroms)
+        plotdt %<>% extract( # targets
+            , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
+            by = 'seqnames')
     # Main ranges
-    plotdt %>%  extract(, y      := min(start), by = y)
-    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
-    plotdt %>%  extract(, xstart := start-min(start), by = xref)
-    plotdt %>%  extract(, xend   := xstart + width)
-    
+        plotdt %>%  extract(, y      := min(start), by = y)
+        plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
+        plotdt %>%  extract(, xstart := start-min(start), by = xref)
+        plotdt %>%  extract(, xend   := xstart + width)
     # Target marks
-    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
-        plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
-        plotdt %>% extract(, xtargetend   := xend   + targetend-end  )
-    }
-    
+        if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
+            plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
+            plotdt %>% extract(, xtargetend   := xend   + targetend-end  )
+        }
     # Extensions
-    if ('extension' %in% names(mcols(gr))){
-        plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
-        plotdt %>% extract(strand=='-',
-                            extstart := xend-16-(nchar(revtranscript)[1]-1))
-        plotdt %>% extract(, extend   := extstart + nchar(extension)[1]-1)
-    }
-
+        if ('extension' %in% names(mcols(gr))){
+            plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
+            plotdt %>% extract(strand=='-',
+                                extstart := xend-16-(nchar(revtranscript)[1]-1))
+            plotdt %>% extract(, extend   := extstart + nchar(extension)[1]-1)
+        }
     # Flip for arrow direction    
-    plotdt %>%  extract(strand=='-', tmp    := xend)
-    plotdt %>%  extract(strand=='-', xend   := xstart)
-    plotdt %>%  extract(strand=='-', xstart := tmp)
-    if ('extension' %in% names(mcols(gr))){
-        plotdt %>%  extract(strand=='+', tmp := extend)
-        plotdt %>%  extract(strand=='+', extend := extstart)
-        plotdt %>%  extract(strand=='+', extstart := tmp)
-    }
-    plotdt %>%  extract(, tmp := NULL)
-    
+        plotdt %>%  extract(strand=='-', tmp    := xend)
+        plotdt %>%  extract(strand=='-', xend   := xstart)
+        plotdt %>%  extract(strand=='-', xstart := tmp)
+        if ('extension' %in% names(mcols(gr))){
+            plotdt %>%  extract(strand=='+', tmp := extend)
+            plotdt %>%  extract(strand=='+', extend := extstart)
+            plotdt %>%  extract(strand=='+', extstart := tmp)
+        }
+        plotdt %>%  extract(, tmp := NULL)
     # Return
-    plotdt
+        plotdt
 }

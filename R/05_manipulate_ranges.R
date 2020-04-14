@@ -374,11 +374,12 @@ double_flank <- function(
         up$set <- 'upstream flank'
         dn$set <- 'downstream flank'
         allgr <- c(gr, up, dn)
-        allgr$set %<>% factor(c('original', 'upstream flank', 'downstream flank'))
+        allgr$set %<>% factor(
+                        c('original', 'upstream flank', 'downstream flank'))
         txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
                         length(newgr), length(up), length(dn))
-        print(plot_intervals(
-                allgr, linetype_var = linetype_var, title = txt, y = 'targetname', ...))
+        print(plot_intervals(allgr, linetype_var = linetype_var, title = txt, 
+                            y = 'targetname', ...))
     }
     
     # Return
