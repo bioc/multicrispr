@@ -8,11 +8,13 @@
 
 <title>Function reference • multicrispr</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -32,7 +34,9 @@
 
 
 
+
 <meta property="og:title" content="Function reference" />
+
 
 
 
@@ -63,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -78,20 +82,7 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/using_multicrispr.html">Using multicrispr</a>
-    </li>
-  </ul>
-</li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -128,99 +119,183 @@
       <tr>
         
         <td>
-          <p><code><a href="as.granges.html">as.granges()</a></code> </p>
+          <p><code><a href="add_context.html">add_context()</a></code> </p>
         </td>
-        <td><p>Convert data.table into GenomicRanges::GRanges</p></td>
+        <td><p>Add [-4, +3] context</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="assert_is_granges_datatable.html">assert_is_granges_datatable()</a></code> </p>
+          <p><code><a href="add_efficiency.html">add_efficiency()</a></code> <code><a href="add_efficiency.html">filter_efficient()</a></code> </p>
         </td>
-        <td><p>Assert that object is a genomic ranges datatable</p></td>
+        <td><p>Add efficiency scores and filter</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="cmessage.html">cmessage()</a></code> </p>
+          <p><code><a href="add_genome_counts.html">add_genome_counts()</a></code> </p>
         </td>
-        <td><p>Message with sprintf syntax</p></td>
+        <td><p>Add genome counts</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="complement.html">complement()</a></code> </p>
+          <p><code><a href="add_inverse_strand.html">add_inverse_strand()</a></code> </p>
         </td>
-        <td><p>Complement granges</p></td>
+        <td><p>Add inverse strand</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="contextseqs.html">contextseqs()</a></code> </p>
+          <p><code><a href="add_seq.html">add_seq()</a></code> </p>
         </td>
-        <td><p>Get contextseqs</p></td>
+        <td><p>Add sequence to GRanges</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="find_cas9ranges.html">find_cas9ranges()</a></code> </p>
+          <p><code><a href="add_target_counts.html">add_target_counts()</a></code> </p>
         </td>
-        <td><p>Find cas9 ranges in targetranges</p></td>
+        <td><p>Add target counts</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="find_specific_cas9ranges.html">find_specific_cas9ranges()</a></code> </p>
+          <p><code><a href="bed_to_granges.html">bed_to_granges()</a></code> </p>
         </td>
-        <td><p>Find target cas9 ranges with no offtargets</p></td>
+        <td><p>Read bedfile into GRanges</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="flank_fourways.html">flank_fourways()</a></code> </p>
+          <p><code><a href="char_to_granges.html">char_to_granges()</a></code> </p>
         </td>
-        <td><p>Flank fourways</p></td>
+        <td><p>Convert character vector into GRanges</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="get_bsgenome.html">get_bsgenome()</a></code> </p>
+          <p><code><a href="double_flank.html">double_flank()</a></code> </p>
         </td>
-        <td><p>Get BSgenome</p></td>
+        <td><p>Double flank</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="left_flank.html">left_flank()</a></code> </p>
+          <p><code><a href="EnsDb.Hsapiens.v99.html">EnsDb.Hsapiens.v99()</a></code> </p>
         </td>
-        <td><p>Left flank</p></td>
+        <td><p>Get EnsDb.Hsapiens.v98 from AnnotationHub</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="read_bed.html">read_bed()</a></code> </p>
+          <p><code><a href="EnsDb.Mmusculus.v98.html">EnsDb.Mmusculus.v98()</a></code> </p>
         </td>
-        <td><p>Read bedfile as data.table</p></td>
+        <td><p>Get EnsDb.Mmusculus.v98 from AnnotationHub</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="right_flank.html">right_flank()</a></code> </p>
+          <p><code><a href="extend_for_pe.html">extend_for_pe()</a></code> </p>
         </td>
-        <td><p>Right flank</p></td>
+        <td><p>Extend ranges for prime editing</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="score_cas9ranges.html">score_contextseqs()</a></code> <code><a href="score_cas9ranges.html">score_cas9ranges()</a></code> </p>
+          <p><code><a href="extend_pe_to_gg.html">extend_pe_to_gg()</a></code> </p>
         </td>
-        <td><p>Score cas9ranges</p></td>
+        <td><p>Extend prime editing target to find GG sites</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="seqs.html">seqs()</a></code> </p>
+          <p><code><a href="extract_matchranges.html">extract_matchranges()</a></code> </p>
         </td>
-        <td><p>Get sequence values</p></td>
+        <td><p>Extract matching subranges</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="slop.html">slop()</a></code> </p>
+          <p><code><a href="extract_subranges.html">extract_subranges()</a></code> </p>
         </td>
-        <td><p>Slop (i.e. extend left/right)</p></td>
+        <td><p>Extract subranges</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="slop_fourways.html">slop_fourways()</a></code> </p>
+          <p><code><a href="filter_prime_specific.html">filter_prime_specific()</a></code> </p>
         </td>
-        <td><p>Slop granges for both strands, merging overlaps</p></td>
+        <td><p>Filter for specific prime editing spacers</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="filter_target_specific.html">add_specificity()</a></code> <code><a href="filter_target_specific.html">filter_target_specific()</a></code> </p>
+        </td>
+        <td><p>Filter for target-specific spacers</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="find_gg.html">find_gg()</a></code> </p>
+        </td>
+        <td><p>Find GG</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="find_pe_spacers.html">find_pe_spacers()</a></code> </p>
+        </td>
+        <td><p>Find prime editing spacers</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="find_spacers.html">find_spacers()</a></code> </p>
+        </td>
+        <td><p>Find crispr spacers in targetranges</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="genes_to_granges.html">genes_to_granges()</a></code> <code><a href="genes_to_granges.html">genefile_to_granges()</a></code> </p>
+        </td>
+        <td><p>Convert geneids into GRanges</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="gr2dt.html">gr2dt()</a></code> <code><a href="gr2dt.html">dt2gr()</a></code> </p>
+        </td>
+        <td><p>GRanges &lt;-&gt; data.table</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="index_genome.html">index_genome()</a></code> </p>
+        </td>
+        <td><p>Index genome</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="index_targets.html">index_targets()</a></code> </p>
+        </td>
+        <td><p>Index targets</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="make_unique_names.html">make_unique_names()</a></code> </p>
+        </td>
+        <td><p>Make unique names</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="match_seqs.html">match_seqs()</a></code> </p>
+        </td>
+        <td><p>Match spacer sequences</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="match_spacers.html">match_spacers()</a></code> </p>
+        </td>
+        <td><p>Match spacers</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plot_intervals.html">plot_intervals()</a></code> </p>
+        </td>
+        <td><p>Interval plot GRanges</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plot_karyogram.html">plot_karyogram()</a></code> </p>
+        </td>
+        <td><p>Karyo/Interval Plot GRanges(List)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="up_flank.html">up_flank()</a></code> <code><a href="up_flank.html">down_flank()</a></code> <code><a href="up_flank.html">extend()</a></code> </p>
+        </td>
+        <td><p>Extend or Flank GRanges</p></td>
       </tr>
     </tbody>
     </table>
@@ -237,11 +312,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aditya Bhagwat, Mette Bentsen, Jens Preussner, Mario Looso.</p>
+  <p>Developed by Aditya Bhagwat.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9100.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

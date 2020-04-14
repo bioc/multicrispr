@@ -18,17 +18,4 @@
         BiocManager::install('BSgenome.Mmusculus.UCSC.mm10')
         BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')
         index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
-        index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38) 
-
-### Use
-
-    # Parallel Targeting
-        reticulate::use_condaenv('azienv')
-        bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-        bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-        targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10')
-        extended <- extend(targets, -22, +22)
-        spacers  <- extended %>% find_spacers(bsgenome)
-        spacers %<>% add_specificity(extended, bsgenome)
-        spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
-    
+        index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
