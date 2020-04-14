@@ -367,6 +367,8 @@ double_flank <- function(
     names(up) %<>% paste0('_u') # ensure unique names
     names(dn) %<>% paste0('_d')
     newgr  <- c(up, dn)
+    txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
+                        length(newgr), length(up), length(dn))
     
     # Plot    
     if (plot){
@@ -376,8 +378,6 @@ double_flank <- function(
         allgr <- c(gr, up, dn)
         allgr$set %<>% factor(
                         c('original', 'upstream flank', 'downstream flank'))
-        txt <- sprintf('\t\t%d flank ranges: %d up + %d down', 
-                        length(newgr), length(up), length(dn))
         print(plot_intervals(allgr, linetype_var = linetype_var, title = txt, 
                             y = 'targetname', ...))
     }
