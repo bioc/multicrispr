@@ -1,25 +1,34 @@
 <center> <h1> multicrispr </h1> </center>
 
+### Overview
 
-![](https://gitlab.gwdg.de/loosolab/software/multicrispr/wikis/uploads/43b432cd32eb156af2ac217efd98aceb/workflow.png)
+![](https://gitlab.gwdg.de/loosolab/software/multicrispr/wikis/uploads/ff69d25a1cad1f4c93fdf79e0c549ecf/readme.png)
 
+### Installation
 
-1. Read a set of genomics ranges 
+    # Install multicrispr
+        remotes::install_git('https://gitlab.gwdg.de/loosolab/software/multicrispr.git', 
+        			    repos = BiocManager::repositories())
+    # Install azimuth
+        install.packages('reticulate')
+        reticulate::conda_create('azienv', c('python=2.7'))
+        reticulate::use_condaenv('azienv')
+        reticulate::py_install(c('azimuth', 'scikit-learn==0.17.1'), 'azienv', pip = TRUE)
+    # Index mm10 and hg38
+        BiocManager::install('BSgenome.Mmusculus.UCSC.mm10')
+        BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')
+        index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
+        index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38) 
 
-2. Find cas9 sequences which 
+### Use
 
-    - target
-
-        + **thousands** of such **ranges**, their **flanks**, or **slopped extensions**
-        + **efficiently** with **data.table** and **Biostrings** based **c-level** looping and matching
-        + enabling **crispr<sub>ko</sub>**, **crispr<sub>i</sub>**, and **crispr<sub>a</sub>** design.
-
-   - are free of offtarget (mis)matches
-
-   - bind well
-   
-        + as determined by Doench 2016 ontargetscore (interfacing to original python module **azimuth** when available)
-        + or Doench 2014 ontargetscore otherwise
-
-remotes::install_git('https://gitlab.gwdg.de/loosolab/software/multicrispr.git', 
-    			    repos = BiocManager::repositories())
+    # Parallel Targeting
+        reticulate::use_condaenv('azienv')
+        bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+        bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
+        targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10')
+        extended <- extend(targets, -22, +22)
+        spacers  <- extended %>% find_spacers(bsgenome)
+        spacers %<>% add_specificity(extended, bsgenome)
+        spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
+    
