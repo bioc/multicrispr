@@ -18,16 +18,17 @@ OUTDIR <- '~/multicrisprout'
     spacer_fasta <- function(outdir = OUTDIR){
             paste0(outdir, '/spacers.fa') }
 
-# Has been indexed?
-# @param bsgenome BSgenome
-# @param indexedgenomesdir directory with indexed genomes
-# @examples 
-# bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-# has_been_indexed(bsgenome)
-# @export
-# has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
-#     dir.exists(genome_dir(bsgenome = bsgenome))
-# }
+#' Has been indexed?
+#' @param bsgenome BSgenome
+#' @param indexedgenomesdir directory with indexed genomes
+#' @examples 
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#' has_been_indexed(bsgenome)
+#' @export
+has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
+     dir.exists(genome_dir(indexedgenomesdir, bsgenome = bsgenome))
+    # don't rm this function - is used in vignette
+}
 
 # multicrispr_bucket <- function(){
 #     Sys.setenv('AWS_S3_ENDPOINT' = 's3.mpi-bn.mpg.de')
