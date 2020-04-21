@@ -433,6 +433,7 @@ add_target_counts <- function(
 #' @param pam        string (default 'NGG') pam pattern to expand
 #' @param outdir     dir where output is written to
 #' @param indexedgenomesdir string: dir with indexed genomes
+#' @param plot          FALSE (default) or TRUE
 #' @param verbose       TRUE (default) or FALSE
 #' @return spacer GRanges with additional mcols
 #' @seealso \code{\link{index_genome}}, \code{\link{index_targets}}
@@ -448,7 +449,7 @@ add_target_counts <- function(
 #'                        bsgenome)
 #'  spacers <- find_pe_spacers(gr, bsgenome)
 #'  # index_genome(bsgenome)
-#'  # add_genome_counts(spacers, bsgenome, mismatches=1)
+#'  # add_genome_counts(spacers, bsgenome, mismatches=1, plot = TRUE)
 #'     
 #' # TFBS example
 #' #-------------
@@ -467,6 +468,7 @@ add_genome_counts <- function(
     pam               = 'NGG', 
     outdir            = OUTDIR,
     indexedgenomesdir = INDEXEDGENOMESDIR,
+    plot              = FALSE,
     verbose           = TRUE
 ){
     . <- NULL
@@ -487,9 +489,23 @@ add_genome_counts <- function(
                     intersect(names(dt))
     othervars <- setdiff(names(dt), c(targetvars, crisprvars))
     
-    dt %>% 
-    extract(, c(targetvars, crisprvars, othervars), with = FALSE) %>% 
-    dt2gr(seqinfo(spacers))
+    spacers <-  dt %>%  
+            extract(, c(targetvars, crisprvars, othervars), with = FALSE) %>% 
+            dt2gr(seqinfo(spacers))
+    
+    # Plot
+    if (plot){
+        spacers$`G0==1` <- spacers$G0==1
+        grplot <- gr2dt(spacers) %>% 
+                    extract(, if(any(specific)) .SD, by = 'targetname') %>% 
+                    dt2gr(seqinfo(spacers))
+        p <- plot_intervals(grplot, alpha_var = 'G0==1') + 
+            ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25))
+        print(p)
+    }
+    
+    # Return
+    spacers
 }
 
 

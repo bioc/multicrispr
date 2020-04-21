@@ -11,6 +11,7 @@ add_genome_counts(
   pam = "NGG",
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
+  plot = FALSE,
   verbose = TRUE
 )
 }
@@ -26,6 +27,8 @@ add_genome_counts(
 \item{outdir}{dir where output is written to}
 
 \item{indexedgenomesdir}{string: dir with indexed genomes}
+
+\item{plot}{FALSE (default) or TRUE}
 
 \item{verbose}{TRUE (default) or FALSE}
 }
@@ -52,7 +55,7 @@ Adds match counts to GRanges object, and then returns it.
                        bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
  # index_genome(bsgenome)
- # add_genome_counts(spacers, bsgenome, mismatches=1)
+ # add_genome_counts(spacers, bsgenome, mismatches=1, plot = TRUE)
     
 # TFBS example
 #-------------
