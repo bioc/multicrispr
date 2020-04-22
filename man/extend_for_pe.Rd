@@ -10,7 +10,7 @@ extend_for_pe(
   nrt = 16,
   spacer = strrep("N", 20),
   pam = "NGG",
-  plot = TRUE
+  plot = FALSE
 )
 }
 \arguments{
@@ -36,14 +36,14 @@ Extend target ranges to span in which to look for spacer-pam seqs
 Extend target ranges to find nearby spacers for prime editing
 }
 \examples{
-    require(magrittr)
-    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-    gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-                            HBB  = 'chr11:5227002:-',             # snp
-                            HEXA = 'chr15:72346580-72346583:-',   # del
-                            CFTR = 'chr7:117559593-117559595:+'), # ins
-                          bsgenome = bsgenome)
-    find_pe_spacers(gr, bsgenome)
-    (grext <- extend_for_pe(gr))
-    find_spacers(grext, bsgenome, complement = FALSE)
+require(magrittr)
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+gr <- char_to_granges(c( PRNP = 'chr20:4699600:+',             # snp
+                         HBB  = 'chr11:5227002:-',             # snp
+                         HEXA = 'chr15:72346580-72346583:-',   # del
+                         CFTR = 'chr7:117559593-117559595:+'), # ins
+                     bsgenome = bsgenome)
+find_pe_spacers(gr, bsgenome)
+(grext <- extend_for_pe(gr))
+find_spacers(grext, bsgenome, complement = FALSE)
 }

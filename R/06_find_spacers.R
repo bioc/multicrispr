@@ -247,16 +247,16 @@ find_spacers <- function(
 #' @param plot      TRUE (default) or FALSE
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
-#'     require(magrittr)
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-#'                             HBB  = 'chr11:5227002:-',             # snp
-#'                             HEXA = 'chr15:72346580-72346583:-',   # del
-#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
-#'                           bsgenome = bsgenome)
-#'     find_pe_spacers(gr, bsgenome)
-#'     (grext <- extend_for_pe(gr))
-#'     find_spacers(grext, bsgenome, complement = FALSE)
+#' require(magrittr)
+#' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#' gr <- char_to_granges(c( PRNP = 'chr20:4699600:+',             # snp
+#'                          HBB  = 'chr11:5227002:-',             # snp
+#'                          HEXA = 'chr15:72346580-72346583:-',   # del
+#'                          CFTR = 'chr7:117559593-117559595:+'), # ins
+#'                      bsgenome = bsgenome)
+#' find_pe_spacers(gr, bsgenome)
+#' (grext <- extend_for_pe(gr))
+#' find_spacers(grext, bsgenome, complement = FALSE)
 #' @export
 extend_for_pe <- function(
     gr, 
@@ -264,7 +264,7 @@ extend_for_pe <- function(
     nrt    = 16, 
     spacer = strrep('N', 20), 
     pam    = 'NGG', 
-    plot   = TRUE
+    plot   = FALSE
 ){
     fw <- copy( gr, start=end(gr)+1-nrt-17, end=start(gr)-1+6,      strand='+')
     rv <- copy( gr, start=end(gr)+1-6,      end=start(gr)-1+nrt+17, strand='-')
@@ -272,10 +272,11 @@ extend_for_pe <- function(
     names(rv) %<>% paste0('_r')
     ext <- c(fw, rv)
     if (plot){
-        gr$set <- 'PE target'
+        #gr$set <- 'PE target'
         fw$set <- "potential '+' spacers"
         rv$set <- "potential '-' spacers"
-        print(plot_intervals(c(fw, gr, rv), color_var = 'set', y = 'set'))
+        print(plot_intervals(c(fw, gr, rv), linetype_var = 'set', 
+                            y = 'targetname', color_var = 'targetname'))
     }
     ext
 }
