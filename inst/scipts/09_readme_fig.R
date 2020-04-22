@@ -20,7 +20,7 @@ bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10', plot = FALSE)
 extended <- extend(targets, -22, +22)
 spacers  <- extended %>% find_spacers(bsgenome, plot = FALSE)
-spacers %<>% add_specificity(extended, bsgenome, plot = FALSE)
+spacers %<>% add_offtargets(bsgenome, extended, plot = FALSE)
 spacers %<>% add_efficiency(bsgenome, method = 'Doench2016', plot = FALSE)
 
 tweaksave(targets,  fname = 'srf01')

@@ -177,10 +177,9 @@ doench2016 <- function(
 #'     spacers <- find_spacers(targets, bsgenome)
 #'     # reticulate::use_condaenv('azienv')
 #'     # reticulate::import('azienv')
-#'     # (spacers %<>% add_specificity(targets, bsgenome))
-#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2014'))
-#'     # (spacers %>% add_efficiency(bsgenome, 'Doench2016'))
-#'     #  spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4)
+#'     # (spacers %<>% add_offtargets(bsgenome, targets))
+#'     # (spacers %>%  add_efficiency(bsgenome, 'Doench2014'))
+#'     # (spacers %>%  add_efficiency(bsgenome, 'Doench2016'))
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
 #' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,

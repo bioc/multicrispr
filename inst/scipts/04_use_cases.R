@@ -22,7 +22,7 @@ extended <- extend(targets, -22, +22)
 # targets['T0151'] %>% down_flank() %>% plot_intervals()
 
 spacers  <- extended %>% find_spacers(bsgenome)
-spacers %<>% add_specificity(extended, bsgenome)
+spacers %<>% add_offtargets(bsgenome, extended)
 spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
 
 spacers %>% subset(seqnames == 'chr1') %>% 
