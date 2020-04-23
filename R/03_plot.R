@@ -147,21 +147,18 @@ plot_intervals <- function(
     size_var = default_size_var(gr), alpha_var = default_alpha_var(gr),
     title = NULL, scales= 'free'
 ){
-    # Comply
+# Comply
     edge <- targetname <- NULL
-    
-    # Assert, Import, Comply
+# Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
     if (!is.null(color_var)) assert_is_a_string(color_var)
     assert_is_subset(color_var, names(as.data.table(gr)))
     contig <- .N <- .SD <- seqnames <- start <- NULL
     strand <- tmp <- width <- xstart <- xend <- . <- NULL
-
-    # Prepare plotdt
+# Prepare plotdt
     plotdt <- prepare_plot_intervals(
                 gr, xref, y, nperchrom, nchrom, alpha_var, size_var)
-    
-    # Core Ranges
+# Core Ranges
     p <-ggplot( plotdt, 
                 aes_string(x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
                             color = color_var, linetype = linetype_var, 
@@ -172,25 +169,20 @@ plot_intervals <- function(
         scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
     if (!is.null(size_var))  p <- p +
         scale_size_manual(values = c(`0+` = 0.1, `0.3+` = 1, `0.5+` = 2))
-
-    # Targets
+# Targets
     if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
         p <-p + geom_point(aes_string(
                     x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
                 geom_point(aes_string(
-                    x = 'xtargetend',   y = 'y'), shape = '|', size = 4)
-    }
-    
-    # Extensions
+                    x = 'xtargetend',   y = 'y'), shape = '|', size = 4)}
+# Extensions
     if ('extension' %in% names(mcols(gr))){
         p <-p + geom_segment(
                     aes_string( x = 'extstart', xend = 'extend', size = NULL), 
                                 linetype = 'dotted',
-                arrow = arrow(length = unit(0.1, "inches")))
-    }
+                arrow = arrow(length = unit(0.1, "inches")))}
     p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
-    
-    # Return
+# Return
     p # print(p)
 }
 
@@ -219,53 +211,50 @@ head_tail <- function(x, n){
 prepare_plot_intervals <- function(
     gr, xref, y, nperchrom, nchrom, alpha_var, size_var
 ){
-    # Comply
-        edge <- targetname <- xstart <- xend <- width <- NULL
-        targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
-        extstart <- primer <- revtranscript <- extension <- tmp <- NULL
-    # Prepare data.table. Select chromosomes/targets to plot.
-        plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
-        plotdt %<>% extract(order(seqnames, start))
-        plotdt$seqnames %<>% droplevels()
-        headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
-        plotdt %<>% extract(headtailchroms, on = 'seqnames')
-        plotdt$seqnames %<>% factor(headtailchroms)
-        plotdt %<>% extract( # targets
-            , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
-            by = 'seqnames')
-    # Main ranges
-        plotdt %>%  extract(, y      := min(start), by = y)
-        plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
-        plotdt %>%  extract(, xstart := start-min(start), by = xref)
-        plotdt %>%  extract(, xend   := xstart + width)
-    # Target marks
-        if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
-            plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
-            plotdt %>% extract(, xtargetend   := xend   + targetend-end  )
-        }
-    # Extensions
-        if ('extension' %in% names(mcols(gr))){
-            plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
-            plotdt %>% extract(strand=='-',
-                                extstart := xend-16-(nchar(revtranscript)[1]-1))
-            plotdt %>% extract(, extend   := extstart + nchar(extension)[1]-1)
-        }
-    # Flip for arrow direction    
-        plotdt %>%  extract(strand=='-', tmp    := xend)
-        plotdt %>%  extract(strand=='-', xend   := xstart)
-        plotdt %>%  extract(strand=='-', xstart := tmp)
-        if ('extension' %in% names(mcols(gr))){
-            plotdt %>%  extract(strand=='+', tmp := extend)
-            plotdt %>%  extract(strand=='+', extend := extstart)
-            plotdt %>%  extract(strand=='+', extstart := tmp)
-        }
-        plotdt %>%  extract(, tmp := NULL)
-    # Alpha and Size
-        if (!is.null(alpha_var)) plotdt[[alpha_var]] %<>% cut(
-                                        c(-Inf, 0, Inf), c('0', '1+'))
-        if (!is.null(size_var))  plotdt[[size_var]]  %<>% cut(
-                                        c(-Inf, 0.3, 0.5, Inf), 
-                                    c('0+', '0.3+', '0.5+'))
-    # Return
-        plotdt
+# Comply
+    edge <- targetname <- xstart <- xend <- width <- NULL
+    targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
+    extstart <- primer <- revtranscript <- extension <- tmp <- NULL
+# Prepare data.table. Select chromosomes/targets to plot.
+    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
+    plotdt %<>% extract(order(seqnames, start))
+    plotdt$seqnames %<>% droplevels()
+    headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
+    plotdt %<>% extract(headtailchroms, on = 'seqnames')
+    plotdt$seqnames %<>% factor(headtailchroms)
+    plotdt %<>% extract( # targets
+        , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
+        by = 'seqnames')
+# Main ranges
+    plotdt %>%  extract(, y      := min(start), by = y)
+    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
+    plotdt %>%  extract(, xstart := start-min(start), by = xref)
+    plotdt %>%  extract(, xend   := xstart + width)
+# Target marks
+    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
+        plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
+        plotdt %>% extract(, xtargetend   := xend   + targetend-end  )}
+# Extensions
+    if ('extension' %in% names(mcols(gr))){
+        plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
+        plotdt %>% extract(strand=='-',
+                            extstart := xend-16-(nchar(revtranscript)[1]-1))
+        plotdt %>% extract(, extend   := extstart + nchar(extension)[1]-1)}
+# Flip for arrow direction    
+    plotdt %>%  extract(strand=='-', tmp    := xend)
+    plotdt %>%  extract(strand=='-', xend   := xstart)
+    plotdt %>%  extract(strand=='-', xstart := tmp)
+    if ('extension' %in% names(mcols(gr))){
+        plotdt %>%  extract(strand=='+', tmp := extend)
+        plotdt %>%  extract(strand=='+', extend := extstart)
+        plotdt %>%  extract(strand=='+', extstart := tmp)}
+    plotdt %>%  extract(, tmp := NULL)
+# Alpha and Size
+    if (!is.null(alpha_var)) plotdt[[alpha_var]] %<>% cut(
+                                    c(-Inf, 0, Inf), c('0', '1+'))
+    if (!is.null(size_var))  plotdt[[size_var]]  %<>% cut(
+                                    c(-Inf, 0.3, 0.5, Inf), 
+                                c('0+', '0.3+', '0.5+'))
+# Return
+    plotdt
 }

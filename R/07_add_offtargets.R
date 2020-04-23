@@ -21,6 +21,7 @@ OUTDIR <- '~/multicrisprout'
 #' Has been indexed?
 #' @param bsgenome BSgenome
 #' @param indexedgenomesdir directory with indexed genomes
+#' @return TRUE or FALSE
 #' @examples 
 #' bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 #' has_been_indexed(bsgenome)
@@ -608,8 +609,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
                         outdir = outdir, pam = pam, verbose = verbose)
         for (mis in 0:mismatches){
                 assert_all_are_true(mcols(spacers)[[paste0('T', mis)]] <= 
-                                    mcols(spacers)[[paste0('G', mis)]])}
-    }
+                                    mcols(spacers)[[paste0('G', mis)]])}}
 # Add offtarget counts
     digits <- ceiling(log10(length(spacers)))
     if (verbose) cmessage('\tCalculate offtargets for %d spacers', 
@@ -617,7 +617,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
     spacers$off <- spacers$G0 - (if (is.null(targets)) 1 else spacers$T0)
     spacers$off0 <- spacers$off # don't switch order to keep off first
     if (mismatches>0){
-        for (mis in 1:mismatches){
+        for (mis in seq_len(mismatches)){
             Gx <- mcols(spacers)[[paste0('G', mis)]]
             Tx <- if (is.null(targets)) 0 else mcols(spacers)[[paste0('T',mis)]]
             offcounts <- Gx - Tx
@@ -625,9 +625,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
             mcols(spacers)[[offvar]] <- offcounts
             spacers$off %<>% add(offcounts)
             if (verbose) cmessage('\t       %s have no %d-mismatch offtargets', 
-                format(sum(mcols(spacers)[[offvar]]==0), width = digits), mis)
-        }
-    }
+                format(sum(mcols(spacers)[[offvar]]==0), width = digits), mis)}}
 # Plot and return
     if (plot){
         grplot <- gr2dt(spacers) %>%  # don't do that - what if no such exist?
@@ -635,8 +633,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
                     dt2gr(seqinfo(spacers))
         p <- plot_intervals(
                 grplot, alpha_var = 'off', size_var = size_var)
-        print(p)
-    }
+        print(p)}
     spacers
 }
 
@@ -673,8 +670,8 @@ filter_offtarget_free <- function(
     spacers %<>% add_offtargets(
                     bsgenome      = bsgenome, 
                     targets       = targets,
-                    mismatches    = max(mismatches, 1),  # 1-mismatch oftargets require
-                    pam           = pam,                 # consideration for pam expansion!
+                    mismatches    = mismatches,
+                    pam           = pam,       
                     outdir        = outdir, 
                     indexedgenomesdir = indexedgenomesdir,
                     plot          = plot,

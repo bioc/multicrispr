@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, cache = TRUE)
 
 **Crispr/Cas9** is a prokaryotic immune system turned into a genome engineering tool, with a Cas9/gRNA complex at the heart of its functioning. The **gRNA** (guide RNA) contains a 20 nucleotide (proto)**spacer** which guides the complex to a genomic locus with identical sequence, but only when followed by an *NGG* **PAM** (protospacer adjacent motif (see Figure 1A). The **Cas9** enzyme performs some effector action at that locus: *wildtype Cas9* cuts both strands after spacer nucleotide 17, *Cas9Nickase* cuts only a single strand (two variants exist, cutting respectively each of the strands), while catalytically dead *dCas9*, fused to some effector domain (KRAB, VPR, APEX) performs some alternative action (e.g. KRAB represses, VPR activates, APEX biotinylates). 
 
-**Prime Editing** extends this further, by coupling Cas9 to a Reverse Transcriptase (RT). As shown in Figure 1, the guide RNA is extended with a 3' extension that contains primer binding site (binding a complementary DNA region that acts as a primer for reverse transcription) and reverse transcription template (the template used for reverse transcription). The spacer still acts as targeting agent, guiding the Cas9/RT complex to targeted genomic locus.
+**Prime Editing** (Anzalone et al., 2019) extends this further, by coupling Cas9 to a Reverse Transcriptase (RT). As shown in Figure 1, the guide RNA is extended with a 3' extension that contains primer binding site (binding a complementary DNA region that acts as a primer for reverse transcription) and reverse transcription template (the template used for reverse transcription). The spacer still acts as targeting agent, guiding the Cas9/RT complex to targeted genomic locus.
 
 
 ```{r, fig.small = TRUE, echo = FALSE, fig.cap = 'gRNAs for Crispr/Cas9 (A) and Prime Editing'}
@@ -221,7 +221,11 @@ if (reticulate::py_module_available('azimuth')){
   spacers
 ```
 
+# References {-}
 
+Anzalone, A.V., Randolph, P.B., Davis, J.R. et al. Search-and-replace genome editing without double-strand breaks or donor DNA. Nature 576, 149–157 (2019). https://doi.org/10.1038/s41586-019-1711-4
+
+Doench et al. (2016). Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9. Nature Biotechnology, 34(7), doi:10.1038/nbt.3437
 
 
 

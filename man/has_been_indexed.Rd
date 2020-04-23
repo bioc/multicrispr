@@ -11,6 +11,9 @@ has_been_indexed(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR)
 
 \item{indexedgenomesdir}{directory with indexed genomes}
 }
+\value{
+TRUE or FALSE
+}
 \description{
 Has been indexed?
 }
