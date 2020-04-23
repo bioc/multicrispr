@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">multicrispr: gRNA design for Crispr/Cas9 and Prime Editing</a>
+      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -219,7 +219,7 @@
 #&gt;   PRNP_3 CCTTGGCGGCTACATG CATGTAGCCGCCAAGGCCCCCCACCACTG
 #&gt;   PRNP_4 TGGCGGCTACATGCTG CAGCATGTAGCCGCCAAGGCCCCCCACCA
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>), <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='find_spacers-3.png' alt='' width='700' height='433' /></div><div class='img'><img src='find_spacers-4.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 6 metadata columns:
+#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>), <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='find_spacers-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 6 metadata columns:
 #&gt;            seqnames              ranges strand |  targetname targetstart
 #&gt;               &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;     CFTR_f     chr7 117559575-117559594      + |        CFTR   117559593
@@ -253,7 +253,7 @@
 <span class='co'>#-------------</span>
     <span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Mmusculus.UCSC.mm10</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Mmusculus.UCSC.mm10/man/package.html'>BSgenome.Mmusculus.UCSC.mm10</a></span>
     <span class='no'>bedfile</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata/SRF.bed'</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>'multicrispr'</span>)
-    <span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='st'>'mm10'</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='up_flank.html'>extend</a></span>()</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='find_spacers-5.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='find_spacers-6.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10159 ranges and 8 metadata columns:
+    <span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='st'>'mm10'</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='up_flank.html'>extend</a></span>()</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='find_spacers-4.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='find_spacers-5.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10159 ranges and 8 metadata columns:
 #&gt;             seqnames            ranges strand |         name     score
 #&gt;                &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;character&gt; &lt;numeric&gt;
 #&gt;   T0001_r_5     chr1   4712619-4712638      - | SRF_MA0083.3  10.49542

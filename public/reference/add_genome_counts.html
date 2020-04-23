@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">multicrispr: gRNA design for Crispr/Cas9 and Prime Editing</a>
+      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -128,6 +128,7 @@
   <span class='kw'>pam</span> <span class='kw'>=</span> <span class='st'>"NGG"</span>,
   <span class='kw'>outdir</span> <span class='kw'>=</span> <span class='no'>OUTDIR</span>,
   <span class='kw'>indexedgenomesdir</span> <span class='kw'>=</span> <span class='no'>INDEXEDGENOMESDIR</span>,
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
@@ -159,6 +160,10 @@
       <td><p>string: dir with indexed genomes</p></td>
     </tr>
     <tr>
+      <th>plot</th>
+      <td><p>FALSE (default) or TRUE</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p>TRUE (default) or FALSE</p></td>
     </tr>
@@ -187,7 +192,7 @@ Adds match counts to GRanges object, and then returns it.</p>
                          <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
                        <span class='no'>bsgenome</span>)
  <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='add_genome_counts-1.png' alt='' width='700' height='433' /></div><div class='input'> <span class='co'># index_genome(bsgenome)</span>
- <span class='co'># add_genome_counts(spacers, bsgenome, mismatches=1)</span>
+ <span class='co'># add_genome_counts(spacers, bsgenome, mismatches=0, plot = TRUE)</span>
 
 <span class='co'># TFBS example</span>
 <span class='co'>#-------------</span>

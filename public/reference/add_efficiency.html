@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">multicrispr: gRNA design for Crispr/Cas9 and Prime Editing</a>
+      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -128,7 +128,8 @@
   <span class='kw'>chunksize</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>alpha_var</span> <span class='kw'>=</span> <span class='fu'>default_alpha_var</span>(<span class='no'>spacers</span>)
+  <span class='kw'>alpha_var</span> <span class='kw'>=</span> <span class='fu'>default_alpha_var</span>(<span class='no'>spacers</span>),
+  <span class='kw'>size_var</span> <span class='kw'>=</span> <span class='no'>method</span>
 )
 
 <span class='fu'>filter_efficient</span>(
@@ -172,6 +173,10 @@
     <tr>
       <th>alpha_var</th>
       <td><p>NULL or string: var mapped to alpha in plot</p></td>
+    </tr>
+    <tr>
+      <th>size_var</th>
+      <td><p>NULL or string: var mapped to size in plot</p></td>
     </tr>
     <tr>
       <th>cutoff</th>
@@ -283,10 +288,9 @@ doi: 10.1038/nbt.3437</p>
     <span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Mmusculus.UCSC.mm10</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Mmusculus.UCSC.mm10/man/package.html'>BSgenome.Mmusculus.UCSC.mm10</a></span>
     <span class='no'>targets</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='up_flank.html'>extend</a></span>(<span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='st'>'mm10'</span>))</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='add_efficiency-3.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>targets</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='add_efficiency-4.png' alt='' width='700' height='433' /></div><div class='input'>    # reticulate::use_condaenv('azienv')
     # reticulate::import('azienv')
-    # (spacers %<>% add_specificity(targets, bsgenome))
-    # (spacers %>% add_efficiency(bsgenome, 'Doench2014'))
-    # (spacers %>% add_efficiency(bsgenome, 'Doench2016'))
-    #  spacers %>% filter_efficient(bsgenome, 'Doench2016', 0.4)
+    # (spacers %<>% add_offtargets(bsgenome, targets))
+    # (spacers %>%  add_efficiency(bsgenome, 'Doench2014'))
+    # (spacers %>%  add_efficiency(bsgenome, 'Doench2016'))
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

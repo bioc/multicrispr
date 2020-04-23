@@ -1,8 +1,6 @@
 <center> <h1> multicrispr </h1> </center>
 
-### Overview
-
-![](https://gitlab.gwdg.de/loosolab/software/multicrispr/wikis/uploads/ff69d25a1cad1f4c93fdf79e0c549ecf/readme.png)
+![](inst/extdata/readme_portrait.png)
 
 ### Installation
 

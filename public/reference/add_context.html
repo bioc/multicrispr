@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">multicrispr: gRNA design for Crispr/Cas9 and Prime Editing</a>
+      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -153,7 +153,7 @@
                             <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,   <span class='co'># del</span>
                             <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
                           <span class='no'>bsgenome</span>)
-    <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>), <span class='no'>bsgenome</span>, <span class='kw'>complement</span><span class='kw'>=</span><span class='fl'>FALSE</span>)</div><div class='img'><img src='add_context-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='add_context-2.png' alt='' width='700' height='433' /></div><div class='input'>    (<span class='fu'>add_context</span>(<span class='no'>spacers</span>, <span class='no'>bsgenome</span>))</div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; GRanges object with 10 ranges and 7 metadata columns:
+    <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>), <span class='no'>bsgenome</span>, <span class='kw'>complement</span><span class='kw'>=</span><span class='fl'>FALSE</span>)</div><div class='img'><img src='add_context-1.png' alt='' width='700' height='433' /></div><div class='input'>    (<span class='fu'>add_context</span>(<span class='no'>spacers</span>, <span class='no'>bsgenome</span>))</div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; GRanges object with 10 ranges and 7 metadata columns:
 #&gt;            seqnames              ranges strand |  targetname targetstart
 #&gt;               &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;     CFTR_f     chr7 117559575-117559594      + |        CFTR   117559593
@@ -219,7 +219,7 @@
 #&gt; <span class='message'>    windows</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attache Paket: 'Biostrings'</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from 'package:base':</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    strsplit</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='add_context-3.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='no'>spacers</span>    <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>targets</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='add_context-4.png' alt='' width='700' height='433' /></div><div class='input'>    (<span class='no'>spacers</span> <span class='kw'>%&lt;&gt;%</span> <span class='fu'>add_context</span>(<span class='no'>bsgenome</span>))</div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; GRanges object with 10159 ranges and 9 metadata columns:
+#&gt; <span class='message'>    strsplit</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='add_context-2.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='no'>spacers</span>    <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>targets</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='add_context-3.png' alt='' width='700' height='433' /></div><div class='input'>    (<span class='no'>spacers</span> <span class='kw'>%&lt;&gt;%</span> <span class='fu'>add_context</span>(<span class='no'>bsgenome</span>))</div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; GRanges object with 10159 ranges and 9 metadata columns:
 #&gt;             seqnames            ranges strand |         name     score
 #&gt;                &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;character&gt; &lt;numeric&gt;
 #&gt;   T0001_r_5     chr1   4712619-4712638      - | SRF_MA0083.3  10.49542

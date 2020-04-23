@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Match spacers — match_spacers • multicrispr</title>
+<title>Add offtarget counts — add_specificity • multicrispr</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Match spacers — match_spacers" />
-<meta property="og:description" content="Count matches to indexed target/genome and add to GRanges" />
+<meta property="og:title" content="Add offtarget counts — add_specificity" />
+<meta property="og:description" content="Add mcols 'off' (offtargets), 'off0' (0-mismatch offtargets), etc." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,22 +112,28 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Match spacers</h1>
+    <h1>Add offtarget counts</h1>
     
-    <div class="hidden name"><code>match_spacers.Rd</code></div>
+    <div class="hidden name"><code>add_offtargets.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Count matches to indexed target/genome and add to GRanges</p>
+    <p>Add mcols 'off' (offtargets), 'off0' (0-mismatch offtargets), etc.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>match_spacers</span>(
+    <pre class="usage"><span class='fu'>add_specificity</span>(<span class='no'>...</span>)
+
+<span class='fu'>add_offtargets</span>(
   <span class='no'>spacers</span>,
-  <span class='no'>indexdir</span>,
-  <span class='no'>norc</span>,
+  <span class='no'>bsgenome</span>,
+  <span class='kw'>targets</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>mismatches</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>outdir</span> <span class='kw'>=</span> <span class='no'>OUTDIR</span>,
   <span class='kw'>pam</span> <span class='kw'>=</span> <span class='st'>"NGG"</span>,
+  <span class='kw'>outdir</span> <span class='kw'>=</span> <span class='no'>OUTDIR</span>,
+  <span class='kw'>indexedgenomesdir</span> <span class='kw'>=</span> <span class='no'>INDEXEDGENOMESDIR</span>,
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>size_var</span> <span class='kw'>=</span> <span class='fu'>default_size_var</span>(<span class='no'>spacers</span>),
+  <span class='kw'>alpha_var</span> <span class='kw'>=</span> <span class='st'>"off"</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
@@ -135,32 +141,49 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>...</th>
+      <td><p>to channel deprecated add_specificity to add_offtargets</p></td>
+    </tr>
+    <tr>
       <th>spacers</th>
       <td><p>spacer <code><a href='https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html'>GRanges-class</a></code></p></td>
     </tr>
     <tr>
-      <th>indexdir</th>
-      <td><p>string: dir containing indexed reference.
-This can be an indexed genome( <code><a href='index_genome.html'>index_genome</a></code>
-It can also be indexed targets (<code><a href='index_targets.html'>index_targets</a></code>)</p></td>
+      <th>bsgenome</th>
+      <td><p><code><a href='https://rdrr.io/pkg/BSgenome/man/BSgenome-class.html'>BSgenome-class</a></code></p></td>
     </tr>
     <tr>
-      <th>norc</th>
-      <td><p>TRUE or FALSE: whether to run bowtie also with revcompls
-Generally TRUE for genome and FALSE for target matches, 
-because target ranges generally include both strands.</p></td>
+      <th>targets</th>
+      <td><p>NULL (default) or target 
+<code><a href='https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html'>GRanges-class</a></code></p></td>
     </tr>
     <tr>
       <th>mismatches</th>
       <td><p>number (default 2): max number of mismatches to consider</p></td>
     </tr>
     <tr>
-      <th>outdir</th>
-      <td><p>string: file where to output bowtie results</p></td>
+      <th>pam</th>
+      <td><p>string (default 'NGG'): pam sequence</p></td>
     </tr>
     <tr>
-      <th>pam</th>
-      <td><p>string (default 'NGG') pam pattern to expand</p></td>
+      <th>outdir</th>
+      <td><p>directory where output is written to</p></td>
+    </tr>
+    <tr>
+      <th>indexedgenomesdir</th>
+      <td><p>string: dir with indexed genomes</p></td>
+    </tr>
+    <tr>
+      <th>plot</th>
+      <td><p>TRUE (default) or FALSE</p></td>
+    </tr>
+    <tr>
+      <th>size_var</th>
+      <td><p>string: mapped to size in plot</p></td>
+    </tr>
+    <tr>
+      <th>alpha_var</th>
+      <td><p>string: mapped to alpha in plot</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -170,15 +193,11 @@ because target ranges generally include both strands.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>data.table</p>
+    <p>filtered spacer <code><a href='https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html'>GRanges-class</a></code></p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Expands iupac amgiguities in the pam sequence.
-Matches all resulting sequences against (indexes) target and genome.
-Adds match counts to GRanges object, and then returns it.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='index_genome.html'>index_genome</a></code>, <code><a href='index_targets.html'>index_targets</a></code></p></div>
+    <p>For NULL targets: offtarget counts = (G0- 1) +  G1     + ...
+Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># PE example</span>
@@ -190,25 +209,17 @@ Adds match counts to GRanges object, and then returns it.</p>
                          <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,   <span class='co'># del</span>
                          <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
                        <span class='no'>bsgenome</span>)
- <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='match_spacers-1.png' alt='' width='700' height='433' /></div><div class='input'> <span class='co'># indexdir &lt;- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)</span>
- <span class='co'># match_spacers(spacers, indexdir, norc=TRUE, mismatches = 1)</span>
-
+ <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='add_offtargets-1.png' alt='' width='700' height='433' /></div><div class='input'> <span class='co'># index_genome(bsgenome)</span>
+ <span class='co'># add_offtargets(spacers, bsgenome, mismatches=0)</span>
+ <span class='co'># add_offtargets(spacers, bsgenome, mismatches=2)</span>
 <span class='co'># TFBS example</span>
 <span class='co'>#-------------</span>
-<span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Mmusculus.UCSC.mm10</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Mmusculus.UCSC.mm10/man/package.html'>BSgenome.Mmusculus.UCSC.mm10</a></span>
-<span class='no'>bedfile</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata/SRF.bed'</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>'multicrispr'</span>)
-<span class='no'>targets</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='up_flank.html'>extend</a></span>(<span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='kw'>genome</span> <span class='kw'>=</span> <span class='st'>'mm10'</span>))</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='match_spacers-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>indexdir</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='index_targets.html'>index_targets</a></span>(<span class='no'>targets</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>	Index target sequences</span></div><div class='output co'>#&gt; <span class='message'>		1974 target ranges</span></div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='output co'>#&gt; <span class='message'>		3932 ranges after merging overlaps</span></div><div class='output co'>#&gt; <span class='message'>		Write seqs  to ~/multicrisprout/targets.fa</span></div><div class='output co'>#&gt; <span class='message'>		Write index to ~/multicrisprout/targets</span></div><div class='input'><span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>targets</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='match_spacers-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>match_spacers</span>(<span class='no'>spacers</span>, <span class='no'>indexdir</span>, <span class='kw'>norc</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>mismatches</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; <span class='message'>		Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>		Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>		Map reads: ~/multicrisprout/spacers/spacers_to_targets.txt</span></div><div class='output co'>#&gt; <span class='message'>		Load results</span></div><div class='output co'>#&gt; <span class='message'>		Count matches</span></div><div class='output co'>#&gt;               crisprspacer  MM0  MM1
-#&gt;    1: ATATAAGGGCATTGGAAGAA    2 1946
-#&gt;    2: AATATAAGGGCATTGGAAGA    2 1920
-#&gt;    3: TGGAGACAATATAAGGGCAT    2 1950
-#&gt;    4: TTCTGCTGGAGACAATATAA    4 1654
-#&gt;    5: CTTCTGCTGGAGACAATATA 1650  484
-#&gt;   ---                               
-#&gt; 3013: AGATGAGGAATATGCAAATA    2    0
-#&gt; 3014: TTGCATATTCCTCATCTGAT    2    0
-#&gt; 3015: AGTGTGCTTATAAGGGGGGA    2    0
-#&gt; 3016: AGAGAGTGTGCTTATAAGGG    2    4
-#&gt; 3017: AGCACACTCTCTTAGTAAAT    2    6</div></pre>
+ <span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Mmusculus.UCSC.mm10</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Mmusculus.UCSC.mm10/man/package.html'>BSgenome.Mmusculus.UCSC.mm10</a></span>
+ <span class='no'>bedfile</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata/SRF.bed'</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>'multicrispr'</span>)
+ <span class='no'>targets</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='up_flank.html'>extend</a></span>(<span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='kw'>genome</span> <span class='kw'>=</span> <span class='st'>'mm10'</span>))</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='add_offtargets-2.png' alt='' width='700' height='433' /></div><div class='input'> <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>targets</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='add_offtargets-3.png' alt='' width='700' height='433' /></div><div class='input'> # index_genome(bsgenome)
+ # spacers %>% add_offtargets(bsgenome)           # off = G - 1
+ # spacers %>% add_offtargets(bsgenome, targets)  # off = G - T
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -216,7 +227,6 @@ Adds match counts to GRanges object, and then returns it.</p>
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

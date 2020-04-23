@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">multicrispr: gRNA design for Crispr/Cas9 and Prime Editing</a>
+      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -127,7 +127,7 @@
   <span class='kw'>nrt</span> <span class='kw'>=</span> <span class='fl'>16</span>,
   <span class='kw'>spacer</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/strrep.html'>strrep</a></span>(<span class='st'>"N"</span>, <span class='fl'>20</span>),
   <span class='kw'>pam</span> <span class='kw'>=</span> <span class='st'>"NGG"</span>,
-  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -167,14 +167,14 @@
     <p>Extend target ranges to find nearby spacers for prime editing</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>magrittr</span>)
-    <span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Hsapiens.UCSC.hg38</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Hsapiens.UCSC.hg38/man/package.html'>BSgenome.Hsapiens.UCSC.hg38</a></span>
-    <span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='char_to_granges.html'>char_to_granges</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>PRNP</span> <span class='kw'>=</span> <span class='st'>'chr20:4699600:+'</span>,             <span class='co'># snp</span>
-                            <span class='kw'>HBB</span>  <span class='kw'>=</span> <span class='st'>'chr11:5227002:-'</span>,             <span class='co'># snp</span>
-                            <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,   <span class='co'># del</span>
-                            <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
-                          <span class='kw'>bsgenome</span> <span class='kw'>=</span> <span class='no'>bsgenome</span>)
-    <span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='extend_for_pe-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 9 metadata columns:
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>magrittr</span>)
+<span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Hsapiens.UCSC.hg38</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Hsapiens.UCSC.hg38/man/package.html'>BSgenome.Hsapiens.UCSC.hg38</a></span>
+<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='char_to_granges.html'>char_to_granges</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>( <span class='kw'>PRNP</span> <span class='kw'>=</span> <span class='st'>'chr20:4699600:+'</span>,             <span class='co'># snp</span>
+                         <span class='kw'>HBB</span>  <span class='kw'>=</span> <span class='st'>'chr11:5227002:-'</span>,             <span class='co'># snp</span>
+                         <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,   <span class='co'># del</span>
+                         <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
+                     <span class='kw'>bsgenome</span> <span class='kw'>=</span> <span class='no'>bsgenome</span>)
+<span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='extend_for_pe-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 9 metadata columns:
 #&gt;          seqnames              ranges strand |  targetname targetstart
 #&gt;             &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;   CFTR_1     chr7 117559575-117559594      + |        CFTR   117559593
@@ -212,7 +212,7 @@
 #&gt;   PRNP_3 CCTTGGCGGCTACATG CATGTAGCCGCCAAGGCCCCCCACCACTG
 #&gt;   PRNP_4 TGGCGGCTACATGCTG CAGCATGTAGCCGCCAAGGCCCCCCACCA
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>    (<span class='no'>grext</span> <span class='kw'>&lt;-</span> <span class='fu'>extend_for_pe</span>(<span class='no'>gr</span>))</div><div class='img'><img src='extend_for_pe-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 8 ranges and 3 metadata columns:
+#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>(<span class='no'>grext</span> <span class='kw'>&lt;-</span> <span class='fu'>extend_for_pe</span>(<span class='no'>gr</span>))</div><div class='output co'>#&gt; GRanges object with 8 ranges and 3 metadata columns:
 #&gt;          seqnames              ranges strand |  targetname targetstart
 #&gt;             &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;   PRNP_f    chr20     4699568-4699605      + |        PRNP     4699600
@@ -234,7 +234,7 @@
 #&gt;   HEXA_r  72346583
 #&gt;   CFTR_r 117559595
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>    <span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>grext</span>, <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='extend_for_pe-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 6 metadata columns:
+#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'><span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>grext</span>, <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='extend_for_pe-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 6 metadata columns:
 #&gt;            seqnames              ranges strand |  targetname targetstart
 #&gt;               &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;     CFTR_f     chr7 117559575-117559594      + |        CFTR   117559593
