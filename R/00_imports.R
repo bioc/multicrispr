@@ -29,7 +29,7 @@
 #' @importFrom  ggplot2               scale_alpha_manual  scale_size_manual
 #' @importFrom  ggplot2               theme_bw  unit  xlab  ylab
 #' @importFrom  grid                  arrow
-#' @importFrom  magrittr              %>%   %<>%   and
+#' @importFrom  magrittr              %>%   %<>%   add   and
 #' @importFrom  magrittr              extract  extract2  set_names
 #' @importFrom  methods               as
 #' @importFrom  tidyr                 separate_rows

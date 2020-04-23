@@ -127,10 +127,6 @@ to_megabase <- function(y){
 #'     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
 #'     targets   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
 #'     plot_intervals(targets)
-#'     targets %<>% extend(plot = TRUE)
-#'     spacers <- find_spacers(targets, bsgenome)
-#'     specific <- filter_target_specific(spacers, targets, bsgenome)
-#'     efficient <- filter_efficient(spacers, bsgenome, cutoff = 0.4)
 #'     
 #' # PE targets
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  

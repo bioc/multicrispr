@@ -22,6 +22,8 @@ add_offtargets(
 )
 }
 \arguments{
+\item{...}{to channel deprecated add_specificity to add_offtargets}
+
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
@@ -38,6 +40,10 @@ add_offtargets(
 \item{indexedgenomesdir}{string: dir with indexed genomes}
 
 \item{plot}{TRUE (default) or FALSE}
+
+\item{size_var}{string: mapped to size in plot}
+
+\item{alpha_var}{string: mapped to alpha in plot}
 
 \item{verbose}{TRUE (default) or FALSE}
 }

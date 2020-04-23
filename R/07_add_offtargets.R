@@ -559,7 +559,10 @@ add_specificity <- function(...){
 #' @param outdir     directory where output is written to
 #' @param indexedgenomesdir string: dir with indexed genomes
 #' @param plot       TRUE (default) or FALSE
+#' @param alpha_var  string: mapped to alpha in plot
+#' @param size_var   string: mapped to size in plot
 #' @param verbose    TRUE (default) or FALSE
+#' @param ...        to channel deprecated add_specificity to add_offtargets
 #' @return  filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # PE example
@@ -593,6 +596,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 # First clear
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
     mcols(spacers) %<>% extract(, setdiff(names(.), offcols))
+    . <- off <- NULL
 # Add genome/target counts
     spacers %<>% add_genome_counts(
                     bsgenome, mismatches = mismatches, outdir = outdir,
@@ -664,6 +668,7 @@ filter_offtarget_free <- function(
     plot              = TRUE,
     verbose           = TRUE
 ){
+    . <- NULL
     # Add specificty info
     spacers %<>% add_offtargets(
                     bsgenome      = bsgenome, 
@@ -676,7 +681,7 @@ filter_offtarget_free <- function(
                     verbose       = verbose)
 
     # Subset
-    spacers %<>% subset(off==0)
+    spacers %<>% subset(.$off==0)
     
     # Return
     return(spacers)

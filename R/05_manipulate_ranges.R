@@ -310,7 +310,7 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
         revcomps$set <- 'inverse'
         print(plot_intervals(
                 c(gr, revcomps), 
-                color_var = 'set', size_var = 'set', ..., title = txt))
+                color_var = 'set', linetype_var = 'set', ..., title = txt))
         gr$set <- NULL
     }
     
