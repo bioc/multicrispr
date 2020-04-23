@@ -148,7 +148,8 @@ to_megabase <- function(y){
 plot_intervals <- function(
     gr, xref = 'targetname', y = 'names', nperchrom = 2, nchrom = 4, 
     color_var = 'targetname', facet_var = 'seqnames', linetype_var = NULL, 
-    size_var = NULL, alpha_var = NULL, title = NULL, scales= 'free'
+    size_var = default_size_var(gr), alpha_var = default_alpha_var(gr),
+    title = NULL, scales= 'free'
 ){
     # Comply
     edge <- targetname <- NULL
@@ -161,7 +162,8 @@ plot_intervals <- function(
     strand <- tmp <- width <- xstart <- xend <- . <- NULL
 
     # Prepare plotdt
-    plotdt <- prepare_plot_intervals(gr, xref, y, nperchrom, nchrom)
+    plotdt <- prepare_plot_intervals(
+                gr, xref, y, nperchrom, nchrom, alpha_var, size_var)
     
     # Core Ranges
     p <-ggplot( plotdt, 
@@ -170,7 +172,11 @@ plot_intervals <- function(
                             size = size_var, alpha = alpha_var)) + 
         facet_wrap(facet_var, scales = scales) + 
         geom_segment(arrow = arrow(length = unit(0.1, "inches")))
-    
+    if (!is.null(alpha_var)) p <- p + 
+        scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
+    if (!is.null(size_var))  p <- p +
+        scale_size_manual(values = c(`0+` = 0.1, `0.3+` = 1, `0.5+` = 2))
+
     # Targets
     if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
         p <-p + geom_point(aes_string(
@@ -192,6 +198,16 @@ plot_intervals <- function(
     p # print(p)
 }
 
+
+default_alpha_var <- function(gr){
+    if ('off' %in% names(mcols(gr))) 'off' else NULL
+}
+
+default_size_var <- function(gr){
+    if ('Doench2016' %in% names(mcols(gr))) 'Doench2016' else NULL
+}
+
+
 # Identify contigs and order on them
 # gr$contig <- GenomicRanges::findOverlaps(
 #                 gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
@@ -204,7 +220,9 @@ head_tail <- function(x, n){
     x[idx]
 }
 
-prepare_plot_intervals <- function(gr, xref, y, nperchrom, nchrom){
+prepare_plot_intervals <- function(
+    gr, xref, y, nperchrom, nchrom, alpha_var, size_var
+){
     # Comply
         edge <- targetname <- xstart <- xend <- width <- NULL
         targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
@@ -246,6 +264,12 @@ prepare_plot_intervals <- function(gr, xref, y, nperchrom, nchrom){
             plotdt %>%  extract(strand=='+', extstart := tmp)
         }
         plotdt %>%  extract(, tmp := NULL)
+    # Alpha and Size
+        if (!is.null(alpha_var)) plotdt[[alpha_var]] %<>% cut(
+                                        c(-Inf, 0, Inf), c('0', '1+'))
+        if (!is.null(size_var))  plotdt[[size_var]]  %<>% cut(
+                                        c(-Inf, 0.3, 0.5, Inf), 
+                                    c('0+', '0.3+', '0.5+'))
     # Return
         plotdt
 }

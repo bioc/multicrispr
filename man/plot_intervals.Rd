@@ -13,8 +13,8 @@ plot_intervals(
   color_var = "targetname",
   facet_var = "seqnames",
   linetype_var = NULL,
-  size_var = NULL,
-  alpha_var = NULL,
+  size_var = default_size_var(gr),
+  alpha_var = default_alpha_var(gr),
   title = NULL,
   scales = "free"
 )

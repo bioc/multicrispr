@@ -573,8 +573,8 @@ add_specificity <- function(...){
 #'                        bsgenome)
 #'  spacers <- find_pe_spacers(gr, bsgenome)
 #'  # index_genome(bsgenome)
-#'  # add_offtargets(spacers, bsgenome, mismatches=0, plot = TRUE)
-#'  # add_offtargets(spacers, bsgenome, mismatches=2, plot = TRUE)
+#'  # add_offtargets(spacers, bsgenome, mismatches=0)
+#'  # add_offtargets(spacers, bsgenome, mismatches=2)
 #' # TFBS example
 #' #-------------
 #'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
@@ -587,7 +587,8 @@ add_specificity <- function(...){
 #' @export
 add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2, 
     pam = 'NGG', outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, 
-    plot = TRUE, verbose= TRUE
+    plot = TRUE, size_var = default_size_var(spacers), alpha_var = 'off', 
+    verbose= TRUE
 ){
 # First clear
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
@@ -628,9 +629,8 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
         grplot <- gr2dt(spacers) %>%  # don't do that - what if no such exist?
                     #extract(, if(any(off==0)) .SD, by = 'targetname') %>% 
                     dt2gr(seqinfo(spacers))
-        grplot$offtargets <- cut(grplot$off, c(-Inf, 0, Inf), c('0', '1+'))
-        p <- plot_intervals(grplot, alpha_var = 'offtargets') +
-            ggplot2::scale_alpha_manual(values = c(`0`=1, `1+`=0.3))
+        p <- plot_intervals(
+                grplot, alpha_var = 'off', size_var = size_var)
         print(p)
     }
     spacers

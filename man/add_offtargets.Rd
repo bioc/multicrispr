@@ -16,6 +16,8 @@ add_offtargets(
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   plot = TRUE,
+  size_var = default_size_var(spacers),
+  alpha_var = "off",
   verbose = TRUE
 )
 }
@@ -61,8 +63,8 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
                        bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
  # index_genome(bsgenome)
- # add_offtargets(spacers, bsgenome, mismatches=0, plot = TRUE)
- # add_offtargets(spacers, bsgenome, mismatches=2, plot = TRUE)
+ # add_offtargets(spacers, bsgenome, mismatches=0)
+ # add_offtargets(spacers, bsgenome, mismatches=2)
 # TFBS example
 #-------------
  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10

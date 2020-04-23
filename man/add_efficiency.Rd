@@ -12,7 +12,8 @@ add_efficiency(
   chunksize = 10000,
   verbose = TRUE,
   plot = TRUE,
-  alpha_var = default_alpha_var(spacers)
+  alpha_var = default_alpha_var(spacers),
+  size_var = method
 )
 
 filter_efficient(
@@ -40,6 +41,8 @@ filter_efficient(
 \item{plot}{TRUE (default) or FALSE}
 
 \item{alpha_var}{NULL or string: var mapped to alpha in plot}
+
+\item{size_var}{NULL or string: var mapped to size in plot}
 
 \item{cutoff}{value to filter on}
 }

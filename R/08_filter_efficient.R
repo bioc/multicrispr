@@ -135,6 +135,7 @@ doench2016 <- function(
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
 #' @param alpha_var  NULL or string: var mapped to alpha in plot
+#' @param size_var   NULL or string: var mapped to size in plot
 #' @return numeric vector
 #' @examples
 #' 
@@ -193,9 +194,8 @@ doench2016 <- function(
 #' @export
 add_efficiency <- function(
     spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
-    chunksize = 10000,
-    verbose = TRUE, plot = TRUE, 
-    alpha_var = default_alpha_var(spacers)
+    chunksize = 10000, verbose = TRUE, plot = TRUE, 
+    alpha_var = default_alpha_var(spacers), size_var = method
 ){
     # Assert
     assert_is_all_of(spacers, 'GRanges')
@@ -210,8 +210,7 @@ add_efficiency <- function(
     scoredt <- data.table(crisprcontext = unique(spacerdt$crisprcontext))
     
     # Score
-    scores <- switch(
-        method, 
+    scores <- switch(method, 
         Doench2014 = doench2014(scoredt$crisprcontext, verbose=verbose), 
         Doench2016 = doench2016(scoredt$crisprcontext, chunksize=chunksize, 
                                 verbose=verbose))
@@ -224,21 +223,21 @@ add_efficiency <- function(
     
     # Plot
     if (plot){
-        scores   <- mcols(spacers)[[method]]
-        tertiles <- stats::quantile(scores, c(0.33, 0.66, 1))
-        labels   <- sprintf('%s < %s (%s)', method, 
-                            as.character(round(tertiles, 2)), names(tertiles))
-        spacers$efficiency <- cut(scores, c(0, tertiles), labels)
-        p <- plot_intervals(
-                spacers, size_var = 'efficiency', alpha_var = alpha_var) + 
-            ggplot2::scale_size_manual(values = c(0.1, 1, 2))
+        p <- plot_intervals(spacers, alpha_var = alpha_var, size_var = size_var)
         print(p)
-        spacers$efficiency <- NULL
     }
     
     # Return
     spacers
 }
+
+        #scores   <- mcols(spacers)[[method]]
+        #tertiles <- stats::quantile(scores, c(0.33, 0.66, 1))
+        #labels   <- sprintf('%s < %s (%s)', method, 
+        #                   as.character(round(tertiles, 2)), names(tertiles))
+        #spacers$efficiency <- cut(scores, c(0, tertiles), labels)
+        #labels <- paste0(method, ' > ', c('0', '0.3', '0.5'))
+
 
 #' @rdname add_efficiency
 #' @export
@@ -267,5 +266,5 @@ filter_efficient <- function(
 }
 
 default_alpha_var <- function(gr){
-    if ('specific' %in% names(mcols(gr))) 'specific' else NULL
+    if ('off' %in% names(mcols(gr))) 'off' else NULL
 }

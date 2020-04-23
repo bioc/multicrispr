@@ -26,6 +26,7 @@
 #' @importFrom  ggplot2               aes   aes_string
 #' @importFrom  ggplot2               facet_wrap  geom_point  geom_segment  
 #' @importFrom  ggplot2               ggplot  ggtitle  scale_x_continuous
+#' @importFrom  ggplot2               scale_alpha_manual  scale_size_manual
 #' @importFrom  ggplot2               theme_bw  unit  xlab  ylab
 #' @importFrom  grid                  arrow
 #' @importFrom  magrittr              %>%   %<>%   and
