@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r, include=TRUE, echo=FALSE, message=FALSE}
-knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, cache = FALSE)
 #str(knitr::opts_chunk$get())
 ```
 

@@ -1,14 +1,15 @@
-#' @importFrom  assertive.base        assert_all_are_true  is_identical_to_true
-#' @importFrom  assertive.base        assert_all_are_false
-#' @importFrom  assertive.files       assert_all_are_existing_files
-#' @importFrom  assertive.numbers     assert_all_are_less_than
-#' @importFrom  assertive.properties  has_names   assert_has_names
-#' @importFrom  assertive.reflection  is_windows
-#' @importFrom  assertive.sets        assert_is_subset
-#' @importFrom  assertive.strings     assert_all_are_matching_regex
-#' @importFrom  assertive.types       assert_is_all_of    assert_is_any_of  
-#' @importFrom  assertive.types       assert_is_a_bool    assert_is_a_number
-#' @importFrom  assertive.types       assert_is_a_string  assert_is_character
+#' @importFrom  assertive  assert_all_are_true  is_identical_to_true
+#' @importFrom  assertive  assert_all_are_false
+#' @importFrom  assertive  assert_all_are_existing_files
+#' @importFrom  assertive  assert_all_are_less_than
+#' @importFrom  assertive  has_names   assert_has_names
+#' @importFrom  assertive  is_windows  assert_all_are_dirs
+#' @importFrom  assertive  assert_is_subset  assert_has_no_duplicates
+#' @importFrom  assertive  assert_all_are_matching_regex
+#' @importFrom  assertive  assert_is_all_of    assert_is_any_of  
+#' @importFrom  assertive  assert_is_a_bool    assert_is_a_number
+#' @importFrom  assertive  assert_is_a_string  assert_is_character
+#' @importFrom  assertive  assert_is_scalar
 #' @importFrom  Biostrings            complement  DNAStringSet   
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict
 #' @importFrom  BiocGenerics          end  end<-  invertStrand

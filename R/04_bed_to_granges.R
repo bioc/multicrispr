@@ -133,7 +133,7 @@ bed_to_granges <- function(
     
     # Plot
     genome1 <- unique(genome(gr))
-    assertive.properties::assert_is_scalar(genome1)
+    assert_is_scalar(genome1)
     title <- paste0(genome1, ': ', basename(bedfile))
     if (plot) plot_karyogram(gr, title)
     

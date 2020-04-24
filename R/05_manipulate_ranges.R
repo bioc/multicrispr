@@ -284,7 +284,7 @@ extend <- function(
 add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
 
     # Assert
-    assertive::assert_is_all_of(gr, 'GRanges')
+    assert_is_all_of(gr, 'GRanges')
 
     # Invert
     revcomps <- invertStrand(gr)
