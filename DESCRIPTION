@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design
-Version: 0.1.0
+Version: 0.99.0
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",  c("aut", "cre")),
             person( "Johannes", "Graumann",   NULL, 'johannes.graumann@mpi-bn.mpg.de', "sad"),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",     "ctb"),
@@ -9,12 +9,12 @@ Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.d
             person( "Herve",    "Pages",      NULL, "hpages@fredhutch.org",            "ctb"),
             person( "Mario",    "Looso",      NULL, "mario.looso@mpi-bn.mpg.de",     c("sad","rth")))
 Description: Contains functions to facilitate the design of a multi-locus Crispr/Cas library.
-License: GPL
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
 Depends:
-    R (>= 3.6.0)
+    R (>= 4.0)
 Imports:
     assertive,
     AnnotationHub,
@@ -44,6 +44,7 @@ Suggests:
     BiocStyle,
     BSgenome.Hsapiens.UCSC.hg38,
     BSgenome.Mmusculus.UCSC.mm10,
+    BSgenome.Scerevisiae.UCSC.sacCer1,
     dbplyr,
     dplyr,
     ensembldb,
@@ -55,4 +56,6 @@ Suggests:
     testthat,
     TxDb.Mmusculus.UCSC.mm10.knownGene
 VignetteBuilder: knitr
-biocViews: CRISPR
+biocViews: CRISPR, Software
+BugReports: https://github.com/loosolab/multicrispr/issues
+URL: https://github.com/loosolab/multicrispr

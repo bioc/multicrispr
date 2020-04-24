@@ -33,10 +33,6 @@ version can be downloaded from our s3 storage. If not, builds the
 index with bowtie. This can take a few hours, but is a one-time operation.
 }
 \examples{
-#bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#index_genome(bsgenome)
-#bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#index_genome(bsgenome)
-#bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
-#index_genome(bsgenome)
+bsgenome <- BSgenome.Scerevisiae.UCSC.sacCer1::Scerevisiae
+index_genome(bsgenome, indexedgenomesdir = tempdir())
 }

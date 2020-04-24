@@ -27,7 +27,7 @@ OUTDIR <- '~/multicrisprout'
 #' has_been_indexed(bsgenome)
 #' @export
 has_been_indexed <- function(bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR){
-     dir.exists(genome_dir(indexedgenomesdir, bsgenome = bsgenome))
+    dir.exists(genome_dir(indexedgenomesdir, bsgenome = bsgenome))
     # don't rm this function - is used in vignette
 }
 
@@ -56,12 +56,8 @@ indexed_genomes_s3 <- c("BSgenome.Hsapiens.UCSC.hg38",
 #' @param overwrite TRUE or FALSE (default)
 #' @return invisible(genomdir)
 #' @examples
-#' #bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#' #index_genome(bsgenome)
-#' #bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-#' #index_genome(bsgenome)
-#' #bsgenome <- BSgenome.Hsapiens.NCBI.GRCh38::BSgenome.Hsapiens.NCBI.GRCh38
-#' #index_genome(bsgenome)
+#' bsgenome <- BSgenome.Scerevisiae.UCSC.sacCer1::Scerevisiae
+#' index_genome(bsgenome, indexedgenomesdir = tempdir())
 #' @export
 index_genome <- function(
     bsgenome, indexedgenomesdir = INDEXEDGENOMESDIR, 
