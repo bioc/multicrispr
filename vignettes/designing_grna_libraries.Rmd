@@ -62,20 +62,16 @@ url <- 'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'
 remotes::install_git(url, repos = BiocManager::repositories())
 ```
 
-
 Doench et al. (2016) 's python package **azimuth** for on-target efficiency prediction using their method can be easily installed and activated using reticulate:
 
 ```{r, eval = FALSE}
-# Install - run R(Studio) with admin privileges for this to work!
-  reticulate::conda_create('azienv', 'python=2.7')
-  reticulate::conda_install('azienv', 'azimuth', pip = TRUE)
-  reticulate::conda_install('azienv', 'scikit-learn==0.17.1', pip = TRUE)
-```
-```{r}
-# Activate
+# Install (once) - run R(Studio) with (local) admin privileges
+  # reticulate::conda_create('azienv', 'python=2.7')
+  # reticulate::conda_install('azienv', 'azimuth', pip = TRUE)
+  # reticulate::conda_install('azienv', 'scikit-learn==0.17.1', pip = TRUE)
+# Then activate
   reticulate::use_condaenv('azienv')
 ```
-
 
 Bowtie-indexed genomes for quick offtarget analysis can be installed using `index_genome`. For the two genomes used in the examples, mm10 and hg38, the functions downloads pre-build indexes from our data server, allowing a quick exploration (set `download=FALSE` to build index anew):
 
@@ -94,12 +90,12 @@ index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  )
 ```{r, echo = FALSE, results = FALSE, message=FALSE}
   # Not required
   # Done to load dependencies silently - keeping focus
-  require(GenomicRanges)
-  require(Biostrings)
-  require(dplyr)
-  require(dbplyr)
-  require(htmltools)
-  require(htmlwidgets)
+  #require(GenomicRanges)
+  #require(Biostrings)
+  #require(dplyr)
+  #require(dbplyr)
+  #require(htmltools)
+  #require(htmlwidgets)
 ```
 
 ## Define targets

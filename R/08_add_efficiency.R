@@ -97,7 +97,7 @@ doench2016 <- function(
     txt <- paste0('\t\tRun Doench2016 %d times on %d-seq chunks ', 
                 'to preserve memory')
     cmessage(txt, length(contextchunks), chunksize)
-    mc.cores <- if (is_windows()) 1 else parallel::detectCores()-2
+    mc.cores <- if (is_windows()) 1 else max(1, parallel::detectCores()-2)
     doench2016scores <- unlist(parallel::mclapply(contextchunks, 
             function(x){
                 reticulate::py_suppress_warnings(
