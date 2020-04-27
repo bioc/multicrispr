@@ -5,7 +5,7 @@
 # Nanog: three isoforms, each with a different TSS
 txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene
 AnnotationDbi::keytypes(txdb)
-ensdb <- multicrispr::EnsDb.Mmusculus.v98()
+ensdb <- AnnotationHub::AnnotationHub()[["AH75036"]] #EnsDb.Mmusculus.v98
 ensembldb::keytypes(ensdb)
 ensembldb::columns(ensdb)
 ensembldb::select(ensdb, 'Nanog', keytype = 'GENENAME', columns = ensembldb::columns(ensdb))

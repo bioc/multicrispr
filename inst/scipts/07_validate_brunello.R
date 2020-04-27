@@ -174,7 +174,8 @@ validate_brunello_spacers <- function(brunello){
 find_enclosing_exons <- function(spacers){
     
     # Load canonical exons
-    exons <- ensembldb::exons(multicrispr::EnsDb.Hsapiens.v99())
+    ensdb <- AnnotationHub::AnnotationHub()[["AH78783"]]
+    exons <- ensembldb::exons(ensdb)
     exons %<>% extract( as.character(seqnames(exons)) %in% 
                         as.character(GenomicRanges::seqnames(spacers)))
     

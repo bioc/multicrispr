@@ -19,7 +19,7 @@
                           list(seqnames, start, end, strand, entrez=gene_id))
     
 # Ensembl
-    db <- EnsDb.Mmusculus.v98()
+    db <- AnnotationHub::AnnotationHub()[["AH75036"]] #EnsDb.Mmusculus.v98
     ensembl  <- annotate_granges(gr, db) %>% 
                 magrittr::extract(!is.na(.$gene_id)) %>%
                 data.table::as.data.table() %>%
