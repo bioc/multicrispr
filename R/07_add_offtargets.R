@@ -419,7 +419,7 @@ add_target_counts <- function(
     # Index targets
     targetdir <- target_dir(outdir)
     dir.create(targetdir, showWarnings = FALSE, recursive = FALSE)
-    index_targets(targets, bsgenome, targetdir)
+    index_targets(targets, bsgenome, outdir)
 
     # Match spacers to targets
     if (verbose) cmessage('\tAdd target counts')
