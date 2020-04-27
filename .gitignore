@@ -1,5 +1,5 @@
 inst/doc
 .Rproj.user
 vignettes/*_cache
-.Rproj
+multicrispr.Rproj
 .gitattributes
