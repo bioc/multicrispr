@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 0.99.8
+Version: 0.99.9
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",  c("aut", "cre")),
             person( "Johannes", "Graumann",   NULL, 'johannes.graumann@mpi-bn.mpg.de', c("sad", "ctb")),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",     "ctb"),
@@ -21,7 +21,6 @@ Depends:
     R (>= 4.0)
 Imports:
     assertive,
-    AnnotationHub,
     BiocGenerics,
     Biostrings,
     BSgenome,
@@ -44,6 +43,7 @@ Imports:
     tidyr,
     utils
 Suggests: 
+    AnnotationHub,
     BiocStyle,
     BSgenome.Hsapiens.UCSC.hg38,
     BSgenome.Mmusculus.UCSC.mm10,
