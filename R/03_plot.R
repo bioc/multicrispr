@@ -81,7 +81,7 @@ plot_karyogram <- function(
 #                                         genome     = genome), 
 #                         genomeaxis = Gviz::GenomeAxisTrack())
 #     selectedgr   <- subset(gr, group==1) %>% split(names(.))
-#     annottracks  <- mapply( Gviz::AnnotationTrack, selectedgr, name = names(gr))
+#  annottracks  <- mapply( Gviz::AnnotationTrack, selectedgr, name = names(gr))
 #     Gviz::plotTracks(c(coretracks, annottracks), 
 #                     background.title = 'gray40', 
 #                     add = TRUE)
