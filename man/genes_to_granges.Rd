@@ -41,11 +41,11 @@ Convert geneids into GRanges
 
 # Ensembl
 #--------
-    txdb <- EnsDb.Mmusculus.v98()
-    genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
-    geneids <- as.character(read.table(genefile)[[1]])
-    (gr <- genes_to_granges(geneids, txdb))
-    (gr <- genefile_to_granges(genefile, txdb))
+    # txdb <- AnnotationHub::AnnotationHub()[["AH75036"]]
+    # genefile <- system.file('extdata/SRF.ensembl', package='multicrispr')
+    # geneids <- as.character(read.table(genefile)[[1]])
+    # (gr <- genes_to_granges(geneids, txdb))
+    # (gr <- genefile_to_granges(genefile, txdb))
 }
 \seealso{
 \code{\link{char_to_granges}}, \code{\link{bed_to_granges}}
