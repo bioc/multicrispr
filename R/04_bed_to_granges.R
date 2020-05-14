@@ -3,51 +3,6 @@
 # bed_to_granges
 #=============================================================================
 
-# Convert GRanges into Sequences
-# @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-# @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-# @return character vector
-# @examples 
-# bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-# bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-# gr <- bed_to_granges(bedfile, bsgenome)
-# seqs(gr[1:3], bsgenome)
-# @export
-# seqs <- function(gr, bsgenome){
-#     
-#     # Assert
-#     assert_is_all_of(gr, 'GRanges')
-#     assert_is_all_of(bsgenome, 'BSgenome')
-#     
-#     # Do
-#     BSgenome::getSeq( bsgenome,
-#                       names  = seqnames(gr),
-#                       start  = start(gr),
-#                       end    = end(gr), 
-#                       strand = strand(gr), 
-#                       as.character = TRUE)
-# }
-
-
-
-# Get BSgenome
-# @param gr \code{\link[GenomicRanges]{GRanges-class}}
-# @return BSgenome
-# @examples 
-# bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
-# bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-# gr <- bed_to_granges(bedfile, bsgenome)
-# get_bsgenome(gr)
-# @export
-#get_bsgenome <- function(gr){
-#    . <- NULL
-#    
-#    assert_is_identical_to_true(is(gr, 'GRanges'))
-#    genome <- unique(unname(genome(gr)))
-#    assert_is_a_string(genome)
-#    getBSgenome(genome)
-#}
-
 
 annotate_granges <- function(gr, txdb){
     

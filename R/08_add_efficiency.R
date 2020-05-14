@@ -231,13 +231,6 @@ add_efficiency <- function(
     spacers
 }
 
-        #scores   <- mcols(spacers)[[method]]
-        #tertiles <- stats::quantile(scores, c(0.33, 0.66, 1))
-        #labels   <- sprintf('%s < %s (%s)', method, 
-        #                   as.character(round(tertiles, 2)), names(tertiles))
-        #spacers$efficiency <- cut(scores, c(0, tertiles), labels)
-        #labels <- paste0(method, ' > ', c('0', '0.3', '0.5'))
-
 
 #' @rdname add_efficiency
 #' @export

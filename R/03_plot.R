@@ -61,34 +61,6 @@ plot_karyogram <- function(
 }
 
 
-# plot_tracks <- function(grlist){
-#     
-#     group <- . <-  NULL
-#     
-#     if (methods::is(grlist, 'GRangesList')) gr <- unlist(grlist)
-#     genome  <- unique(genome(seqinfo(gr)))
-#     assert_is_a_string(genome)
-#     chrom   <- unique(as.character(seqnames(gr)))[1]
-#     assert_is_a_string(chrom)
-#     
-#     # Find continuum groups
-#     gr$group <- GenomicRanges::findOverlaps(
-#                     gr, maxgap = 1, ignore.strand = TRUE, select = 'first')
-#     
-#     # Plot
-#     coretracks <- list( ideogram = Gviz::IdeogramTrack(
-#                                         chromosome = chrom, 
-#                                         genome     = genome), 
-#                         genomeaxis = Gviz::GenomeAxisTrack())
-#     selectedgr   <- subset(gr, group==1) %>% split(names(.))
-#  annottracks  <- mapply( Gviz::AnnotationTrack, selectedgr, name = names(gr))
-#     Gviz::plotTracks(c(coretracks, annottracks), 
-#                     background.title = 'gray40', 
-#                     add = TRUE)
-# 
-# }
-
-
 to_megabase <- function(y){
     z <- vector('character', length(y))
     
@@ -194,13 +166,6 @@ default_alpha_var <- function(gr){
 default_size_var <- function(gr){
     if ('Doench2016' %in% names(mcols(gr))) 'Doench2016' else NULL
 }
-
-
-# Identify contigs and order on them
-# gr$contig <- GenomicRanges::findOverlaps(
-#                 gr, maxgap = 30, select = 'first', ignore.strand = TRUE)
-# gr %<>% extract(order(.$contig))
-
 
 
 head_tail <- function(x, n){
