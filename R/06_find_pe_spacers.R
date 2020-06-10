@@ -152,17 +152,18 @@ find_gg <- function(gr){
 #'   * pam:    NGG PAMs
 #'   * 3pext:  3' extension of gRNA (RTtemplate + primerbindingsite)
 #' @examples
-#' # PE example
-#' #-----------
-#'     require(magrittr)
+#' # Find PE spacers for four clinically relevant loci (Anzalone et al, 2019)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-#'                             HBB  = 'chr11:5227002:-',             # snp
-#'                             HEXA = 'chr15:72346580-72346583:-',   # del
-#'                             CFTR = 'chr7:117559593-117559595:+'), # ins
-#'                           bsgenome)
+#'     gr <- char_to_granges(c(
+#'         PRNP = 'chr20:4699600:+',             # snp: prion disease
+#'         HBB  = 'chr11:5227002:-',             # snp: sickle cell anemia
+#'         HEXA = 'chr15:72346580-72346583:-',   # del: tay sachs disease
+#'         CFTR = 'chr7:117559593-117559595:+'), # ins: cystic fibrosis
+#'         bsgenome)
 #'     find_pe_spacers(gr, bsgenome)
 #'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+#'     
+#' # Find 
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
