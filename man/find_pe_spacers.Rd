@@ -7,7 +7,7 @@
 find_pe_spacers(
   gr,
   bsgenome,
-  fixes = get_plus_seq(bsgenome, gr),
+  edits = get_plus_seq(bsgenome, gr),
   nprimer = 13,
   nrt = 16,
   plot = TRUE
@@ -18,7 +18,7 @@ find_pe_spacers(
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{fixes}{character vector: '+' strand fix seqs}
+\item{edits}{character vector: desired edits (on '+' strand)}
 
 \item{nprimer}{n primer nucleotides (default 13, max 17)}
 
@@ -39,7 +39,7 @@ Find prime editing spacers around target ranges
 }
 \details{
 Below the architecture of a prime editing site.
-Fixes can be performed anywhere in the revtranscript area.
+Edits can be performed anywhere in the revtranscript area.
 
         spacer        pam
   --------------------===

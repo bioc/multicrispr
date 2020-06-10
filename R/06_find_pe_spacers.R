@@ -129,7 +129,7 @@ find_gg <- function(gr){
 #' Find prime editing spacers around target ranges
 #' 
 #' Below the architecture of a prime editing site.
-#' Fixes can be performed anywhere in the revtranscript area.
+#' Edits can be performed anywhere in the revtranscript area.
 #' 
 #'         spacer        pam
 #'   --------------------===
@@ -141,7 +141,7 @@ find_gg <- function(gr){
 #' 
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param fixes     character vector: '+' strand fix seqs
+#' @param edits     character vector: desired edits (on '+' strand)
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
 #' @param plot      TRUE (default) or FALSE
@@ -165,14 +165,14 @@ find_gg <- function(gr){
 #'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
-find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr), 
+find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
     nprimer = 13, nrt = 16, plot = TRUE){
     
     # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
-    assert_is_character(fixes)
-    assert_all_are_matching_regex(fixes, '^[ACGTacgt]+$')
+    assert_is_character(edits)
+    assert_all_are_matching_regex(edits, '^[ACGTacgt]+$')
     assert_is_a_number(nprimer)
     assert_is_a_number(nrt)
     assert_all_are_less_than(nprimer, 17)
@@ -187,9 +187,9 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     spacer       <- up_flank(gg, -21,        -2)    %>% add_seq(bs)
     pam          <- up_flank(gg,  -1,        +1)    %>% add_seq(bs) 
     primer       <- up_flank(gg, -4-nprimer, -5)    %>% add_seq(bs)
-    revtranscript<- up_flank(gg, -4, -5+nrt) %>% add_fixed_seqs(bs, fixes)
+    revtranscript<- up_flank(gg, -4, -5+nrt) %>% add_fixed_seqs(bs, edits)
     ext  <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand() %>% 
-            add_fixed_seqs(bs, fixes) # Revcomp for "-" seqs
+            add_fixed_seqs(bs, edits) # Revcomp for "-" seqs
     # Plot
     if (plot){
         spacer$part<-'spacer'
@@ -210,11 +210,11 @@ find_pe_spacers <- function(gr, bsgenome, fixes = get_plus_seq(bsgenome, gr),
     spacer
 }
 
-add_fixed_seqs <- function(gr, bsgenome, fixes){
+add_fixed_seqs <- function(gr, bsgenome, edits){
     # Get '+' seq
     gr$seq <- get_plus_seq(bsgenome, gr)
     substr(gr$seq, gr$targetstart - start(gr)+1, 
-                    gr$targetend  - start(gr)+1) <- fixes[gr$targetname]
+                    gr$targetend  - start(gr)+1) <- edits[gr$targetname]
     gr$seq[as.logical(strand(gr)=='-')] %<>% revcomp()     
     gr
 }
