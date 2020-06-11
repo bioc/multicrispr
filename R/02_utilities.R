@@ -28,13 +28,21 @@ uniquify <- function(x){
 #' @param x vector
 #' @param prefix string: prefix with which to start names
 #' @return character vector with unique names
+#' @noRd
 make_unique_names <- function(x, prefix='T'){
     
-    if (has_names(x)) return(uniquify(names(x)))
+    if (has_names(x)){
+        return(uniquify(names(x)))
+    } else {
+        y <- as.character(x)
+        assert_has_no_duplicates(y)
+        return(y)
+    }
     
-    paste0(prefix, formatC(seq_along(x), 
-                                digits = floor(log10(length(x))), 
-                                flag = 0))
+    
+    #paste0(prefix, formatC(seq_along(x), 
+    #                            digits = floor(log10(length(x))), 
+    #                            flag = 0))
 }
 
 name_uniquely <- function(gr, prefix = 'x'){
