@@ -18,7 +18,8 @@ find_pe_spacers(
 
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 
-\item{edits}{character vector: desired edits (on '+' strand)}
+\item{edits}{character vector: desired edits on '+' strand.
+If named, names should be identical to those of \code{gr}}
 
 \item{nprimer}{n primer nucleotides (default 13, max 17)}
 
@@ -50,7 +51,7 @@ Edits can be performed anywhere in the revtranscript area.
       ----------extension----------
 }
 \examples{
-# Find PE spacers for four clinically relevant loci (Anzalone et al, 2019)
+# Find PE spacers for 4 clinically relevant loci (Anzalone et al, 2019)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
     gr <- char_to_granges(c(
         PRNP = 'chr20:4699600:+',             # snp: prion disease
@@ -61,7 +62,11 @@ Edits can be performed anywhere in the revtranscript area.
     find_pe_spacers(gr, bsgenome)
     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
     
-# Find 
+# Edit PRNP locus for resistance against prion disease (Anzalone et al, 2019)
+    bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+    gr <- char_to_granges('chr20:4699600:+', bsgenome)
+    find_pe_spacers(gr, bsgenome)
+    find_pe_spacers(gr, bsgenome, edits = 'T')
 }
 \seealso{
 \code{\link{find_spacers}} to find standard crispr sites

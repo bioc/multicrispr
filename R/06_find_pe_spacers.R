@@ -141,7 +141,8 @@ find_gg <- function(gr){
 #' 
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
 #' @param bsgenome  \code{\link[BSgenome]{BSgenome-class}}
-#' @param edits     character vector: desired edits (on '+' strand)
+#' @param edits     character vector: desired edits on '+' strand.
+#'        If named, names should be identical to those of \code{gr}
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
 #' @param plot      TRUE (default) or FALSE
@@ -152,7 +153,7 @@ find_gg <- function(gr){
 #'   * pam:    NGG PAMs
 #'   * 3pext:  3' extension of gRNA (RTtemplate + primerbindingsite)
 #' @examples
-#' # Find PE spacers for four clinically relevant loci (Anzalone et al, 2019)
+#' # Find PE spacers for 4 clinically relevant loci (Anzalone et al, 2019)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
 #'     gr <- char_to_granges(c(
 #'         PRNP = 'chr20:4699600:+',             # snp: prion disease
@@ -163,7 +164,11 @@ find_gg <- function(gr){
 #'     find_pe_spacers(gr, bsgenome)
 #'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     
-#' # Find 
+#' # Edit PRNP locus for resistance against prion disease (Anzalone et al, 2019)
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- char_to_granges('chr20:4699600:+', bsgenome)
+#'     find_pe_spacers(gr, bsgenome)
+#'     find_pe_spacers(gr, bsgenome, edits = 'T')
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
@@ -174,12 +179,14 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     assert_is_all_of(bsgenome, 'BSgenome')
     assert_is_character(edits)
     assert_all_are_matching_regex(edits, '^[ACGTacgt]+$')
+    assert_are_same_length(gr, edits)
+    if (has_names(edits))   assert_are_identical(names(gr), names(edits))
     assert_is_a_number(nprimer)
     assert_is_a_number(nrt)
     assert_all_are_less_than(nprimer, 17)
 
     # Find GG in nrt window around target site
-    gr %<>% name_uniquely()
+    gr %<>% name_uniquely(); names(edits) <- names(gr)
     gg  <-  gr %>% extend_pe_to_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
     names(gg) <- gg$crisprname <- uniquify(gg$targetname)
     

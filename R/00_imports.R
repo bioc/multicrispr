@@ -2,10 +2,11 @@
 #' @importFrom  assertive  assert_all_are_false
 #' @importFrom  assertive  assert_all_are_existing_files
 #' @importFrom  assertive  assert_all_are_less_than
+#' @importFrom  assertive  assert_all_are_matching_regex
+#' @importFrom  assertive  assert_are_identical   assert_are_same_length
 #' @importFrom  assertive  has_names   assert_has_names
 #' @importFrom  assertive  is_windows  assert_all_are_dirs
 #' @importFrom  assertive  assert_is_subset  assert_has_no_duplicates
-#' @importFrom  assertive  assert_all_are_matching_regex
 #' @importFrom  assertive  assert_is_all_of    assert_is_any_of  
 #' @importFrom  assertive  assert_is_a_bool    assert_is_a_number
 #' @importFrom  assertive  assert_is_a_string  assert_is_character
