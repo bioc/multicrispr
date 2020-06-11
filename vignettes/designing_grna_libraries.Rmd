@@ -4,7 +4,7 @@ author: "Aditya M Bhagwat"
 date: "`r Sys.Date()`"
 output: BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{finding_flank_cas9s}
+  %\VignetteIndexEntry{designing_grna_libraries}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
