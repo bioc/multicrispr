@@ -12,5 +12,5 @@ Rscript -e 'BiocManager::install(installed.packages()[,1])'
 # https://www.cyberciti.biz/faq/unix-howto-read-line-by-line-from-file/
 while IFS= read -r package;
 do
-  RDscript -e "BiocManager::install('"$package"', update = TRUE, ask = FALSE)";
+  Rscript -e "BiocManager::install('"$package"', update = TRUE, ask = FALSE)";
 done < ".ci/r-requirements.txt"
