@@ -5,7 +5,7 @@ stages:
   - check
 
 before_script:
-  - chmod +x ./ci/ci_setup.sh
+  - chmod +x .ci/ci_setup.sh
   - .ci/ci_setup.sh
 
 build:
