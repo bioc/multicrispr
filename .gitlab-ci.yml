@@ -4,6 +4,9 @@ stages:
   - build
   - check
 
+before_script:
+  -.ci/setup.sh
+
 build:
   stage: build
   tags:

@@ -5,6 +5,7 @@ Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.d
             person( "Johannes", "Graumann",   NULL, 'johannes.graumann@mpi-bn.mpg.de', c("sad", "ctb")),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",     "ctb"),
             person( "Jens",     "Preussner",  NULL, "jens.preussner@mpi-bn.mpg.de",    "ctb"),
+            person( "Henrik",   "Schultheis",  NULL,"henrik.schultheis@mpi-bn.mpg.de",    "ctb"),
             person( "Michael",  "Lawrence",   NULL, "lawrence.michael@gene.com",       "ctb"),
             person( "Herve",    "Pages",      NULL, "hpages@fredhutch.org",            "ctb"),
             person( "Mario",    "Looso",      NULL, "mario.looso@mpi-bn.mpg.de",     c("sad","rth")))
