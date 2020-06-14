@@ -1,5 +1,4 @@
-# r-devel subpipeline
-image: rocker/r-devel
+image: bioconductor/bioconductor_docker:devel
 
 stages:
   - build
@@ -10,11 +9,11 @@ build:
   tags:
     - docker
   script:
-    - RD CMD build .
+    - R CMD build .
   artifacts:
     paths:
       - multicrispr_*.tar.gz
-    name: "$CI_COMMIT_REF_NAME-dev-builds"
+    name: "$CI_COMMIT_REF_NAME-builds"
 
 check:
   stage: check
@@ -22,10 +21,9 @@ check:
     - docker
   variables:
     http_proxy: http://www-proxy.t-online.de:80
-#    R_ZIPCMD: /opt/conda/bin/zip
     _R_CHECK_FORCE_SUGGESTS_: 0
   script:
-    - RD CMD check *tar.gz --as-cran --no-manual
+    - R CMD check *tar.gz --as-cran --no-manual
   artifacts:
     expire_in: 1 week
     paths:
