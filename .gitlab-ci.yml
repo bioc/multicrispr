@@ -1,3 +1,34 @@
+image: bioconductor/bioconductor_docker:devel
+
+stages: 
+  - build
+  - check
+  
+build:
+  stage: build
+  tags:
+    - docker
+  script: 
+    - R CMD build .
+  artifacts:
+    paths:
+      - multicrispr_*.tar.gz
+    name: "$CI_COMMIT_REF_NAME-dev-builds"
+
+check:
+  stage: check
+  tags:
+    - docker
+  variables:
+    http_proxy: http://www-proxy.t-online.de:80
+    _R_CHECK_FORCE_SUGGESTS_:0
+  script:
+    - R CMD check *tar.gz --as-cran --no-manual
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - multicrispr.Rcheck/*
+
 pages:
   script:
     - touch public
