@@ -30,6 +30,7 @@ check:
       - multicrispr.Rcheck/*
 
 pages:
+  stage: deploy
   script:
     - touch public
   artifacts:
