@@ -1,4 +1,4 @@
-image: bioconductor/bioconductor_docker
+image: docker.gitlab.gwdg.de/loosolab/software/multicrispr
 
 stages:
   - build
