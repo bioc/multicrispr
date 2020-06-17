@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-"^\\.ci$"
-.gitlab-ci.yml
+gitlab_ci
 public
 _pkgdown.yml
 grA.png

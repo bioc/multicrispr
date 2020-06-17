@@ -13,4 +13,4 @@ Rscript -e 'BiocManager::install(installed.packages()[,1])'
 while IFS= read -r package;
 do
   Rscript -e "BiocManager::install('"$package"', update = TRUE, ask = FALSE)";
-done < ".ci/r-requirements.txt"
+done < ".gitlab_ci_dependencies.txt"
