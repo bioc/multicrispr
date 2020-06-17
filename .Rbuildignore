@@ -1,7 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 gitlab_ci
+^ci\\.yml$
 public
-_pkgdown.yml
+"^_pkgdwn\\.yml$"
 grA.png
 grB.pgn
