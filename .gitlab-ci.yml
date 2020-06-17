@@ -1,4 +1,7 @@
-image: multicrispr
+image: docker.gitlab.gwdg.de/loosolab/software/multicrispr
+services:
+  - name: docker.gitlab.gwdg.de/loosolab/software/multicrispr-dind
+    alias: docker
 
 stages:
   - build
