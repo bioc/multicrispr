@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-.ci
+"^\\.ci$"
 .gitlab-ci.yml
 public
 _pkgdown.yml
