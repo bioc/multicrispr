@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+.ci
 .gitlab-ci.yml
 public
 _pkgdown.yml
