@@ -52,6 +52,7 @@ Suggests:
     ensembldb,
     IRanges,
     knitr,
+    magick,
     rmarkdown,
     testthat,
     TxDb.Mmusculus.UCSC.mm10.knownGene
