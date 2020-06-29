@@ -1,7 +1,6 @@
 r-assertive
 r-data.table
 r-ggplot2
-r-grid
 r-magrittr
 r-reticulate
 r-stringi
