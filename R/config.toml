@@ -1,0 +1,3 @@
+[runners.docker]
+  image = docker.gitlab.gwdg.de/loosolab/software/multicrispr
+  
