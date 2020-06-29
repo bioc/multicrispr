@@ -1,12 +1,11 @@
-image: docker.gitlab.gwdg.de/loosolab/software/multicrispr:latest
+image: continuumio/miniconda3:4.7.12
 
 stages:
   - build
   - check
 
 before_script:
-  - chmod +x .ci/ci_setup.sh
-  - .ci/ci_setup.sh
+  - .ci/setup.sh
 
 build:
   stage: build
@@ -25,6 +24,7 @@ check:
     - docker
   variables:
     http_proxy: http://www-proxy.t-online.de:80
+    R_ZIPCMD: /opt/conda/bin/zip
     _R_CHECK_FORCE_SUGGESTS_: 0
   script:
     - R CMD check *tar.gz --as-cran --no-manual
