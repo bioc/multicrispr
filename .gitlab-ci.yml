@@ -1,4 +1,4 @@
-image: docker.gitlab.gwdg.de/loosolab/software/multicrispr
+image: docker.gitlab.gwdg.de/loosolab/software/multicrispr:latest
 
 stages:
   - build
