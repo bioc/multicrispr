@@ -3,6 +3,7 @@ require(AnnotationHub)
 ah <- AnnotationHub()
 names(ah)[1:10]
 ah <- query(ah, 'Mus musculus')
+ah <- query(ah, 'Homo sapiens')
 table(ah$dataprovider)
 
 # UCSC
