@@ -1,6 +1,6 @@
 <center> <h1> multicrispr </h1> </center>
 
-![](inst/extdata/readme_portrait.png)
+[![Build Status](https://travis-ci.com/bhagwataditya/multicrispr.svg?branch=master)](https://travis-ci.com/bhagwataditya/multicrispr)
 
 ### Installation
 
