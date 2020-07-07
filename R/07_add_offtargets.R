@@ -58,8 +58,8 @@ index_genome <- function(
 ){
     # Assert
     assert_is_all_of(bsgenome, 'BSgenome')
-    bsname <- GenomeInfoDb::bsgenomeName(bsgenome)
-    
+    bsname <- GenomeInfoDb::bsgenomeName(as(bsgenome, 'GenomeDescription'))
+
     # Return if already available
     genomedir    <- genome_dir(  indexedgenomesdir, bsgenome)
     message('\tIndex ', bsname)
