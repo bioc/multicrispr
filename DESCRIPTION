@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 0.99.12
+Version: 0.99.13
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",   c("aut", "cre")),
             person( "Johannes", "Graumann",   NULL, 'johannes.graumann@mpi-bn.mpg.de',c("sad", "ctb")),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",      "ctb"),
