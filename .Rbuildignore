@@ -1,7 +1,8 @@
 ^.*\.Rproj$
-^\.Rproj\.user$
-^\.gitlab-ci\.yml$
 ^\.ci$
+^\.gitlab-ci\.yml$
+^\.Rproj\.user$
+^\.travis.yml$
 public
 grA.png
 grB.pgn
