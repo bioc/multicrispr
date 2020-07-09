@@ -112,6 +112,8 @@ to_megabase <- function(y){
 #'     plot_intervals(extend_for_pe(gr))
 #'     plot_intervals(spacers)
 #'     
+#' # Empty gr
+#'     plot_intervals(GenomicRanges::GRanges())
 #' @export
 plot_intervals <- function(
     gr, xref = 'targetname', y = 'names', nperchrom = 2, nchrom = 4, 
@@ -123,6 +125,7 @@ plot_intervals <- function(
     edge <- targetname <- NULL
 # Assert, Import, Comply
     assert_is_all_of(gr, 'GRanges')
+    if (assertive::is_empty(gr)) return(invisible(NULL))
     if (!is.null(color_var)) assert_is_a_string(color_var)
     assert_is_subset(color_var, names(as.data.table(gr)))
     contig <- .N <- .SD <- seqnames <- start <- NULL
