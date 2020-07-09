@@ -11,8 +11,8 @@ find_pe_spacers(
   nprimer = 13,
   nrt = 16,
   plot = TRUE,
-  outdir,
-  indexedgenomesdir,
+  outdir = OUTDIR,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
   ...
 )
 }

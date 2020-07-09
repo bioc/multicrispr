@@ -172,7 +172,8 @@ find_gg <- function(gr){
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, plot = TRUE, outdir, indexedgenomesdir, ...){
+    nprimer = 13, nrt = 16, plot = TRUE, outdir = OUTDIR, 
+    indexedgenomesdir = INDEXEDGENOMESDIR, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
@@ -211,9 +212,9 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacer$revtranscript <- revtranscript$seq
     spacer$extension     <- ext$seq
 # Filter for offtargets
-    spacer %<>% filter_offtargets(groupby = 'targetname', mismatches = 0, 
-        outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, 
-        verbose= TRUE, plot = TRUE, ...)
+    spacer %<>% filter_offtargets(bsgenome, by = 'targetname', mismatches = 0, 
+        outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
+        verbose= TRUE, plot = plot, ...)
     spacer
 }
 

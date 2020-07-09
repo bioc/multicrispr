@@ -24,8 +24,9 @@ add_offtargets(
 
 filter_offtargets(
   spacers,
-  by = "targetname",
+  bsgenome,
   targets = NULL,
+  by = "targetname",
   mismatches = 2,
   pam = "NGG",
   outdir = OUTDIR,

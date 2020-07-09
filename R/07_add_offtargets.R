@@ -593,10 +593,10 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 #' Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
 #' 
 #' @param spacers    spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param by         string (default "targetname"): filter by this mcol
+#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
 #' @param targets    NULL (default) or target 
 #'                   \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
+#' @param by         string (default "targetname"): filter by this mcol
 #' @param mismatches number (default 2): max number of mismatches to consider
 #' @param pam        string (default 'NGG'): pam sequence
 #' @param outdir     directory where output is written to
@@ -632,8 +632,8 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 #'  # spacers %>% add_offtargets(bsgenome)           # off = G - 1
 #'  # spacers %>% add_offtargets(bsgenome, targets)  # off = G - T
 #' @export
-filter_offtargets <- function(spacers, by = 'targetname', targets = NULL, 
-    mismatches = 2, pam = 'NGG', outdir = OUTDIR, 
+filter_offtargets <- function(spacers, bsgenome, targets = NULL, 
+    by = 'targetname', mismatches = 2, pam = 'NGG', outdir = OUTDIR, 
     indexedgenomesdir = INDEXEDGENOMESDIR, verbose= TRUE, plot = TRUE, ...
 ){
     
@@ -643,8 +643,8 @@ filter_offtargets <- function(spacers, by = 'targetname', targets = NULL,
     assert_is_subset(by, names(mcols(spacers)))
 
     # Add offtargets
-    spacers %<>% add_offtargets(spacers, bsgenome, targets = targets, 
-        mismatches = 2, pam = 'NGG', outdir = outdir, 
+    spacers %<>% add_offtargets(bsgenome, targets = targets, 
+        mismatches = mismatches, pam = pam, outdir = outdir, 
         indexedgenomesdir = indexedgenomesdir, verbose = verbose, plot = plot, 
         ...)
     
