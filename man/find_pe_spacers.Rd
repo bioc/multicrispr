@@ -10,6 +10,7 @@ find_pe_spacers(
   edits = get_plus_seq(bsgenome, gr),
   nprimer = 13,
   nrt = 16,
+  filterofftargets = TRUE,
   plot = TRUE,
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
@@ -28,15 +29,27 @@ If named, names should be identical to those of \code{gr}}
 
 \item{nrt}{n rev transcr nucleotides (default 16, recomm. 10-16)}
 
+\item{filterofftargets}{TRUE (default) or FALSE: whether to filter for 
+minimal offtargets}
+
 \item{plot}{TRUE (default) or FALSE}
+
+\item{outdir}{string: passed to filter_offtargets}
+
+\item{indexedgenomesdir}{string: passed to filter_offtargets}
+
+\item{...}{passed to plot_intervals}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}} with PE spacer ranges
 Each prime editing range is defined in terms of its N20NGG spacer.
 Additionally, three sequence mcols are returned:
-  * spacer: N20 spacers
-  * pam:    NGG PAMs
-  * 3pext:  3' extension of gRNA (RTtemplate + primerbindingsite)
+  * crisprspacer: N20 spacers
+  * crisprpam:    NGG PAMs
+  * primer: primer (on PAM strand)
+  * revtranscript: reverse transcript (on PAM strand)
+  * extension:  3' extension of gRNA 
+                (reverse transcription template + primer binding site)
 }
 \description{
 Find prime editing spacers around target ranges

@@ -145,13 +145,21 @@ find_gg <- function(gr){
 #'        If named, names should be identical to those of \code{gr}
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
+#' @param filterofftargets TRUE (default) or FALSE: whether to filter for 
+#'                         minimal offtargets
 #' @param plot      TRUE (default) or FALSE
+#' @param outdir    string: passed to filter_offtargets
+#' @param indexedgenomesdir  string: passed to filter_offtargets
+#' @param ...       passed to plot_intervals
 #' @return  \code{\link[GenomicRanges]{GRanges-class}} with PE spacer ranges
 #' Each prime editing range is defined in terms of its N20NGG spacer.
 #' Additionally, three sequence mcols are returned:
-#'   * spacer: N20 spacers
-#'   * pam:    NGG PAMs
-#'   * 3pext:  3' extension of gRNA (RTtemplate + primerbindingsite)
+#'   * crisprspacer: N20 spacers
+#'   * crisprpam:    NGG PAMs
+#'   * primer: primer (on PAM strand)
+#'   * revtranscript: reverse transcript (on PAM strand)
+#'   * extension:  3' extension of gRNA 
+#'                 (reverse transcription template + primer binding site)
 #' @examples
 #' # Find PE spacers for 4 clinically relevant loci (Anzalone et al, 2019)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
@@ -172,8 +180,8 @@ find_gg <- function(gr){
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, plot = TRUE, outdir = OUTDIR, 
-    indexedgenomesdir = INDEXEDGENOMESDIR, ...){
+    nprimer = 13, nrt = 16, filterofftargets = TRUE, plot = TRUE, 
+    outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
@@ -212,9 +220,11 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacer$revtranscript <- revtranscript$seq
     spacer$extension     <- ext$seq
 # Filter for offtargets
-    spacer %<>% filter_offtargets(bsgenome, by = 'targetname', mismatches = 0, 
-        outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
-        verbose= TRUE, plot = plot, ...)
+    if (filterofftargets){
+        spacer %<>% filter_offtargets(bsgenome, by = 'targetname', mismatches = 0, 
+            outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
+            verbose= TRUE, plot = plot, ...)
+    }
     spacer
 }
 
