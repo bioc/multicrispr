@@ -71,6 +71,8 @@ Interval plot GRanges
     plot_intervals(extend_for_pe(gr))
     plot_intervals(spacers)
     
+# Empty gr
+    plot_intervals(GenomicRanges::GRanges())
 }
 \seealso{
 \code{\link{plot_karyogram}}
