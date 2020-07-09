@@ -92,11 +92,15 @@
 #' @param ir \code{\link[IRanges]{IRanges-class}}: subranges to be extracted
 #' @param plot TRUE or FALSE (default)
 #' @return \code{\link[GenomicRanges]{GRanges-class}}. 
-#' @examples 
+#' @examples
+#' # Extract a subrange
 #' gr <- GenomicRanges::GRanges(c(A = 'chr1:1-100:+', B = 'chr1:1-100:-'))
 #' gr$targetname <- 'AB'
 #' ir <- IRanges::IRanges(c(A = '1-10', A = '11-20', B = '1-10', B = '11-20'))
 #' extract_subranges(gr, ir, plot = TRUE)
+#' 
+#' # Return empty GRanges for empty IRanges 
+#' extract_subranges(GenomicRanges::GRanges('chr1:345-456'), IRanges::IRanges())
 #' @export
 extract_subranges <- function(gr, ir, plot = FALSE){
 
@@ -104,6 +108,7 @@ extract_subranges <- function(gr, ir, plot = FALSE){
     substart <- subwidth <- NULL
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(ir, 'IRanges')
+    if (assertive::is_empty(ir)) return(GRanges(seqinfo=seqinfo(gr)))
     assert_has_names(gr)
     assert_has_names(ir)
     assert_is_subset(unique(names(ir)), names(gr))
