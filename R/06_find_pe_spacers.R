@@ -172,9 +172,8 @@ find_gg <- function(gr){
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, plot = TRUE){
-    
-    # Assert
+    nprimer = 13, nrt = 16, plot = TRUE, outdir, indexedgenomesdir, ...){
+# Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
     assert_is_character(edits)
@@ -184,13 +183,11 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     assert_is_a_number(nprimer)
     assert_is_a_number(nrt)
     assert_all_are_less_than(nprimer, 17)
-
-    # Find GG in nrt window around target site
+# Find GG in nrt window around target site
     gr %<>% name_uniquely(); names(edits) <- names(gr)
     gg  <-  gr %>% extend_pe_to_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
     names(gg) <- gg$crisprname <- uniquify(gg$targetname)
-    
-    # Extract from these other components
+# Extract from these other components
     bs <- bsgenome; invstr <- invertStrand
     spacer       <- up_flank(gg, -21,        -2)    %>% add_seq(bs)
     pam          <- up_flank(gg,  -1,        +1)    %>% add_seq(bs) 
@@ -198,23 +195,25 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     revtranscript<- up_flank(gg, -4, -5+nrt) %>% add_fixed_seqs(bs, edits)
     ext  <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand() %>% 
             add_fixed_seqs(bs, edits) # Revcomp for "-" seqs
-    # Plot
+# Plot
     if (plot){
-        spacer$part<-'spacer'
-        ext$part  <- "3' extension"
+        spacer$part<-'spacer'; ext$part  <- "3' extension"
         allranges <- c(spacer, ext)
         allranges$part %<>% factor((c("spacer", "3' extension")))
         print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part',
                 facet_var = c('seqnames', 'targetname')))
         spacer$part <- NULL
     }
-    
-    # Add sequences and return
+# Add sequences
     names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'crisprspacer')
     spacer$crisprpam     <- pam$seq
     spacer$primer        <- primer$seq
     spacer$revtranscript <- revtranscript$seq
     spacer$extension     <- ext$seq
+# Filter for offtargets
+    spacer %<>% filter_offtargets(groupby = 'targetname', mismatches = 0, 
+        outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, 
+        verbose= TRUE, plot = TRUE, ...)
     spacer
 }
 

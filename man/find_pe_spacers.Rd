@@ -10,7 +10,10 @@ find_pe_spacers(
   edits = get_plus_seq(bsgenome, gr),
   nprimer = 13,
   nrt = 16,
-  plot = TRUE
+  plot = TRUE,
+  outdir,
+  indexedgenomesdir,
+  ...
 )
 }
 \arguments{
