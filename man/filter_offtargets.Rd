@@ -3,7 +3,8 @@
 \name{add_specificity}
 \alias{add_specificity}
 \alias{add_offtargets}
-\title{Add offtarget counts}
+\alias{filter_offtargets}
+\title{Filter for minimal offtarget counts}
 \usage{
 add_specificity(...)
 
@@ -19,6 +20,19 @@ add_offtargets(
   size_var = default_size_var(spacers),
   alpha_var = "off",
   verbose = TRUE
+)
+
+filter_offtargets(
+  spacers,
+  by = "targetname",
+  targets = NULL,
+  mismatches = 2,
+  pam = "NGG",
+  outdir = OUTDIR,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
+  verbose = TRUE,
+  plot = TRUE,
+  ...
 )
 }
 \arguments{
@@ -46,6 +60,8 @@ add_offtargets(
 \item{alpha_var}{string: mapped to alpha in plot}
 
 \item{verbose}{TRUE (default) or FALSE}
+
+\item{by}{string (default "targetname"): filter by this mcol}
 }
 \value{
 filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
@@ -69,8 +85,9 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
                        bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
  # index_genome(bsgenome)
- # add_offtargets(spacers, bsgenome, mismatches=0)
- # add_offtargets(spacers, bsgenome, mismatches=2)
+ spacers \%>\% filter_offtargets(bsgenome, mismatches=0)
+ spacers \%>\% add_offtargets(bsgenome, mismatches=0)
+ 
 # TFBS example
 #-------------
  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10

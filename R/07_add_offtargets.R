@@ -526,58 +526,14 @@ add_genome_counts <- function(
 
 
 #' @export
-#' @rdname add_offtargets
+#' @rdname filter_offtargets
 add_specificity <- function(...){
     #.Deprecated('add_offtargets')
     add_offtargets(...)
 }
 
 
-#' Add offtarget counts
-#' 
-#' Add mcols 'off' (offtargets), 'off0' (0-mismatch offtargets), etc.
-#' 
-#' For NULL targets: offtarget counts = (G0- 1) +  G1     + ...
-#' Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
-#' 
-#' @param spacers    spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param targets    NULL (default) or target 
-#'                   \code{\link[GenomicRanges]{GRanges-class}}
-#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
-#' @param mismatches number (default 2): max number of mismatches to consider
-#' @param pam        string (default 'NGG'): pam sequence
-#' @param outdir     directory where output is written to
-#' @param indexedgenomesdir string: dir with indexed genomes
-#' @param plot       TRUE (default) or FALSE
-#' @param alpha_var  string: mapped to alpha in plot
-#' @param size_var   string: mapped to size in plot
-#' @param verbose    TRUE (default) or FALSE
-#' @param ...        to channel deprecated add_specificity to add_offtargets
-#' @return  filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @examples
-#' # PE example
-#' #-----------
-#'  require(magrittr)
-#'  bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'  gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-#'                          HBB  = 'chr11:5227002:-',             # snp
-#'                          HEXA = 'chr15:72346580-72346583:-',   # del
-#'                          CFTR = 'chr7:117559593-117559595:+'), # ins
-#'                        bsgenome)
-#'  spacers <- find_pe_spacers(gr, bsgenome)
-#'  # index_genome(bsgenome)
-#'  # add_offtargets(spacers, bsgenome, mismatches=0)
-#'  # add_offtargets(spacers, bsgenome, mismatches=2)
-#'  
-#' # TFBS example
-#' #-------------
-#'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
-#'  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-#'  spacers <- find_spacers(targets, bsgenome)
-#'  # index_genome(bsgenome)
-#'  # spacers %>% add_offtargets(bsgenome)           # off = G - 1
-#'  # spacers %>% add_offtargets(bsgenome, targets)  # off = G - T
+#' @rdname filter_offtargets
 #' @export
 add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2, 
     pam = 'NGG', outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, 
@@ -585,6 +541,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
     verbose= TRUE
 ){
 # First clear
+    if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
     mcols(spacers) %<>% extract(, setdiff(names(.), offcols))
     . <- off <- NULL
@@ -628,13 +585,29 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 }
 
 
-#' Filter for minimal offtargets
+#' Filter for minimal offtarget counts
 #' 
-#' Filter for minimal offtargets (per "targetname" or alternate groupby var)
-#' @param spacers  GRanges
-#' @param groupby string: mcol on which to group before filtering
-#' @return GRanges
-#' @examples 
+#' Add mcols 'off' (offtargets), 'off0' (0-mismatch offtargets), etc.
+#' 
+#' For NULL targets: offtarget counts = (G0- 1) +  G1     + ...
+#' Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
+#' 
+#' @param spacers    spacer \code{\link[GenomicRanges]{GRanges-class}}
+#' @param by         string (default "targetname"): filter by this mcol
+#' @param targets    NULL (default) or target 
+#'                   \code{\link[GenomicRanges]{GRanges-class}}
+#' @param bsgenome   \code{\link[BSgenome]{BSgenome-class}}
+#' @param mismatches number (default 2): max number of mismatches to consider
+#' @param pam        string (default 'NGG'): pam sequence
+#' @param outdir     directory where output is written to
+#' @param indexedgenomesdir string: dir with indexed genomes
+#' @param plot       TRUE (default) or FALSE
+#' @param alpha_var  string: mapped to alpha in plot
+#' @param size_var   string: mapped to size in plot
+#' @param verbose    TRUE (default) or FALSE
+#' @param ...        to channel deprecated add_specificity to add_offtargets
+#' @return  filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
+#' @examples
 #' # PE example
 #' #-----------
 #'  require(magrittr)
@@ -646,22 +619,38 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 #'                        bsgenome)
 #'  spacers <- find_pe_spacers(gr, bsgenome)
 #'  # index_genome(bsgenome)
-#'  # spacers %<>% add_offtargets(bsgenome, mismatches=0)
-#'  # spacers %<>% filter_offtargets()
+#'  spacers %>% filter_offtargets(bsgenome, mismatches=0)
+#'  spacers %>% add_offtargets(bsgenome, mismatches=0)
+#'  
+#' # TFBS example
+#' #-------------
+#'  bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
+#'  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
+#'  spacers <- find_spacers(targets, bsgenome)
+#'  # index_genome(bsgenome)
+#'  # spacers %>% add_offtargets(bsgenome)           # off = G - 1
+#'  # spacers %>% add_offtargets(bsgenome, targets)  # off = G - T
 #' @export
-filter_offtargets <- function(
-    spacers, groupby = 'targetname', plot = TRUE, verbose = TRUE){
+filter_offtargets <- function(spacers, by = 'targetname', targets = NULL, 
+    mismatches = 2, pam = 'NGG', outdir = OUTDIR, 
+    indexedgenomesdir = INDEXEDGENOMESDIR, verbose= TRUE, plot = TRUE, ...
+){
     
     # Assert
     assert_is_all_of(spacers, 'GRanges')
-    assert_is_subset(groupby, names(mcols(spacers)))
-    assert_is_subset('off', names(mcols(spacers)))
-    
-    # Plot
-    if (plot) print(plot_intervals(spacers, alpha_var = 'off'))
+    if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
+    assert_is_subset(by, names(mcols(spacers)))
+
+    # Add offtargets
+    spacers %<>% add_offtargets(spacers, bsgenome, targets = targets, 
+        mismatches = 2, pam = 'NGG', outdir = outdir, 
+        indexedgenomesdir = indexedgenomesdir, verbose = verbose, plot = plot, 
+        ...)
     
     # Filter
     n0 <- length(spacers)
+    groupby <- by
     spacers %<>% gr2dt() %>% 
                 extract(, .SD[off==min(off)], by = groupby) %>% 
                 dt2gr(seqinfo(spacers))
