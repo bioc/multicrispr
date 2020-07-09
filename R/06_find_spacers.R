@@ -225,13 +225,13 @@ find_spacers <- function(
     if (complement){
         gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
     }
-    sites <- extract_matchranges(gr, bsgenome, paste0(spacer, pam)) %>% unique()
+    sites <- extract_matchranges(gr, bsgenome, paste0(spacer, pam))# %>% unique()
     spacers <-     extend(sites,  0, -3, bsgenome = bsgenome)
     pams    <- down_flank(sites, -2,  0, bsgenome = bsgenome)
     spacers$crisprname   <- names(spacers)
     spacers$crisprspacer <- getSeq(bsgenome, spacers, as.character=TRUE)
     spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
-    spacers %>% sort(ignore.strand = TRUE)
+    #spacers %>% sort(ignore.strand = TRUE)
     if (plot){
         print(plot_intervals(spacers, y='crisprname'))
         spacers$sitename <- NULL
