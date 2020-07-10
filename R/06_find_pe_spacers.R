@@ -191,8 +191,6 @@ add_nickspacers <- function(
 #'        If named, names should be identical to those of \code{gr}
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
-#' @param filterofftargets TRUE (default) or FALSE: whether to filter for 
-#'                         minimal offtargets
 #' @param plot      TRUE (default) or FALSE
 #' @param outdir    string: passed to filter_offtargets
 #' @param indexedgenomesdir  string: passed to filter_offtargets
@@ -202,9 +200,9 @@ add_nickspacers <- function(
 #' Additionally, three sequence mcols are returned:
 #'   * crisprspacer: N20 spacers
 #'   * crisprpam:    NGG PAMs
-#'   * primer: primer (on PAM strand)
-#'   * revtranscript: reverse transcript (on PAM strand)
-#'   * extension:  3' extension of gRNA 
+#'   * crisprprimer: primer (on PAM strand)
+#'   * crisprtranscript: reverse transcript (on PAM strand)
+#'   * crisprextension:  3' extension of gRNA 
 #'                 (reverse transcription template + primer binding site)
 #' @examples
 #' # Find PE spacers for 4 clinically relevant loci (Anzalone et al, 2019)
@@ -226,7 +224,7 @@ add_nickspacers <- function(
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, filterofftargets = TRUE, plot = TRUE, 
+    nprimer = 13, nrt = 16, plot = TRUE, 
     outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
@@ -261,17 +259,17 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     }
 # Add sequences
     names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'crisprspacer')
-    spacer$crisprpam     <- pam$seq
-    spacer$primer        <- primer$seq
-    spacer$revtranscript <- revtranscript$seq
-    spacer$extension     <- ext$seq
-# Filter for offtargets
-    if (filterofftargets){
-        spacer %<>% filter_offtargets(bsgenome, by = 'targetname', mismatches = 0, 
-            outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
-            verbose= TRUE, plot = plot, ...)
-    }
-    spacer
+    spacer$crisprpam        <- pam$seq
+    spacer$crisprprimer     <- primer$seq
+    spacer$crisprtranscript <- revtranscript$seq
+    spacer$crisprextension  <- ext$seq
+# Add offtargets
+    spacer %<>% add_offtargets(bsgenome, mismatches = 0, 
+                    outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
+                    verbose= TRUE, plot = plot, ...)
+# Add nicking spacers and return
+    add_nickspacers(spacer, bsgenome, plot = TRUE, 
+                    outdir = outdir, indexedgenomesdir = indexedgenomesdir)
 }
 
 add_fixed_seqs <- function(gr, bsgenome, edits){
