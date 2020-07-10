@@ -86,3 +86,21 @@ dt2gr <- function(dt, seqinfo){
     gr
 }
 
+get_plus_seq <- function(bsgenome, gr){
+    seqs1  <-  BSgenome::getSeq(bsgenome, 
+                                seqnames(gr),
+                                start(gr),
+                                end(gr), 
+                                strand = '+', 
+                                as.character = TRUE)
+    if (has_names(gr)) names(seqs1) <- names(gr)
+    seqs1
+        
+}
+
+
+revcomp <- function(y)  y %>% 
+                        Biostrings::DNAStringSet() %>% 
+                        Biostrings::reverseComplement() %>% 
+                        as.character()
+
