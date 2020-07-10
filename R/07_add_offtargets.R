@@ -563,14 +563,17 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
                             length(spacers))
     spacers$off <- spacers$G0 - (if (is.null(targets)) 1 else spacers$T0)
     spacers$off0 <- spacers$off # don't switch order to keep off first
+    if (!is.null(targets))  spacers$G0 <- NULL
     if (mismatches>0){
         for (mis in seq_len(mismatches)){
-            Gx <- mcols(spacers)[[paste0('G', mis)]]
+            Gvar <- paste0('G', mis)
+            Gx <- mcols(spacers)[[Gvar]]
             Tx <- if (is.null(targets)) 0 else mcols(spacers)[[paste0('T',mis)]]
             offcounts <- Gx - Tx
             offvar <- paste0('off', mis)
             mcols(spacers)[[offvar]] <- offcounts
             spacers$off %<>% add(offcounts)
+            if (is.null(targets))  mcols(spacers)[[Gvar]] <- NULL
             if (verbose) cmessage('\t       %s have no %d-mismatch offtargets', 
                 format(sum(mcols(spacers)[[offvar]]==0), width = digits), mis)}}
 # Plot and return
@@ -617,10 +620,10 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 #'                          HEXA = 'chr15:72346580-72346583:-',   # del
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
-#'  spacers <- find_pe_spacers(gr, bsgenome, filterofftargets = FALSE)
+#'  spacers <- find_pe_spacers(gr, bsgenome)
 #'  # index_genome(bsgenome)
-#'  spacers %>% filter_offtargets(bsgenome, mismatches=0)
 #'  spacers %>% add_offtargets(bsgenome, mismatches=0)
+#'  spacers %>% filter_offtargets(bsgenome, mismatches=0)
 #'  
 #' # TFBS example
 #' #-------------
