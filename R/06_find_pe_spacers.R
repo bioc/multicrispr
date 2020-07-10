@@ -129,6 +129,10 @@ add_nickspacers <- function(
     pespacers, bsgenome, plot = TRUE, outdir = OUTDIR, 
     indexedgenomesdir = INDEXEDGENOMESDIR
 ){
+    # Satisfy R Cmd Check
+    . <- crisprname <- crisprspacer <- crisprpam <- NULL
+    off0 <- off1 <- off2 <- pename <- off <- NULL
+    
     # Clean pespacers
     pespacers$pename <- pespacers$crisprname
     pespacers$type <- 'pespacer'
@@ -151,7 +155,8 @@ add_nickspacers <- function(
     if (plot){
         plotgr <- c(pespacers, nickspacers)
         plotgr$type %<>% factor(c('pespacer', 'nickspacer'))
-        print(plot_intervals(plotgr, linetype_var = 'type', xref = 'pename', y = 'pename'))
+        print(plot_intervals(
+                plotgr, linetype_var = 'type', xref = 'pename', y = 'pename'))
     }
     
     # Merge

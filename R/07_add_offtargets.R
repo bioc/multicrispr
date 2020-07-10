@@ -538,8 +538,7 @@ add_specificity <- function(...){
 add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2, 
     pam = 'NGG', outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, 
     plot = TRUE, size_var = default_size_var(spacers), alpha_var = 'off', 
-    verbose= TRUE
-){
+    verbose= TRUE){
 # First clear
     if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
@@ -641,6 +640,7 @@ filter_offtargets <- function(spacers, bsgenome, targets = NULL,
 ){
     
     # Assert
+    off <- NULL
     assert_is_all_of(spacers, 'GRanges')
     if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     assert_is_subset(by, names(mcols(spacers)))
@@ -659,7 +659,7 @@ filter_offtargets <- function(spacers, bsgenome, targets = NULL,
                 dt2gr(seqinfo(spacers))
     # Message
     if (verbose) message('\tRetain ', length(spacers), '/', n0, 
-                         ' ranges with minimal offtargets (per ', groupby, ')')
+                        ' ranges with minimal offtargets (per ', groupby, ')')
     
     # Return
     spacers

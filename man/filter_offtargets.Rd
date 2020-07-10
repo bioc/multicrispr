@@ -84,10 +84,10 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
                          HEXA = 'chr15:72346580-72346583:-',   # del
                          CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
- spacers <- find_pe_spacers(gr, bsgenome, filterofftargets = FALSE)
+ spacers <- find_pe_spacers(gr, bsgenome)
  # index_genome(bsgenome)
- spacers \%>\% filter_offtargets(bsgenome, mismatches=0)
  spacers \%>\% add_offtargets(bsgenome, mismatches=0)
+ spacers \%>\% filter_offtargets(bsgenome, mismatches=0)
  
 # TFBS example
 #-------------
