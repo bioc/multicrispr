@@ -129,51 +129,53 @@ add_nickspacers <- function(
     pespacers, bsgenome, plot = TRUE, outdir = OUTDIR, 
     indexedgenomesdir = INDEXEDGENOMESDIR
 ){
-    # Satisfy R Cmd Check
+# Check / Clean
     . <- crisprname <- crisprspacer <- crisprpam <- NULL
     off0 <- off1 <- off2 <- pename <- off <- NULL
-    
-    # Clean pespacers
+# Clean pespacers
     pespacers$pename <- pespacers$crisprname
     pespacers$type <- 'pespacer'
-
-    # Get nick spacers
+# Get nick spacers
     message('\tAdd nicking spacers')
     nickzone <- invertStrand(down_flank(pespacers, -3+40-5, -3+90+17))
     mcols(nickzone) %<>% extract(, c('targetname', 'pename'), drop = FALSE)
     nickspacers <- find_spacers(
                         nickzone, bsgenome, complement=FALSE, plot=FALSE)
     nickspacers$type <- 'nickspacer'
-    
-    # Analyze Offtargets if indexed genome available
+# Analyze Offtargets if indexed genome available
     nickspacers %<>% filter_offtargets(
         bsgenome, by = 'pename', plot = FALSE, outdir = outdir,
         indexedgenomesdir = indexedgenomesdir, verbose = FALSE)
     nickspacers$G0 <- nickspacers$G1 <- nickspacers$G2 <- NULL
-
-    # Plot
+# Plot
     if (plot){
         plotgr <- c(pespacers, nickspacers)
         plotgr$type %<>% factor(c('pespacer', 'nickspacer'))
         print(plot_intervals(
                 plotgr, linetype_var = 'type', xref = 'pename', y = 'pename'))
     }
-    
-    # Merge
-    nickdt <- gr2dt(nickspacers)
-    nickdt %<>% extract( , .(
-        nickname   = crisprname, 
-        nickrange  = as.character(nickspacers), 
-        nickspacer = crisprspacer, nickpam = crisprpam,
-        nick0   = off0, nick1 = off1, nick2 = off2,
-        pename     = pename))
+# Merge
+    nickdt  <-  gr2dt(nickspacers) %>% 
+                extract( , .(
+                    pename     = pename,
+                    nickrange  = paste0(start, '-', end, ':', strand), 
+                    nickspacer = crisprspacer, 
+                    nickpam    = crisprpam,
+                    nickoff    = off,
+                    nickoff0   = off0, 
+                    nickoff1   = off1, 
+                    nickoff2   = off2)) %>%
+                extract( , lapply(.SD, pastelapse), by = 'pename')
+
     pedt <- gr2dt(pespacers)
     pedt$type <- pedt$G0 <- pedt$off <- NULL
-    mergedranges <- merge(pedt, nickdt, by = 'pename', sort = FALSE)
+    mergedranges <- merge(pedt, nickdt, by = 'pename', sort = FALSE, all = TRUE)
     mergedranges %<>% dt2gr(seqinfo(pespacers))
     return(mergedranges)
 }
 
+
+pastelapse <- function(x) paste0(x, collapse = ';')
 
 #' Find prime editing spacers
 #' 
@@ -259,7 +261,7 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
         allranges <- c(spacer, ext)
         allranges$part %<>% factor((c("spacer", "3' extension")))
         print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part',
-                facet_var = c('seqnames', 'targetname')))
+                facet_var = c('seqnames')))
         spacer$part <- NULL
     }
 # Add sequences
