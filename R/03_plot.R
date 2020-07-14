@@ -151,7 +151,7 @@ plot_intervals <- function(
                 geom_point(aes_string(
                     x = 'xtargetend',   y = 'y'), shape = '|', size = 4)}
 # Extensions
-    if ('extension' %in% names(mcols(gr))){
+    if ('crisprextension' %in% names(mcols(gr))){
         p <-p + geom_segment(
                     aes_string( x = 'extstart', xend = 'extend', size = NULL), 
                                 linetype = 'dotted',
