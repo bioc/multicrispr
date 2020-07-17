@@ -1,0 +1,72 @@
+---
+title: "Genome arithmetics with multicrispr"
+author: "Aditya M Bhagwat"
+date: "`r Sys.Date()`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{designing_grna_libraries}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=TRUE, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, cache = FALSE)
+#str(knitr::opts_chunk$get())
+```
+
+<!-- ![](../inst/extdata/readme.png) -->
+
+# Introduction {-}
+
+This vignette discusses multicrispr's genome arithmetics functionality, often required in the first step of Crispr/Cas9 design.
+Multicrispr's genome arithmetics functions allow two-way transformations around a genomic range's start/end. The `r Biocpkg("GenomicRanges")` and `r Biocpkg("plyranges")` packages also offer an extensive genome arithmetics functionality, though with functions designed as one-way transformations.
+
+We illustrate the different operations on a small GRanges with four prime editing targets in Anazlone et al. (2019)
+
+```{r, fig.width=5.5, fig.height=3, out.width="85%"}
+require(multicrispr)
+bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
+                        HBB  = 'chr11:5227002:-',            # snp
+                        HEXA = 'chr15:72346580-72346583:-',  # del
+                        CFTR = 'chr7:117559593-117559595:+'),# ins
+                     bsgenome = bsgenome)
+plot_intervals(gr, facet_var = c('targetname','seqnames'))
+```
+
+# Genome arithmetics {-}
+
+## Extend {-}
+
+```{r, fig.width=5.5, fig.height=3, out.width="85%"}
+ext <- extend(gr, start = -10, end = +10, plot = TRUE)
+```
+
+## Up flank {-}
+
+```{r, fig.width=5.5, fig.height=3, out.width="85%"}
+up <- up_flank(gr,  -22,  -1, plot=TRUE, facet_var=c('targetname', 'seqnames'))
+```
+
+## Down flank {-}
+
+```{r, fig.width=5.5, fig.height=3, out.width="85%"}
+dn <- down_flank(gr, +1, +22, plot=TRUE)
+```
+
+## Double flank {-}
+
+```{r, fig.width=5.5, fig.height=3, out.width="85%"}
+dbl <- double_flank(gr, -10,  -1, +1, +20, plot = TRUE)
+```
+
+# References {-}
+
+Anzalone, A.V., Randolph, P.B., Davis, J.R. et al. Search-and-replace genome editing without double-strand breaks or donor DNA. Nature 576, 149–157 (2019). https://doi.org/10.1038/s41586-019-1711-4
+
+
+
+
+
+
+
