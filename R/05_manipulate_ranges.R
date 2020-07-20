@@ -122,11 +122,12 @@ up_flank <- function(
                     shift)
     
     # Flank
-    GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
+    GenomicRanges::start(newgr) <- 1  # avoid integrity errors
     GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + end
+    GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
-        # do not switch following lines to avoid integrity errors !
+        GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
         GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start
         GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end
     }
@@ -174,12 +175,14 @@ down_flank <- function(
                     shift)
     
     # Flank
+    GenomicRanges::start(newgr) <- 1 # avoid integrity errors
     GenomicRanges::end(newgr)   <- GenomicRanges::end(gr) + end
     GenomicRanges::start(newgr) <- GenomicRanges::end(gr) + start
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx]-end
+        GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
         GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx]-start
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx]-end
     }
 
     # Add seq
@@ -226,12 +229,14 @@ extend <- function(
                     shift)
 
     # Extend
-    GenomicRanges::start(newgr) <- GenomicRanges::start(newgr) + start
-    GenomicRanges::end(  newgr) <- GenomicRanges::end(  newgr) + end
+    GenomicRanges::start(newgr) <- 1 # avoid integrity errors
+    GenomicRanges::end(  newgr) <- GenomicRanges::end(gr) + end
+    GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
+        GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
         GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
     }
 
     # Add seq
