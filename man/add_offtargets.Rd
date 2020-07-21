@@ -58,10 +58,6 @@ filter_offtargets(
 \item{plot}{TRUE (default) or FALSE}
 
 \item{by}{string (default "targetname"): filter by this mcol}
-
-\item{alpha_var}{string: mapped to alpha in plot}
-
-\item{size_var}{string: mapped to size in plot}
 }
 \value{
 filtered spacer \code{\link[GenomicRanges]{GRanges-class}}

@@ -42,11 +42,9 @@ filter_ontargets(
 
 \item{plot}{TRUE (default) or FALSE}
 
+\item{...}{passed to \code{\link{plot_intervals}}}
+
 \item{cutoff}{value to filter on}
-
-\item{alpha_var}{NULL or string: var mapped to alpha in plot}
-
-\item{size_var}{NULL or string: var mapped to size in plot}
 }
 \value{
 numeric vector

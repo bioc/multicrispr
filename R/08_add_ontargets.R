@@ -130,12 +130,11 @@ doench2016 <- function(
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param method   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
-#' @param cutoff   value to filter on
+#' @param cutoff    value to filter on
 #' @param chunksize Doench2016 is executed in chunks of chunksize
-#' @param verbose    TRUE (default) or FALSE
-#' @param plot       TRUE (default) or FALSE
-#' @param alpha_var  NULL or string: var mapped to alpha in plot
-#' @param size_var   NULL or string: var mapped to size in plot
+#' @param verbose   TRUE (default) or FALSE
+#' @param plot      TRUE (default) or FALSE
+#' @param ...       passed to \code{\link{plot_intervals}}
 #' @return numeric vector
 #' @examples
 #' 

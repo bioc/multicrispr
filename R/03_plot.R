@@ -89,10 +89,6 @@ plot_intervals_engine <- function(
 # Comply
     edge <- targetname <- NULL
 # Assert, Import, Comply
-    assert_is_all_of(gr, 'GRanges')
-    if (assertive::is_empty(gr)) return(invisible(NULL))
-    if (!is.null(color_var)) assert_is_a_string(color_var)
-    assert_is_subset(color_var, names(as.data.table(gr)))
     contig <- .N <- .SD <- seqnames <- start <- NULL
     strand <- tmp <- width <- xstart <- xend <- . <- NULL
 # Prepare plotdt
@@ -168,19 +164,33 @@ plot_intervals <- function(
     linetype_var = default_linetype(gr), size_var = default_size_var(gr), 
     alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'
 ){
+# Assert
+    assert_is_all_of(gr, 'GRanges')
+    if (assertive::is_empty(gr)) return(invisible(NULL))
+    assert_is_subset(xref, names(gr2dt(gr)))
+    assert_is_subset(y,    names(gr2dt(gr)))
+    assert_is_a_number(nperchrom)
+    assert_is_a_number(nchrom)
+    if (!is.null(color_var))    assert_is_subset(color_var,    names(gr2dt(gr)))
+    if (!is.null(facet_var))    assert_is_subset(facet_var,    names(gr2dt(gr)))
+    if (!is.null(linetype_var)) assert_is_a_string(linetype_var)
+    if (!is.null(size_var))     assert_is_subset(size_var,     names(gr2dt(gr)))
+    if (!is.null(alpha_var))    assert_is_subset(alpha_var,    names(gr2dt(gr)))
+    if (!is.null(title))        assert_is_a_string(title)
+    assert_is_a_string(scales)
+#  Initialize
     nickrange <- NULL
     gr$type <- 'spacer'
     gr$type %<>% factor(c("spacer", "3' extension", "nicking spacer"))
     seqinfo1 <- seqinfo(gr)
     plotgr <- gr
-
+# Extract 3' extensions
     if ('crisprextension' %in% names(mcols(gr))){
         extgr <- GRanges(gr$crisprextrange, seqinfo=seqinfo1)
         mcols(extgr) <- mcols(gr)
         extgr$type <- "3' extension"
-        plotgr %<>% c(extgr)
-    }
-    
+        plotgr %<>% c(extgr)}
+# Extract nickranges
     if ('nickrange' %in% names(mcols(gr))){
         nickdt <- gr2dt(gr)
         nickdt %<>% extract(complete.cases(nickrange))
@@ -189,22 +199,13 @@ plot_intervals <- function(
         nickgr$off <- as.numeric(nickdt$nickoff)
         mcols(nickgr) <- mcols(dt2gr(nickdt, seqinfo = seqinfo1))
         nickgr$type <- 'nicking spacer'
-        plotgr %<>% c(nickgr)
-    }
-    
-    plot_intervals_engine(  plotgr, 
-                            xref         = xref, 
-                            y            = y, 
-                            nperchrom    = nperchrom,
-                            nchrom       = nchrom,
-                            color_var    = color_var, 
-                            facet_var    = facet_var,
-                            linetype_var = linetype_var,
-                            size_var     = size_var,
-                            alpha_var    = alpha_var,
-                            title        = title, 
-                            scales       = scales)
-    
+        plotgr %<>% c(nickgr)}
+# Plot    
+    plot_intervals_engine(
+        plotgr, xref = xref, y = y, nperchrom = nperchrom, nchrom = nchrom,
+        color_var = color_var, facet_var = facet_var, 
+        linetype_var = linetype_var, size_var = size_var, alpha_var = alpha_var,
+        title = title, scales = scales)
 }
 
 default_linetype <- function(gr){

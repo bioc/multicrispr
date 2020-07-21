@@ -474,8 +474,6 @@ add_specificity <- function(...){
 #' @param outdir     directory where output is written to
 #' @param indexedgenomesdir string: dir with indexed genomes
 #' @param plot       TRUE (default) or FALSE
-#' @param alpha_var  string: mapped to alpha in plot
-#' @param size_var   string: mapped to size in plot
 #' @param verbose    TRUE (default) or FALSE
 #' @param ...        passed to plot_intervals
 #' @return  filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
