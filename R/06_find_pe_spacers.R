@@ -146,7 +146,6 @@ add_nickspacers <- function(
     nickspacers %<>% filter_offtargets(
         bsgenome, by = 'pename', plot = FALSE, outdir = outdir,
         indexedgenomesdir = indexedgenomesdir, verbose = FALSE)
-    nickspacers$G0 <- nickspacers$G1 <- nickspacers$G2 <- NULL
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
                 extract( , .(
@@ -161,7 +160,7 @@ add_nickspacers <- function(
                 extract( , lapply(.SD, pastelapse), by = 'pename')
 
     pedt <- gr2dt(pespacers)
-    pedt$type <- pedt$G0 <- NULL
+    pedt$type <- NULL
     mergedranges <- merge(pedt, nickdt, by = 'pename', sort = FALSE, all = TRUE)
     mergedranges$pename <- NULL
     mergedranges %<>% dt2gr(seqinfo(pespacers))
@@ -216,8 +215,8 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #'         HEXA = 'chr15:72346580-72346583:-',   # del: tay sachs disease
 #'         CFTR = 'chr7:117559593-117559595:+'), # ins: cystic fibrosis
 #'         bsgenome)
-#'     find_pe_spacers(gr, bsgenome)
-#'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+#'     spacers <- find_pe_spacers(gr, bsgenome)
+#'     spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
 #'     
 #' # Edit PRNP locus for resistance against prion disease (Anzalone et al, 2019)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
