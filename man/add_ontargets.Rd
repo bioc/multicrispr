@@ -2,6 +2,8 @@
 % Please edit documentation in R/08_add_ontargets.R
 \name{add_ontargets}
 \alias{add_ontargets}
+\alias{add_efficiency}
+\alias{filter_ontargets}
 \title{Add on-target efficiency scores}
 \usage{
 add_ontargets(
@@ -9,6 +11,18 @@ add_ontargets(
   bsgenome,
   method = c("Doench2014", "Doench2016")[1],
   chunksize = 10000,
+  verbose = TRUE,
+  plot = TRUE,
+  ...
+)
+
+add_efficiency(...)
+
+filter_ontargets(
+  spacers,
+  bsgenome,
+  method = c("Doench2014", "Doench2016")[1],
+  cutoff,
   verbose = TRUE,
   plot = TRUE,
   ...
@@ -70,12 +84,12 @@ Add Doench2014 or Doench2016 on-target efficiency scores
                                  CFTR = 'chr7:117559593-117559595:+'), # ins
                                bsgenome)
     spacers <- find_pe_spacers(targets, bsgenome)
-   #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
-    (spacers \%<>\% add_efficiency(bsgenome, 'Doench2014'))
+    #spacers<- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+    (spacers \%<>\% add_ontargets(bsgenome, 'Doench2014'))
     # reticulate::use_condaenv('azienv')
     # reticulate::import('azimuth')
-    # spacers \%<>\% add_efficiency(bsgenome, 'Doench2016')
-    # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4)
+    # spacers \%<>\% add_ontargets(bsgenome, 'Doench2016')
+    # filter_ontargets(spacers, bsgenome, 'Doench2016', 0.4)
     
 # TFBS example
 #-------------

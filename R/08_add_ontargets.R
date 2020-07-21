@@ -163,12 +163,12 @@ doench2016 <- function(
 #'                                  CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                                bsgenome)
 #'     spacers <- find_pe_spacers(targets, bsgenome)
-#'    #spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
-#'     (spacers %<>% add_efficiency(bsgenome, 'Doench2014'))
+#'     #spacers<- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+#'     (spacers %<>% add_ontargets(bsgenome, 'Doench2014'))
 #'     # reticulate::use_condaenv('azienv')
 #'     # reticulate::import('azimuth')
-#'     # spacers %<>% add_efficiency(bsgenome, 'Doench2016')
-#'     # filter_efficient(spacers, bsgenome, 'Doench2016', 0.4)
+#'     # spacers %<>% add_ontargets(bsgenome, 'Doench2016')
+#'     # filter_ontargets(spacers, bsgenome, 'Doench2016', 0.4)
 #'     
 #' # TFBS example
 #' #-------------
@@ -228,7 +228,7 @@ add_ontargets <- function(
 }
 
 
-#' @rdname add_ontargetscore
+#' @rdname add_ontargets
 add_efficiency <- function(...){
     .Deprecated('add_ontargets')
     add_ontargetscore(...)
@@ -240,7 +240,7 @@ filter_efficient <- function(...){
 }
 
 
-#' @rdname add_efficiency
+#' @rdname add_ontargets
 #' @export
 filter_ontargets <- function(
     spacers, 
