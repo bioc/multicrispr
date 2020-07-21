@@ -71,8 +71,8 @@ Edits can be performed anywhere in the revtranscript area.
         HEXA = 'chr15:72346580-72346583:-',   # del: tay sachs disease
         CFTR = 'chr7:117559593-117559595:+'), # ins: cystic fibrosis
         bsgenome)
-    find_pe_spacers(gr, bsgenome)
-    find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+    spacers <- find_pe_spacers(gr, bsgenome)
+    spacers <- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
     
 # Edit PRNP locus for resistance against prion disease (Anzalone et al, 2019)
     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  

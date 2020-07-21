@@ -7,14 +7,19 @@
 \usage{
 write_ranges(gr, file, verbose = TRUE)
 
-read_ranges(file)
+read_ranges(file, bsgenome)
 }
 \arguments{
-\item{gr}{GRanges}
+\item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{file}{}
+\item{file}{file}
 
 \item{verbose}{TRUE (default) or FALSE}
+
+\item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
+}
+\value{
+\code{\link[GenomicRanges]GRanges-class} for read_ranges
 }
 \description{
 Write GRanges to file
@@ -28,10 +33,7 @@ Write GRanges to file
         HEXA = 'chr15:72346580-72346583:-',   # del: tay sachs disease
         CFTR = 'chr7:117559593-117559595:+'), # ins: cystic fibrosis
         bsgenome)
-    spacers <- find_pe_spacers(gr, bsgenome)
-    targetfile <- file.path(tempdir(), 'targets.txt')
-    spacerfile <- file.path(tempdir(), 'spacers.txt')
-    write_ranges(gr,      targetfile)
-    write_ranges(spacers, spacerfile)
-    read_ranges(targetfile)
+    file <- file.path(tempdir(), 'gr.txt')
+    write_ranges(gr, file)
+    read_ranges(targetfile, bsgenome)
 }
