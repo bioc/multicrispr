@@ -152,13 +152,13 @@ add_nickspacers <- function(
         plotgr <- c(pespacers, nickspacers)
         plotgr$type %<>% factor(c('pespacer', 'nickspacer'))
         print(plot_intervals(
-                plotgr, linetype_var = 'type', xref = 'pename', y = 'pename'))
+                plotgr, xref = 'pename', y = 'pename'))
     }
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
                 extract( , .(
                     pename     = pename,
-                    nickrange  = paste0(start, '-', end, ':', strand), 
+                    nickrange  = as.character(granges(nickspacers)), 
                     nickspacer = crisprspacer, 
                     nickpam    = crisprpam,
                     nickoff    = off,
@@ -168,8 +168,9 @@ add_nickspacers <- function(
                 extract( , lapply(.SD, pastelapse), by = 'pename')
 
     pedt <- gr2dt(pespacers)
-    pedt$type <- pedt$G0 <- pedt$off <- NULL
+    pedt$type <- pedt$G0 <- NULL
     mergedranges <- merge(pedt, nickdt, by = 'pename', sort = FALSE, all = TRUE)
+    mergedranges$pename <- NULL
     mergedranges %<>% dt2gr(seqinfo(pespacers))
     return(mergedranges)
 }
@@ -231,8 +232,8 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, plot = TRUE, 
-    outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, ...){
+    nprimer = 13, nrt = 16, plot = TRUE, outdir = OUTDIR, 
+    indexedgenomesdir = INDEXEDGENOMESDIR, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
@@ -270,12 +271,13 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacer$crisprprimer     <- primer$seq
     spacer$crisprtranscript <- revtranscript$seq
     spacer$crisprextension  <- ext$seq
+    spacer$crisprextrange   <- unname(as.character(granges(ext)))
 # Add offtargets
     spacer %<>% add_offtargets(bsgenome, mismatches = 0, 
                     outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
                     verbose= TRUE, plot = plot, ...)
 # Add nicking spacers and return
-    add_nickspacers(spacer, bsgenome, plot = TRUE, 
+    add_nickspacers(spacer, bsgenome, plot = plot, 
                     outdir = outdir, indexedgenomesdir = indexedgenomesdir)
 }
 

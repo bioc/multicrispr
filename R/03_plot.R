@@ -76,50 +76,15 @@ to_megabase <- function(y){
 }
 
 
-#' Interval plot GRanges
-#' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
-#' @param xref        gr var used for scaling x axis
-#' @param y           'names' (default) or name of gr variable
-#' @param nperchrom    number (default 1): n head (and n tail) targets 
-#'                     shown per chromosome
-#' @param nchrom       number (default 6) of chromosomes shown
-#' @param color_var   'seqnames' (default) or other gr variable
-#' @param linetype_var NULL (default) or gr variable mapped to linetype
-#' @param size_var     NULL (default) or gr variable mapped to size
-#' @param facet_var    NULL(default)  or gr variable mapped to facet
-#' @param alpha_var    NULL or gr variable mapped to alpha
-#' @param title        NULL or string: plot title
-#' @param scales       'free', 'fixed', etc
-#' @return ggplot object
-#' @seealso  \code{\link{plot_karyogram}}
-#' @examples 
-#' # SRF sites
-#'     require(magrittr)
-#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
-#'     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
-#'     targets   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
-#'     plot_intervals(targets)
-#'     
-#' # PE targets
-#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',
-#'                             HBB  = 'chr11:5227002:-',
-#'                             HEXA = 'chr15:72346580-72346583:-',
-#'                             CFTR = 'chr7:117559593-117559595:+'), 
-#'                           bsgenome)
-#'     spacers <- find_pe_spacers(gr, bsgenome)
-#'     plot_intervals(gr)
-#'     plot_intervals(extend_for_pe(gr))
-#'     plot_intervals(spacers)
-#'     
-#' # Empty gr
-#'     plot_intervals(GenomicRanges::GRanges())
-#' @export
-plot_intervals <- function(
-    gr, xref = 'targetname', y = 'names', nperchrom = 2, nchrom = 4, 
-    color_var = 'targetname', facet_var = 'seqnames', linetype_var = NULL, 
-    size_var = default_size_var(gr), alpha_var = default_alpha_var(gr),
-    title = NULL, scales= 'free'
+strsplitextract <- function(x, split, fixed = FALSE, i){
+    vapply(strsplit(x, split = split, fixed=fixed), extract, character(1), i)
+}
+
+
+
+plot_intervals_engine <- function(
+    gr, xref, y, nperchrom, nchrom , color_var, facet_var, linetype_var, 
+    size_var, alpha_var, title, scales
 ){
 # Comply
     edge <- targetname <- NULL
@@ -151,16 +116,108 @@ plot_intervals <- function(
                 geom_point(aes_string(
                     x = 'xtargetend',   y = 'y'), shape = '|', size = 4)}
 # Extensions
-    if ('crisprextension' %in% names(mcols(gr))){
-        p <-p + geom_segment(
-                    aes_string( x = 'extstart', xend = 'extend', size = NULL), 
-                                linetype = 'dotted',
-                arrow = arrow(length = unit(0.1, "inches")))}
     p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
 # Return
     p # print(p)
 }
 
+
+#' Interval plot GRanges
+#' 
+#' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
+#' @param xref        gr var used for scaling x axis
+#' @param y           'names' (default) or name of gr variable
+#' @param nperchrom    number (default 1): n head (and n tail) targets 
+#'                     shown per chromosome
+#' @param nchrom       number (default 6) of chromosomes shown
+#' @param color_var   'seqnames' (default) or other gr variable
+#' @param linetype_var NULL (default) or gr variable mapped to linetype
+#' @param size_var     NULL (default) or gr variable mapped to size
+#' @param facet_var    NULL(default)  or gr variable mapped to facet
+#' @param alpha_var    NULL or gr variable mapped to alpha
+#' @param title        NULL or string: plot title
+#' @param scales       'free', 'fixed', etc
+#' @return ggplot object
+#' @seealso  \code{\link{plot_karyogram}}
+#' @examples 
+#' # SRF sites
+#'     require(magrittr)
+#'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#'     bedfile <-  system.file('extdata/SRF.bed',  package = 'multicrispr')
+#'     targets   <- bed_to_granges(bedfile, 'mm10', plot = FALSE)
+#'     plot_intervals(targets)
+#'     
+#' # PE targets
+#'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
+#'     gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',
+#'                             HBB  = 'chr11:5227002:-',
+#'                             HEXA = 'chr15:72346580-72346583:-',
+#'                             CFTR = 'chr7:117559593-117559595:+'), 
+#'                           bsgenome)
+#'     spacers <- find_pe_spacers(gr, bsgenome, plot = FALSE)
+#'     plot_intervals(gr)
+#'     plot_intervals(extend_for_pe(gr))
+#'     plot_intervals(spacers)
+#'     
+#' # Empty gr
+#'     plot_intervals(GenomicRanges::GRanges())
+#' @export
+plot_intervals <- function(
+    gr, xref = 'targetname', y = default_y(gr), nperchrom = 2, nchrom = 4, 
+    color_var = 'targetname', facet_var = 'seqnames', 
+    linetype_var = default_linetype(gr), size_var = default_size_var(gr), 
+    alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'
+){
+    gr$type <- 'spacer'
+    gr$type %<>% factor(c("spacer", "3' extension", "nicking spacer"))
+    seqinfo1 <- seqinfo(gr)
+    plotgr <- gr
+
+    if ('crisprextension' %in% names(mcols(gr))){
+        extgr <- GRanges(gr$crisprextrange, seqinfo=seqinfo1)
+        mcols(extgr) <- mcols(gr)
+        extgr$type <- "3' extension"
+        plotgr %<>% c(extgr)
+    }
+    
+    if ('nickrange' %in% names(mcols(gr))){
+        nickdt <- gr2dt(gr)
+        nickdt %<>% extract(complete.cases(nickrange))
+        nickdt %<>%  tidyr::separate_rows(tidyselect::starts_with('nick'), sep = ';')
+        nickgr <- GRanges(nickdt$nickrange, seqinfo = seqinfo1)
+        nickgr$off <- as.numeric(nickdt$nickoff)
+        mcols(nickgr) <- mcols(dt2gr(nickdt, seqinfo = seqinfo1))
+        nickgr$type <- 'nicking spacer'
+        plotgr %<>% c(nickgr)
+    }
+    
+    plot_intervals_engine(  plotgr, 
+                            xref         = xref, 
+                            y            = y, 
+                            nperchrom    = nperchrom,
+                            nchrom       = nchrom,
+                            color_var    = color_var, 
+                            facet_var    = facet_var,
+                            linetype     = linetype_var, 
+                            size_var     = size_var,
+                            alpha_var    = alpha_var,
+                            title        = title, 
+                            scales       = scales)
+    
+}
+
+default_linetype <- function(gr){
+    if (any(c('crisprextension', 'nickrange') %in% names(mcols(gr)))){
+        'type'
+    } else {
+        NULL
+    }
+}
+
+default_y <- function(gr){
+    if ('crisprname' %in% names(mcols(gr)))  'crisprname' else 'names'
+    
+}
 
 default_alpha_var <- function(gr){
     if ('off' %in% names(mcols(gr))) 'off' else NULL
@@ -182,7 +239,7 @@ prepare_plot_intervals <- function(
 # Comply
     edge <- targetname <- xstart <- xend <- width <- NULL
     targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
-    extstart <- primer <- revtranscript <- extension <- tmp <- NULL
+    extstart <- crisprprimer <- crisprtranscript <- crisprextension <- tmp <- NULL
 # Prepare data.table. Select chromosomes/targets to plot.
     plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
     plotdt %<>% extract(order(seqnames, start))
@@ -202,21 +259,11 @@ prepare_plot_intervals <- function(
     if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
         plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
         plotdt %>% extract(, xtargetend   := xend   + targetend-end  )}
-# Extensions
-    if ('extension' %in% names(mcols(gr))){
-        plotdt %>% extract(strand=='+', extstart := xstart+18-nchar(primer)[1])
-        plotdt %>% extract(strand=='-',
-                            extstart := xend-16-(nchar(revtranscript)[1]-1))
-        plotdt %>% extract(, extend   := extstart + nchar(extension)[1]-1)}
 # Flip for arrow direction    
-    plotdt %>%  extract(strand=='-', tmp    := xend)
-    plotdt %>%  extract(strand=='-', xend   := xstart)
-    plotdt %>%  extract(strand=='-', xstart := tmp)
-    if ('extension' %in% names(mcols(gr))){
-        plotdt %>%  extract(strand=='+', tmp := extend)
-        plotdt %>%  extract(strand=='+', extend := extstart)
-        plotdt %>%  extract(strand=='+', extstart := tmp)}
-    plotdt %>%  extract(, tmp := NULL)
+    plotdt[strand=='-', tmp    := xend]
+    plotdt[strand=='-', xend   := xstart]
+    plotdt[strand=='-', xstart := tmp]
+    plotdt[           , tmp      := NULL]
 # Alpha and Size
     if (!is.null(alpha_var)) plotdt[[alpha_var]] %<>% cut(
                                     c(-Inf, 0, Inf), c('0', '1+'))

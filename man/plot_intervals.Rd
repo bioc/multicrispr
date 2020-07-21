@@ -7,12 +7,12 @@
 plot_intervals(
   gr,
   xref = "targetname",
-  y = "names",
+  y = default_y(gr),
   nperchrom = 2,
   nchrom = 4,
   color_var = "targetname",
   facet_var = "seqnames",
-  linetype_var = NULL,
+  linetype_var = default_linetype(gr),
   size_var = default_size_var(gr),
   alpha_var = default_alpha_var(gr),
   title = NULL,
@@ -66,7 +66,7 @@ Interval plot GRanges
                             HEXA = 'chr15:72346580-72346583:-',
                             CFTR = 'chr7:117559593-117559595:+'), 
                           bsgenome)
-    spacers <- find_pe_spacers(gr, bsgenome)
+    spacers <- find_pe_spacers(gr, bsgenome, plot = FALSE)
     plot_intervals(gr)
     plot_intervals(extend_for_pe(gr))
     plot_intervals(spacers)
