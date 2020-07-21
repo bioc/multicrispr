@@ -35,5 +35,5 @@ Write GRanges to file
         bsgenome)
     file <- file.path(tempdir(), 'gr.txt')
     write_ranges(gr, file)
-    read_ranges(targetfile, bsgenome)
+    read_ranges(file, bsgenome)
 }
