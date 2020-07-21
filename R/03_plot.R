@@ -162,8 +162,7 @@ plot_intervals <- function(
     gr, xref = 'targetname', y = default_y(gr), nperchrom = 2, nchrom = 4, 
     color_var = 'targetname', facet_var = 'seqnames', 
     linetype_var = default_linetype(gr), size_var = default_size_var(gr), 
-    alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'
-){
+    alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     if (assertive::is_empty(gr)) return(invisible(NULL))
@@ -171,11 +170,14 @@ plot_intervals <- function(
     assert_is_subset(y,    names(gr2dt(gr)))
     assert_is_a_number(nperchrom)
     assert_is_a_number(nchrom)
-    if (!is.null(color_var))    assert_is_subset(color_var,    names(gr2dt(gr)))
-    if (!is.null(facet_var))    assert_is_subset(facet_var,    names(gr2dt(gr)))
-    if (!is.null(linetype_var)) assert_is_a_string(linetype_var)
-    if (!is.null(size_var))     assert_is_subset(size_var,     names(gr2dt(gr)))
-    if (!is.null(alpha_var))    assert_is_subset(alpha_var,    names(gr2dt(gr)))
+    if (!is.null(facet_var))    assert_is_subset(facet_var, names(gr2dt(gr)))
+    if (!is.null(alpha_var))    assert_is_subset(alpha_var, names(gr2dt(gr)))
+    if (!is.null(color_var))    assert_is_subset(color_var,    
+                                                c('type', names(gr2dt(gr))))
+    if (!is.null(linetype_var)) assert_is_subset(linetype_var, 
+                                                c('type', names(gr2dt(gr))))
+    if (!is.null(size_var))     assert_is_subset(size_var,     
+                                                c('type', names(gr2dt(gr))))
     if (!is.null(title))        assert_is_a_string(title)
     assert_is_a_string(scales)
 #  Initialize
