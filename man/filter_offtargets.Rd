@@ -16,10 +16,9 @@ add_offtargets(
   pam = "NGG",
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
+  verbose = TRUE,
   plot = TRUE,
-  size_var = default_size_var(spacers),
-  alpha_var = "off",
-  verbose = TRUE
+  ...
 )
 
 filter_offtargets(
@@ -37,7 +36,7 @@ filter_offtargets(
 )
 }
 \arguments{
-\item{...}{to channel deprecated add_specificity to add_offtargets}
+\item{...}{passed to plot_intervals}
 
 \item{spacers}{spacer \code{\link[GenomicRanges]{GRanges-class}}}
 
@@ -54,15 +53,15 @@ filter_offtargets(
 
 \item{indexedgenomesdir}{string: dir with indexed genomes}
 
+\item{verbose}{TRUE (default) or FALSE}
+
 \item{plot}{TRUE (default) or FALSE}
 
-\item{size_var}{string: mapped to size in plot}
+\item{by}{string (default "targetname"): filter by this mcol}
 
 \item{alpha_var}{string: mapped to alpha in plot}
 
-\item{verbose}{TRUE (default) or FALSE}
-
-\item{by}{string (default "targetname"): filter by this mcol}
+\item{size_var}{string: mapped to size in plot}
 }
 \value{
 filtered spacer \code{\link[GenomicRanges]{GRanges-class}}

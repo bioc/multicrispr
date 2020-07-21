@@ -189,8 +189,9 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param spacer     string: spacer pattern in extended IUPAC alphabet
 #' @param pam        string: pam pattern in extended IUPAC alphabet
 #' @param complement TRUE (default) or FALSE: also search in compl ranges?
-#' @param plot       TRUE (default) or FALSE
 #' @param verbose    TRUE (default) or FALSE
+#' @param plot       TRUE (default) or FALSE
+#' @param ...        passed to plot_intervals
 #' @return   \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # PE example
@@ -219,7 +220,7 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @export 
 find_spacers <- function(
     gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', complement = TRUE, 
-    verbose = TRUE, plot = TRUE
+    verbose = TRUE, plot = TRUE, ...
 ){
 
     if (complement){
@@ -233,7 +234,7 @@ find_spacers <- function(
     spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
     #spacers %>% sort(ignore.strand = TRUE)
     if (plot){
-        print(plot_intervals(spacers, y='crisprname'))
+        print(plot_intervals(spacers, ...))
         spacers$sitename <- NULL
     }
     spacers

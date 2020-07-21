@@ -11,7 +11,8 @@ find_spacers(
   pam = "NGG",
   complement = TRUE,
   verbose = TRUE,
-  plot = TRUE
+  plot = TRUE,
+  ...
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ find_spacers(
 \item{verbose}{TRUE (default) or FALSE}
 
 \item{plot}{TRUE (default) or FALSE}
+
+\item{...}{passed to plot_intervals}
 }
 \value{
 \code{\link[GenomicRanges]{GRanges-class}}

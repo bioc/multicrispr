@@ -528,7 +528,7 @@ add_genome_counts <- function(
 #' @export
 #' @rdname filter_offtargets
 add_specificity <- function(...){
-    #.Deprecated('add_offtargets')
+    .Deprecated('add_offtargets')
     add_offtargets(...)
 }
 
@@ -537,8 +537,7 @@ add_specificity <- function(...){
 #' @export
 add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2, 
     pam = 'NGG', outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, 
-    plot = TRUE, size_var = default_size_var(spacers), alpha_var = 'off', 
-    verbose= TRUE){
+    verbose = TRUE, plot = TRUE, ...){
 # First clear
     if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
@@ -576,13 +575,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
             if (verbose) cmessage('\t       %s have no %d-mismatch offtargets', 
                 format(sum(mcols(spacers)[[offvar]]==0), width = digits), mis)}}
 # Plot and return
-    if (plot){
-        grplot <- gr2dt(spacers) %>%  # don't do that - what if no such exist?
-                    #extract(, if(any(off==0)) .SD, by = 'targetname') %>% 
-                    dt2gr(seqinfo(spacers))
-        p <- plot_intervals(
-                grplot, alpha_var = 'off', size_var = size_var)
-        print(p)}
+    if (plot)   print(plot_intervals(spacers, ...))
     spacers
 }
 
@@ -607,7 +600,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
 #' @param alpha_var  string: mapped to alpha in plot
 #' @param size_var   string: mapped to size in plot
 #' @param verbose    TRUE (default) or FALSE
-#' @param ...        to channel deprecated add_specificity to add_offtargets
+#' @param ...        passed to plot_intervals
 #' @return  filtered spacer \code{\link[GenomicRanges]{GRanges-class}}
 #' @examples
 #' # PE example

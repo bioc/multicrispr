@@ -147,13 +147,6 @@ add_nickspacers <- function(
         bsgenome, by = 'pename', plot = FALSE, outdir = outdir,
         indexedgenomesdir = indexedgenomesdir, verbose = FALSE)
     nickspacers$G0 <- nickspacers$G1 <- nickspacers$G2 <- NULL
-# Plot
-    if (plot){
-        plotgr <- c(pespacers, nickspacers)
-        plotgr$type %<>% factor(c('pespacer', 'nickspacer'))
-        print(plot_intervals(
-                plotgr, xref = 'pename', y = 'pename'))
-    }
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
                 extract( , .(
@@ -172,6 +165,8 @@ add_nickspacers <- function(
     mergedranges <- merge(pedt, nickdt, by = 'pename', sort = FALSE, all = TRUE)
     mergedranges$pename <- NULL
     mergedranges %<>% dt2gr(seqinfo(pespacers))
+# Plot and Return
+    if (plot)   print(plot_intervals(mergedranges))
     return(mergedranges)
 }
 
@@ -256,15 +251,6 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     revtranscript<- up_flank(gg, -4, -5+nrt) %>% add_fixed_seqs(bs, edits)
     ext  <- up_flank(gg, -4-nprimer, -5+nrt) %>% invertStrand() %>% 
             add_fixed_seqs(bs, edits) # Revcomp for "-" seqs
-# Plot
-    if (plot){
-        spacer$part<-'spacer'; ext$part  <- "3' extension"
-        allranges <- c(spacer, ext)
-        allranges$part %<>% factor((c("spacer", "3' extension")))
-        print(plot_intervals(allranges, y = 'crisprname', linetype_var = 'part',
-                facet_var = c('seqnames')))
-        spacer$part <- NULL
-    }
 # Add sequences
     names(mcols(spacer)) %<>% stri_replace_first_fixed('seq', 'crisprspacer')
     spacer$crisprpam        <- pam$seq
@@ -275,10 +261,14 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
 # Add offtargets
     spacer %<>% add_offtargets(bsgenome, mismatches = 0, 
                     outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
-                    verbose= TRUE, plot = plot, ...)
+                    verbose= TRUE, plot = FALSE, ...)
 # Add nicking spacers and return
-    add_nickspacers(spacer, bsgenome, plot = plot, 
+    spacer %<>% add_nickspacers(bsgenome, plot = FALSE, 
                     outdir = outdir, indexedgenomesdir = indexedgenomesdir)
+# Plot and Return
+    if (plot) print(plot_intervals(spacer, ...))
+    spacer
+
 }
 
 add_fixed_seqs <- function(gr, bsgenome, edits){
