@@ -67,8 +67,8 @@ summarize_loci <- function(gr){
 #' \code{down_flank} returns downstream flanks, in relation to end(gr).
 #' \code{extend}     returns extensions, in relation to start(gr) and end(gr)
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param start     (pos or neg) number: relative start position (see details)
-#' @param end       (pos or neg) number: relative end position   (see details)
+#' @param start     number or vector (same length as gr): start definition, relative to gr start (up_flank, extend) or gr end (down_flank).
+#' @param end       number or vector (same length as gr): end definition,   relative to gr start (up_flank) or gr end (extend, down_flank).
 #' @param strandaware  TRUE (default) or FALSE: consider strand information?
 #' @param bsgenome  NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                  Required to update gr$seq if present.
@@ -87,10 +87,14 @@ summarize_loci <- function(gr){
 #'                          HEXA = 'chr15:72346580-72346583:-',  # del
 #'                          CFTR = 'chr7:117559593-117559595:+'),# ins
 #'                       bsgenome = bsgenome)
-#' gr %>% up_flank( -22,  -1, plot=TRUE, facet_var=c('targetname', 'seqnames'))
+#' gr %>% up_flank( -22,  -1, plot=TRUE)
+#' gr %>% up_flank( c(-10,-20,-30,-40),  -1, plot=TRUE)
 #' gr %>% up_flank( -22,  -1, plot=TRUE, strandaware=FALSE)
+#' 
 #' gr %>% down_flank(+1, +22, plot=TRUE)
+#' gr %>% down_flank(+1, c(10, 20, 30, 40), plot=TRUE)
 #' gr %>% down_flank(+1, +22, plot=TRUE, strandaware=FALSE)
+#' 
 #' gr %>% extend(   -10, +20, plot=TRUE)
 #' gr %>% extend(   -10, +20, plot=TRUE, strandaware=FALSE)
 #'
@@ -106,39 +110,41 @@ up_flank <- function(
     gr, start = -200, end = -1, strandaware = TRUE, bsgenome = NULL, 
     verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
 ){
-    # Assert
+# Assert
     assert_is_all_of(gr, 'GRanges')
-    assert_is_a_number(start)
-    assert_is_a_number(end)
+    assert_is_numeric(start)
+    assert_is_numeric(end)
+    assert_is_subset(length(start), c(1, length(gr)))
+    assert_is_subset(length(end),   c(1, length(gr)))
     assert_is_a_bool(verbose)
-    
-    # Record
+# Record
     newgr <- gr
-    shift <- sprintf('(%s%d,%s%d)', 
-                                csign(start), abs(start), csign(end), abs(end))
+    shift <- sprintf('(%s%d,%s%d)', csign(start[1]), abs(start[1]), 
+                     csign(end[1]), abs(end[1]))
+    if (!is_scalar(start) | !is_scalar(end)) shift %<>% paste0(' etc.')
     txt <- sprintf('\t\t%d%supstream %s flanks', 
                     length(newgr), 
                     ifelse(!strandaware, ' (strandagnostic) ', ' '),
                     shift)
-    
-    # Flank
+# Flank
+    if (is_scalar(start))  start <- rep(start, length(gr))
+    if (is_scalar(end))    end   <- rep(end,   length(gr))
     GenomicRanges::start(newgr) <- 1  # avoid integrity errors
     GenomicRanges::end(newgr)   <- GenomicRanges::start(gr) + end
     GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start[idx]
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end[idx]
     }
-
-    # Add seq
+# Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
 
-    # Plot, Message, Return
+# Plot, Message, Return
     if (plot){
         gr$set    <- 'original'
         newgr$set <- 'upstream flanks'
@@ -159,39 +165,40 @@ down_flank <- function(
     gr, start = 1,  end = 200, strandaware = TRUE, bsgenome = NULL,
     verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
 ){
-    # Assert
+# Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(start)
-    assert_is_a_number(end)
+    assert_is_numeric(start)
+    assert_is_numeric(end)
+    assert_is_subset(length(start), c(1, length(gr)))
+    assert_is_subset(length(end),   c(1, length(gr)))
     assert_is_a_bool(verbose)
-    
-    # Record 
+# Record 
     newgr <- gr
-    shift <- sprintf('(%s%d,%s%d)', 
-                                csign(start), abs(start), csign(end), abs(end))
+    shift <- sprintf('(%s%d,%s%d)', csign(start[1]), abs(start[1]), 
+                     csign(end[1]), abs(end[1]))
+    if (!is_scalar(start) | !is_scalar(end)) shift %<>% paste0(' etc.')
     txt <- sprintf('\t\t%d%sdownstream %s flanks', 
                     length(newgr), 
                     ifelse(!strandaware, ' (strandagnostic) ', ' '),
                     shift)
-    
-    # Flank
+# Flank
+    if (is_scalar(start))  start <- rep(start, length(gr))
+    if (is_scalar(end))    end   <- rep(end,   length(gr))
     GenomicRanges::start(newgr) <- 1 # avoid integrity errors
     GenomicRanges::end(newgr)   <- GenomicRanges::end(gr) + end
     GenomicRanges::start(newgr) <- GenomicRanges::end(gr) + start
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx]-start
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx]-end
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx]-start[idx]
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx]-end[idx]
     }
-
-    # Add seq
+# Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
-    
-    # Plot, Message, Return
+# Plot, Message, Return
     if (plot){
         gr$set <- 'original'
         newgr$set <- 'downstream flanks'
@@ -212,40 +219,41 @@ extend <- function(
     gr, start = -22, end = 22, strandaware = TRUE, bsgenome = NULL,
     verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
 ){
-
-    # Assert
+# Assert
     assert_is_any_of(gr, 'GRanges')
-    assert_is_a_number(start)
-    assert_is_a_number(end)
+    assert_is_numeric(start)
+    assert_is_numeric(end)
+    assert_is_subset(length(start), c(1, length(gr)))
+    assert_is_subset(length(end),   c(1, length(gr)))
     assert_is_a_bool(verbose)
-    
-    # Record
+# Record
     newgr <- gr
+    if (!is_scalar(start) | !is_scalar(end)) shift %<>% paste0(' etc.')
     shift <- sprintf('(%s%d,%s%d)', 
-                    csign(start), abs(start), csign(end), abs(end))
+                    csign(start[1]), abs(start[1]), csign(end[1]), abs(end[1]))
     txt <- sprintf('\t\t%d%sextensions %s', 
                     length(newgr), 
                     ifelse(!strandaware, ' (strandagnostic) ', ' '),
                     shift)
-
-    # Extend
+# Extend
+    if (is_scalar(start))  start <- rep(start, length(gr))
+    if (is_scalar(end))    end   <- rep(end,   length(gr))
     GenomicRanges::start(newgr) <- 1 # avoid integrity errors
     GenomicRanges::end(  newgr) <- GenomicRanges::end(gr) + end
     GenomicRanges::start(newgr) <- GenomicRanges::start(gr) + start
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end
+        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start[idx]
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end[idx]
     }
-
-    # Add seq
+# Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
     
-    # Plot, Message, Return
+# Plot, Message, Return
     if (plot){
         gr$set <- 'original'
         newgr$set <- 'extensions'
@@ -257,7 +265,6 @@ extend <- function(
     }
     if (verbose) message(txt)
     newgr
-    
 }
 
 

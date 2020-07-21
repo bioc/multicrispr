@@ -45,9 +45,9 @@ extend(
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{start}{(pos or neg) number: relative start position (see details)}
+\item{start}{number or vector (same length as gr): start definition, relative to gr start (up_flank, extend) or gr end (down_flank).}
 
-\item{end}{(pos or neg) number: relative end position   (see details)}
+\item{end}{number or vector (same length as gr): end definition,   relative to gr start (up_flank) or gr end (extend, down_flank).}
 
 \item{strandaware}{TRUE (default) or FALSE: consider strand information?}
 
@@ -83,10 +83,14 @@ gr <- char_to_granges(c(PRNP  = 'chr20:4699600:+',         # snp
                          HEXA = 'chr15:72346580-72346583:-',  # del
                          CFTR = 'chr7:117559593-117559595:+'),# ins
                       bsgenome = bsgenome)
-gr \%>\% up_flank( -22,  -1, plot=TRUE, facet_var=c('targetname', 'seqnames'))
+gr \%>\% up_flank( -22,  -1, plot=TRUE)
+gr \%>\% up_flank( c(-10,-20,-30,-40),  -1, plot=TRUE)
 gr \%>\% up_flank( -22,  -1, plot=TRUE, strandaware=FALSE)
+
 gr \%>\% down_flank(+1, +22, plot=TRUE)
+gr \%>\% down_flank(+1, c(10, 20, 30, 40), plot=TRUE)
 gr \%>\% down_flank(+1, +22, plot=TRUE, strandaware=FALSE)
+
 gr \%>\% extend(   -10, +20, plot=TRUE)
 gr \%>\% extend(   -10, +20, plot=TRUE, strandaware=FALSE)
 
