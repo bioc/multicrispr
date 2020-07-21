@@ -168,6 +168,7 @@ plot_intervals <- function(
     linetype_var = default_linetype(gr), size_var = default_size_var(gr), 
     alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'
 ){
+    nickrange <- NULL
     gr$type <- 'spacer'
     gr$type %<>% factor(c("spacer", "3' extension", "nicking spacer"))
     seqinfo1 <- seqinfo(gr)
@@ -183,7 +184,7 @@ plot_intervals <- function(
     if ('nickrange' %in% names(mcols(gr))){
         nickdt <- gr2dt(gr)
         nickdt %<>% extract(complete.cases(nickrange))
-        nickdt %<>%  tidyr::separate_rows(tidyselect::starts_with('nick'), sep = ';')
+        nickdt %<>%  separate_rows(starts_with('nick'), sep = ';')
         nickgr <- GRanges(nickdt$nickrange, seqinfo = seqinfo1)
         nickgr$off <- as.numeric(nickdt$nickoff)
         mcols(nickgr) <- mcols(dt2gr(nickdt, seqinfo = seqinfo1))
@@ -198,7 +199,7 @@ plot_intervals <- function(
                             nchrom       = nchrom,
                             color_var    = color_var, 
                             facet_var    = facet_var,
-                            linetype     = linetype_var, 
+                            linetype_var = linetype_var,
                             size_var     = size_var,
                             alpha_var    = alpha_var,
                             title        = title, 

@@ -231,7 +231,7 @@ add_ontargets <- function(
 #' @rdname add_ontargets
 add_efficiency <- function(...){
     .Deprecated('add_ontargets')
-    add_ontargetscore(...)
+    add_ontargets(...)
 }
 
 filter_efficient <- function(...){

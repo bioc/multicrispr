@@ -76,6 +76,7 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
 \examples{
 # PE example
 #-----------
+ require(magrittr)
  bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
  gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                          HBB  = 'chr11:5227002:-',             # snp

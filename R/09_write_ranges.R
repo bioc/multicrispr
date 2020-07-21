@@ -3,7 +3,7 @@
 #' @param file file 
 #' @param verbose TRUE (default) or FALSE
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
-#' @return \code{\link[GenomicRanges]GRanges-class} for read_ranges
+#' @return \code{\link[GenomicRanges]{GRanges-class}} for read_ranges
 #' @examples 
 #' # Find PE spacers for 4 clinically relevant loci (Anzalone et al, 2019)
 #'     bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  

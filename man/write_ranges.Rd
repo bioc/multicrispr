@@ -19,7 +19,7 @@ read_ranges(file, bsgenome)
 \item{bsgenome}{\code{\link[BSgenome]{BSgenome-class}}}
 }
 \value{
-\code{\link[GenomicRanges]GRanges-class} for read_ranges
+\code{\link[GenomicRanges]{GRanges-class}} for read_ranges
 }
 \description{
 Write GRanges to file
