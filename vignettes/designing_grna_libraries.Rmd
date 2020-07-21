@@ -207,7 +207,7 @@ Not all N~20~NGG gRNA sequences target equally well (even when matching sequence
 
 ```{r, fig.width=3.6, fig.height=2.1}
 if (reticulate::py_module_available('azimuth')){
-  spacers %<>% add_efficiency(bsgenome, 'Doench2016')
+  spacers %<>% add_ontargets(bsgenome, 'Doench2016')
 }
 ```
 
