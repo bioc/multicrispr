@@ -4,7 +4,7 @@
 \alias{add_specificity}
 \alias{add_offtargets}
 \alias{filter_offtargets}
-\title{Filter for minimal offtarget counts}
+\title{Add offtarget counts}
 \usage{
 add_specificity(...)
 
@@ -76,7 +76,6 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
 \examples{
 # PE example
 #-----------
- require(magrittr)
  bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
  gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                          HBB  = 'chr11:5227002:-',             # snp
@@ -85,8 +84,8 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
                        bsgenome)
  spacers <- find_pe_spacers(gr, bsgenome)
  # index_genome(bsgenome)
- spacers \%>\% add_offtargets(bsgenome, mismatches=0)
- spacers \%>\% filter_offtargets(bsgenome, mismatches=0)
+ add_offtargets(spacers, bsgenome, mismatches=0)
+ filter_offtargets(spacers, bsgenome, mismatches=0)
  
 # TFBS example
 #-------------
@@ -94,7 +93,8 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
  bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
  targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
  spacers <- find_spacers(targets, bsgenome)
+ spacers \%<>\% extract(1:500)
  # index_genome(bsgenome)
- # spacers \%>\% add_offtargets(bsgenome)           # off = G - 1
- # spacers \%>\% add_offtargets(bsgenome, targets)  # off = G - T
+ # add_offtargets(spacers, bsgenome)    # off = G - 1
+ # add_offtargets(spacers, bsgenome, targets)  # off = G - T
 }
