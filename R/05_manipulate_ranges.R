@@ -67,8 +67,10 @@ summarize_loci <- function(gr){
 #' \code{down_flank} returns downstream flanks, in relation to end(gr).
 #' \code{extend}     returns extensions, in relation to start(gr) and end(gr)
 #' @param gr        \code{\link[GenomicRanges]{GRanges-class}}
-#' @param start     number or vector (same length as gr): start definition, relative to gr start (up_flank, extend) or gr end (down_flank).
-#' @param end       number or vector (same length as gr): end definition,   relative to gr start (up_flank) or gr end (extend, down_flank).
+#' @param start     number or vector (same length as gr): start definition, 
+#' relative to gr start (up_flank, extend) or gr end (down_flank).
+#' @param end       number or vector (same length as gr): end definition,   
+#' relative to gr start (up_flank) or gr end (extend, down_flank).
 #' @param strandaware  TRUE (default) or FALSE: consider strand information?
 #' @param bsgenome  NULL (default) or \code{\link[BSgenome]{BSgenome-class}}.
 #'                  Required to update gr$seq if present.
@@ -120,7 +122,7 @@ up_flank <- function(
 # Record
     newgr <- gr
     shift <- sprintf('(%s%d,%s%d)', csign(start[1]), abs(start[1]), 
-                     csign(end[1]), abs(end[1]))
+                    csign(end[1]), abs(end[1]))
     if (!is_scalar(start) | !is_scalar(end)) shift %<>% paste0(' etc.')
     txt <- sprintf('\t\t%d%supstream %s flanks', 
                     length(newgr), 
@@ -135,15 +137,14 @@ up_flank <- function(
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start[idx]
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx] - end[idx]
+        GenomicRanges::end(newgr)[idx] <- GenomicRanges::end(gr)[idx]-start[idx]
+        GenomicRanges::start(newgr)[idx] <- GenomicRanges::end(gr)[idx]-end[idx]
     }
 # Add seq
     if ('seq' %in% names(mcols(gr))){
         assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
-
 # Plot, Message, Return
     if (plot){
         gr$set    <- 'original'
@@ -175,7 +176,7 @@ down_flank <- function(
 # Record 
     newgr <- gr
     shift <- sprintf('(%s%d,%s%d)', csign(start[1]), abs(start[1]), 
-                     csign(end[1]), abs(end[1]))
+                    csign(end[1]), abs(end[1]))
     if (!is_scalar(start) | !is_scalar(end)) shift %<>% paste0(' etc.')
     txt <- sprintf('\t\t%d%sdownstream %s flanks', 
                     length(newgr), 
@@ -190,8 +191,8 @@ down_flank <- function(
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::start(gr)[idx]-start[idx]
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx]-end[idx]
+        GenomicRanges::end(newgr)[idx]<-GenomicRanges::start(gr)[idx]-start[idx]
+        GenomicRanges::start(newgr)[idx]<-GenomicRanges::start(gr)[idx]-end[idx]
     }
 # Add seq
     if ('seq' %in% names(mcols(gr))){
@@ -244,8 +245,8 @@ extend <- function(
     if (strandaware){
         idx <- as.logical(strand(newgr)=='-')
         GenomicRanges::start(newgr)[idx] <- 1 # avoid integrity errors
-        GenomicRanges::end(  newgr)[idx] <- GenomicRanges::end(gr)[idx] - start[idx]
-        GenomicRanges::start(newgr)[idx] <- GenomicRanges::start(gr)[idx] - end[idx]
+        GenomicRanges::end(  newgr)[idx]<-GenomicRanges::end(gr)[idx]-start[idx]
+        GenomicRanges::start(newgr)[idx]<-GenomicRanges::start(gr)[idx]-end[idx]
     }
 # Add seq
     if ('seq' %in% names(mcols(gr))){

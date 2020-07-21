@@ -45,9 +45,11 @@ extend(
 \arguments{
 \item{gr}{\code{\link[GenomicRanges]{GRanges-class}}}
 
-\item{start}{number or vector (same length as gr): start definition, relative to gr start (up_flank, extend) or gr end (down_flank).}
+\item{start}{number or vector (same length as gr): start definition, 
+relative to gr start (up_flank, extend) or gr end (down_flank).}
 
-\item{end}{number or vector (same length as gr): end definition,   relative to gr start (up_flank) or gr end (extend, down_flank).}
+\item{end}{number or vector (same length as gr): end definition,
+relative to gr start (up_flank) or gr end (extend, down_flank).}
 
 \item{strandaware}{TRUE (default) or FALSE: consider strand information?}
 

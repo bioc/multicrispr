@@ -39,6 +39,7 @@ Imports:
     Rbowtie,
     reticulate,
     rtracklayer,
+    stats,
     stringi, 
     tidyr,
     tidyselect,

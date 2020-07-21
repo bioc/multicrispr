@@ -240,8 +240,8 @@ prepare_plot_intervals <- function(
 ){
 # Comply
     edge <- targetname <- xstart <- xend <- width <- NULL
-    targetstart <- targetend <- xtargetstart <- xtargetend <- NULL
-    extstart <- crisprprimer <- crisprtranscript <- crisprextension <- tmp <- NULL
+    targetstart <- targetend <- xtargetstart <- xtargetend <- tmp <- NULL
+    extstart <- crisprprimer <- crisprtranscript <- crisprextension <- NULL
 # Prepare data.table. Select chromosomes/targets to plot.
     plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
     plotdt %<>% extract(order(seqnames, start))
