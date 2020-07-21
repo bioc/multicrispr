@@ -16,6 +16,7 @@
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
 #' @importFrom  BSgenome              getSeq   getBSgenome
+#' @importFrom  data.table            fwrite
 #' @importFrom  data.table            :=  data.table  as.data.table  setnames
 #' @importFrom  data.table            setnames  setorderv   setnafill    .SD
 #' @importFrom  GenomeInfoDb          genome
