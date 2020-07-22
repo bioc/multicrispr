@@ -76,11 +76,6 @@ to_megabase <- function(y){
 }
 
 
-strsplitextract <- function(x, split, fixed = FALSE, i){
-    vapply(strsplit(x, split = split, fixed=fixed), extract, character(1), i)
-}
-
-
 
 #' Interval plot GRanges
 #' 
