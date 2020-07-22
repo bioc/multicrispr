@@ -82,42 +82,6 @@ strsplitextract <- function(x, split, fixed = FALSE, i){
 
 
 
-plot_intervals_engine <- function(
-    gr, xref, y, nperchrom, nchrom , color_var, facet_var, linetype_var, 
-    size_var, alpha_var, title, scales
-){
-# Comply
-    edge <- targetname <- NULL
-# Assert, Import, Comply
-    contig <- .N <- .SD <- seqnames <- start <- NULL
-    strand <- tmp <- width <- xstart <- xend <- . <- NULL
-# Prepare plotdt
-    plotdt <- prepare_plot_intervals(
-                gr, xref, y, nperchrom, nchrom, alpha_var, size_var)
-# Core Ranges
-    p <-ggplot( plotdt, 
-                aes_string(x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
-                            color = color_var, linetype = linetype_var, 
-                            size = size_var, alpha = alpha_var)) + 
-        facet_wrap(facet_var, scales = scales) + 
-        geom_segment(arrow = arrow(length = unit(0.1, "inches")))
-    if (!is.null(alpha_var)) p <- p + 
-        scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
-    if (!is.null(size_var))  p <- p +
-        scale_size_manual(values = c(`0+` = 0.1, `0.3+` = 1, `0.5+` = 2))
-# Targets
-    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
-        p <-p + geom_point(aes_string(
-                    x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
-                geom_point(aes_string(
-                    x = 'xtargetend',   y = 'y'), shape = '|', size = 4)}
-# Extensions
-    p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
-# Return
-    p # print(p)
-}
-
-
 #' Interval plot GRanges
 #' 
 #' @param gr          \code{\link[GenomicRanges]{GRanges-class}}
@@ -158,9 +122,8 @@ plot_intervals_engine <- function(
 #' # Empty gr
 #'     plot_intervals(GenomicRanges::GRanges())
 #' @export
-plot_intervals <- function(
-    gr, xref = 'targetname', y = default_y(gr), nperchrom = 2, nchrom = 4, 
-    color_var = 'targetname', facet_var = 'seqnames', 
+plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr), 
+    nperchrom = 2, nchrom = 4, color_var = 'targetname', facet_var = 'seqnames',
     linetype_var = default_linetype(gr), size_var = default_size_var(gr), 
     alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'){
 # Assert
@@ -170,14 +133,12 @@ plot_intervals <- function(
     assert_is_subset(y,    names(gr2dt(gr)))
     assert_is_a_number(nperchrom)
     assert_is_a_number(nchrom)
-    if (!is.null(facet_var))    assert_is_subset(facet_var, names(gr2dt(gr)))
-    if (!is.null(alpha_var))    assert_is_subset(alpha_var, names(gr2dt(gr)))
-    if (!is.null(color_var))    assert_is_subset(color_var,    
-                                                c('type', names(gr2dt(gr))))
-    if (!is.null(linetype_var)) assert_is_subset(linetype_var, 
-                                                c('type', names(gr2dt(gr))))
-    if (!is.null(size_var))     assert_is_subset(size_var,     
-                                                c('type', names(gr2dt(gr))))
+    grvars <- c('type', names(gr2dt(gr)))
+    if (!is.null(facet_var))    assert_is_subset(facet_var,    grvars)
+    if (!is.null(alpha_var))    assert_is_subset(alpha_var,    grvars)
+    if (!is.null(color_var))    assert_is_subset(color_var,    grvars)
+    if (!is.null(linetype_var)) assert_is_subset(linetype_var, grvars)
+    if (!is.null(size_var))     assert_is_subset(size_var,     grvars)
     if (!is.null(title))        assert_is_a_string(title)
     assert_is_a_string(scales)
 #  Initialize
@@ -203,39 +164,46 @@ plot_intervals <- function(
         nickgr$type <- 'nicking spacer'
         plotgr %<>% c(nickgr)}
 # Plot    
-    plot_intervals_engine(
-        plotgr, xref = xref, y = y, nperchrom = nperchrom, nchrom = nchrom,
-        color_var = color_var, facet_var = facet_var, 
-        linetype_var = linetype_var, size_var = size_var, alpha_var = alpha_var,
-        title = title, scales = scales)
+    p <- plot_intervals_engine(plotgr, xref=xref, y=y, nperchrom=nperchrom, 
+            nchrom=nchrom, color_var=color_var, facet_var=facet_var, 
+            linetype_var=linetype_var, size_var=size_var, alpha_var=alpha_var, 
+            title=title, scales=scales)
+    p %<>% scale_alpha(alpha_var)
+    p %<>% scale_size(size_var)
+    p
 }
 
-default_linetype <- function(gr){
-    if (any(c('crisprextension', 'nickrange') %in% names(mcols(gr)))){
-        'type'
-    } else {
-        NULL
-    }
+plot_intervals_engine <- function(
+    gr, xref, y, nperchrom, nchrom , color_var, facet_var, linetype_var, 
+    size_var, alpha_var, title, scales
+){
+# Comply
+    edge <- targetname <- NULL
+# Assert, Import, Comply
+    contig <- .N <- .SD <- seqnames <- start <- NULL
+    strand <- tmp <- width <- xstart <- xend <- . <- NULL
+# Prepare plotdt
+    plotdt <- prepare_plot_intervals(
+                gr, xref, y, nperchrom, nchrom, alpha_var, size_var)
+# Core Ranges
+    p <-ggplot( plotdt, 
+                aes_string(x = 'xstart', xend = 'xend', y = 'y', yend = 'y', 
+                            color = color_var, linetype = linetype_var, 
+                            size = size_var, alpha = alpha_var)) + 
+        facet_wrap(facet_var, scales = scales) + 
+        geom_segment(arrow = arrow(length = unit(0.1, "inches")))
+# Targets
+    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
+        p <-p + geom_point(aes_string(
+                    x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
+                geom_point(aes_string(
+                    x = 'xtargetend',   y = 'y'), shape = '|', size = 4)}
+# Extensions
+    p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
+# Return
+    p # print(p)
 }
 
-default_y <- function(gr){
-    if ('crisprname' %in% names(mcols(gr)))  'crisprname' else 'names'
-    
-}
-
-default_alpha_var <- function(gr){
-    if ('off' %in% names(mcols(gr))) 'off' else NULL
-}
-
-default_size_var <- function(gr){
-    if ('Doench2016' %in% names(mcols(gr))) 'Doench2016' else NULL
-}
-
-
-head_tail <- function(x, n){
-    idx <- x %in% unique( c(head(x, ceiling(n/2)), tail(x, floor(n/2))))
-    x[idx]
-}
 
 prepare_plot_intervals <- function(
     gr, xref, y, nperchrom, nchrom, alpha_var, size_var
@@ -269,11 +237,53 @@ prepare_plot_intervals <- function(
     plotdt[strand=='-', xstart := tmp]
     plotdt[           , tmp      := NULL]
 # Alpha and Size
-    if (!is.null(alpha_var)) plotdt[[alpha_var]] %<>% cut(
-                                    c(-Inf, 0, Inf), c('0', '1+'))
-    if (!is.null(size_var))  plotdt[[size_var]]  %<>% cut(
-                                    c(-Inf, 0.3, 0.5, Inf), 
-                                c('0+', '0.3+', '0.5+'))
+    if (!is.null(alpha_var)) if (alpha_var == 'off')    plotdt[[alpha_var]] %<>%
+        cut(c(-Inf, 0, Inf), c('0', '1+'))
+    if (!is.null(size_var)) if (size_var=='Doench2016') plotdt[[size_var]]  %<>%
+        cut(c(-Inf,0.3,0.5,Inf), c('0+','0.3+','0.5+'))
 # Return
     plotdt
 }
+
+
+scale_alpha <- function(p, alpha_var){
+    if (!is.null(alpha_var)) if (alpha_var == 'off') p <- p + 
+        scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
+    return(p)
+}
+
+scale_size <- function(p, size_var){
+    if (!is.null(size_var)) if (size_var == 'Doench2016') p <- p +
+        scale_size_manual(values = c(`0+` = 0.1, `0.3+` = 1, `0.5+` = 2))
+    return(p)
+}
+
+
+
+default_linetype <- function(gr){
+    if (any(c('crisprextension', 'nickrange') %in% names(mcols(gr)))){
+        'type'
+    } else {
+        NULL
+    }
+}
+
+default_y <- function(gr){
+    if ('crisprname' %in% names(mcols(gr)))  'crisprname' else 'names'
+    
+}
+
+default_alpha_var <- function(gr){
+    if ('off' %in% names(mcols(gr))) 'off' else NULL
+}
+
+default_size_var <- function(gr){
+    if ('Doench2016' %in% names(mcols(gr))) 'Doench2016' else NULL
+}
+
+
+head_tail <- function(x, n){
+    idx <- x %in% unique( c(head(x, ceiling(n/2)), tail(x, floor(n/2))))
+    x[idx]
+}
+
