@@ -10,6 +10,7 @@ find_pe_spacers(
   edits = get_plus_seq(bsgenome, gr),
   nprimer = 13,
   nrt = 16,
+  ontargets = "Doench2014",
   plot = TRUE,
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
@@ -27,6 +28,8 @@ If named, names should be identical to those of \code{gr}}
 \item{nprimer}{n primer nucleotides (default 13, max 17)}
 
 \item{nrt}{n rev transcr nucleotides (default 16, recomm. 10-16)}
+
+\item{ontargets}{'Doench2014' or 'Doench2016': on-target scoring method}
 
 \item{plot}{TRUE (default) or FALSE}
 

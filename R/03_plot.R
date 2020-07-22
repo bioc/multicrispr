@@ -121,13 +121,12 @@ plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr),
     nperchrom = 2, nchrom = 4, color_var = 'targetname', facet_var = 'seqnames',
     linetype_var = default_linetype(gr), size_var = default_size_var(gr), 
     alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'){
-# Assert
+# Assert/Initialize
     assert_is_all_of(gr, 'GRanges')
     if (assertive::is_empty(gr)) return(invisible(NULL))
     assert_is_subset(xref, names(gr2dt(gr)))
     assert_is_subset(y,    names(gr2dt(gr)))
-    assert_is_a_number(nperchrom)
-    assert_is_a_number(nchrom)
+    assert_is_a_number(nperchrom);     assert_is_a_number(nchrom)
     grvars <- c('type', names(gr2dt(gr)))
     if (!is.null(facet_var))    assert_is_subset(facet_var,    grvars)
     if (!is.null(alpha_var))    assert_is_subset(alpha_var,    grvars)
@@ -136,28 +135,18 @@ plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr),
     if (!is.null(size_var))     assert_is_subset(size_var,     grvars)
     if (!is.null(title))        assert_is_a_string(title)
     assert_is_a_string(scales)
-#  Initialize
     nickrange <- NULL
-    gr$type <- 'spacer'
-    gr$type %<>% factor(c("spacer", "3' extension", "nicking spacer"))
-    seqinfo1 <- seqinfo(gr)
+# Extract spacer ranges
     plotgr <- gr
-# Extract 3' extensions
-    if ('crisprextension' %in% names(mcols(gr))){
-        extgr <- GRanges(gr$crisprextrange, seqinfo=seqinfo1)
-        mcols(extgr) <- mcols(gr)
-        extgr$type <- "3' extension"
-        plotgr %<>% c(extgr)}
-# Extract nickranges
-    if ('nickrange' %in% names(mcols(gr))){
-        nickdt <- gr2dt(gr)
-        nickdt %<>% extract(complete.cases(nickrange))
-        nickdt %<>%  separate_rows(starts_with('nick'), sep = ';')
-        nickgr <- GRanges(nickdt$nickrange, seqinfo = seqinfo1)
-        nickgr$off <- as.numeric(nickdt$nickoff)
-        mcols(nickgr) <- mcols(dt2gr(nickdt, seqinfo = seqinfo1))
-        nickgr$type <- 'nicking spacer'
-        plotgr %<>% c(nickgr)}
+    plotgr$type <- 'spacer'
+    plotgr$type %<>% factor(c("spacer", "3' extension", "nicking spacer"))
+    plotgr %<>% c(extract_extensions(gr))
+    plotgr %<>% c(extract_nickspacers(gr))
+# Discretize values
+    plotgr %<>% prepare_alpha(alpha_var)
+    plotgr %<>% prepare_size(size_var)
+    plotgr$color <- mcols(plotgr)[[color_var]]; color_var <- 'color'
+    plotgr %<>% prepare_color(color_var)
 # Plot    
     p <- plot_intervals_engine(plotgr, xref=xref, y=y, nperchrom=nperchrom, 
             nchrom=nchrom, color_var=color_var, facet_var=facet_var, 
@@ -165,8 +154,163 @@ plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr),
             title=title, scales=scales)
     p %<>% scale_alpha(alpha_var)
     p %<>% scale_size(size_var)
+    p %<>% scale_linetype(linetype_var)
+    p %<>% scale_color(color_var, mcols(plotgr)[[color_var]])
     p
 }
+
+
+prepare_alpha <- function(plotgr, alpha_var){
+    if (!is.null(alpha_var)){
+        if (alpha_var == 'off'){
+            mcols(plotgr)[[alpha_var]] %<>% cut(c(-Inf, 0, Inf), c('0', '1+'))}}
+    plotgr
+}
+
+prepare_size <- function(plotgr, size_var){
+    if (!is.null(size_var)){
+        if (size_var %in% c('Doench2014', 'Doench2016')){
+            mcols(plotgr)[[size_var]] %<>% 
+                cut(c(-Inf,0.3,0.5,Inf), c('0+','0.3+','0.5+'))}}
+    plotgr
+}
+
+prepare_color <- function(plotgr, color_var){
+    . <- NULL
+    if ('nicking spacer' %in% unique(plotgr$type)){
+        mcols(plotgr)[[color_var]] %<>% factor(c(unique(.), 'nicking spacer'))
+        mcols(plotgr)[[color_var]][plotgr$type=='nicking spacer'] <- 
+            'nicking spacer'
+    }
+    plotgr
+}
+
+
+
+scale_alpha <- function(p, alpha_var){
+    if (!is.null(alpha_var)){ if (alpha_var == 'off'){
+        p <- p + scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
+    }}
+    p
+}
+
+scale_size <- function(p, size_var){
+    if (!is.null(size_var)){  if (size_var %in% c('Doench2014', 'Doench2016')){
+        p <- p + scale_size_manual(
+                    values = c(`0+` = 0.1, `0.3+` = 1, `0.5+` = 2))
+    }}
+    p
+}
+
+scale_linetype <- function(p, linetype_var){
+    if (!is.null(linetype_var)) if (linetype_var == 'type'){
+        p <- p + scale_linetype_manual(values = 
+                    c(  `spacer` = 'solid', 
+                        `3' extension` = 'dotted', 
+                        `nicking spacer` = 'solid'))
+    }
+    p
+}
+
+scale_color <- function(p, color_var, color_values){
+    if (!is.null(color_var)){ 
+        if ('nicking spacer' %in% color_values){
+            colors <- make_ggcolors(setdiff(
+                        unique(color_values), 'nicking spacer'))
+            colors %<>% c(`nicking spacer` = 'gray40')
+            p <- p + scale_color_manual(values = colors)
+        }
+    }
+    p
+}
+
+make_ggcolors <- function (factor_levels){
+    n <- length(factor_levels)
+    hues <- seq(15, 375, length = n + 1)
+    color_levels <- grDevices::hcl(h = hues, l = 65, c = 100)[seq_len(n)]
+    names(color_levels) <- factor_levels
+    color_levels
+}
+
+extract_extensions  <- function(spacers){
+    
+    if ('crisprextension' %in% names(mcols(spacers))){
+        extgr <- GRanges(spacers$crisprextrange, seqinfo=seqinfo(spacers))
+        mcols(extgr) <- mcols(spacers)
+        mcols(extgr)$targetstart <- mcols(extgr)$targetend <- NULL
+        extgr$type <- "3' extension"
+        return(extgr)
+        
+    } else {
+        return(GRanges(seqinfo = seqinfo(spacers)))
+    }
+}
+
+extract_nickspacers <- function(spacers){
+    
+    nickrange <- NULL
+    
+    if ('nickrange' %in% names(mcols(spacers))){
+        seqinfo1 <- seqinfo(spacers)
+        nickdt <- gr2dt(spacers)
+        nickdt %<>% extract(complete.cases(nickrange))
+        nickdt %<>%  separate_rows(starts_with('nick'), sep = ';')
+        nickgr <- GRanges(nickdt$nickrange, seqinfo = seqinfo1)
+        mcols(nickgr) <- mcols(dt2gr(nickdt, seqinfo=seqinfo1))
+        mcols(nickgr)$targetstart <- mcols(nickgr)$targetend <- NULL
+        if ('nickoff' %in% names(mcols(nickgr))){
+            nickgr$off <- as.numeric(nickgr$nickoff)
+            nickgr$nickoff <- NULL}
+        if ('nickDoench2014' %in% names(mcols(nickgr))){
+            nickgr$Doench2014 <- as.numeric(nickgr$nickDoench2014)
+            nickgr$nickDoench2014 <- NULL}
+        if ('nickDoench2016' %in% names(mcols(nickgr))){
+            nickgr$Doench2016 <- as.numeric(nickgr$nickDoench2016)
+            nickgr$nickDoench2016 <- NULL
+        }
+        nickgr$type <- 'nicking spacer'
+        return(nickgr)
+        
+    } else {
+        return(GRanges(seqinfo = seqinfo(spacers)))
+    }
+}
+
+prepare_plot_intervals <- function(
+    gr, xref, y, nperchrom, nchrom, alpha_var, size_var
+){
+# Comply
+    edge <- targetname <- xstart <- xend <- width <- NULL
+    targetstart <- targetend <- xtargetstart <- xtargetend <- tmp <- NULL
+    extstart <- crisprprimer <- crisprtranscript <- crisprextension <- NULL
+# Prepare data.table. Select chromosomes/targets to plot.
+    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
+    plotdt %<>% extract(order(seqnames, start))
+    plotdt$seqnames %<>% droplevels()
+    headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
+    plotdt %<>% extract(headtailchroms, on = 'seqnames')
+    plotdt$seqnames %<>% factor(headtailchroms)
+    plotdt %<>% extract( # targets
+        , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
+        by = 'seqnames')
+# Main ranges
+    plotdt %>%  extract(, y      := min(start), by = y)
+    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
+    plotdt %>%  extract(, xstart := start-min(start), by = xref)
+    plotdt %>%  extract(, xend   := xstart + width)
+# Target marks
+    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
+        plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
+        plotdt %>% extract(, xtargetend   := xend   + targetend-end  )}
+# Flip for arrow direction    
+    plotdt[strand=='-', tmp    := xend]
+    plotdt[strand=='-', xend   := xstart]
+    plotdt[strand=='-', xstart := tmp]
+    plotdt[           , tmp      := NULL]
+# Return
+    plotdt
+}
+
 
 plot_intervals_engine <- function(
     gr, xref, y, nperchrom, nchrom , color_var, facet_var, linetype_var, 
@@ -200,59 +344,6 @@ plot_intervals_engine <- function(
 }
 
 
-prepare_plot_intervals <- function(
-    gr, xref, y, nperchrom, nchrom, alpha_var, size_var
-){
-# Comply
-    edge <- targetname <- xstart <- xend <- width <- NULL
-    targetstart <- targetend <- xtargetstart <- xtargetend <- tmp <- NULL
-    extstart <- crisprprimer <- crisprtranscript <- crisprextension <- NULL
-# Prepare data.table. Select chromosomes/targets to plot.
-    plotdt <- data.table::as.data.table(gr) %>% cbind(names = names(gr))
-    plotdt %<>% extract(order(seqnames, start))
-    plotdt$seqnames %<>% droplevels()
-    headtailchroms <- head_tail(levels(plotdt$seqnames), nchrom)
-    plotdt %<>% extract(headtailchroms, on = 'seqnames')
-    plotdt$seqnames %<>% factor(headtailchroms)
-    plotdt %<>% extract( # targets
-        , .SD[targetname %in% head_tail(unique(targetname), nperchrom)],
-        by = 'seqnames')
-# Main ranges
-    plotdt %>%  extract(, y      := min(start), by = y)
-    plotdt %>%  extract(, y      := factor(format(y, big.mark = " ")))
-    plotdt %>%  extract(, xstart := start-min(start), by = xref)
-    plotdt %>%  extract(, xend   := xstart + width)
-# Target marks
-    if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
-        plotdt %>% extract(, xtargetstart := xstart + targetstart-start)
-        plotdt %>% extract(, xtargetend   := xend   + targetend-end  )}
-# Flip for arrow direction    
-    plotdt[strand=='-', tmp    := xend]
-    plotdt[strand=='-', xend   := xstart]
-    plotdt[strand=='-', xstart := tmp]
-    plotdt[           , tmp      := NULL]
-# Alpha and Size
-    if (!is.null(alpha_var)) if (alpha_var == 'off')    plotdt[[alpha_var]] %<>%
-        cut(c(-Inf, 0, Inf), c('0', '1+'))
-    if (!is.null(size_var)) if (size_var=='Doench2016') plotdt[[size_var]]  %<>%
-        cut(c(-Inf,0.3,0.5,Inf), c('0+','0.3+','0.5+'))
-# Return
-    plotdt
-}
-
-
-scale_alpha <- function(p, alpha_var){
-    if (!is.null(alpha_var)) if (alpha_var == 'off') p <- p + 
-        scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
-    return(p)
-}
-
-scale_size <- function(p, size_var){
-    if (!is.null(size_var)) if (size_var == 'Doench2016') p <- p +
-        scale_size_manual(values = c(`0+` = 0.1, `0.3+` = 1, `0.5+` = 2))
-    return(p)
-}
-
 
 
 default_linetype <- function(gr){
@@ -273,8 +364,14 @@ default_alpha_var <- function(gr){
 }
 
 default_size_var <- function(gr){
-    if ('Doench2016' %in% names(mcols(gr))) 'Doench2016' else NULL
+    if ('Doench2016' %in% names(mcols(gr))) return('Doench2016')
+    if ('Doench2014' %in% names(mcols(gr))) return('Doench2014')
+    return(NULL)
 }
+
+
+
+
 
 
 head_tail <- function(x, n){

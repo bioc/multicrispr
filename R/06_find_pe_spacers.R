@@ -126,7 +126,7 @@ find_gg <- function(gr){
 
 
 add_nickspacers <- function(
-    pespacers, bsgenome, plot = TRUE, outdir = OUTDIR, 
+    pespacers, bsgenome, ontargets, plot = TRUE, outdir = OUTDIR, 
     indexedgenomesdir = INDEXEDGENOMESDIR
 ){
 # Check / Clean
@@ -146,6 +146,9 @@ add_nickspacers <- function(
     nickspacers %<>% filter_offtargets(
         bsgenome, by = 'pename', plot = FALSE, outdir = outdir,
         indexedgenomesdir = indexedgenomesdir, verbose = FALSE)
+    nickspacers %<>% add_ontargets(
+                        bsgenome, method = ontargets, verbose=FALSE, plot=FALSE)
+    mcols(nickspacers)[[ontargets]] %<>% round(digits = 2)
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
                 extract( , .(
@@ -157,6 +160,8 @@ add_nickspacers <- function(
                     nickoff0   = off0, 
                     nickoff1   = off1, 
                     nickoff2   = off2)) %>%
+                extract(, (paste0('nick', ontargets)) := 
+                                mcols(nickspacers)[[ontargets]]) %>% 
                 extract( , lapply(.SD, pastelapse), by = 'pename')
 
     pedt <- gr2dt(pespacers)
@@ -193,6 +198,7 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #'        If named, names should be identical to those of \code{gr}
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
+#' @param ontargets  'Doench2014' or 'Doench2016': on-target scoring method
 #' @param plot      TRUE (default) or FALSE
 #' @param outdir    string: passed to filter_offtargets
 #' @param indexedgenomesdir  string: passed to filter_offtargets
@@ -226,8 +232,8 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, plot = TRUE, outdir = OUTDIR, 
-    indexedgenomesdir = INDEXEDGENOMESDIR, ...){
+    nprimer = 13, nrt = 16, ontargets = 'Doench2014', plot = TRUE, 
+    outdir = OUTDIR, indexedgenomesdir = INDEXEDGENOMESDIR, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
@@ -257,12 +263,13 @@ find_pe_spacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacer$crisprtranscript <- revtranscript$seq
     spacer$crisprextension  <- ext$seq
     spacer$crisprextrange   <- unname(as.character(granges(ext)))
-# Add offtargets
+# Add on/offtarget results
     spacer %<>% add_offtargets(bsgenome, mismatches = 0, 
                     outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
                     verbose= TRUE, plot = FALSE, ...)
+    spacer %<>% add_ontargets(bsgenome, method = ontargets, plot = FALSE)
 # Add nicking spacers and return
-    spacer %<>% add_nickspacers(bsgenome, plot = FALSE, 
+    spacer %<>% add_nickspacers(bsgenome, ontargets = ontargets, plot = FALSE, 
                     outdir = outdir, indexedgenomesdir = indexedgenomesdir)
 # Plot and Return
     if (plot) print(plot_intervals(spacer, ...))

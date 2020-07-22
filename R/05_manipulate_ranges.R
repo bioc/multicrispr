@@ -110,8 +110,7 @@ summarize_loci <- function(gr){
 #' @export
 up_flank <- function(
     gr, start = -200, end = -1, strandaware = TRUE, bsgenome = NULL, 
-    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
-){
+    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_numeric(start)
@@ -164,8 +163,7 @@ up_flank <- function(
 #' @export
 down_flank <- function(
     gr, start = 1,  end = 200, strandaware = TRUE, bsgenome = NULL,
-    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
-){
+    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...){
 # Assert
     assert_is_any_of(gr, 'GRanges')
     assert_is_numeric(start)
@@ -218,8 +216,7 @@ down_flank <- function(
 #' @export
 extend <- function(
     gr, start = -22, end = 22, strandaware = TRUE, bsgenome = NULL,
-    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...
-){
+    verbose = FALSE, plot = FALSE, linetype_var = 'set', ...){
 # Assert
     assert_is_any_of(gr, 'GRanges')
     assert_is_numeric(start)
@@ -253,7 +250,6 @@ extend <- function(
         assert_is_all_of(bsgenome, 'BSgenome')
         newgr %<>% add_seq(bsgenome)
     }
-    
 # Plot, Message, Return
     if (plot){
         gr$set <- 'original'
