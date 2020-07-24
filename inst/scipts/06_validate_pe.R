@@ -8,7 +8,7 @@ x <- multicrispr::char_to_granges(
             HBB  = 'chr11:5227002:-',   # snp
             HEXA = 'chr15:72346579:-'), # ins
         bsgenome = bsgenome)
-spacers <- multicrispr::find_pe_spacers(x, bsgenome)
+spacers <- multicrispr::find_primespacers(x, bsgenome)
 spacers['HBB_1']
     # CATGGTGCATCTGACTCCTG   # HBB_1 C->T, extra nucleotide
     # GCATGGTGCACCTGACTCCTG  # Anzalone

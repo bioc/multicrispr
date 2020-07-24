@@ -58,6 +58,11 @@ knitr::include_graphics("../inst/extdata/readme_portrait.png")
 Installing **multicrispr** is simple:
 
 ```{r, eval = FALSE}
+# From BioC
+install.packages("BiocManager")
+BiocManager::install(version='devel')
+BiocManager::install("multicrispr")
+# From gitlab: 
 url <- 'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'
 remotes::install_git(url, repos = BiocManager::repositories())
 ```
@@ -169,19 +174,19 @@ This can be done with `find_spacers`, after extending target range(s) to prime e
 ```{r, fig.width=3, fig.height=1.5}
 bsgenome   <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 neighbourhood <- extend_for_pe(targets, bsgenome)
-spacers    <- find_spacers(neighbourhood, bsgenome, complement = FALSE)
+spacers    <- find_spacers(neighbourhood, bsgenome, complement = FALSE, mismatches = 0)
 ```
 
-For prime editing, however, it is better to use `find_pe_spacers`, which performs target to neighbourhood extension implicitly, and also adds 3' extension (Fig 1) to returned spacer GRanges.
+For prime editing, however, it is better to use `find_primespacers`, which performs target to neighbourhood extension implicitly, and also adds 3' extension (Fig 1) to returned spacer GRanges.
 
 ```{r, fig.width=3.3, fig.height=1.7}
-spacers <- find_pe_spacers(targets, bsgenome=bsgenome) 
+spacers <- find_primespacers(targets, bsgenome=bsgenome) 
 ```
 
 This finds prime editing sites that follow Anzalone et al. (2019)'s recommended default settings: a 13-nucleotide primer and a 16-nucleotide reverse transcription template. These settings can be easily altered (e.g. Anzalone et al. report success with reverse transcription templates of up to 48 nucleotides) by: 
 
 ```{r, fig.width=3.6, fig.height=2.1}
-spacers <- find_pe_spacers(targets, bsgenome=bsgenome, nrt = 48) 
+spacers <- find_primespacers(targets, bsgenome=bsgenome, nrt = 48) 
 ```
 
 

@@ -41,7 +41,7 @@ bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 gr <- char_to_granges(c(HBB  = 'chr11:5227002:-'), bsgenome)
 plot_intervals(gr, facet_var = c('seqnames', 'targetname'))
 
-spacers <-  gr %>% find_pe_spacers(bsgenome, nrt=48) %>% add_genome_counts()
+spacers <-  gr %>% find_primespacers(bsgenome, nrt=48) %>% add_genome_counts()
 spacers$specific <- spacers$G0==1
 spacers %<>% add_efficiency(bsgenome, 'Doench2016')
     # Select HBB
@@ -56,7 +56,7 @@ p <- plot_intervals(extended, facet_var = c('seqnames', 'targetname')) +
     ggplot2::guides(color = FALSE)
 ggplot2::ggsave('graphs/hbb02_extended.pdf', p, width=2.1, height=1.8, device = grDevices::cairo_pdf)
 
-spacers <- gr %>% find_pe_spacers(bsgenome, nrt=48)
+spacers <- gr %>% find_primespacers(bsgenome, nrt=48)
 p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname')) + 
      ggplot2::guides(color = FALSE, size = FALSE)
 ggplot2::ggsave('graphs/hbb03_spacers.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
@@ -111,7 +111,7 @@ grDevices::hcl(h = seq(15, 375, length = n + 1), l = 65, c = 100)[1:3]
     #                legend.background = ggplot2::element_blank())
 
 # Find pe sites
-spacers <- find_pe_spacers(gr, bsgenome, nrt = 26)
+spacers <- find_primespacers(gr, bsgenome, nrt = 26)
 
 # Filter for specificity
 genomedir <- '~/.multicrispr/bowtie/genome/BSgenome.Hsapiens.UCSC.hg38'

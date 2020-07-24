@@ -54,7 +54,7 @@ Adds match counts to GRanges object, and then returns it.
                          HEXA = 'chr15:72346580-72346583:-',   # del
                          CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
- spacers <- find_pe_spacers(gr, bsgenome)
+ spacers <- find_primespacers(gr, bsgenome)
  # indexdir <- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)
  # match_spacers(spacers, indexdir, norc=TRUE, mismatches = 1)
  

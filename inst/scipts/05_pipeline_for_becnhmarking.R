@@ -46,7 +46,7 @@
                                 bsgenome)
     
     # Find specific, efficient spacers
-    spacers <-  find_pe_spacers(targets, bsgenome)
+    spacers <-  find_primespacers(targets, bsgenome)
     spacers %<>% filter_prime_specific(bsgenome)
     spacers %<>% add_efficiency(bsgenome, method = 'Doench2016')
     spacers

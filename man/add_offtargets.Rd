@@ -79,7 +79,7 @@ Non-NULL targets: offtarget counts = (G0-T0) + (G1-T1) + ...
                          HEXA = 'chr15:72346580-72346583:-',   # del
                          CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
- spacers <- find_pe_spacers(gr, bsgenome)
+ spacers <- find_primespacers(gr, bsgenome)
  # index_genome(bsgenome)
  add_offtargets(spacers, bsgenome, mismatches=0)
  filter_offtargets(spacers, bsgenome, mismatches=0)

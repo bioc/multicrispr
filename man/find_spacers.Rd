@@ -10,6 +10,10 @@ find_spacers(
   spacer = strrep("N", 20),
   pam = "NGG",
   complement = TRUE,
+  ontargets = c("Doench2014", "Doench2016")[1],
+  mismatches = 2,
+  indexedgenomesdir = INDEXEDGENOMESDIR,
+  outdir = OUTDIR,
   verbose = TRUE,
   plot = TRUE,
   ...
@@ -25,6 +29,16 @@ find_spacers(
 \item{pam}{string: pam pattern in extended IUPAC alphabet}
 
 \item{complement}{TRUE (default) or FALSE: also search in compl ranges?}
+
+\item{ontargets}{'Doench2016' or 'Doench2016': on-target scoring method}
+
+\item{mismatches}{0-3: allowed mismatches in offtargetanalysis 
+(choose mismatch=-1 to suppress offtarget analysis)}
+
+\item{indexedgenomesdir}{directory with Bowtie-indexed genomes 
+(as produced with \code{\link{index_genome}})}
+
+\item{outdir}{directory where bowtie analysis results are written to}
 
 \item{verbose}{TRUE (default) or FALSE}
 
@@ -49,8 +63,8 @@ Find crispr spacers in targetranges
                             CFTR = 'chr7:117559593-117559595:+'), # ins
                           bsgenome)
     plot_intervals(gr)
-    find_pe_spacers(gr, bsgenome)
-    find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+    find_primespacers(gr, bsgenome)
+    find_spacers(extend_for_pe(gr), bsgenome, complement=FALSE, mismatches=0)
           # complement = FALSE because extend_for_pe  already 
           # adds  reverse complements and does so in a strand-specific 
           # manner
@@ -63,5 +77,5 @@ Find crispr spacers in targetranges
     find_spacers(gr, bsgenome)
 }
 \seealso{
-\code{\link{find_pe_spacers}} to find prime editing spacers
+\code{\link{find_primespacers}} to find prime editing spacers
 }

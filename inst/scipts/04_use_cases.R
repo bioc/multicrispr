@@ -80,51 +80,62 @@ ggplot2::ggsave('graphs/srf05_efficient.pdf', p, width = 2.2, height = 1.5, devi
 
 # PE
 #=====
+require(magrittr)
+require(multicrispr)
+require(ggplot2)
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-# gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
-#                         HBB  = 'chr11:5227002:-',              # snp
-#                         HEXA = 'chr15:72346580-72346583:-',    # del
-#                         CFTR = 'chr7:117559593-117559595:+'),  # ins
-#                        bsgenome)
-gr <- char_to_granges(c(HBB  = 'chr11:5227002:-'), bsgenome)
-plot_intervals(gr, facet_var = c('seqnames', 'targetname'))
+gr <- char_to_granges(c(PRNP='chr20:4699600:+'), bsgenome)
+find_primespacers(gr, bsgenome, edits = 'T')
+plot_intervals(gr)
+blanken <- function(
+    p, 
+    axis.text.x        = element_blank(),
+    axis.text.y        = element_blank(),
+    axis.ticks.x       = element_blank(),
+    axis.ticks.y       = element_blank(),
+    panel.grid.major.x = element_line(size=.5),
+    panel.grid.minor.x = element_line(size=.5)
+    
+){
+    p + 
+    theme(  strip.background   = element_blank(), 
+            strip.text.x       = element_blank(), 
+            axis.text.x        = axis.text.x,
+            axis.text.y        = axis.text.y,
+            axis.ticks.x       = axis.ticks.x,
+            axis.ticks.y       = axis.ticks.y,
+            panel.grid.major.y = element_blank(), 
+            panel.grid.minor.y = element_blank(), 
+            panel.grid.major.x = panel.grid.major.x, 
+            panel.grid.minor.x = panel.grid.minor.x, 
+            plot.background    = element_rect(fill = 'transparent', colour=NA)) + 
+    guides(color = FALSE, size = FALSE, linetype = FALSE, alpha = FALSE)
+}
 
-spacers <-  gr %>% find_pe_spacers(bsgenome, nrt=48) %>% add_genome_counts()
-spacers$specific <- spacers$G0==1
-spacers %<>% add_efficiency(bsgenome, 'Doench2016')
-    # Select HBB
+extended <- extend_for_pe(gr)
+plot_intervals(extended) %>% blanken()
+ggsave('../graphs/prnp02_extended.pdf', width=1.3, height=0.6, device = grDevices::cairo_pdf, bg = 'transparent')
 
-gr %<>% extract('HBB')
-p <- plot_intervals(gr, facet_var = c('seqnames', 'targetname')) + 
-    ggplot2::guides(color = FALSE)
-ggplot2::ggsave('graphs/hbb01.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
+spacers <- find_primespacers(gr, bsgenome, ontargets = 'Doench2016')
+(plot_intervals(spacers, alpha_var = 'type', size_var = NULL) + 
+scale_alpha_manual(values = c(`spacer` = 1, `3 extension` = 1, `nicking spacer` = 0))) %>% blanken()
+ggplot2::ggsave('../graphs/prnp03_primespacers.pdf', width=1.3, height=0.9, device = grDevices::cairo_pdf, bg = 'transparent')
 
-extended <- extend_for_pe(gr, nrt = 48)
-p <- plot_intervals(extended, facet_var = c('seqnames', 'targetname')) + 
-    ggplot2::guides(color = FALSE)
-ggplot2::ggsave('graphs/hbb02_extended.pdf', p, width=2.1, height=1.8, device = grDevices::cairo_pdf)
+plot_intervals(spacers, alpha_var = NULL, size_var = NULL) %>% blanken(axis.text.y = element_text())
+ggplot2::ggsave('../graphs/prnp04_nickspacers.pdf',  width=1.85, height=0.9, device = grDevices::cairo_pdf, bg = 'transparent')
 
-spacers <- gr %>% find_pe_spacers(bsgenome, nrt=48)
-p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname')) + 
-     ggplot2::guides(color = FALSE, size = FALSE)
-ggplot2::ggsave('graphs/hbb03_spacers.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
+plot_intervals(spacers) %>% blanken(axis.text.x = element_text())
+ggplot2::ggsave('../graphs/prnp05_onofftargets.pdf', width=1.3, height=1.0, device = grDevices::cairo_pdf, bg = 'transparent')
 
-spacers %<>% add_genome_counts()
-spacers$specific <- spacers$G0==1
-p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname'), 
-                    alpha_var = 'specific') + 
-    ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25)) + 
-    ggplot2::guides(color = FALSE, size = FALSE, alpha = FALSE)
-ggplot2::ggsave('graphs/hbb04_specific.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
 
-spacers %<>% add_efficiency(bsgenome, 'Doench2016')
+
+spacers %<>% add_ontargets(bsgenome, 'Doench2016')
+plot_intervals(spacers) %>% blanken()
+
 quantiles <- round(quantile(spacers$Doench2016, c(0.33, 0.66, 1)), 2)
 spacers$efficiency <- cut(spacers$Doench2016, c(0, quantiles), labels = quantiles) %>% 
                         as.character()
-p <- plot_intervals(spacers, facet_var = c('seqnames', 'targetname'), 
-               alpha_var = 'specific', size_var  = 'efficiency') + 
-    ggplot2::scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.25)) + 
-    ggplot2::scale_size_manual(values = c(0.2, 1.5, 3) %>% set_names(quantiles)) + 
+p <- plot_intervals(spacers, facet_var = 'seqnames') + 
     ggplot2::guides(color = FALSE, size = FALSE, alpha = FALSE)
 ggplot2::ggsave('graphs/hbb05_efficient.pdf', p, width=2.2, height=1.8, device = grDevices::cairo_pdf)
 
@@ -159,7 +170,7 @@ grDevices::hcl(h = seq(15, 375, length = n + 1), l = 65, c = 100)[1:3]
     #                legend.background = ggplot2::element_blank())
 
 # Find pe sites
-spacers <- find_pe_spacers(gr, bsgenome, nrt = 26)
+spacers <- find_primespacers(gr, bsgenome, nrt = 26)
 
 # Filter for specificity
 genomedir <- '~/.multicrispr/bowtie/genome/BSgenome.Hsapiens.UCSC.hg38'

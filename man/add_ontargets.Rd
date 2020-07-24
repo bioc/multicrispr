@@ -81,7 +81,7 @@ Add Doench2014 or Doench2016 on-target efficiency scores
                                  HEXA = 'chr15:72346580-72346583:-',   # del
                                  CFTR = 'chr7:117559593-117559595:+'), # ins
                                bsgenome)
-    spacers <- find_pe_spacers(targets, bsgenome)
+    spacers <- find_primespacers(targets, bsgenome)
     #spacers<- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
     (spacers \%<>\% add_ontargets(bsgenome, 'Doench2014'))
     # reticulate::use_condaenv('azienv')

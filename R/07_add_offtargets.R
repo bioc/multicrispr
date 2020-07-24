@@ -234,7 +234,7 @@ read_bowtie_results <- function(outfile, mis){
 #'                          HEXA = 'chr15:72346580-72346583:-',   # del
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
-#'  spacers <- find_pe_spacers(gr, bsgenome)
+#'  spacers <- find_primespacers(gr, bsgenome)
 #'  # indexdir <- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)
 #'  # match_seqs(spacers$crisprspacer, indexdir, norc=TRUE, mismatches = 1)
 #'  
@@ -324,7 +324,7 @@ expand_iupac_ambiguities <- function(x){
 #'                          HEXA = 'chr15:72346580-72346583:-',   # del
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
-#'  spacers <- find_pe_spacers(gr, bsgenome)
+#'  spacers <- find_primespacers(gr, bsgenome)
 #'  # indexdir <- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)
 #'  # match_spacers(spacers, indexdir, norc=TRUE, mismatches = 1)
 #'  
@@ -487,7 +487,7 @@ add_specificity <- function(...){
 #'                          HEXA = 'chr15:72346580-72346583:-',   # del
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
-#'  spacers <- find_pe_spacers(gr, bsgenome)
+#'  spacers <- find_primespacers(gr, bsgenome)
 #'  # index_genome(bsgenome)
 #'  add_offtargets(spacers, bsgenome, mismatches=0)
 #'  filter_offtargets(spacers, bsgenome, mismatches=0)
@@ -508,6 +508,7 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
     verbose = TRUE, plot = TRUE, ...){
 # First clear
     if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
+    if (mismatches==-1) return(spacers)
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
     mcols(spacers) %<>% extract(, setdiff(names(.), offcols))
     . <- off <- NULL

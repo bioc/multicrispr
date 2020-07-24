@@ -189,6 +189,12 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param spacer     string: spacer pattern in extended IUPAC alphabet
 #' @param pam        string: pam pattern in extended IUPAC alphabet
 #' @param complement TRUE (default) or FALSE: also search in compl ranges?
+#' @param ontargets  'Doench2016' or 'Doench2016': on-target scoring method
+#' @param mismatches 0-3: allowed mismatches in offtargetanalysis 
+#'                   (choose mismatch=-1 to suppress offtarget analysis)
+#' @param indexedgenomesdir directory with Bowtie-indexed genomes 
+#'                          (as produced with \code{\link{index_genome}})
+#' @param outdir     directory where bowtie analysis results are written to
 #' @param verbose    TRUE (default) or FALSE
 #' @param plot       TRUE (default) or FALSE
 #' @param ...        passed to plot_intervals
@@ -204,8 +210,8 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'                             CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                           bsgenome)
 #'     plot_intervals(gr)
-#'     find_pe_spacers(gr, bsgenome)
-#'     find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
+#'     find_primespacers(gr, bsgenome)
+#'     find_spacers(extend_for_pe(gr), bsgenome, complement=FALSE, mismatches=0)
 #'           # complement = FALSE because extend_for_pe  already 
 #'           # adds  reverse complements and does so in a strand-specific 
 #'           # manner
@@ -216,13 +222,24 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10') %>% extend()
 #'     find_spacers(gr, bsgenome)
-#' @seealso \code{\link{find_pe_spacers}} to find prime editing spacers 
+#' @seealso \code{\link{find_primespacers}} to find prime editing spacers 
 #' @export 
-find_spacers <- function(
-    gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', complement = TRUE, 
+find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', 
+    complement = TRUE, ontargets = c('Doench2014', 'Doench2016')[1],
+    mismatches = 2, indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
     verbose = TRUE, plot = TRUE, ...
 ){
-
+# Assert
+    assert_is_all_of(gr, 'GRanges')
+    assert_is_all_of(bsgenome, 'BSgenome')
+    assert_is_a_string(spacer)
+    assert_is_a_string(pam)
+    assert_is_a_bool(complement)
+    assert_is_subset(ontargets, c('Doench2016', 'Doench2014'))
+    assert_is_subset(mismatches, c(-1, 0,1,2))
+    assert_is_a_bool(verbose)
+    assert_is_a_bool(plot)
+# Find
     if (complement){
         gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
     }
@@ -232,11 +249,13 @@ find_spacers <- function(
     spacers$crisprname   <- names(spacers)
     spacers$crisprspacer <- getSeq(bsgenome, spacers, as.character=TRUE)
     spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
-    #spacers %>% sort(ignore.strand = TRUE)
-    if (plot){
-        print(plot_intervals(spacers, ...))
-        spacers$sitename <- NULL
-    }
+# Add on/offtargets
+    spacers %<>% add_offtargets(bsgenome, mismatches = mismatches, 
+                    indexedgenomesdir = indexedgenomesdir, outdir = outdir, 
+                    verbose = verbose, plot=FALSE)
+    spacers %<>% add_ontargets(bsgenome, method = ontargets, plot = FALSE)
+# Plot/Return
+    if (plot) print(plot_intervals(spacers, ...)) #spacers$sitename <- NULL
     spacers
 }
 
@@ -260,7 +279,7 @@ find_spacers <- function(
 #'                          HEXA = 'chr15:72346580-72346583:-',   # del
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                      bsgenome = bsgenome)
-#' find_pe_spacers(gr, bsgenome)
+#' find_primespacers(gr, bsgenome)
 #' (grext <- extend_for_pe(gr))
 #' find_spacers(grext, bsgenome, complement = FALSE)
 #' @export

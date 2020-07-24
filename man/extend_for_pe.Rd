@@ -43,7 +43,7 @@ gr <- char_to_granges(c( PRNP = 'chr20:4699600:+',             # snp
                          HEXA = 'chr15:72346580-72346583:-',   # del
                          CFTR = 'chr7:117559593-117559595:+'), # ins
                      bsgenome = bsgenome)
-find_pe_spacers(gr, bsgenome)
+find_primespacers(gr, bsgenome)
 (grext <- extend_for_pe(gr))
 find_spacers(grext, bsgenome, complement = FALSE)
 }
