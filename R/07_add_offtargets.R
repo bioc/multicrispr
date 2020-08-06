@@ -236,7 +236,7 @@ read_bowtie_results <- function(outfile, mis){
 #'                        bsgenome)
 #'  spacers <- find_primespacers(gr, bsgenome)
 #'  # reference <- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)
-#'  # match_seqs(spacers$crisprspacer, reference, norc=TRUE, mismatches = 1)
+#'  # bowtie_count(spacers$crisprspacer, reference, norc=TRUE, mismatches = 1)
 #'  
 #' # TFBS example
 #' #-------------
@@ -246,8 +246,9 @@ read_bowtie_results <- function(outfile, mis){
 #' reference <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
 #' crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
-#' match_seqs(crisprseqs, reference, norc=FALSE)
-#' match_seqs(crisprseqs, reference, norc=FALSE, mismatches=3)
+#' bnowtie_count(crisprseqs, reference, norc=FALSE)
+#' bowtie_count(crisprseqs, reference, norc=FALSE, mismatches=3)
+#' @noRd
 #' @export
 bowtie_count <- function(crisprseqs, reference, mismatches = 2, norc, 
     outdir = OUTDIR, verbose = TRUE
