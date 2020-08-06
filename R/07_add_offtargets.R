@@ -212,7 +212,7 @@ read_bowtie_results <- function(outfile, mis){
 #' 
 #' Count matches to indexed target/genome using Bowtie
 #' 
-#' @param seqs      character vector: sequences to match against indexed ref
+#' @param crisprseqs      character vector: sequences to match against indexed ref
 #' @param reference  string: dir containing indexed reference.
 #'                  This can be an indexed genome( \code{\link{index_genome}}
 #'                  It can also be indexed targets (\code{\link{index_targets}})
@@ -245,20 +245,20 @@ read_bowtie_results <- function(outfile, mis){
 #' targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
 #' reference <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
-#' seqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
-#' match_seqs(seqs, reference, norc=FALSE)
-#' match_seqs(seqs, reference, norc=FALSE, mismatches=3)
+#' crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
+#' match_seqs(crisprseqs, reference, norc=FALSE)
+#' match_seqs(crisprseqs, reference, norc=FALSE, mismatches=3)
 #' @export
-bowtie_count <- function(seqs, reference, mismatches = 2, norc, 
+bowtie_count <- function(crisprseqs, reference, mismatches = 2, norc, 
     outdir = OUTDIR, verbose = TRUE
 ){
 
     # Assert
-    assertive::assert_is_character(seqs)
-    assertive::assert_has_no_duplicates(seqs)
+    assertive::assert_is_character(crisprseqs)
+    assertive::assert_has_no_duplicates(crisprseqs)
 
     # Write reads to fasta
-    reads <- Biostrings::DNAStringSet(unique(seqs))
+    reads <- Biostrings::DNAStringSet(unique(crisprseqs))
     reads %<>% name_uniquely('read')
     readfasta <- spacer_fasta(outdir)
     dir.create(dirname(readfasta), recursive = TRUE, showWarnings = FALSE)
@@ -283,7 +283,7 @@ bowtie_count <- function(seqs, reference, mismatches = 2, norc,
 
     # Return
     readdt[, 'readname' := NULL]
-    readdt[seqs, on = 'readseq']
+    readdt[crisprseqs, on = 'readseq']
 }
 
 explode <- function(x) unlist(strsplit(x, character(0)))
