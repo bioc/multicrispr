@@ -78,7 +78,7 @@ Find crispr spacers in targetranges
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10') \%>\% extend()
-    find_spacers(gr, bsgenome)
+    find_spacers(gr, bsgenome, subtract_targets = TRUE)
 }
 \seealso{
 \code{\link{find_primespacers}} to find prime editing spacers

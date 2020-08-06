@@ -14,6 +14,7 @@ add_offtargets(
   targets = NULL,
   mismatches = 2,
   pam = "NGG",
+  method = c("bowtie", "pdict")[1],
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   verbose = TRUE,
@@ -48,6 +49,8 @@ filter_offtargets(
 \item{mismatches}{number (default 2): max number of mismatches to consider}
 
 \item{pam}{string (default 'NGG'): pam sequence}
+
+\item{method}{'bowtie' or 'pdict'}
 
 \item{outdir}{directory where output is written to}
 
