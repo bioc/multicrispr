@@ -223,7 +223,7 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10') %>% extend()
-#'     find_spacers(gr, bsgenome)
+#'     find_spacers(gr, bsgenome, subtract_targets = TRUE)
 #' @seealso \code{\link{find_primespacers}} to find prime editing spacers 
 #' @export 
 find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', 
