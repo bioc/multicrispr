@@ -35,23 +35,39 @@
 # TFBS
 #=============
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+    index_genome(bsgenome)
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
     targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10', plot = FALSE)
     extended <- extend(targets, -22, +22)
-    spacers  <- find_spacers(extended, bsgenome, ontargets = 'Doench2016')
+    spacers  <- find_spacers(
+        extended, bsgenome, ontargets = 'Doench2016', subtract_targets = TRUE)
     
-    # Select target to plot
-    spacers %>% subset(seqnames == 'chr1') %>% 
-                subset(off == 0)   %>% 
+    # Select target to showcase
+    # Find a target that allows to showcase subtract_targets = TRUE
+    # In the (200 NT wide) TFBS flanks, many examples like these can be found
+    # In the (22 NT wide)  TFBS extensions, there are not so much examples like these
+    # Still, we prefer the TFBS extensions because computations are faster and it is easier to explain why we targeting the extensions
+    # In the extensions, we find two targets with mutual (exact) cross-matches
+    # This is due to exact sequence duplication among those two targets
+    spacers %>% subset(off == 0 & (T0>1 | T1>1 | T2>1))   %>% 
                 gr2dt() %>%
                 extract(,.SD[.N>2] ,by = 'targetname') %>% 
                 dt2gr(seqinfo(spacers))
-    spacers  %<>% extract(.$targetname == 'chr1:63177095-63177110:+')
-    extended %<>% extract(.$targetname == 'chr1:63177095-63177110:+')
-    targets  %<>% extract(.$targetname == 'chr1:63177095-63177110:+')
+    c("chr13:119991554-119991569:+", "chr13:120070959-120070974:-") %>% 
+    GRanges(, seqinfo = seqinfo(bsgenome)) %>% 
+    extend(-22,+22) %>% 
+    BSgenome::getSeq(bsgenome, .)
+    
+    # Fine then, let's focus on these targets
+    selection <- 'chr13:119991554-119991569:+' # 'chr1:63177095-63177110:+'
+    spacers  %<>% extract(.$targetname == selection)
+    extended %<>% extract(.$targetname == selection)
+    targets  %<>% extract(.$targetname == selection)
+    BSgenome::vmatchPattern(Biostrings::DNAString("GTGAGAAGGTCGCCTTTATT"), bsgenome)
+    
     
     # Plot
-    color_blue <- function(p) p + scale_color_manual(values = c(`chr1:63177095-63177110:+` = "#00BFC4"))
+    color_blue <- function(p) p + scale_color_manual(values = c(`chr13:119991554-119991569:+` = "#00BFC4"))
     plot_intervals(targets, color_var = 'targetname') %>% color_blue() %>% blanken()
     ggsave('../graphs/srf01.pdf',   width =1.3, height = 0.5, device = grDevices::cairo_pdf)
     
@@ -59,15 +75,15 @@
     ggsave('../graphs/srf02_extended.pdf', width = 1.3, height = 0.9, device = grDevices::cairo_pdf,   bg = 'transparent')
     
     plot_intervals(spacers, alpha_var = NULL, size_var = NULL)  %>% color_blue() %>% blanken()
-    ggsave('../graphs/srf03_spacers.pdf', width = 1.3, height = 0.9, device = grDevices::cairo_pdf,    bg = 'transparent')
+    ggsave('../graphs/srf03_spacers.pdf', width = 2, height = 1.4, device = grDevices::cairo_pdf,    bg = 'transparent')
     
-    plot_intervals(spacers, alpha_var = NULL) %>% color_blue() %>% blanken()
-    ggsave('../graphs/srf04_ontargets.pdf', width = 1.3, height = 0.9, device = grDevices::cairo_pdf,  bg = 'transparent')
+    plot_intervals(spacers, size_var = NULL) %>% color_blue() %>% blanken()
+    ggsave('../graphs/srf04_offtargets.pdf', width = 2, height = 1.4, device = grDevices::cairo_pdf, bg = 'transparent')
     
     plot_intervals(spacers) %>% color_blue() %>% blanken()
-    ggsave('../graphs/srf05_offtargets.pdf', width = 1.3, height = 0.9, device = grDevices::cairo_pdf, bg = 'transparent')
+    ggsave('../graphs/srf05_ontargets.pdf', width = 2, height = 1.4, device = grDevices::cairo_pdf,  bg = 'transparent')
     
-    spacers
+    rev(spacers)
 
 # PE
 #=====
