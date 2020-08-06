@@ -1,3 +1,56 @@
+
+# See documentation of bowtie_count
+#' @export
+pdict_count <- function(crisprseqs, reference, mismatches, norc = FALSE,
+    outdir = OUTDIR, verbose = TRUE
+){
+    # Assert
+    assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
+    assert_is_any_of(reference, 'BSgenome')
+    assert_is_subset(mismatches, c(0,1,2,3))
+    assert_is_character(chromosomes)
+    assert_is_a_bool(verbose)
+
+    # Comply
+    . <- count <- NULL
+
+    # Count
+    starttime <- Sys.time()
+    matches <- data.table(readname = crisprseqs)
+    countfun <- if (is(reference, 'BSgenome')){     pdict_count_bsgenome
+                } else if (is.character(reference)){pdict_count_character}
+        
+    for (mismatch in seq(0, mismatches)){
+        if (verbose) cmessage( 
+                        '\t\t\tCount %d-mismatch hits in genome      : %s',
+                        mismatch, format(signif(Sys.time() - starttime, 2)))
+        countvar <- paste0('MM', i)
+        matches[, (countvar) := countfun(crisprseqs, reference, mismatch)]}
+
+    # Return
+    matches
+}
+
+pdict_count_bsgenome <- function(crisprseqs, bsgenome, mismatch){
+    Biostrings::vcountPDict(Biostrings::DNAStringSet(crisprseqs),
+                            bsgenome,
+                            min.mismatch = mismatch,
+                            max.mismatch = mismatch) %>% 
+    data.table::as.data.table()  %>% 
+    extract(, .(n = sum(count)), by ='index') %>%
+    extract2('n')
+}
+
+pdict_count_character <- function(crisprseqs, targetseqs, mismatch){
+    Biostrings::vcountPDict(Biostrings::DNAStringSet(crisprseqs),
+                            Biostrings::DNAStringSet(targetseqs),
+                            min.mismatch = mismatch,
+                            max.mismatch = mismatch) %>% 
+    rowSums()
+}
+
+
+
 INDEXEDGENOMESDIR <- '~/multicrisprout/indexedgenomes'
     genome_dir <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){
             paste0(indexedgenomesdir, '/', bsgenome@pkgname)}
