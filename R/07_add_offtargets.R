@@ -97,7 +97,7 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #' Count matches to indexed target/genome using Bowtie
 #' 
 #' @param crisprseqs character vector: sequences to match against indexed ref
-#' @param bowtieindex  string: dir containing Bowtie index
+#' @param referenceseqs  string: dir with Bowtie indexed referenceseqs
 #'                  This can be an indexed genome( \code{\link{index_genome}}
 #'                  It can also be indexed targets (\code{\link{index_targets}})
 #' @param mismatches max number of mismatches to consider
@@ -128,13 +128,13 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-#' bowtieindex <- index_targets(targets, bsgenome)
+#' referenceseqs <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
 #' crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
-#' bowtie_count(crisprseqs, bowtieindex, norc=FALSE)
-#' bowtie_count(crisprseqs, bowtieindex, norc=FALSE, mismatches=3)
+#' bowtie_count(crisprseqs, referenceseqs, norc=FALSE)
+#' bowtie_count(crisprseqs, referenceseqs, norc=FALSE, mismatches=3)
 #' @noRd
-bowtie_count <- function(crisprseqs, bowtieindex, mismatches = 2, norc, 
+bowtie_count <- function(crisprseqs, referenceseqs, mismatches = 2, norc, 
     outdir = OUTDIR, verbose = TRUE
 ){
 
@@ -151,9 +151,9 @@ bowtie_count <- function(crisprseqs, bowtieindex, mismatches = 2, norc,
     writeXStringSet(reads, readfasta)
 
     # Map reads and read results
-    outfile <- spacer_matchfile(outdir, bowtieindex)
+    outfile <- spacer_matchfile(outdir, referenceseqs)
     if (verbose) cmessage('\t\tMap reads: %s', outfile)
-    run_bowtie(readfasta, bowtieindex, outfile, norc = norc, 
+    run_bowtie(readfasta, referenceseqs, outfile, norc = norc, 
                 mismatches = max(1, mismatches)) # 1-mismatch offtargets 
     if (verbose) cmessage('\t\tLoad results')    # required for pam correction
     matches <- read_bowtie_results(outfile, mismatches)
