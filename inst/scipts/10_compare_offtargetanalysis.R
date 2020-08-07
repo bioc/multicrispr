@@ -10,13 +10,15 @@ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                        bsgenome)
 spacers <- find_primespacers(gr, bsgenome)
 spacers
-bowtie_results <- multicrispr:::bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, mismatches = 3)
-pdict_results  <- multicrispr:::pdict_count( spacers$crisprspacer, bsgenome,               norc=FALSE, mismatches = 3)
 
+# Matching spacers only (without pam)
+(bowtie_results <- multicrispr:::bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, mismatches = 3))
+(pdict_results  <- multicrispr:::pdict_count( spacers$crisprspacer, bsgenome,               norc=FALSE, mismatches = 3))
 saveRDS(pdict_results, '../offtarget_comparison/pdict_results.rds')
 
-bowtie_results0 <- bowtie_results
-pdict_results0  <- pdict_results
+# spacer+pam (expanded)
+(bowtie_results2 <- multicrispr:::count_spacer_matches(spacers, index_genome(bsgenome), norc=FALSE, mismatches = 3, offtargetmethod = 'bowtie'))
+(pdict_results2  <- multicrispr:::count_spacer_matches(spacers,              bsgenome,  norc=FALSE, mismatches = 3, offtargetmethod = 'vcountpdict'))
 
 offtarget_comparison <- data.table( targetname   = spacers$targetname, 
             crisprname   = spacers$crisprname,
