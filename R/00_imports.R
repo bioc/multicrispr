@@ -13,6 +13,7 @@
 #' @importFrom  assertive  assert_is_numeric   assert_is_scalar
 #' @importFrom  Biostrings            complement  DNAStringSet   
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict
+#' @importFrom  Biostrings            writeXStringSet
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
 #' @importFrom  BSgenome              getSeq   getBSgenome

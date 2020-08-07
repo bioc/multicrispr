@@ -34,7 +34,7 @@
 #'  spacers <- find_primespacers(gr, bsgenome)
 #'  # pdict_count( spacers$crisprspacer, bsgenome,  norc=FALSE, mismatches = 0)
 #'  # bowtie_count(spacers$crisprspacer, index_genome(bsgenome),  norc=FALSE, 
-#'                 mismatches = 0)
+#'  #               mismatches = 0)
 #' @noRd
 pdict_count <- function(crisprseqs, reference, mismatches, norc = FALSE,
     outdir = OUTDIR, verbose = TRUE
@@ -118,9 +118,9 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
 #'  spacers <- find_primespacers(gr, bsgenome)
-#'  # reference <- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)
-#'  # bowtie_count(spacers$crisprspacer, reference, norc=FALSE, mismatches = 0)
 #'  # pdict_count( spacers$crisprspacer, bsgenome,  norc=FALSE, mismatches = 0)
+#'  # bowtie_count(spacers$crisprspacer, genome_dir(bsgenome), norc=FALSE, 
+#'  #    mismatches = 0)
 #'  
 #' # TFBS example
 #' #-------------
@@ -138,16 +138,16 @@ bowtie_count <- function(crisprseqs, reference, mismatches = 2, norc,
 ){
 
     # Assert
-    assertive::assert_is_character(crisprseqs)
-    assertive::assert_has_no_duplicates(crisprseqs)
+    assert_is_character(crisprseqs)
+    assert_has_no_duplicates(crisprseqs)
 
     # Write reads to fasta
-    reads <- Biostrings::DNAStringSet(unique(crisprseqs))
+    reads <- DNAStringSet(unique(crisprseqs))
     reads %<>% name_uniquely('read')
     readfasta <- spacer_fasta(outdir)
     dir.create(dirname(readfasta), recursive = TRUE, showWarnings = FALSE)
     if (verbose) cmessage('\t\tWrite reads to %s', readfasta)
-    Biostrings::writeXStringSet(reads, readfasta)
+    writeXStringSet(reads, readfasta)
 
     # Map reads and read results
     outfile <- spacer_matchfile(outdir, reference)
