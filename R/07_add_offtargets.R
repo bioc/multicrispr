@@ -129,7 +129,7 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
 #' referenceseqs <- index_targets(targets, bsgenome)
-#' spacers <- find_spacers(targets, bsgenome)
+#' spacers <- find_spacers(targets[1:100], bsgenome)
 #' crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
 #' bowtie_count(crisprseqs, referenceseqs, norc=FALSE)
 #' bowtie_count(crisprseqs, referenceseqs, norc=FALSE, mismatches=3)
@@ -350,33 +350,52 @@ run_bowtie <- function(spacerfasta, bowtieindex, outfile, norc, mismatches = 2){
         force     = TRUE)
 }
 
-read_bowtie_results <- function(outfile, mis){
-    
-    .N <- . <- readname <- NULL
-    
-    assertive::assert_all_are_existing_files(outfile)
-    mismatch <- mismatches <- NULL
-    
+read_bowtie_results <- function(outfile, mis, nag_pam=TRUE, verbose=FALSE){
+# Assert. Initialize.
+    assert_all_are_existing_files(outfile)
+    .N <- . <- readname <- mismatch <- mismatches <- NULL
+# Read
     dt <- data.table::fread(
             outfile,
             col.names = c(  'readname', 'strand', 'target', 'position', 
                             'readseq', 'quality', 'matches', 'mismatches'))
-
-    pattern <- '20:[ACGT][>][ACGT]'
-    dt %<>% extract(!stri_detect_regex(mismatches, pattern))
-
+    if (verbose)  message(sprintf('\tRead %d (mis)match hits', nrow(dt)))
+# Avoid NGG mismatches
+# N: dont doublecount expanded pams
+    dt %<>% extract(!stri_detect_regex(mismatches, '20:[ACGT][>][ACGT]'))
+    if (verbose) message(
+                "\tRetain ", nrow(dt), " after removing NGG 'N' mismatches")
+# G1: only NAG>NGG allowed
+    dropinplus <- if (nag_pam) '21:[CT][>]G' else '21:[ACT][>]G'
+    dropinmin  <- if (nag_pam) '21:[AG][>]C' else '21:[AGT][>]C'
+    dt %<>% extract((strand=='+' & !stri_detect_regex(mismatches, dropinplus)) |
+                    (strand=='-' & !stri_detect_regex(mismatches, dropinmin)))
+        # NAG remains
+        # dt[(stri_detect_regex(mismatches, '21:[ACGT]>[ACGT]'))]
+    if (verbose) message(
+                "\tRetain ", nrow(dt), " after removing NGG 'G1' mismatches")
+# G2: no mismatch allowed
+    dropinplus <- '22:[ACT][>]G'
+    dropinmin  <- '22:[ATG][>]C'
+    dt %<>% extract((strand=='+' & !stri_detect_regex(mismatches, dropinplus)) |
+                    (strand=='-' & !stri_detect_regex(mismatches, dropinmin)))
+    if (verbose) message(
+                "\tRetain ", nrow(dt), " after removing NGG 'G2' mismatches")
+# Handle NA values
     dt[ is.na(mismatches), mismatch := 0]
+# Count no of mismatches
     dt[!is.na(mismatches), mismatch := stringi::stri_count_fixed(
                                         mismatches, '>')]
+# Keep only relevant number of mismatches
     dt %<>% extract(mismatch<=mis)
     dt[, mismatch := factor(mismatch, c(seq(0, mis)))]
-
+# Cast into wide format
     results <-  dt %>% 
         extract( , .N, keyby = .(readname, mismatch)) %>% 
         data.table::dcast(readname ~ mismatch,  value.var='N', drop=FALSE) %>% 
         data.table::setnames(names(.)[-1], paste0('MM', names(.)[-1]))
-    
     results <- cbind(results[, 1], setnafill(results[, -1], fill = 0))
+# Return
     results
 }
 
@@ -429,7 +448,7 @@ expand_iupac_ambiguities <- function(x){
 #'  spacers <- find_primespacers(gr, bsgenome)
 #'  genomeindex <- index_genome(bsgenome)
 #'  count_spacer_matches(spacers, genomeindex, norc=FALSE, mismatches=0)
-#'  # count_spacer_matches(spacers, genomeindex, norc=FALSE, mismatches=0, 
+#'  # count_spacer_matches(spacers, bsgenome, norc=FALSE, mismatches=0, 
 #'  #                      offtargetmethod = 'vcountpdict')
 #'  
 #' # TFBS example
