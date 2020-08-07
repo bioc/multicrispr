@@ -127,6 +127,7 @@ find_gg <- function(gr){
 
 add_nickspacers <- function(primespacers, bsgenome, 
     ontargets = c('Doench2014', 'Doench2016'), mismatches = 2, 
+    offtargetmethod = c('bowtie', 'vcountpdict')[1],
     indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, plot = TRUE
 ){
 # Check / Clean
@@ -145,6 +146,7 @@ add_nickspacers <- function(primespacers, bsgenome,
 # Analyze Offtargets if indexed genome available
     nickspacers %<>% filter_offtargets(
         bsgenome, by = 'pename', mismatches = mismatches, 
+        offtargetmethod = offtargetmethod,
         indexedgenomesdir = indexedgenomesdir, outdir = outdir, 
         verbose = FALSE, plot = FALSE)
     nickspacers %<>% add_ontargets(
@@ -204,6 +206,7 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #'                   (default 0, to suppress offtarget analysis: -1)
 #' @param nickmatches no of nickspacer offtarget mismatches 
 #'                   (default 2, to suppresses offtarget analysis: -1)
+#' @param offtargetmethod  'bowtie' or 'vcountpdict'
 #' @param indexedgenomesdir  directory with indexed genomes 
 #'                           (as created by \code{\link{index_genome}})
 #' @param outdir    directory whre offtarget analysis output is written
@@ -248,8 +251,10 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @export
 find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
     nprimer = 13, nrt = 16, ontargets = c('Doench2014', 'Doench2016')[1], 
-    mismatches = 0, nickmatches = 2, indexedgenomesdir = INDEXEDGENOMESDIR, 
-    outdir = OUTDIR, verbose = TRUE, plot = TRUE, ...){
+    mismatches = 0, nickmatches = 2, 
+    offtargetmethod = c('bowtie', 'vcountpdict')[1], 
+    indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
+    verbose = TRUE, plot = TRUE, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
@@ -283,12 +288,14 @@ find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacers$crisprextension  <- exts$seq
     spacers$crisprextrange   <- unname(as.character(granges(exts)))
 # Add offtargets, ontargets, nickspacers
-    spacers %<>% add_offtargets(bsgenome, mismatches = mismatches, 
-                    indexedgenomesdir = indexedgenomesdir, outdir = outdir, 
+    spacers %<>% add_offtargets(bsgenome, mismatches = mismatches, pam = 'NGG',
+                    offtargetmethod = offtargetmethod,outdir = outdir, 
+                    indexedgenomesdir = indexedgenomesdir, 
                     verbose= TRUE, plot = FALSE)
     spacers %<>% add_ontargets(bsgenome, method = ontargets, plot = FALSE)
     spacers %<>% add_nickspacers(bsgenome, ontargets = ontargets, 
-            mismatches = nickmatches, indexedgenomesdir = indexedgenomesdir,
+            mismatches = nickmatches, offtargetmethod = offtargetmethod,
+            indexedgenomesdir = indexedgenomesdir,
             outdir = outdir, plot = FALSE)
 # Plot and Return
     if (plot) print(plot_intervals(spacers, ...))

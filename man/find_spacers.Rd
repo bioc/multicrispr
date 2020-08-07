@@ -11,6 +11,7 @@ find_spacers(
   pam = "NGG",
   complement = TRUE,
   ontargets = c("Doench2014", "Doench2016")[1],
+  offtargetmethod = c("bowtie", "vcountpdict")[1],
   subtract_targets = FALSE,
   mismatches = 2,
   indexedgenomesdir = INDEXEDGENOMESDIR,
@@ -32,6 +33,8 @@ find_spacers(
 \item{complement}{TRUE (default) or FALSE: also search in compl ranges?}
 
 \item{ontargets}{'Doench2016' or 'Doench2016': on-target scoring method}
+
+\item{offtargetmethod}{'bowtie' (default) or 'vcountpdict'}
 
 \item{subtract_targets}{TRUE or FALSE (default): whether to subtract target 
 (mis)matches from offtarget counts}

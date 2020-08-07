@@ -190,6 +190,7 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param pam        string: pam pattern in extended IUPAC alphabet
 #' @param complement TRUE (default) or FALSE: also search in compl ranges?
 #' @param ontargets  'Doench2016' or 'Doench2016': on-target scoring method
+#' @param offtargetmethod 'bowtie' (default) or 'vcountpdict'
 #' @param subtract_targets TRUE or FALSE (default): whether to subtract target 
 #'                   (mis)matches from offtarget counts
 #' @param mismatches 0-3: allowed mismatches in offtargetanalysis 
@@ -228,6 +229,7 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @export 
 find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', 
     complement = TRUE, ontargets = c('Doench2014', 'Doench2016')[1], 
+    offtargetmethod = c('bowtie', 'vcountpdict')[1],
     subtract_targets = FALSE, mismatches = 2, 
     indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
     verbose = TRUE, plot = TRUE, ...){
@@ -254,8 +256,9 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
 # Add on/offtargets
     spacers %<>% add_offtargets(
         bsgenome, targets = if (subtract_targets) gr else NULL, 
-        mismatches = mismatches, indexedgenomesdir = indexedgenomesdir, 
-        outdir = outdir, verbose = verbose, plot=FALSE)
+        mismatches = mismatches, pam = pam, offtargetmethod = offtargetmethod, 
+        outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
+        verbose = verbose, plot = FALSE)
     spacers %<>% add_ontargets(bsgenome, method = ontargets, plot = FALSE)
 # Plot/Return
     if (plot) print(plot_intervals(spacers, ...)) #spacers$sitename <- NULL

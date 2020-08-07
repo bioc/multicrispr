@@ -13,6 +13,7 @@ find_primespacers(
   ontargets = c("Doench2014", "Doench2016")[1],
   mismatches = 0,
   nickmatches = 2,
+  offtargetmethod = c("bowtie", "vcountpdict")[1],
   indexedgenomesdir = INDEXEDGENOMESDIR,
   outdir = OUTDIR,
   verbose = TRUE,
@@ -39,6 +40,8 @@ If named, names should be identical to those of \code{gr}}
 
 \item{nickmatches}{no of nickspacer offtarget mismatches 
 (default 2, to suppresses offtarget analysis: -1)}
+
+\item{offtargetmethod}{'bowtie' or 'vcountpdict'}
 
 \item{indexedgenomesdir}{directory with indexed genomes 
 (as created by \code{\link{index_genome}})}

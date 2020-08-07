@@ -14,7 +14,7 @@ add_offtargets(
   targets = NULL,
   mismatches = 2,
   pam = "NGG",
-  method = c("bowtie", "pdict")[1],
+  offtargetmethod = c("bowtie", "vcountpdict")[1],
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   verbose = TRUE,
@@ -29,6 +29,7 @@ filter_offtargets(
   by = "targetname",
   mismatches = 2,
   pam = "NGG",
+  offtargetmethod = c("bowtie", "vcountpdict")[1],
   outdir = OUTDIR,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   verbose = TRUE,
@@ -50,7 +51,7 @@ filter_offtargets(
 
 \item{pam}{string (default 'NGG'): pam sequence}
 
-\item{method}{'bowtie' or 'pdict'}
+\item{offtargetmethod}{'bowtie' or 'vcountpdict'}
 
 \item{outdir}{directory where output is written to}
 

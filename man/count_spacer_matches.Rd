@@ -9,7 +9,7 @@ count_spacer_matches(
   reference,
   mismatches = 2,
   pam = "NGG",
-  method = c("bowtie", "pdict")[1],
+  offtargetmethod = c("bowtie", "vcountpdict")[1],
   norc,
   outdir = OUTDIR,
   verbose = TRUE
@@ -25,7 +25,7 @@ BSgenome (when method = 'pdict')}
 
 \item{pam}{string (default 'NGG') pam pattern to expand}
 
-\item{method}{'bowtie' or 'pdict'}
+\item{offtargetmethod}{'bowtie' or 'vcountpdict'}
 
 \item{norc}{TRUE or FALSE: whether to run bowtie also with revcompls
 Generally TRUE for genome and FALSE for target matches, 
