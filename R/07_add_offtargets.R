@@ -32,9 +32,9 @@
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
 #'  spacers <- find_primespacers(gr, bsgenome)
-#'  # pdict_count( spacers$crisprspacer, bsgenome,  norc=FALSE, mismatches = 0)
-#'  # bowtie_count(spacers$crisprspacer, index_genome(bsgenome),  norc=FALSE, 
-#'  #               mismatches = 0)
+#'  pdict_count( spacers$crisprspacer, bsgenome,  norc=FALSE, mismatches = 0)
+#'  bowtie_count(spacers$crisprspacer, index_genome(bsgenome),  norc=FALSE, 
+#'              mismatches = 0)
 #' @noRd
 pdict_count <- function(crisprseqs, reference, mismatches, norc = FALSE,
     outdir = OUTDIR, verbose = TRUE
@@ -118,9 +118,9 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
 #'  spacers <- find_primespacers(gr, bsgenome)
-#'  # pdict_count( spacers$crisprspacer, bsgenome,  norc=FALSE, mismatches = 0)
-#'  # bowtie_count(spacers$crisprspacer, genome_dir(bsgenome), norc=FALSE, 
-#'  #    mismatches = 0)
+#'  pdict_count( spacers$crisprspacer, bsgenome,  norc=FALSE, mismatches = 0)
+#'  bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, 
+#'      mismatches = 0)
 #'  
 #' # TFBS example
 #' #-------------
@@ -426,8 +426,7 @@ expand_iupac_ambiguities <- function(x){
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
 #'  spacers <- find_primespacers(gr, bsgenome)
-#'  # reference <- genome_dir(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome)
-#'  # count_spacer_matches(spacers, reference, norc=TRUE, mismatches = 1)
+#'  count_spacer_matches(spacers, index_genome(bsgenome), norc=TRUE, mismatches=1)
 #'  
 #' # TFBS example
 #' #-------------
