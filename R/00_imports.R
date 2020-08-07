@@ -10,6 +10,7 @@
 #' @importFrom  assertive  assert_is_all_of    assert_is_any_of  
 #' @importFrom  assertive  assert_is_a_bool    assert_is_a_number
 #' @importFrom  assertive  assert_is_a_string  assert_is_character
+#' @importFrom  assertive  assert_is_non_scalar
 #' @importFrom  assertive  assert_is_numeric   assert_is_scalar
 #' @importFrom  Biostrings            complement  DNAStringSet   
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict

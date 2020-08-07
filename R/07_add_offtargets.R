@@ -10,7 +10,7 @@
 #' Count matches to indexed target/genome using Bowtie
 #' 
 #' @param crisprseqs character vector: sequences to match against indexed ref
-#' @param reference  string: dir containing indexed reference.
+#' @param referenceseqs  string: dir containing indexed referenceseqs.
 #'                  This can be an indexed genome( \code{\link{index_genome}}
 #'                  It can also be indexed targets (\code{\link{index_targets}})
 #' @param mismatches max number of mismatches to consider
@@ -36,12 +36,13 @@
 #'  bowtie_count(spacers$crisprspacer, index_genome(bsgenome),  norc=FALSE, 
 #'              mismatches = 0)
 #' @noRd
-pdict_count <- function(crisprseqs, reference, mismatches, norc = FALSE,
+pdict_count <- function(crisprseqs, referenceseqs, mismatches, norc = FALSE,
     outdir = OUTDIR, verbose = TRUE
 ){
     # Assert. Comply
     assert_is_any_of(crisprseqs, c('character', 'XStringSet'))
-    assert_is_any_of(reference, c('BSgenome', 'character'))
+    assert_is_any_of(referenceseqs, c('BSgenome', 'character'))
+    if (is.character(referenceseqs)) assert_is_non_scalar(referenceseqs)
     assert_is_subset(mismatches, c(0,1,2,3))
     assert_is_a_bool(verbose)
     . <- count <- NULL
@@ -49,12 +50,12 @@ pdict_count <- function(crisprseqs, reference, mismatches, norc = FALSE,
     # Count
     starttime <- Sys.time()
     matches <- data.table(readseq = crisprseqs)
-    countfun <- if (is(reference, 'BSgenome')){     pdict_count_bsgenome
-                } else if (is.character(reference)){pdict_count_character}
+    countfun <- if (is(referenceseqs, 'BSgenome')){     pdict_count_bsgenome
+                } else if (is.character(referenceseqs)){pdict_count_character}
         
     for (i in seq(0, mismatches)){
         countvar <- paste0('MM', i)
-        matches[, (countvar) := countfun(crisprseqs, reference, i)]
+        matches[, (countvar) := countfun(crisprseqs, referenceseqs, i)]
         if (verbose) cmessage( 
                         '\t\t\tCount %d-mismatch hits in genome      : %s',
                         i, format(signif(Sys.time() - starttime, 2)))
@@ -96,7 +97,7 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #' Count matches to indexed target/genome using Bowtie
 #' 
 #' @param crisprseqs character vector: sequences to match against indexed ref
-#' @param reference  string: dir containing indexed reference.
+#' @param bowtieindex  string: dir containing Bowtie index
 #'                  This can be an indexed genome( \code{\link{index_genome}}
 #'                  It can also be indexed targets (\code{\link{index_targets}})
 #' @param mismatches max number of mismatches to consider
@@ -127,13 +128,13 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-#' reference <- index_targets(targets, bsgenome)
+#' bowtieindex <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
 #' crisprseqs <- unique(paste0(spacers$crisprspacer, spacers$crisprpam))
-#' bowtie_count(crisprseqs, reference, norc=FALSE)
-#' bowtie_count(crisprseqs, reference, norc=FALSE, mismatches=3)
+#' bowtie_count(crisprseqs, bowtieindex, norc=FALSE)
+#' bowtie_count(crisprseqs, bowtieindex, norc=FALSE, mismatches=3)
 #' @noRd
-bowtie_count <- function(crisprseqs, reference, mismatches = 2, norc, 
+bowtie_count <- function(crisprseqs, bowtieindex, mismatches = 2, norc, 
     outdir = OUTDIR, verbose = TRUE
 ){
 
@@ -150,9 +151,9 @@ bowtie_count <- function(crisprseqs, reference, mismatches = 2, norc,
     writeXStringSet(reads, readfasta)
 
     # Map reads and read results
-    outfile <- spacer_matchfile(outdir, reference)
+    outfile <- spacer_matchfile(outdir, bowtieindex)
     if (verbose) cmessage('\t\tMap reads: %s', outfile)
-    run_bowtie(readfasta, reference, outfile, norc = norc, 
+    run_bowtie(readfasta, bowtieindex, outfile, norc = norc, 
                 mismatches = max(1, mismatches)) # 1-mismatch offtargets 
     if (verbose) cmessage('\t\tLoad results')    # required for pam correction
     matches <- read_bowtie_results(outfile, mismatches)
@@ -184,8 +185,8 @@ OUTDIR <- '~/multicrisprout'
     target_fasta    <- function(outdir = OUTDIR){
             paste0(outdir, '/targets.fa')}
     
-    spacer_matchfile <- function(outdir = OUTDIR, indexdir){
-            paste0(outdir, '/spacers/spacers_to_', basename(indexdir), '.txt')}
+    spacer_matchfile <- function(outdir = OUTDIR, bowtieindex){
+            paste0(outdir, '/spacers/spacers_to_', basename(bowtieindex), '.txt')}
     
     spacer_fasta <- function(outdir = OUTDIR){
             paste0(outdir, '/spacers.fa') }
@@ -327,10 +328,10 @@ index_targets <- function(
 }
 
 
-run_bowtie <- function(spacerfasta, indexdir, outfile, norc, mismatches = 2){
+run_bowtie <- function(spacerfasta, bowtieindex, outfile, norc, mismatches = 2){
     
     assert_all_are_existing_files(spacerfasta)
-    assert_all_are_dirs(indexdir)
+    assert_all_are_dirs(bowtieindex)
     assert_is_a_bool(norc)
     assert_is_a_number(mismatches)
     assert_is_subset(mismatches, 0:3)
@@ -339,7 +340,7 @@ run_bowtie <- function(spacerfasta, indexdir, outfile, norc, mismatches = 2){
     
     Rbowtie::bowtie(
         sequences = spacerfasta,
-        index     = file.path(indexdir, basename(indexdir)),
+        index     = file.path(bowtieindex, basename(bowtieindex)),
         f         = TRUE,        # fasta input
         #m         = 10000,      # ignore seqs with m+ alignments
         a         = TRUE,        # report ALL alignments
@@ -397,14 +398,14 @@ expand_iupac_ambiguities <- function(x){
 
 #' Count spacer matches
 #' 
-#' Count spacer matches to reference 
+#' Count spacer matches to referenceseqs 
 #' 
 #' Expands iupac amgiguities in the pam sequence.
 #' Matches all resulting sequences against (indexes) target and genome.
 #' Adds match counts to GRanges object, and then returns it.
 #' @param spacers   spacer \code{\link[GenomicRanges]{GRanges-class}}
-#' @param reference either directory (with Bowtie index) or 
-#'                  BSgenome (when method = 'pdict')
+#' @param referenceseqs either Bowtie index directory (offtargetmethod=='bowtie')) 
+#'                  or BSgenome (offtargetmethod == 'vcountpdict')
 #' @param mismatches number (default 2): max number of mismatches to consider
 #' @param pam        string (default 'NGG') pam pattern to expand
 #' @param offtargetmethod 'bowtie' or 'vcountpdict'
@@ -426,19 +427,22 @@ expand_iupac_ambiguities <- function(x){
 #'                          CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                        bsgenome)
 #'  spacers <- find_primespacers(gr, bsgenome)
-#'  count_spacer_matches(spacers, index_genome(bsgenome), norc=TRUE, mismatches=1)
+#'  genomeindex <- index_genome(bsgenome)
+#'  count_spacer_matches(spacers, genomeindex, norc=FALSE, mismatches=0)
+#'  # count_spacer_matches(spacers, genomeindex, norc=FALSE, mismatches=0, 
+#'  #                      offtargetmethod = 'vcountpdict')
 #'  
 #' # TFBS example
 #' #-------------
 #' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #' bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #' targets <- extend(bed_to_granges(bedfile, genome = 'mm10'))
-#' reference <- index_targets(targets, bsgenome)
+#' referenceseqs <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
-#' count_spacer_matches(spacers, reference, norc=FALSE, mismatches = 1)
+#' count_spacer_matches(spacers, referenceseqs, norc=FALSE, mismatches = 1)
 #' @noRd
 count_spacer_matches <- function(
-    spacers, reference, mismatches = 2, pam = 'NGG', 
+    spacers, referenceseqs, mismatches = 2, pam = 'NGG', 
     offtargetmethod = c('bowtie', 'vcountpdict')[1], norc, outdir = OUTDIR, 
     verbose = TRUE
 ){
@@ -459,7 +463,7 @@ count_spacer_matches <- function(
     countfun <- switch(offtargetmethod, 
                         bowtie = bowtie_count, vcountpdict = pdict_count)
     matches <-  countfun(crisprseqs, 
-                         reference   = reference, 
+                         referenceseqs   = referenceseqs, 
                          mismatches = mismatches,
                          norc       = norc, 
                          outdir     = outdir,
@@ -504,15 +508,15 @@ add_target_counts <- function(
         targetdir <- target_dir(outdir)
         dir.create(targetdir, showWarnings = FALSE, recursive = FALSE)
         index_targets(targets, bsgenome, outdir)
-        reference <- targetdir
+        referenceseqs <- targetdir
     } else if (offtargetmethod == 'vcountpdict'){
-        reference <- targets
+        referenceseqs <- targets
     }
 
     # Match spacers to targets
     if (verbose) cmessage('\tAdd target counts')
     matches <- count_spacer_matches(
-                    spacers, reference, mismatches = mismatches, pam = pam, 
+                    spacers, referenceseqs, mismatches = mismatches, pam = pam, 
                     oftargetmethod = offtargetmethod, 
                     norc = TRUE, outdir = outdir, verbose = verbose)
     names(matches) %<>% stringi::stri_replace_first_regex('^MM', 'T')
@@ -546,12 +550,12 @@ add_genome_counts <- function(
     . <- NULL
     
     # Add genome matches
-    reference <- switch(offtargetmethod, 
+    referenceseqs <- switch(offtargetmethod, 
             bowtie = genome_dir(indexedgenomesdir, bsgenome), 
             vcountpdict = bsgenome)
     if (verbose) message('\tAdd genome counts')
     matches <- count_spacer_matches(
-                        spacers, reference, mismatches = mismatches, pam = pam, 
+                        spacers, referenceseqs, mismatches = mismatches, pam = pam, 
                         offtargetmethod = offtargetmethod, norc = FALSE,  
                         outdir = outdir, verbose = verbose)
     names(matches) %<>% stringi::stri_replace_first_regex('^MM', 'G')
