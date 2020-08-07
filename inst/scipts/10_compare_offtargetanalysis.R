@@ -10,8 +10,8 @@ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                        bsgenome)
 spacers <- find_primespacers(gr, bsgenome)
 spacers
-bowtie_results <- bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, mismatches = 3)
-pdict_results  <- pdict_count( spacers$crisprspacer, bsgenome,               norc=FALSE, mismatches = 3)
+bowtie_results <- multicrispr:::bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, mismatches = 3)
+pdict_results  <- multicrispr:::pdict_count( spacers$crisprspacer, bsgenome,               norc=FALSE, mismatches = 3)
 
 saveRDS(pdict_results, '../offtarget_comparison/pdict_results.rds')
 

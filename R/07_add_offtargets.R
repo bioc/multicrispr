@@ -36,7 +36,6 @@
 #'  # bowtie_count(spacers$crisprspacer, index_genome(bsgenome),  norc=FALSE, 
 #'                 mismatches = 0)
 #' @noRd
-#' @export
 pdict_count <- function(crisprseqs, reference, mismatches, norc = FALSE,
     outdir = OUTDIR, verbose = TRUE
 ){
@@ -134,7 +133,6 @@ pdict_count_character <- function(crisprseqs, targetseqs, mismatches){
 #' bowtie_count(crisprseqs, reference, norc=FALSE)
 #' bowtie_count(crisprseqs, reference, norc=FALSE, mismatches=3)
 #' @noRd
-#' @export
 bowtie_count <- function(crisprseqs, reference, mismatches = 2, norc, 
     outdir = OUTDIR, verbose = TRUE
 ){
@@ -439,7 +437,7 @@ expand_iupac_ambiguities <- function(x){
 #' reference <- index_targets(targets, bsgenome)
 #' spacers <- find_spacers(targets, bsgenome)
 #' count_spacer_matches(spacers, reference, norc=FALSE, mismatches = 1)
-#' @export
+#' @noRd
 count_spacer_matches <- function(
     spacers, reference, mismatches = 2, pam = 'NGG', 
     offtargetmethod = c('bowtie', 'vcountpdict')[1], norc, outdir = OUTDIR, 
