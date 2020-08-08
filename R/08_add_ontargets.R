@@ -190,7 +190,7 @@ doench2016 <- function(
 #' doi: 10.1038/nbt.3437
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
-#' @export
+#' @noRd
 add_ontargets <- function(
     spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
     chunksize = 10000, verbose = TRUE, plot = TRUE, ...

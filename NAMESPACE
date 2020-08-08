@@ -2,8 +2,6 @@
 
 export(add_context)
 export(add_inverse_strand)
-export(add_offtargets)
-export(add_ontargets)
 export(add_seq)
 export(add_specificity)
 export(bed_to_granges)

@@ -130,27 +130,22 @@ add_nickspacers <- function(primespacers, bsgenome,
     offtargetmethod = c('bowtie', 'vcountpdict')[1],
     indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, plot = TRUE
 ){
-# Check / Clean
+# Check / Initialize
     . <- crisprname <- crisprspacer <- crisprpam <- NULL
     off0 <- off1 <- off2 <- pename <- off <- NULL
-# Clean primespacers
     primespacers$pename <- primespacers$crisprname
     primespacers$type <- 'pespacer'
 # Get nick spacers
-    message('\tAdd nicking spacers')
+    message('\tAdd nickspacers')
     nickzone <- invertStrand(down_flank(primespacers, -3+40-5, -3+90+17))
     mcols(nickzone) %<>% extract(, c('targetname', 'pename'), drop = FALSE)
-    nickspacers <- find_spacers(
-                        nickzone, bsgenome, complement=FALSE, plot=FALSE)
+    nickspacers <- find_spacers(nickzone, bsgenome, complement = FALSE, 
+        ontargets = ontargets, offtargetmethod = offtargetmethod, 
+        offtargetfilterby = 'pename',
+        mismatches = mismatches, indexedgenomesdir = indexedgenomesdir, 
+        outdir = outdir, plot=FALSE)
     nickspacers$type <- 'nickspacer'
-# Analyze Offtargets if indexed genome available
-    nickspacers %<>% filter_offtargets(
-        bsgenome, by = 'pename', mismatches = mismatches, 
-        offtargetmethod = offtargetmethod,
-        indexedgenomesdir = indexedgenomesdir, outdir = outdir, 
-        verbose = FALSE, plot = FALSE)
-    nickspacers %<>% add_ontargets(
-                        bsgenome, method = ontargets, verbose=FALSE, plot=FALSE)
+    if (verbose) message('\tFound ', length(nickspacers), ' nickspacers')
     mcols(nickspacers)[[ontargets]] %<>% round(digits = 2)
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
@@ -288,7 +283,7 @@ find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacers$crisprextension  <- exts$seq
     spacers$crisprextrange   <- unname(as.character(granges(exts)))
 # Add offtargets, ontargets, nickspacers
-    if (verbose) message("Found ", length(spacers), " spacers/3'extensions")
+    if (verbose) message("\tFound ", length(spacers), " spacers/3'extensions")
     spacers %<>% add_offtargets(bsgenome, mismatches = mismatches, pam = 'NGG',
                     offtargetmethod = offtargetmethod,outdir = outdir, 
                     indexedgenomesdir = indexedgenomesdir, 

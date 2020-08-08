@@ -507,15 +507,15 @@ count_spacer_matches <- function(
 
 #==============================================================================
 #
-#                                ADD_TARGET_COUNTS
-#                                ADD_GENOME_COUNTS
+#                                count_target_matches
+#                                count_genome_matches
 #                                ADD_OFFTARGETS
 #                                FILTER_OFFTARGETS
 #
 #==============================================================================
 
 
-add_target_counts <- function(
+count_target_matches <- function(
     spacers, targets, bsgenome, mismatches = 2, pam = 'NGG', 
     offtargetmethod = c('bowtie', 'vcountpdict')[1], 
     outdir = OUTDIR, verbose = TRUE
@@ -557,7 +557,7 @@ add_target_counts <- function(
     
 }
 
-add_genome_counts <- function(
+count_genome_matches <- function(
     spacers, 
     bsgenome          = getBSgenome(genome(spacers)[1]),
     mismatches        = 2,
@@ -595,6 +595,42 @@ add_genome_counts <- function(
     spacers
 }
 
+count_offtargets <- function(spacers, targets, mismatches, verbose){
+    if (verbose) cmessage('\t\tCount off-targets', 
+                            length(spacers))
+    digits <- ceiling(log10(length(spacers)))
+    spacers$off <- spacers$G0 - (if (is.null(targets)) 1 else spacers$T0)
+    spacers$off0 <- spacers$off # don't switch order to keep off first
+    if (is.null(targets))  spacers$G0 <- NULL
+    if (mismatches>0){
+        for (mis in seq_len(mismatches)){
+            Gvar <- paste0('G', mis)
+            Gx <- mcols(spacers)[[Gvar]]
+            Tx <- if (is.null(targets)) 0 else mcols(spacers)[[paste0('T',mis)]]
+            offcounts <- Gx - Tx
+            offvar <- paste0('off', mis)
+            mcols(spacers)[[offvar]] <- offcounts
+            spacers$off %<>% add(offcounts)
+            if (is.null(targets))  mcols(spacers)[[Gvar]] <- NULL
+            if (verbose) cmessage('\t       %s have no %d-mismatch offtargets', 
+                format(sum(mcols(spacers)[[offvar]]==0), width = digits), mis)}}
+    return(spacers)
+}
+
+filter_offtargets <- function(spacers, offtargetfilterby){
+    if (length(offtargetfilterby)>0){
+        if (verbose) message('\tFilter for best offtarget counts')
+        spacerdt <- gr2dt(spacers)
+        for (i in seq(0, mismatches)){
+            offvar <- paste0("off", i)
+            spacerdt %<>% extract(, .SD[get(offvar)==min(get(offvar))], by = offtargetfilterby)
+            if (verbose) message('\t\tRetain ', nrow(spacerdt), ' with best ', 
+                                 offvar, ' counts per ', offtargetfilterby)
+        }
+        spacers <- dt2gr(spacerdt, seqinfo = seqinfo(nickspacers))
+    }
+    spacers
+}
 
 #' @export
 #' @rdname add_offtargets
@@ -650,50 +686,37 @@ add_specificity <- function(...){
 #'  # index_genome(bsgenome)
 #'  # add_offtargets(spacers, bsgenome)    # off = G - 1
 #'  # add_offtargets(spacers, bsgenome, targets)  # off = G - T
-#' @export
+#' @noRd
 add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2, 
-    pam = 'NGG', offtargetmethod = c('bowtie', 'vcountpdict')[1], outdir = OUTDIR, 
-    indexedgenomesdir = INDEXEDGENOMESDIR, verbose = TRUE, plot = TRUE, ...){
+    pam = 'NGG', offtargetmethod = c('bowtie', 'vcountpdict')[1], 
+    offtargetfilterby = character(0), outdir = OUTDIR, 
+    indexedgenomesdir = INDEXEDGENOMESDIR, verbose = TRUE, plot = TRUE, ...
+){
 # First clear
     if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     if (mismatches==-1) return(spacers)
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')
     mcols(spacers) %<>% extract(, setdiff(names(.), offcols))
     . <- off <- NULL
-# Add genome/target counts
-    if (verbose) cmessage('\tCount offtargets', 
-                            length(spacers))
-    spacers %<>% add_genome_counts(
+# Count genome matches
+    if (verbose) message('\tCount offtargets', length(spacers))
+    spacers %<>% count_genome_matches(
                     bsgenome, mismatches = mismatches, pam = pam, 
                     offtargetmethod = offtargetmethod, outdir = outdir,
                     indexedgenomesdir = indexedgenomesdir, verbose = verbose)
+# Count target matches
     if (!is.null(targets)){
-        spacers %<>% add_target_counts(
-                        targets, bsgenome, mismatches = mismatches, pam = pam, 
-                        offtargetmethod = offtargetmethod, outdir = outdir, 
-                        verbose = verbose)
+        spacers %<>% count_target_matches(
+                        targets, bsgenome, mismatches = mismatches,
+                        pam = pam, offtargetmethod = offtargetmethod, 
+                        outdir = outdir, verbose = verbose)
         for (mis in 0:mismatches){
                 assert_all_are_true(mcols(spacers)[[paste0('T', mis)]] <= 
                                     mcols(spacers)[[paste0('G', mis)]])}}
-# Add offtarget counts
-    if (verbose) cmessage('\t\tCount off-targets', 
-                            length(spacers))
-    digits <- ceiling(log10(length(spacers)))
-    spacers$off <- spacers$G0 - (if (is.null(targets)) 1 else spacers$T0)
-    spacers$off0 <- spacers$off # don't switch order to keep off first
-    if (is.null(targets))  spacers$G0 <- NULL
-    if (mismatches>0){
-        for (mis in seq_len(mismatches)){
-            Gvar <- paste0('G', mis)
-            Gx <- mcols(spacers)[[Gvar]]
-            Tx <- if (is.null(targets)) 0 else mcols(spacers)[[paste0('T',mis)]]
-            offcounts <- Gx - Tx
-            offvar <- paste0('off', mis)
-            mcols(spacers)[[offvar]] <- offcounts
-            spacers$off %<>% add(offcounts)
-            if (is.null(targets))  mcols(spacers)[[Gvar]] <- NULL
-            if (verbose) cmessage('\t       %s have no %d-mismatch offtargets', 
-                format(sum(mcols(spacers)[[offvar]]==0), width = digits), mis)}}
+# Count and filter offtargets
+    spacers %<>% count_offtargets(targets, mismatches = mismatches, 
+                    verbose = verbose)
+    spacers %<>% filter_offtargets(offtargetfilterby = offtargetfilterby)
 # Plot and return
     if (plot)   print(plot_intervals(spacers, ...))
     spacers
