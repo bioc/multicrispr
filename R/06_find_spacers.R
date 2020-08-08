@@ -190,7 +190,7 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param pam        string: pam pattern in extended IUPAC alphabet
 #' @param complement TRUE (default) or FALSE: also search in compl ranges?
 #' @param ontargetmethod  'Doench2016' or 'Doench2016': on-target scoring method
-#' @param offtargetmethod 'bowtie' (default) or 'vcountpdict'
+#' @param offtargetmethod 'bowtie' (default) or 'pdict'
 #' @param offtargetfilterby filter for best off-target counts by this variable
 #' @param subtract_targets TRUE or FALSE (default): whether to subtract target 
 #'                   (mis)matches from offtarget counts
@@ -232,7 +232,7 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', 
     complement = TRUE, 
     ontargetmethod  = c('Doench2014', 'Doench2016')[1],
-    offtargetmethod = c('bowtie', 'vcountpdict')[1],
+    offtargetmethod = c('bowtie', 'pdict')[1],
     offtargetfilterby = character(0),
     subtract_targets = FALSE, mismatches = 3, 
     indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 

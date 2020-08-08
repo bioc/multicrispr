@@ -11,7 +11,7 @@ find_spacers(
   pam = "NGG",
   complement = TRUE,
   ontargetmethod = c("Doench2014", "Doench2016")[1],
-  offtargetmethod = c("bowtie", "vcountpdict")[1],
+  offtargetmethod = c("bowtie", "pdict")[1],
   offtargetfilterby = character(0),
   subtract_targets = FALSE,
   mismatches = 3,
@@ -35,7 +35,7 @@ find_spacers(
 
 \item{ontargetmethod}{'Doench2016' or 'Doench2016': on-target scoring method}
 
-\item{offtargetmethod}{'bowtie' (default) or 'vcountpdict'}
+\item{offtargetmethod}{'bowtie' (default) or 'pdict'}
 
 \item{offtargetfilterby}{filter for best off-target counts by this variable}
 

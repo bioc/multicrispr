@@ -9,15 +9,51 @@ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                         CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
 spacers <- find_primespacers(gr, bsgenome)
-spacers
+spacers$targetlocus <- c(rep('chr7 : 117 559 593', 2), 
+                        rep('chr11 : 5 227 002',  2),
+                        rep('chr15 : 72 346 580',  2),
+                        rep('chr20 : 4 699 600',  4))
+
+plot_intervals(spacers, alpha_var = NULL, facet_var = c('targetname', 'targetlocus'), size_var = NULL) + 
+ggplot2::guides(color=FALSE, linetype = FALSE, size=FALSE, alpha=FALSE)
+ggplot2::ggsave('../graphs/pe_spacers.pdf', width =6, height = 4, device = grDevices::cairo_pdf)
 
 # Matching spacers only (without pam)
 (bowtie_results <- multicrispr:::bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, mismatches = 3))
-(pdict_results  <- multicrispr:::pdict_count( spacers$crisprspacer, bsgenome,               norc=FALSE, mismatches = 3))
-saveRDS(pdict_results, '../offtarget_comparison/pdict_results.rds')
+#(pdict_results  <- multicrispr:::pdict_count( spacers$crisprspacer, bsgenome,               norc=FALSE, mismatches = 3))
+#saveRDS(pdict_results, '../offtarget_comparison/pdict_results.rds')
+(pdict_results <- readRDS('../offtarget_comparison/pdict_results.rds'))
+
 
 # spacer+pam (expanded)
-(bowtie_results2 <- multicrispr:::count_spacer_matches(spacers, index_genome(bsgenome), norc=FALSE, mismatches = 3, offtargetmethod = 'bowtie'))
+spacers %<>% extract(.$targetname=='PRNP')
+mcols(spacers) %<>% extract(, 1:10)
+(bowtie_results2 <- multicrispr:::count_offtargets(spacers[2], bsgenome, mismatches=1, offtargetmethod = 'bowtie'))
+(pdict_results2  <- multicrispr:::count_offtargets(spacers[2], bsgenome, mismatches=1, offtargetmethod = 'pdict' ))
+
+
+bowtie_results[c("GCAGCTGGGGCAGTGGTGGG"), on = 'readseq']
+pdict_results[c("GCAGCTGGGGCAGTGGTGGG"),  on = 'readseq']
+mcols(bowtie_results2)[, c('crisprspacer', 'off0', 'off1')]
+mcols(pdict_results2)[, c('crisprspacer', 'off0', 'off1')]
+
+
+    
+
+
+
+
+spacers2 <- spacers %>% vadd_genome_matches(bsgenome, mismatches=1, verbose=TRUE)
+
+
+
+
+merge(spacerdt, gr2dt(vres), by = 'index')
+
+
+
+
+
 (pdict_results2  <- multicrispr:::count_spacer_matches(spacers,              bsgenome,  norc=FALSE, mismatches = 3, offtargetmethod = 'vcountpdict'))
 
 offtarget_comparison <- data.table( targetname   = spacers$targetname, 

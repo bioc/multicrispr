@@ -127,7 +127,7 @@ find_gg <- function(gr){
 
 add_nickspacers <- function(primespacers, bsgenome, 
     ontargetmethod  = c('Doench2014', 'Doench2016'), 
-    offtargetmethod = c('bowtie', 'vcountpdict')[1],
+    offtargetmethod = c('bowtie', 'pdict')[1],
     nickmatches = 3, indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
     plot = TRUE, verbose = TRUE
 ){
@@ -197,7 +197,7 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
 #' @param ontargetmethod  'Doench2014' or 'Doench2016': on-target scoring method
-#' @param offtargetmethod  'bowtie' or 'vcountpdict'
+#' @param offtargetmethod  'bowtie' or 'pdict'
 #' @param mismatches  no of primespacer mismatches 
 #'                   (default 0, to suppress offtarget analysis: -1)
 #' @param nickmatches no of nickspacer offtarget mismatches 
@@ -246,7 +246,7 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @export
 find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
     nprimer = 13, nrt = 16, ontargetmethod  = c('Doench2014', 'Doench2016')[1], 
-    offtargetmethod = c('bowtie', 'vcountpdict')[1], 
+    offtargetmethod = c('bowtie', 'pdict')[1], 
     mismatches = 0, nickmatches = 3, indexedgenomesdir = INDEXEDGENOMESDIR, 
     outdir = OUTDIR, verbose = TRUE, plot = TRUE, ...){
 # Assert

@@ -11,7 +11,7 @@ find_primespacers(
   nprimer = 13,
   nrt = 16,
   ontargetmethod = c("Doench2014", "Doench2016")[1],
-  offtargetmethod = c("bowtie", "vcountpdict")[1],
+  offtargetmethod = c("bowtie", "pdict")[1],
   mismatches = 0,
   nickmatches = 3,
   indexedgenomesdir = INDEXEDGENOMESDIR,
@@ -35,7 +35,7 @@ If named, names should be identical to those of \code{gr}}
 
 \item{ontargetmethod}{'Doench2014' or 'Doench2016': on-target scoring method}
 
-\item{offtargetmethod}{'bowtie' or 'vcountpdict'}
+\item{offtargetmethod}{'bowtie' or 'pdict'}
 
 \item{mismatches}{no of primespacer mismatches 
 (default 0, to suppress offtarget analysis: -1)}
