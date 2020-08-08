@@ -217,6 +217,7 @@ add_ontargets <- function(
     # Merge back in
     mergedt  <- merge(spacerdt, scoredt,
                     by='crisprcontext', sort=FALSE, all.x=TRUE)
+    mergedt[, crisprcontext := NULL]
     spacers <- dt2gr(mergedt, seqinfo = seqinfo(spacers))
     
     # Plot
