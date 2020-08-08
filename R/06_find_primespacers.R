@@ -288,6 +288,7 @@ find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacers$crisprextension  <- exts$seq
     spacers$crisprextrange   <- unname(as.character(granges(exts)))
 # Add offtargets, ontargets, nickspacers
+    if (verbose) message("Found ", length(spacers), " spacers/3'extensions")
     spacers %<>% add_offtargets(bsgenome, mismatches = mismatches, pam = 'NGG',
                     offtargetmethod = offtargetmethod,outdir = outdir, 
                     indexedgenomesdir = indexedgenomesdir, 

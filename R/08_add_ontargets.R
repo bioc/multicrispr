@@ -202,7 +202,7 @@ add_ontargets <- function(
     if (method %in% names(mcols(spacers))) mcols(spacers)[[method]] <- NULL
 
     # Add contextseq
-    if (verbose)  cmessage('\tScore crispr spacers')
+    if (verbose)  cmessage('\tScore spacers')
     spacers %<>% add_context(bsgenome, verbose = verbose)
     spacerdt  <- gr2dt(spacers)
     scoredt <- data.table(crisprcontext = unique(spacerdt$crisprcontext))

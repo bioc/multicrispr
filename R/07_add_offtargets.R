@@ -147,19 +147,19 @@ bowtie_count <- function(crisprseqs, referenceseqs, mismatches = 2, norc,
     reads %<>% name_uniquely('read')
     readfasta <- spacer_fasta(outdir)
     dir.create(dirname(readfasta), recursive = TRUE, showWarnings = FALSE)
-    if (verbose) cmessage('\t\tWrite reads to %s', readfasta)
+    if (verbose) cmessage('\t\t\tWrite reads to %s', readfasta)
     writeXStringSet(reads, readfasta)
 
     # Map reads and read results
     outfile <- spacer_matchfile(outdir, referenceseqs)
-    if (verbose) cmessage('\t\tMap reads: %s', outfile)
+    if (verbose) cmessage('\t\t\tMap reads: %s', outfile)
     run_bowtie(readfasta, referenceseqs, outfile, norc = norc, 
                 mismatches = max(1, mismatches)) # 1-mismatch offtargets 
-    if (verbose) cmessage('\t\tLoad results')    # required for pam correction
+    if (verbose) cmessage('\t\t\tLoad results')    # required for pam correction
     matches <- read_bowtie_results(outfile, mismatches)
     
     # Count matches
-    if (verbose) cmessage('\t\tCount matches')
+    if (verbose) cmessage('\t\t\tCount matches')
     readdt <- data.table(readname = names(reads), 
                         readseq   = unname(as.character(reads)))
     readdt %<>% merge(matches, by='readname', all=TRUE, sort=FALSE)
@@ -363,8 +363,8 @@ read_bowtie_results <- function(outfile, mis, nag_pam=TRUE, verbose=FALSE){
 # Avoid NGG mismatches
 # N: dont doublecount expanded pams
     dt %<>% extract(!stri_detect_regex(mismatches, '20:[ACGT][>][ACGT]'))
-    if (verbose) message(
-                "\tRetain ", nrow(dt), " after removing NGG 'N' mismatches")
+    if (verbose) message("\tRetain ", nrow(dt), " after removing NGG 'N' ", 
+                        "mismatches (avoid double counting expanded pams)")
 # G1: only NAG>NGG allowed
     dropinplus <- if (nag_pam) '21:[CT][>]G' else '21:[ACT][>]G'
     dropinmin  <- if (nag_pam) '21:[AG][>]C' else '21:[AGT][>]C'
@@ -372,8 +372,9 @@ read_bowtie_results <- function(outfile, mis, nag_pam=TRUE, verbose=FALSE){
                     (strand=='-' & !stri_detect_regex(mismatches, dropinmin)))
         # NAG remains
         # dt[(stri_detect_regex(mismatches, '21:[ACGT]>[ACGT]'))]
-    if (verbose) message(
-                "\tRetain ", nrow(dt), " after removing NGG 'G1' mismatches")
+    if (verbose) message("\tRetain ", nrow(dt), " after removing ", 
+         "NGG 'G1' mismatches", 
+         ifelse(nag_pam, "(except for NGG -> NAG, which is allowed)", ""))
 # G2: no mismatch allowed
     dropinplus <- '22:[ACT][>]G'
     dropinmin  <- '22:[ATG][>]C'
@@ -469,7 +470,7 @@ count_spacer_matches <- function(
     crispr <- crisprspacer <- . <- NULL
     
     # Expand pams
-    if (verbose) cmessage('\t\tExpand iupac ambiguities in pam')
+    if (verbose) cmessage('\t\t\tExpand iupac ambiguities in pam')
     spacerseqs <- unique(spacers$crisprspacer)
     pamseqs <- expand_iupac_ambiguities(pam)
     crisprdt <- data.table(
@@ -533,7 +534,7 @@ add_target_counts <- function(
     }
 
     # Match spacers to targets
-    if (verbose) cmessage('\tAdd target counts')
+    if (verbose) cmessage('\t\tCount target cross-(mis)matches')
     matches <- count_spacer_matches(
                     spacers, referenceseqs, mismatches = mismatches, pam = pam, 
                     oftargetmethod = offtargetmethod, 
@@ -572,7 +573,7 @@ add_genome_counts <- function(
     referenceseqs <- switch(offtargetmethod, 
             bowtie = genome_dir(indexedgenomesdir, bsgenome), 
             vcountpdict = bsgenome)
-    if (verbose) message('\tAdd genome counts')
+    if (verbose) message('\t\tCount genome (mis)matches')
     matches <- count_spacer_matches(
                         spacers, referenceseqs, mismatches = mismatches, pam = pam, 
                         offtargetmethod = offtargetmethod, norc = FALSE,  
@@ -660,6 +661,8 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
     mcols(spacers) %<>% extract(, setdiff(names(.), offcols))
     . <- off <- NULL
 # Add genome/target counts
+    if (verbose) cmessage('\tCount offtargets', 
+                            length(spacers))
     spacers %<>% add_genome_counts(
                     bsgenome, mismatches = mismatches, pam = pam, 
                     offtargetmethod = offtargetmethod, outdir = outdir,
@@ -673,9 +676,9 @@ add_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
                 assert_all_are_true(mcols(spacers)[[paste0('T', mis)]] <= 
                                     mcols(spacers)[[paste0('G', mis)]])}}
 # Add offtarget counts
-    digits <- ceiling(log10(length(spacers)))
-    if (verbose) cmessage('\tCalculate offtargets for %d spacers', 
+    if (verbose) cmessage('\t\tCount off-targets', 
                             length(spacers))
+    digits <- ceiling(log10(length(spacers)))
     spacers$off <- spacers$G0 - (if (is.null(targets)) 1 else spacers$T0)
     spacers$off0 <- spacers$off # don't switch order to keep off first
     if (is.null(targets))  spacers$G0 <- NULL
