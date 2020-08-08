@@ -40,7 +40,7 @@
     targets  <- multicrispr::bed_to_granges(bedfile, genome='mm10', plot = FALSE)
     extended <- extend(targets, -22, +22)
     spacers  <- find_spacers(
-        extended, bsgenome, ontargets = 'Doench2016', subtract_targets = TRUE)
+        extended, bsgenome, ontargetmethod = 'Doench2016', subtract_targets = TRUE)
     
     # Select target to showcase
     # Find a target that allows to showcase subtract_targets = TRUE
@@ -94,7 +94,7 @@
     plot_intervals(extended) %>% blanken()
     ggsave('../graphs/prnp02_extended.pdf', width=1.3, height=0.6, device = grDevices::cairo_pdf, bg = 'transparent')
     
-    spacers <- find_primespacers(gr, bsgenome, ontargets = 'Doench2016')
+    spacers <- find_primespacers(gr, bsgenome, ontargetmethod = 'Doench2016')
     #(plot_intervals(spacers, alpha_var = 'type', size_var = NULL) + 
     #scale_alpha_manual(values = c(`spacer` = 1, `3 extension` = 1, `nicking spacer` = 0))) %>% blanken()
     #ggplot2::ggsave('../graphs/prnp03_primespacers.pdf', width=1.3, height=0.9, device = grDevices::cairo_pdf, bg = 'transparent')

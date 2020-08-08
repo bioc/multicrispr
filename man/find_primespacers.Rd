@@ -10,10 +10,10 @@ find_primespacers(
   edits = get_plus_seq(bsgenome, gr),
   nprimer = 13,
   nrt = 16,
-  ontargets = c("Doench2014", "Doench2016")[1],
-  mismatches = 0,
-  nickmatches = 2,
+  ontargetmethod = c("Doench2014", "Doench2016")[1],
   offtargetmethod = c("bowtie", "vcountpdict")[1],
+  mismatches = 0,
+  nickmatches = 3,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   outdir = OUTDIR,
   verbose = TRUE,
@@ -33,15 +33,15 @@ If named, names should be identical to those of \code{gr}}
 
 \item{nrt}{n rev transcr nucleotides (default 16, recomm. 10-16)}
 
-\item{ontargets}{'Doench2014' or 'Doench2016': on-target scoring method}
+\item{ontargetmethod}{'Doench2014' or 'Doench2016': on-target scoring method}
+
+\item{offtargetmethod}{'bowtie' or 'vcountpdict'}
 
 \item{mismatches}{no of primespacer mismatches 
 (default 0, to suppress offtarget analysis: -1)}
 
 \item{nickmatches}{no of nickspacer offtarget mismatches 
-(default 2, to suppresses offtarget analysis: -1)}
-
-\item{offtargetmethod}{'bowtie' or 'vcountpdict'}
+(default 3, to suppresses offtarget analysis: -1)}
 
 \item{indexedgenomesdir}{directory with indexed genomes 
 (as created by \code{\link{index_genome}})}

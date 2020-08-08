@@ -10,10 +10,11 @@ find_spacers(
   spacer = strrep("N", 20),
   pam = "NGG",
   complement = TRUE,
-  ontargets = c("Doench2014", "Doench2016")[1],
+  ontargetmethod = c("Doench2014", "Doench2016")[1],
   offtargetmethod = c("bowtie", "vcountpdict")[1],
+  offtargetfilterby = character(0),
   subtract_targets = FALSE,
-  mismatches = 2,
+  mismatches = 3,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   outdir = OUTDIR,
   verbose = TRUE,
@@ -32,9 +33,11 @@ find_spacers(
 
 \item{complement}{TRUE (default) or FALSE: also search in compl ranges?}
 
-\item{ontargets}{'Doench2016' or 'Doench2016': on-target scoring method}
+\item{ontargetmethod}{'Doench2016' or 'Doench2016': on-target scoring method}
 
 \item{offtargetmethod}{'bowtie' (default) or 'vcountpdict'}
+
+\item{offtargetfilterby}{filter for best off-target counts by this variable}
 
 \item{subtract_targets}{TRUE or FALSE (default): whether to subtract target 
 (mis)matches from offtarget counts}
@@ -81,6 +84,7 @@ Find crispr spacers in targetranges
     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
     gr <- bed_to_granges(bedfile, 'mm10') \%>\% extend()
+    gr \%<>\% extract(1:100)
     find_spacers(gr, bsgenome, subtract_targets = TRUE)
 }
 \seealso{

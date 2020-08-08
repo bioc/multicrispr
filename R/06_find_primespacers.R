@@ -126,9 +126,10 @@ find_gg <- function(gr){
 
 
 add_nickspacers <- function(primespacers, bsgenome, 
-    ontargets = c('Doench2014', 'Doench2016'), mismatches = 2, 
+    ontargetmethod  = c('Doench2014', 'Doench2016'), 
     offtargetmethod = c('bowtie', 'vcountpdict')[1],
-    indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, plot = TRUE
+    nickmatches = 3, indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
+    plot = TRUE, verbose = TRUE
 ){
 # Check / Initialize
     . <- crisprname <- crisprspacer <- crisprpam <- NULL
@@ -136,17 +137,16 @@ add_nickspacers <- function(primespacers, bsgenome,
     primespacers$pename <- primespacers$crisprname
     primespacers$type <- 'pespacer'
 # Get nick spacers
-    message('\tAdd nickspacers')
+    message('Find nickspacers')
     nickzone <- invertStrand(down_flank(primespacers, -3+40-5, -3+90+17))
     mcols(nickzone) %<>% extract(, c('targetname', 'pename'), drop = FALSE)
     nickspacers <- find_spacers(nickzone, bsgenome, complement = FALSE, 
-        ontargets = ontargets, offtargetmethod = offtargetmethod, 
+        ontargetmethod = ontargetmethod, offtargetmethod = offtargetmethod, 
         offtargetfilterby = 'pename',
-        mismatches = mismatches, indexedgenomesdir = indexedgenomesdir, 
+        mismatches = nickmatches, indexedgenomesdir = indexedgenomesdir, 
         outdir = outdir, plot=FALSE)
     nickspacers$type <- 'nickspacer'
-    if (verbose) message('\tFound ', length(nickspacers), ' nickspacers')
-    mcols(nickspacers)[[ontargets]] %<>% round(digits = 2)
+    mcols(nickspacers)[[ontargetmethod]] %<>% round(digits = 2)
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
                 extract( , .(
@@ -154,13 +154,13 @@ add_nickspacers <- function(primespacers, bsgenome,
                     nickrange  = as.character(granges(nickspacers)), 
                     nickspacer = crisprspacer, 
                     nickpam    = crisprpam,
-                    nickoff    = off,
-                    nickoff0   = off0, 
-                    nickoff1   = off1, 
-                    nickoff2   = off2)) %>%
-                extract(, (paste0('nick', ontargets)) := 
-                                mcols(nickspacers)[[ontargets]]) %>% 
-                extract( , lapply(.SD, pastelapse), by = 'pename')
+                    nickoff    = off))
+    for (i in seq(0, nickmatches)){
+        nickdt[, (paste0('nickoff',i)) := mcols(nickspacers)[[paste0('off',i)]]]
+    }
+    method <- ontargetmethod
+    nickdt[, (paste0('nick', method)) := mcols(nickspacers)[[method]]]
+    nickdt %<>% extract( , lapply(.SD, pastelapse), by = 'pename')
 
     pedt <- gr2dt(primespacers)
     pedt$type <- NULL
@@ -196,12 +196,12 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #'                  If named, names should be identical to those of \code{gr}
 #' @param nprimer   n primer nucleotides (default 13, max 17)
 #' @param nrt       n rev transcr nucleotides (default 16, recomm. 10-16)
-#' @param ontargets  'Doench2014' or 'Doench2016': on-target scoring method
+#' @param ontargetmethod  'Doench2014' or 'Doench2016': on-target scoring method
+#' @param offtargetmethod  'bowtie' or 'vcountpdict'
 #' @param mismatches  no of primespacer mismatches 
 #'                   (default 0, to suppress offtarget analysis: -1)
 #' @param nickmatches no of nickspacer offtarget mismatches 
-#'                   (default 2, to suppresses offtarget analysis: -1)
-#' @param offtargetmethod  'bowtie' or 'vcountpdict'
+#'                   (default 3, to suppresses offtarget analysis: -1)
 #' @param indexedgenomesdir  directory with indexed genomes 
 #'                           (as created by \code{\link{index_genome}})
 #' @param outdir    directory whre offtarget analysis output is written
@@ -245,11 +245,10 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @seealso \code{\link{find_spacers}} to find standard crispr sites
 #' @export
 find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
-    nprimer = 13, nrt = 16, ontargets = c('Doench2014', 'Doench2016')[1], 
-    mismatches = 0, nickmatches = 2, 
+    nprimer = 13, nrt = 16, ontargetmethod  = c('Doench2014', 'Doench2016')[1], 
     offtargetmethod = c('bowtie', 'vcountpdict')[1], 
-    indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
-    verbose = TRUE, plot = TRUE, ...){
+    mismatches = 0, nickmatches = 3, indexedgenomesdir = INDEXEDGENOMESDIR, 
+    outdir = OUTDIR, verbose = TRUE, plot = TRUE, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
@@ -257,13 +256,11 @@ find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     assert_all_are_matching_regex(edits, '^[ACGTacgt]+$')
     assert_are_same_length(gr, edits)
     if (has_names(edits))   assert_are_identical(names(gr), names(edits))
-    assert_is_a_number(nprimer)
-    assert_is_a_number(nrt)
+    assert_is_a_number(nprimer); assert_is_a_number(nrt)
     assert_all_are_less_than(nprimer, 17)
-    assert_is_subset(ontargets, c('Doench2016', 'Doench2014'))
-    assert_is_a_bool(verbose)
-    assert_is_a_bool(plot)
+    assert_is_a_bool(verbose);   assert_is_a_bool(plot)
 # Find GG in nrt window around target site
+    if (verbose)  message('Find primespacers for ', length(gr), ' targets')
     gr %<>% name_uniquely(); names(edits) <- names(gr)
     gg  <-  gr %>% extend_pe_to_gg(nrt) %>% add_seq(bsgenome) %>% find_gg()
     names(gg) <- gg$crisprname <- uniquify(gg$targetname)
@@ -282,18 +279,17 @@ find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr),
     spacers$crisprtranscript <- transcripts$seq
     spacers$crisprextension  <- exts$seq
     spacers$crisprextrange   <- unname(as.character(granges(exts)))
-# Add offtargets, ontargets, nickspacers
-    if (verbose) message("\tFound ", length(spacers), " spacers/3'extensions")
-    spacers %<>% add_offtargets(bsgenome, mismatches = mismatches, pam = 'NGG',
-                    offtargetmethod = offtargetmethod,outdir = outdir, 
-                    indexedgenomesdir = indexedgenomesdir, 
-                    verbose= TRUE, plot = FALSE)
-    spacers %<>% add_ontargets(bsgenome, method = ontargets, plot = FALSE)
-    spacers %<>% add_nickspacers(bsgenome, ontargets = ontargets, 
-            mismatches = nickmatches, offtargetmethod = offtargetmethod,
-            indexedgenomesdir = indexedgenomesdir,
-            outdir = outdir, plot = FALSE)
-# Plot and Return
+# Count offtargets, score ontargets, add nickspacers, plot, return
+    if (verbose) message("\tFound ", length(spacers), " primespacers")
+    spacers %<>% count_offtargets(bsgenome, mismatches=mismatches, pam='NGG',
+        offtargetmethod = offtargetmethod, outdir = outdir, indexedgenomesdir = 
+        indexedgenomesdir, verbose= TRUE, plot = FALSE)
+    spacers %<>% score_ontargets(
+                    bsgenome, ontargetmethod = ontargetmethod, plot = FALSE)
+    spacers %<>% add_nickspacers(bsgenome, ontargetmethod = ontargetmethod, 
+        offtargetmethod = offtargetmethod, 
+        nickmatches = nickmatches, indexedgenomesdir = indexedgenomesdir,
+        outdir = outdir, plot = FALSE)
     if (plot) print(plot_intervals(spacers, ...))
     spacers
 }

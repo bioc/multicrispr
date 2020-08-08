@@ -162,14 +162,15 @@ invisible(double_flank(targets, -200, -1, +1, +200, plot = TRUE))
 ```
 
 
-## Find spacers
+## Find spacers, count off-targets, score on-targets, find nickspacers
 
 ```{r, fig.small = TRUE, out.width = "70%", echo = FALSE }
 knitr::include_graphics("../inst/extdata/03_find.png")
 ```
 
 The next step is to find N20 spacers followed by NGG pam sites.
-This can be done with `find_spacers`, after extending target range(s) to prime editing neighbourhood(s):
+This can be done with `find_spacers`, after extending target range(s) to prime editing neighbourhood(s). 
+This function also counts off-targets and scores on-targets.
 
 ```{r, fig.width=3, fig.height=1.5}
 bsgenome   <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
@@ -177,43 +178,17 @@ neighbourhood <- extend_for_pe(targets, bsgenome)
 spacers    <- find_spacers(neighbourhood, bsgenome, complement = FALSE, mismatches = 0)
 ```
 
-For prime editing, however, it is better to use `find_primespacers`, which performs target to neighbourhood extension implicitly, and also adds 3' extension (Fig 1) to returned spacer GRanges.
+For prime editing, however, it is better to use `find_primespacers`, which performs target to neighbourhood extension implicitly, and also finds 3' extensions and nickspacers (Fig 1) to returned spacer GRanges.
 
 ```{r, fig.width=3.3, fig.height=1.7}
 spacers <- find_primespacers(targets, bsgenome=bsgenome) 
 ```
 
-This finds prime editing sites that follow Anzalone et al. (2019)'s recommended default settings: a 13-nucleotide primer and a 16-nucleotide reverse transcription template. These settings can be easily altered (e.g. Anzalone et al. report success with reverse transcription templates of up to 48 nucleotides) by: 
+This finds prime editing sites that follow Anzalone et al. (2019)'s recommended default settings: a 13-nucleotide primer and a 16-nucleotide reverse transcription template. These settings can be easily altered (e.g. Anzalone et al. report success with reverse transcription templates of up to 48 nucleotides) by. 
 
 ```{r, fig.width=3.6, fig.height=2.1}
 spacers <- find_primespacers(targets, bsgenome=bsgenome, nrt = 48) 
-```
 
-
-## Add offtargets
-
-```{r, fig.small = TRUE, out.width = "70%", echo = FALSE }
-knitr::include_graphics("../inst/extdata/04_offtargets.png")
-```
-
-```{r, fig.width=3.6, fig.height=2.1}
-if (has_been_indexed(bsgenome)){
-  spacers %<>% add_offtargets(bsgenome, mismatch = 0, plot = TRUE)
-}
-```
-
-## Add efficiency
-
-```{r, fig.small = TRUE, out.width = "70%", echo = FALSE }
-knitr::include_graphics("../inst/extdata/05_efficiency.png")
-```
-
-Not all N~20~NGG gRNA sequences target equally well (even when matching sequence perfectly). For each position in the 23-bp gRNA sequence, the  nucleotide present in current, previous and next position has an effect on targeting efficiency. The current community standard for on-target efficiency prediction is that of Doench et al. (2016), which can be computed and added with `add_efficiency`: 
-
-```{r, fig.width=3.6, fig.height=2.1}
-if (reticulate::py_module_available('azimuth')){
-  spacers %<>% add_ontargets(bsgenome, 'Doench2016')
-}
 ```
 
 ## Return spacer GRanges

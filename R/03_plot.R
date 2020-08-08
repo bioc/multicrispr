@@ -162,7 +162,7 @@ plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr),
 
 prepare_alpha <- function(plotgr, alpha_var){
     if (!is.null(alpha_var)){
-        if (alpha_var == 'off'){
+        if (stri_startswith_fixed(alpha_var, 'off')){
             mcols(plotgr)[[alpha_var]] %<>% cut(c(-Inf, 0, Inf), c('0', '1+'))}}
     plotgr
 }
@@ -188,7 +188,7 @@ prepare_color <- function(plotgr, color_var){
 
 
 scale_alpha <- function(p, alpha_var){
-    if (!is.null(alpha_var)){ if (alpha_var == 'off'){
+    if (!is.null(alpha_var)){ if (stri_startswith_fixed(alpha_var, 'off')){
         p <- p + scale_alpha_manual(values = c(`0` = 1, `1+` = 0.3))
     }}
     p

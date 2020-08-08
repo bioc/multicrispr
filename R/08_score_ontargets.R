@@ -27,7 +27,7 @@
 #'     targets  <- extend(bed_to_granges(bedfile, 'mm10'))
 #'     spacers    <- find_spacers(targets, bsgenome)
 #'     (spacers %<>% add_context(bsgenome))
-#' @export
+#' @noRd
 add_context <- function(spacers, bsgenome, verbose = TRUE){
     
     # Prevent from stats::start from being used (leads to bug!)
@@ -128,7 +128,7 @@ doench2016 <- function(
 #' 
 #' @param spacers  \code{\link[GenomicRanges]{GRanges-class}}: spacers
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
-#' @param method   'Doench2014' (default) or 'Doench2016'
+#' @param ontargetmethod   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
 #' @param cutoff    value to filter on
 #' @param chunksize Doench2016 is executed in chunks of chunksize
@@ -163,11 +163,10 @@ doench2016 <- function(
 #'                                bsgenome)
 #'     spacers <- find_primespacers(targets, bsgenome)
 #'     #spacers<- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
-#'     (spacers %<>% add_ontargets(bsgenome, 'Doench2014'))
+#'     (spacers %<>% score_ontargets(bsgenome, 'Doench2014'))
 #'     # reticulate::use_condaenv('azienv')
 #'     # reticulate::import('azimuth')
-#'     # spacers %<>% add_ontargets(bsgenome, 'Doench2016')
-#'     # filter_ontargets(spacers, bsgenome, 'Doench2016', 0.4)
+#'     # spacers %<>% score_ontargets(bsgenome, 'Doench2016')
 #'     
 #' # TFBS example
 #' #-------------
@@ -177,9 +176,9 @@ doench2016 <- function(
 #'     spacers <- find_spacers(targets, bsgenome)
 #'     # reticulate::use_condaenv('azienv')
 #'     # reticulate::import('azienv')
-#'     # (spacers %<>% add_offtargets(bsgenome, targets))
-#'     # (spacers %>%  add_ontargets(bsgenome, 'Doench2014'))
-#'     # (spacers %>%  add_ontargets(bsgenome, 'Doench2016'))
+#'     # (spacers %<>% count_offtargets(bsgenome, targets))
+#'     # (spacers %>%  score_ontargets(bsgenome, 'Doench2014'))
+#'     # (spacers %>%  score_ontargets(bsgenome, 'Doench2016'))
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
 #' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
@@ -191,28 +190,30 @@ doench2016 <- function(
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
 #' @noRd
-add_ontargets <- function(
-    spacers, bsgenome,  method= c('Doench2014', 'Doench2016')[1],
+score_ontargets <- function(
+    spacers, bsgenome,  ontargetmethod= c('Doench2014', 'Doench2016')[1],
     chunksize = 10000, verbose = TRUE, plot = TRUE, ...
 ){
     # Assert
+    crisprcontext <- NULL
     assert_is_all_of(spacers, 'GRanges')
-    assert_is_a_string(method)
-    assert_is_subset(method, c('Doench2014', 'Doench2016'))
-    if (method %in% names(mcols(spacers))) mcols(spacers)[[method]] <- NULL
+    assert_is_a_string(ontargetmethod)
+    assert_is_subset(ontargetmethod, c('Doench2014', 'Doench2016'))
+    if (ontargetmethod %in% names(mcols(spacers))){
+        mcols(spacers)[[ontargetmethod]] <- NULL}
 
     # Add contextseq
-    if (verbose)  cmessage('\tScore spacers')
+    if (verbose)  cmessage('\tScore ontargets')
     spacers %<>% add_context(bsgenome, verbose = verbose)
     spacerdt  <- gr2dt(spacers)
     scoredt <- data.table(crisprcontext = unique(spacerdt$crisprcontext))
     
     # Score
-    scores <- switch(method, 
+    scores <- switch(ontargetmethod, 
         Doench2014 = doench2014(scoredt$crisprcontext, verbose=verbose), 
         Doench2016 = doench2016(scoredt$crisprcontext, chunksize=chunksize, 
                                 verbose=verbose))
-    scoredt[ , (method) := scores ]
+    scoredt[ , (ontargetmethod) := scores ]
 
     # Merge back in
     mergedt  <- merge(spacerdt, scoredt,
@@ -227,44 +228,6 @@ add_ontargets <- function(
     spacers
 }
 
-
-#' @rdname add_ontargets
-add_efficiency <- function(...){
-    .Deprecated('add_ontargets')
-    add_ontargets(...)
-}
-
-filter_efficient <- function(...){
-    .Deprecated('filter_ontargets')
-    filter_ontargets(...)
-}
-
-
-#' @rdname add_ontargets
-#' @export
-filter_ontargets <- function(
-    spacers, 
-    bsgenome,  
-    method= c('Doench2014', 'Doench2016')[1],
-    cutoff,
-    verbose    = TRUE, 
-    plot       = TRUE,
-    ...
-){
-    spacers %<>% add_ontargets(
-                    bsgenome = bsgenome,  method = method, 
-                    verbose = verbose, plot = plot, ...)
-
-    idx <- mcols(spacers)[[method]] > cutoff
-    if (verbose){
-        width <- nchar(length(idx))
-        cmessage('\t\t%s ranges', formatC(length(idx), width = width))
-        cmessage('\t\t%s ranges after filtering for %s > %s',
-                formatC(sum(idx), width = width), method, as.character(cutoff))
-    }
-    
-    spacers %>% extract(idx)
-}
 
 default_alpha_var <- function(gr){
     if ('off' %in% names(mcols(gr))) 'off' else NULL

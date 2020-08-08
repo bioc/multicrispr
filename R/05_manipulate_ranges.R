@@ -305,7 +305,9 @@ add_inverse_strand <- function(gr, verbose = FALSE, plot = FALSE, ...){
     # Concatenate
     newgr <- c(gr, revcomps)
     newgr %<>% unique()
-    txt <- sprintf('\t\t%d ranges after adding inverse strands', length(newgr))
+    txt <- sprintf(
+        '\tRetain %d unique target ranges after adding inverse strands', 
+        length(newgr))
     
     # Sort
     newgr <- sortSeqlevels(newgr)

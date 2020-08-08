@@ -189,8 +189,9 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param spacer     string: spacer pattern in extended IUPAC alphabet
 #' @param pam        string: pam pattern in extended IUPAC alphabet
 #' @param complement TRUE (default) or FALSE: also search in compl ranges?
-#' @param ontargets  'Doench2016' or 'Doench2016': on-target scoring method
+#' @param ontargetmethod  'Doench2016' or 'Doench2016': on-target scoring method
 #' @param offtargetmethod 'bowtie' (default) or 'vcountpdict'
+#' @param offtargetfilterby filter for best off-target counts by this variable
 #' @param subtract_targets TRUE or FALSE (default): whether to subtract target 
 #'                   (mis)matches from offtarget counts
 #' @param mismatches 0-3: allowed mismatches in offtargetanalysis 
@@ -224,26 +225,29 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     bedfile  <- system.file('extdata/SRF.bed', package='multicrispr')
 #'     gr <- bed_to_granges(bedfile, 'mm10') %>% extend()
+#'     gr %<>% extract(1:100)
 #'     find_spacers(gr, bsgenome, subtract_targets = TRUE)
 #' @seealso \code{\link{find_primespacers}} to find prime editing spacers 
 #' @export 
 find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG', 
-    complement = TRUE, ontargets = c('Doench2014', 'Doench2016')[1], 
+    complement = TRUE, 
+    ontargetmethod  = c('Doench2014', 'Doench2016')[1],
     offtargetmethod = c('bowtie', 'vcountpdict')[1],
-    subtract_targets = FALSE, mismatches = 2, 
+    offtargetfilterby = character(0),
+    subtract_targets = FALSE, mismatches = 3, 
     indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
-    verbose = TRUE, plot = TRUE, ...){
+    verbose = TRUE, plot = TRUE, ...
+){
 # Assert
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(bsgenome, 'BSgenome')
     assert_is_a_string(spacer)
     assert_is_a_string(pam)
     assert_is_a_bool(complement)
-    assert_is_subset(ontargets, c('Doench2016', 'Doench2014'))
-    assert_is_subset(mismatches, c(-1, 0,1,2))
     assert_is_a_bool(verbose)
     assert_is_a_bool(plot)
 # Find
+    if (verbose) message('Find spacers in ', length(gr), ' targets')
     if (complement){
         gr %<>% add_inverse_strand(plot = FALSE, verbose = verbose)
     }
@@ -253,13 +257,16 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
     spacers$crisprname   <- names(spacers)
     spacers$crisprspacer <- getSeq(bsgenome, spacers, as.character=TRUE)
     spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
+    if (verbose) message('\tFound ', length(spacers), ' spacers')
 # Add on/offtargets
-    spacers %<>% add_offtargets(
+    spacers %<>% count_offtargets(
         bsgenome, targets = if (subtract_targets) gr else NULL, 
         mismatches = mismatches, pam = pam, offtargetmethod = offtargetmethod, 
+        offtargetfilterby = offtargetfilterby,
         outdir = outdir, indexedgenomesdir = indexedgenomesdir, 
         verbose = verbose, plot = FALSE)
-    spacers %<>% add_ontargets(bsgenome, method = ontargets, plot = FALSE)
+    spacers %<>% score_ontargets(
+                    bsgenome, ontargetmethod = ontargetmethod, plot = FALSE)
 # Plot/Return
     if (plot) print(plot_intervals(spacers, ...)) #spacers$sitename <- NULL
     spacers

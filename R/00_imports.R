@@ -18,7 +18,7 @@
 #' @importFrom  BiocGenerics          end  end<-  invertStrand
 #' @importFrom  BiocGenerics          start  start<-  strand  strand<-
 #' @importFrom  BSgenome              getSeq   getBSgenome
-#' @importFrom  data.table            fwrite
+#' @importFrom  data.table            fread   fwrite
 #' @importFrom  data.table            :=  data.table  as.data.table  setnames
 #' @importFrom  data.table            setnames  setorderv   setnafill    .SD
 #' @importFrom  GenomeInfoDb          genome
@@ -37,7 +37,7 @@
 #' @importFrom  grid                  arrow
 #' @importFrom  magrittr              %>%   %<>%   add   and
 #' @importFrom  magrittr              extract  extract2  set_names
-#' @importFrom  methods               as
+#' @importFrom  methods               as  is
 #' @importFrom  tidyr                 separate_rows
 #' @importFrom  utils                 download.file   getFromNamespace  head  
 #' @importFrom  utils                 tail  read.csv  read.table
