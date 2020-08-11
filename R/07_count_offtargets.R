@@ -456,7 +456,7 @@ expand_iupac_ambiguities <- function(x){
 #' count_spacer_matches(spacers, indexdir, norc=FALSE, mismatches = 1)
 #' @noRd
 count_spacer_matches <- function(
-    spacers, indexdir, mismatches = 3, pam = 'NGG', norc, outdir = OUTDIR, 
+    spacers, indexdir, mismatches = 2, pam = 'NGG', norc, outdir = OUTDIR, 
     verbose = TRUE
 ){
     # Comply
@@ -508,7 +508,7 @@ count_spacer_matches <- function(
 
 
 add_target_matches <- function(
-    spacers, targets, bsgenome, mismatches = 3, pam = 'NGG', 
+    spacers, targets, bsgenome, mismatches = 2, pam = 'NGG', 
     outdir = OUTDIR, verbose = TRUE
 ){
     # Comply
@@ -545,7 +545,7 @@ add_target_matches <- function(
 add_genome_matches <- function(
     spacers, 
     bsgenome          = getBSgenome(genome(spacers)[1]),
-    mismatches        = 3,
+    mismatches        = 2,
     pam               = 'NGG', 
     offtargetmethod   = c('bowtie', 'pdict')[1],
     outdir            = OUTDIR,
@@ -739,7 +739,7 @@ filter_offtargets <- function(
 #'  # count_offtargets(spacers, bsgenome)    # off = G - 1
 #'  # count_offtargets(spacers, bsgenome, targets)  # off = G - T
 #' @noRd
-count_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 3, 
+count_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2, 
     pam = 'NGG', offtargetmethod = c('bowtie', 'pdict')[1], 
     offtargetfilterby = character(0), outdir = OUTDIR, 
     indexedgenomesdir = INDEXEDGENOMESDIR, verbose = TRUE, plot = TRUE, ...

@@ -201,7 +201,7 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 #' @param mismatches  no of primespacer mismatches 
 #'                   (default 0, to suppress offtarget analysis: -1)
 #' @param nickmatches no of nickspacer offtarget mismatches 
-#'                   (default 3, to suppresses offtarget analysis: -1)
+#'                   (default 2, to suppresses offtarget analysis: -1)
 #' @param indexedgenomesdir  directory with indexed genomes 
 #'                           (as created by \code{\link{index_genome}})
 #' @param outdir    directory whre offtarget analysis output is written
@@ -247,7 +247,7 @@ pastelapse <- function(x) paste0(x, collapse = ';')
 find_primespacers <- function(gr, bsgenome, edits = get_plus_seq(bsgenome, gr), 
     nprimer = 13, nrt = 16, ontargetmethod  = c('Doench2014', 'Doench2016')[1], 
     offtargetmethod = c('bowtie', 'pdict')[1], 
-    mismatches = 0, nickmatches = 3, indexedgenomesdir = INDEXEDGENOMESDIR, 
+    mismatches = 0, nickmatches = 2, indexedgenomesdir = INDEXEDGENOMESDIR, 
     outdir = OUTDIR, verbose = TRUE, plot = TRUE, ...){
 # Assert
     assert_is_all_of(gr, 'GRanges')

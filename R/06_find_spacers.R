@@ -234,7 +234,7 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
     ontargetmethod  = c('Doench2014', 'Doench2016')[1],
     offtargetmethod = c('bowtie', 'pdict')[1],
     offtargetfilterby = character(0),
-    subtract_targets = FALSE, mismatches = 3, 
+    subtract_targets = FALSE, mismatches = 2, 
     indexedgenomesdir = INDEXEDGENOMESDIR, outdir = OUTDIR, 
     verbose = TRUE, plot = TRUE, ...
 ){

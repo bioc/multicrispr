@@ -94,7 +94,7 @@
     plot_intervals(extended) %>% blanken()
     ggsave('../graphs/prnp02_extended.pdf', width=1.3, height=0.6, device = grDevices::cairo_pdf, bg = 'transparent')
     
-    spacers <- find_primespacers(gr, bsgenome, ontargetmethod = 'Doench2016')
+    spacers <- find_primespacers(gr, bsgenome, ontargetmethod = 'Doench2016', mismatches=0, nickmatches=2)
     #(plot_intervals(spacers, alpha_var = 'type', size_var = NULL) + 
     #scale_alpha_manual(values = c(`spacer` = 1, `3 extension` = 1, `nicking spacer` = 0))) %>% blanken()
     #ggplot2::ggsave('../graphs/prnp03_primespacers.pdf', width=1.3, height=0.9, device = grDevices::cairo_pdf, bg = 'transparent')

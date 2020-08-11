@@ -14,7 +14,7 @@ find_spacers(
   offtargetmethod = c("bowtie", "pdict")[1],
   offtargetfilterby = character(0),
   subtract_targets = FALSE,
-  mismatches = 3,
+  mismatches = 2,
   indexedgenomesdir = INDEXEDGENOMESDIR,
   outdir = OUTDIR,
   verbose = TRUE,
