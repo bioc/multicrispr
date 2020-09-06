@@ -1,5 +1,5 @@
 ---
-title: "multicrispr: Crispr/Cas9 gRNA design"
+title: "Crispr/Cas9 gRNA design"
 author: "Aditya M Bhagwat"
 date: "`r Sys.Date()`"
 output: BiocStyle::html_document

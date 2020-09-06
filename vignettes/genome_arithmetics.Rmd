@@ -1,5 +1,5 @@
 ---
-title: "Genome arithmetics with multicrispr"
+title: "Genome arithmetics"
 author: "Aditya M Bhagwat"
 date: "`r Sys.Date()`"
 output: BiocStyle::html_document

@@ -1,5 +1,5 @@
 ---
-title: "multicrispr: Prime Editing"
+title: "Prime Editing"
 author: "Aditya M Bhagwat"
 date: "`r Sys.Date()`"
 output: BiocStyle::html_document
