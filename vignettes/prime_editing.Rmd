@@ -1,10 +1,10 @@
 ---
-title: "Using multicrispr for gRNA design"
+title: "multicrispr: Prime Editing"
 author: "Aditya M Bhagwat"
 date: "`r Sys.Date()`"
 output: BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{grna_design}
+  %\VignetteIndexEntry{prime_editing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,7 +18,6 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, cache = FALSE)
 
 # Background
 
-## Crispr/Cas9 and Prime Editing
 
 **Crispr/Cas9** is a prokaryotic immune system turned into a genome engineering tool, with a Cas9/gRNA complex at the heart of its functioning. The **gRNA** (guide RNA) contains a 20 nucleotide (proto)**spacer** which guides the complex to a genomic locus with identical sequence, but only when followed by an *NGG* **PAM** (protospacer adjacent motif (see Figure 1A). The **Cas9** enzyme performs some effector action at that locus: *wildtype Cas9* cuts both strands after spacer nucleotide 17, *Cas9Nickase* cuts only a single strand (two variants exist, cutting respectively each of the strands), while catalytically dead *dCas9*, fused to some effector domain (KRAB, VPR, APEX) performs some alternative action (e.g. KRAB represses, VPR activates, APEX biotinylates). 
 
@@ -30,15 +29,11 @@ knitr::include_graphics("../inst/extdata/pe.png")
 ```
 
 
-## Guide RNA design
-
-**Guide RNA design** involves finding good guide RNAs to hit the targets of interest. Plasmids with guide RNA scaffolds, ready for cloning desired spacers into, can be readily ordered from AddGene. The actual task, therefore, boils down to finding good spacers for the targets of interest. For prime editing, it additionally involves finding appropriate primer binding site and reverse transcription template to edit the target site of interest. 
-
-A **good spacer** needs to fulfill two requirements.
+**Guide RNA design** involves finding good guide RNAs to hit the targets of interest. Plasmids with guide RNA scaffolds, ready for cloning desired spacers into, can be readily ordered from AddGene. The actual task, therefore, boils down to finding good spacers for the targets of interest. For prime editing, it additionally involves finding appropriate primer binding site and reverse transcription template to edit the target site of interest. In general, a good spacer needs to fulfill two requirements:
 
 1. **Minimal off-target** (mis)matches, so that only intended targets are hit. 
 
-    - Crispr gRNAs can hit exact (with identical and alternate NGG pam), as well as (up-to 2) mismatch offtargets.
+    - Crispr gRNAs can hit exact (with identical and alternate NGG pam), as well as (up-to 3) mismatch offtargets.
     - Prime Editing is much more specific, hitting only exact offtargets.
   
 2. **Maximal on-target** efficiency. Over the years, several sequence-to-efficiency prediction models have been developed, of which the Doench 2016 score has  currently become the community standard. The score is not perfect, and examples can be found where the prediction and the actual outcome differ. Yet, to-date it is the best heuristic to predict on-target efficiency, worth making use of.
@@ -48,8 +43,11 @@ A **good spacer** needs to fulfill two requirements.
 
 Multicrispr was developed to make guide RNA design easier. As shown below, it contains functions to **define** and **transform** targets, **find spacers**,  compute/add  **offtarget counts** and **efficiency scores** (Doench 2016), and finally return all of this as a **GRanges** object.
 
-```{r overview, fig.wide = TRUE, out.width = "80%", echo = FALSE }
-knitr::include_graphics("../inst/extdata/readme_portrait.png")
+\newline
+
+
+```{r overview, fig.wide = TRUE, out.width = "100%", echo = FALSE}
+knitr::include_graphics("../inst/extdata/overview.png")
 ```
 
 ## Install
@@ -62,9 +60,10 @@ Installing **multicrispr** is simple:
 install.packages("BiocManager")
 BiocManager::install(version='devel')
 BiocManager::install("multicrispr")
+
 # From gitlab: 
-url <- 'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'
-remotes::install_git(url, repos = BiocManager::repositories())
+#url <- 'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'
+#remotes::install_git(url, repos = BiocManager::repositories())
 ```
 
 Doench et al. (2016) 's python package **azimuth** for on-target efficiency prediction using their method can be easily installed and activated using reticulate:
@@ -105,96 +104,31 @@ index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  )
 
 ## Define targets
 
-```{r, fig.small = TRUE, out.width = "70%", echo = FALSE }
-knitr::include_graphics("../inst/extdata/01_define_targets.png")
-```
-
-`bed_to_granges` converts a (0-based) BED coordinate file into a (1-based) GRanges.  
-An example is loading the 1974 binding sites of the transcription factor SRF:
-
-```{r}
-require(magrittr)
-require(multicrispr)
-bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
-tfbs0 <- bed_to_granges(bedfile, genome = 'mm10')
-```
-
-
-`genes_to_granges` and `genefile_to_granges` convert entrez/ensembl gene identifiers into GRanges using `txdb` gene models. 
-An example that loads of a small subset of the 1974 SRF binding sites:
-
-```{r}
-require(multicrispr)
-entrezfile <- system.file('extdata/SRF.entrez', package = 'multicrispr')
-txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene
-sometfbs0 <- genefile_to_granges(entrezfile, txdb, complement = TRUE)
-```
-
-
-`char_to_granges` uses a 1-based coordinate vector to specify the GRanges.  
-It can be used to define four prime editing sites mentioned by Anzalone et al. (2019):
+**bed_to_granges** converts a (0-based) BED coordinate file into a (1-based) GRanges.  
+**genes_to_granges** and **genefile_to_granges** convert entrez/ensembl gene identifiers into GRanges using `txdb` gene models. 
+**char_to_granges** uses a 1-based coordinate vector to specify the GRanges. It can be used to prime edit the prion disease locus in the PRNP gene (Anzalone et al., 2019)
 
 ```{r, fig.width=3.5, fig.height=1.5}
 # char_to_granges: Anzalone et al. (2019) prime editing targets
+require(multicrispr)
 bsgenome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  
-pe0 <- char_to_granges(c(HBB  = 'chr11:5227002:-'), bsgenome)
-plot_intervals(pe0)
+targets <- char_to_granges(c(PRNP = 'chr20:4699600:+'), bsgenome)
+plot_intervals(targets)
 ```
 
-## Transform targets
+## Find prime editing spacers and nicking spacers
 
-```{r, fig.small = TRUE, out.width = "70%", echo = FALSE }
-knitr::include_graphics("../inst/extdata/02_transform.png")
-```
+**find_primespacers** finds prime editing spacers, 3' extensions and nicking spacers. For both, on- and off-target analysis is performed.
+Desired edits are always to be specified with respect to the defauylt (+) strand.
 
-As a second step, the original targets may require transformation. The functions `extend`, `up_flank` (upstream flanks), `down_flank` (downstream flanks),  and `double_flank` (double flanks) can be used to update the target ranges as required.
-
-```{r, fig.width=4, fig.height=2, out.width="65%"}
-# Extend
-targets <- pe0
-invisible(extend(targets, -22, 22, plot = TRUE))
-# Up flank
-invisible(up_flank(  targets, -200, -1, plot = TRUE))
-# Down flank
-invisible(down_flank( targets, 1, 200, plot = TRUE))
-# Double flank
-invisible(double_flank(targets, -200, -1, +1, +200, plot = TRUE))
-```
-
-
-## Find spacers, count off-targets, score on-targets, find nickspacers
-
-```{r, fig.small = TRUE, out.width = "70%", echo = FALSE }
-knitr::include_graphics("../inst/extdata/03_find.png")
-```
-
-The next step is to find N20 spacers followed by NGG pam sites.
-This can be done with `find_spacers`, after extending target range(s) to prime editing neighbourhood(s). 
-This function also counts off-targets and scores on-targets.
-
-```{r, fig.width=3, fig.height=1.5}
-bsgenome   <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
-neighbourhood <- extend_for_pe(targets, bsgenome)
-spacers    <- find_spacers(neighbourhood, bsgenome, complement = FALSE, mismatches = 0)
-```
-
-For prime editing, however, it is better to use `find_primespacers`, which performs target to neighbourhood extension implicitly, and also finds 3' extensions and nickspacers (Fig 1) to returned spacer GRanges.
-
-```{r, fig.width=3.3, fig.height=1.7}
-spacers <- find_primespacers(targets, bsgenome=bsgenome) 
-```
-
-This finds prime editing sites that follow Anzalone et al. (2019)'s recommended default settings: a 13-nucleotide primer and a 16-nucleotide reverse transcription template. These settings can be easily altered (e.g. Anzalone et al. report success with reverse transcription templates of up to 48 nucleotides) by. 
-
-```{r, fig.width=3.6, fig.height=2.1}
-spacers <- find_primespacers(targets, bsgenome=bsgenome, nrt = 48) 
-
+```{r, fig.width=3.3, fig.height=1.7, message = FALSE, warning = FALSE}
+spacers <- find_primespacers(targets, bsgenome=bsgenome, edits = "T") 
 ```
 
 ## Return spacer GRanges
 
 ```{r}
-  spacers
+  str(gr2dt(spacers), vec.len=2)
 ```
 
 # References {-}

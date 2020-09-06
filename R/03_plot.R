@@ -145,7 +145,7 @@ plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr),
 # Discretize values
     plotgr %<>% prepare_alpha(alpha_var)
     plotgr %<>% prepare_size(size_var)
-    plotgr$color <- mcols(plotgr)[[color_var]]; color_var <- 'color'
+    plotgr$color <- gr2dt(plotgr)[[color_var]]; color_var <- 'color'
     plotgr %<>% prepare_color(color_var)
 # Plot    
     p <- plot_intervals_engine(plotgr, xref=xref, y=y, nperchrom=nperchrom, 

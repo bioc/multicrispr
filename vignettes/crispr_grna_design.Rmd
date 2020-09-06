@@ -1,0 +1,191 @@
+---
+title: "multicrispr: Crispr/Cas9 gRNA design"
+author: "Aditya M Bhagwat"
+date: "`r Sys.Date()`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{grna_design}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=TRUE, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, cache = TRUE)
+#str(knitr::opts_chunk$get())
+```
+
+<!-- ![](../inst/extdata/readme.png) -->
+
+# Background
+
+**Crispr/Cas9 **is a two-component genome engineering tool: 
+
+* The **Cas9** enzyme performs some action at a genomic locus (cuts, activates, represses, ...)
+* The **guide RNA spacer** targets a matching locus when followed by NGG "pam" sequence
+
+```{r, fig.normal = TRUE, echo = FALSE}
+knitr::include_graphics("../inst/extdata/crispr.png")
+```
+
+
+**Guide RNA design** involves 
+
+1. Defining target ranges
+2. Transforming them according to Crispr/Cas9 application
+3. Finding 20 nucleotide gRNA spacers
+    - which match the target sequence (on either strand) and are followed by an NGG "pam"
+    - have **minimal off-target** (mis)matches
+    - have **maximal on-target** efficiency
+
+# Multicrispr
+
+Multicrispr aism to be a gRNA design solution which is:
+
+  * complete:   defining/transforming targets, finding spacers, analysing on/off-targets
+  * performant: scales towards thousands of targets (data.table backend)
+  * intuitive:  a functional programming design and intuitive visualizations
+  * interoperable: acceping and returning a GRanges
+
+For on-target scoring either the Doench2014 or the Doench2016 method can be used (Doench2016 is the current standard, see e.g. Haeussler et al., 2016).
+For off-target analysis Bowtie (fast) as well as vcountPDict (exact) can be used.
+The figure below gives an overview of how multicrispr can be used, the subsequent sections below discuss the details.
+
+
+```{r overview, fig.wide = TRUE, out.width = "100%", echo = FALSE}
+knitr::include_graphics("../inst/extdata/overview.png")
+```
+
+## Install
+
+
+Installing **multicrispr** is straightforward:
+
+```{r, eval = FALSE}
+# From BioC
+install.packages("BiocManager")
+BiocManager::install(version='devel')
+BiocManager::install("multicrispr")
+
+# From gitlab: 
+#url <- 'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'
+#remotes::install_git(url, repos = BiocManager::repositories())
+```
+
+Doench et al. (2016) 's python package **azimuth** for on-target efficiency prediction using their method can be easily installed and activated using reticulate:
+
+```{r, eval = FALSE}
+# Install once
+  # reticulate::conda_create('azienv', 'python=2.7')
+  # reticulate::conda_install('azienv', 'azimuth', pip = TRUE)
+  # reticulate::conda_install('azienv', 'scikit-learn==0.17.1', pip = TRUE)
+# Then activate
+  reticulate::use_condaenv('azienv')
+```
+
+**Bowtie-indexed genomes** for fast offtarget analysis can be installed using `index_genome`. For the two genomes used in the examples, mm10 and hg38, the function downloads pre-build indexes from our data server, allowing a quick exploration (set `download=FALSE` to build index anew):
+
+```{r, eval = FALSE}
+index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
+index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38  )
+```
+
+<!-- 1. Install conda for python 2.7 -->
+<!-- 2. Create a new conda environment: `conda create --name azimuthenv python=2.7` -->
+<!-- 3. Activate conda environment:     `conda activate azimuthenv` -->
+<!-- 4. Install module azimuth:         `pip install azimuth` -->
+<!-- 5. Install scikit-learn:           `pip install scikit-learn==0.17.1` -->
+
+
+```{r, echo = FALSE, results = FALSE, message=FALSE}
+  # Not required
+  # Done to load dependencies silently - keeping focus
+  #require(GenomicRanges)
+  #require(Biostrings)
+  #require(dplyr)
+  #require(dbplyr)
+  #require(htmltools)
+  #require(htmlwidgets)
+```
+
+## Define targets
+
+**bed_to_granges** converts a (0-based) BED coordinate file into a (1-based) GRanges.  
+An example is loading the 1974 binding sites of the transcription factor SRF:
+
+```{r, message=FALSE, out.width="60%"}
+require(magrittr)
+require(multicrispr)
+bedfile <- system.file('extdata/SRF.bed', package = 'multicrispr')
+targets0 <- bed_to_granges(bedfile, genome = 'mm10')
+```
+
+
+**genes_to_granges** and **genefile_to_granges** convert entrez/ensembl gene identifiers into GRanges using `txdb` gene models. 
+An example that loads a small subset of the 1974 SRF binding sites:
+
+```{r, message=FALSE, out.width="60%" }
+entrezfile <- system.file('extdata/SRF.entrez', package = 'multicrispr')
+txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene::TxDb.Mmusculus.UCSC.mm10.knownGene
+invisible(genefile_to_granges(entrezfile, txdb, complement = TRUE))
+```
+
+**char_to_granges** uses a 1-based coordinate vector to specify the GRanges.  
+It can be used e.g. to define the first SRF binding site explicitly:
+
+```{r, fig.width=3.5, fig.height=1.5, out.width="50%"}
+bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+plot_intervals(char_to_granges(c(srf1 = 'chr13:119991554-119991569:+'), bsgenome))
+```
+
+## Transform
+
+As a second step, the original targets may require transformation. The functions **up_flank** (target upstream flanks), **down_flank** (downstream flanks),  **double_flank** (double flanks) and **extend** can be used to update the target ranges as required.
+
+```{r, fig.wide = TRUE, fig.show = 'hold', message = FALSE, out.width="60%", fig.width=7, fig.height=3}
+# Up flank
+    invisible(up_flank(  targets0, -200, -1))
+# Down flank
+    invisible(down_flank( targets0, 1, 200))
+# Double flank
+    invisible(double_flank(targets0, -200, -1, +1, +200))
+# Extend
+    targets <- extend(targets0, -22, 22, plot = TRUE)
+```
+
+
+## Find spacers, count off-targets, score on-targets
+
+**find_spacers** finds N20 spacers (followed by NGG pam sites), counts off-targets, and scores on-targets.
+It also visualizes the results and returns them as a GRanges object with off-target counts and on-target efficiency.
+
+```{r, message=FALSE}
+spacers <- find_spacers(
+    targets, bsgenome, complement=FALSE, mismatches=0, subtract_targets = TRUE)
+```
+
+## Return/Write
+
+The results are returned as a GRanges object. They can be written to file with **write_ranges**  
+They can be cast into a data.table with **gr2dt**, as shown below
+
+
+```{r}
+  str(gr2dt(spacers), vec.len=2)
+```
+
+# References {-}
+
+Anzalone, A.V., Randolph, P.B., Davis, J.R. et al. Search-and-replace genome editing without double-strand breaks or donor DNA. Nature 576, 149–157 (2019). https://doi.org/10.1038/s41586-019-1711-4
+
+Doench JG, Hartenian E, Graham DB, Tothova Z, Hegde M, Smith I, Sullender M, Ebert BL, Xavier RJ, Root DE, Rational design of highly active sgRNAs for CRISPR-Cas9-mediated gene inactivation Nat Biotechnol 2014 1262-1267.
+
+Doench JG, Fusi N, Sullender M, Hegde M, Vaimberg EW, Donovan KF, Smith I, Tothova Z, Wilen C, Orchard R, Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9 Nat Biotechnol 2016 184-191
+
+Haeussler M, Schönig K, Eckert H, Eschstruth A, Mianné J, Renaud J-B, Schneider-Maunoury S, Shkumatava A, Teboul L, Kent J, Evaluation of off-target and on-target scoring algorithms and integration into the guide RNA selection tool CRISPOR Genome Biol 2016 148
+
+
+
+
+
+
+
