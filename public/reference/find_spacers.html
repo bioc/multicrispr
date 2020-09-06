@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Find crispr spacers in targetranges — find_spacers" />
 <meta property="og:description" content="Find crispr spacers in targetranges" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.23</span>
       </span>
     </div>
 
@@ -92,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
+      <a href="../articles/genome_arithmetics.html">Genome arithmetics with multicrispr</a>
+    </li>
+    <li>
+      <a href="../articles/grna_design.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -127,8 +133,16 @@
   <span class='kw'>spacer</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/strrep.html'>strrep</a></span>(<span class='st'>"N"</span>, <span class='fl'>20</span>),
   <span class='kw'>pam</span> <span class='kw'>=</span> <span class='st'>"NGG"</span>,
   <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>ontargetmethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Doench2014"</span>, <span class='st'>"Doench2016"</span>)[<span class='fl'>1</span>],
+  <span class='kw'>offtargetmethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"bowtie"</span>, <span class='st'>"pdict"</span>)[<span class='fl'>1</span>],
+  <span class='kw'>offtargetfilterby</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(<span class='fl'>0</span>),
+  <span class='kw'>subtract_targets</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>mismatches</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>indexedgenomesdir</span> <span class='kw'>=</span> <span class='no'>INDEXEDGENOMESDIR</span>,
+  <span class='kw'>outdir</span> <span class='kw'>=</span> <span class='no'>OUTDIR</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -155,12 +169,47 @@
       <td><p>TRUE (default) or FALSE: also search in compl ranges?</p></td>
     </tr>
     <tr>
+      <th>ontargetmethod</th>
+      <td><p>'Doench2016' or 'Doench2016': on-target scoring method</p></td>
+    </tr>
+    <tr>
+      <th>offtargetmethod</th>
+      <td><p>'bowtie' (default) or 'pdict'</p></td>
+    </tr>
+    <tr>
+      <th>offtargetfilterby</th>
+      <td><p>filter for best off-target counts by this variable</p></td>
+    </tr>
+    <tr>
+      <th>subtract_targets</th>
+      <td><p>TRUE or FALSE (default): whether to subtract target 
+(mis)matches from offtarget counts</p></td>
+    </tr>
+    <tr>
+      <th>mismatches</th>
+      <td><p>0-3: allowed mismatches in offtargetanalysis 
+(choose mismatch=-1 to suppress offtarget analysis)</p></td>
+    </tr>
+    <tr>
+      <th>indexedgenomesdir</th>
+      <td><p>directory with Bowtie-indexed genomes 
+(as produced with <code><a href='index_genome.html'>index_genome</a></code>)</p></td>
+    </tr>
+    <tr>
+      <th>outdir</th>
+      <td><p>directory where bowtie analysis results are written to</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p>TRUE (default) or FALSE</p></td>
     </tr>
     <tr>
       <th>plot</th>
       <td><p>TRUE (default) or FALSE</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>passed to plot_intervals</p></td>
     </tr>
     </table>
 
@@ -169,7 +218,7 @@
     <p><code><a href='https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html'>GRanges-class</a></code></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='find_pe_spacers.html'>find_pe_spacers</a></code> to find prime editing spacers</p></div>
+    <div class='dont-index'><p><code><a href='find_primespacers.html'>find_primespacers</a></code> to find prime editing spacers</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># PE example</span>
@@ -181,7 +230,7 @@
                             <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,   <span class='co'># del</span>
                             <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
                           <span class='no'>bsgenome</span>)
-    <span class='fu'><a href='plot_intervals.html'>plot_intervals</a></span>(<span class='no'>gr</span>)</div><div class='img'><img src='find_spacers-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='find_spacers-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 9 metadata columns:
+    <span class='fu'><a href='plot_intervals.html'>plot_intervals</a></span>(<span class='no'>gr</span>)</div><div class='img'><img src='find_spacers-1.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'><a href='find_primespacers.html'>find_primespacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>Find primespacers for 4 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 10 primespacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 0 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 53 hits with max 1 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 11 after removing more than 0 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       9 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='output co'>#&gt; <span class='message'>Find nickspacers</span></div><div class='output co'>#&gt; <span class='message'>Find spacers in 10 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 32 spacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 2 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 91 hits with max 2 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 37 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 36 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 33 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 33 after removing more than 2 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       30 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>		       32 are off1 free</span></div><div class='output co'>#&gt; <span class='message'>		       24 are off2 free</span></div><div class='output co'>#&gt; <span class='message'>	Filter for best offtarget counts</span></div><div class='output co'>#&gt; <span class='message'>		Retain 32 with best off0 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>		Retain 32 with best off1 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>		Retain 24 with best off2 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 34 rows containing missing values (geom_point).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 34 rows containing missing values (geom_point).</span></div><div class='img'><img src='find_spacers-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 21 metadata columns:
 #&gt;          seqnames              ranges strand |  targetname targetstart
 #&gt;             &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;   CFTR_1     chr7 117559575-117559594      + |        CFTR   117559593
@@ -194,7 +243,7 @@
 #&gt;   PRNP_2    chr20     4699569-4699588      + |        PRNP     4699600
 #&gt;   PRNP_3    chr20     4699575-4699594      + |        PRNP     4699600
 #&gt;   PRNP_4    chr20     4699578-4699597      + |        PRNP     4699600
-#&gt;          targetend  crisprname         crisprspacer   crisprpam        primer
+#&gt;          targetend  crisprname         crisprspacer   crisprpam  crisprprimer
 #&gt;          &lt;integer&gt; &lt;character&gt;          &lt;character&gt; &lt;character&gt;   &lt;character&gt;
 #&gt;   CFTR_1 117559595      CFTR_1 ATTAAAGAAAATATCATCTT         TGG AAGAAAATATCAT
 #&gt;   CFTR_2 117559595      CFTR_2 TCTGTATCTATATTCATCAT         AGG TATCTATATTCAT
@@ -206,7 +255,7 @@
 #&gt;   PRNP_2   4699600      PRNP_2 GCAGCTGGGGCAGTGGTGGG         GGG CTGGGGCAGTGGT
 #&gt;   PRNP_3   4699600      PRNP_3 GGGGCAGTGGTGGGGGGCCT         TGG CAGTGGTGGGGGG
 #&gt;   PRNP_4   4699600      PRNP_4 GCAGTGGTGGGGGGCCTTGG         CGG TGGTGGGGGGCCT
-#&gt;             revtranscript                     extension
+#&gt;          crisprtranscript               crisprextension
 #&gt;               &lt;character&gt;                   &lt;character&gt;
 #&gt;   CFTR_1 CTTTGGTGTTTCCTAT ATAGGAAACACCAAAGATGATATTTTCTT
 #&gt;   CFTR_2 CATAGGAAACACCAAA TTTGGTGTTTCCTATGATGAATATAGATA
@@ -218,8 +267,68 @@
 #&gt;   PRNP_2 GGGGGGCCTTGGCGGC GCCGCCAAGGCCCCCCACCACTGCCCCAG
 #&gt;   PRNP_3 CCTTGGCGGCTACATG CATGTAGCCGCCAAGGCCCCCCACCACTG
 #&gt;   PRNP_4 TGGCGGCTACATGCTG CAGCATGTAGCCGCCAAGGCCCCCCACCA
+#&gt;                      crisprextrange       off      off0 Doench2014
+#&gt;                         &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt;
+#&gt;   CFTR_1 chr7:117559579-117559607:-         0         0 0.03399990
+#&gt;   CFTR_2 chr7:117559593-117559621:+         0         0 0.22337056
+#&gt;    HBB_1    chr11:5226990-5227018:+         1         1 0.13111422
+#&gt;    HBB_2    chr11:5226988-5227016:-         0         0 0.41398065
+#&gt;   HEXA_1  chr15:72346555-72346583:-         0         0 0.10728361
+#&gt;   HEXA_2  chr15:72346562-72346590:-         0         0 0.03942528
+#&gt;   PRNP_1    chr20:4699572-4699600:-         0         0 0.00994899
+#&gt;   PRNP_2    chr20:4699573-4699601:-         0         0 0.04496627
+#&gt;   PRNP_3    chr20:4699579-4699607:-         0         0 0.00996254
+#&gt;   PRNP_4    chr20:4699582-4699610:-         0         0 0.20935863
+#&gt;                                                                                                        nickrange
+#&gt;                                                                                                      &lt;character&gt;
+#&gt;   CFTR_1                                                                              chr7:117559646-117559665:-
+#&gt;   CFTR_2                                                                              chr7:117559506-117559525:+
+#&gt;    HBB_1                                                         chr11:5226916-5226935:+;chr11:5226917-5226936:+
+#&gt;    HBB_2                                                                                                    &lt;NA&gt;
+#&gt;   HEXA_1 chr15:72346621-72346640:-;chr15:72346628-72346647:-;chr15:72346632-72346651:-;chr15:72346647-72346666:-
+#&gt;   HEXA_2 chr15:72346621-72346640:-;chr15:72346628-72346647:-;chr15:72346632-72346651:-;chr15:72346647-72346666:-
+#&gt;   PRNP_1                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;   PRNP_2                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;   PRNP_3                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;   PRNP_4                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;                                                                                   nickspacer
+#&gt;                                                                                  &lt;character&gt;
+#&gt;   CFTR_1                                                                AGTTTCTTACCTCTTCTAGT
+#&gt;   CFTR_2                                                                GAGGGTAAAATTAAGCACAG
+#&gt;    HBB_1                                           ACCTTGATACCAACCTGCCC;CCTTGATACCAACCTGCCCA
+#&gt;    HBB_2                                                                                &lt;NA&gt;
+#&gt;   HEXA_1 TGGTCACCAAGGCCGGCTTC;CTGGAACTGGTCACCAAGGC;GGAGCTGGAACTGGTCACCA;AGTGAACTATATGAAGGAGC
+#&gt;   HEXA_2 TGGTCACCAAGGCCGGCTTC;CTGGAACTGGTCACCAAGGC;GGAGCTGGAACTGGTCACCA;AGTGAACTATATGAAGGAGC
+#&gt;   PRNP_1                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;   PRNP_2                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;   PRNP_3                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;   PRNP_4                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;                  nickpam     nickoff    nickoff0    nickoff1    nickoff2
+#&gt;              &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;
+#&gt;   CFTR_1             TGG           0           0           0           0
+#&gt;   CFTR_2             TGG           0           0           0           0
+#&gt;    HBB_1         AGG;GGG         1;1         1;1         0;0         0;0
+#&gt;    HBB_2            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;   HEXA_1 CGG;CGG;AGG;TGG     0;0;0;0     0;0;0;0     0;0;0;0     0;0;0;0
+#&gt;   HEXA_2 CGG;CGG;AGG;TGG     0;0;0;0     0;0;0;0     0;0;0;0     0;0;0;0
+#&gt;   PRNP_1     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;   PRNP_2     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;   PRNP_3     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;   PRNP_4     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;              nickDoench2014
+#&gt;                 &lt;character&gt;
+#&gt;   CFTR_1               0.38
+#&gt;   CFTR_2               0.49
+#&gt;    HBB_1          0.06;0.42
+#&gt;    HBB_2               &lt;NA&gt;
+#&gt;   HEXA_1 0.01;0.05;0.32;0.2
+#&gt;   HEXA_2 0.01;0.05;0.32;0.2
+#&gt;   PRNP_1     0.14;0.32;0.52
+#&gt;   PRNP_2     0.14;0.32;0.52
+#&gt;   PRNP_3     0.14;0.32;0.52
+#&gt;   PRNP_4     0.14;0.32;0.52
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>), <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='find_spacers-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 6 metadata columns:
+#&gt;   seqinfo: 595 sequences (1 circular) from hg38 genome</div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>), <span class='no'>bsgenome</span>, <span class='kw'>complement</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>mismatches</span><span class='kw'>=</span><span class='fl'>0</span>)</div><div class='output co'>#&gt; <span class='message'>Find spacers in 8 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 10 spacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 0 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 53 hits with max 1 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 11 after removing more than 0 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       9 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='img'><img src='find_spacers-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 9 metadata columns:
 #&gt;            seqnames              ranges strand |  targetname targetstart
 #&gt;               &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;     CFTR_f     chr7 117559575-117559594      + |        CFTR   117559593
@@ -232,20 +341,32 @@
 #&gt;   PRNP_f_2    chr20     4699569-4699588      + |        PRNP     4699600
 #&gt;   PRNP_f_3    chr20     4699575-4699594      + |        PRNP     4699600
 #&gt;   PRNP_f_4    chr20     4699578-4699597      + |        PRNP     4699600
-#&gt;            targetend  crisprname         crisprspacer   crisprpam
-#&gt;            &lt;integer&gt; &lt;character&gt;          &lt;character&gt; &lt;character&gt;
-#&gt;     CFTR_f 117559595      CFTR_f ATTAAAGAAAATATCATCTT         TGG
-#&gt;     CFTR_r 117559595      CFTR_r TCTGTATCTATATTCATCAT         AGG
-#&gt;      HBB_f   5227002       HBB_f GTAACGGCAGACTTCTCCTC         AGG
-#&gt;      HBB_r   5227002       HBB_r CATGGTGCATCTGACTCCTG         AGG
-#&gt;   HEXA_f_1  72346583    HEXA_f_1 TGTAGAAATCCTTCCAGTCA         GGG
-#&gt;   HEXA_f_2  72346583    HEXA_f_2 ATCCTTCCAGTCAGGGCCAT         AGG
-#&gt;   PRNP_f_1   4699600    PRNP_f_1 AGCAGCTGGGGCAGTGGTGG         GGG
-#&gt;   PRNP_f_2   4699600    PRNP_f_2 GCAGCTGGGGCAGTGGTGGG         GGG
-#&gt;   PRNP_f_3   4699600    PRNP_f_3 GGGGCAGTGGTGGGGGGCCT         TGG
-#&gt;   PRNP_f_4   4699600    PRNP_f_4 GCAGTGGTGGGGGGCCTTGG         CGG
+#&gt;            targetend  crisprname         crisprspacer   crisprpam       off
+#&gt;            &lt;integer&gt; &lt;character&gt;          &lt;character&gt; &lt;character&gt; &lt;numeric&gt;
+#&gt;     CFTR_f 117559595      CFTR_f ATTAAAGAAAATATCATCTT         TGG         0
+#&gt;     CFTR_r 117559595      CFTR_r TCTGTATCTATATTCATCAT         AGG         0
+#&gt;      HBB_f   5227002       HBB_f GTAACGGCAGACTTCTCCTC         AGG         0
+#&gt;      HBB_r   5227002       HBB_r CATGGTGCATCTGACTCCTG         AGG         1
+#&gt;   HEXA_f_1  72346583    HEXA_f_1 TGTAGAAATCCTTCCAGTCA         GGG         0
+#&gt;   HEXA_f_2  72346583    HEXA_f_2 ATCCTTCCAGTCAGGGCCAT         AGG         0
+#&gt;   PRNP_f_1   4699600    PRNP_f_1 AGCAGCTGGGGCAGTGGTGG         GGG         0
+#&gt;   PRNP_f_2   4699600    PRNP_f_2 GCAGCTGGGGCAGTGGTGGG         GGG         0
+#&gt;   PRNP_f_3   4699600    PRNP_f_3 GGGGCAGTGGTGGGGGGCCT         TGG         0
+#&gt;   PRNP_f_4   4699600    PRNP_f_4 GCAGTGGTGGGGGGCCTTGG         CGG         0
+#&gt;                 off0 Doench2014
+#&gt;            &lt;numeric&gt;  &lt;numeric&gt;
+#&gt;     CFTR_f         0 0.03399990
+#&gt;     CFTR_r         0 0.22337056
+#&gt;      HBB_f         0 0.41398065
+#&gt;      HBB_r         1 0.13111422
+#&gt;   HEXA_f_1         0 0.10728361
+#&gt;   HEXA_f_2         0 0.03942528
+#&gt;   PRNP_f_1         0 0.00994899
+#&gt;   PRNP_f_2         0 0.04496627
+#&gt;   PRNP_f_3         0 0.00996254
+#&gt;   PRNP_f_4         0 0.20935863
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>          <span class='co'># complement = FALSE because extend_for_pe  already </span>
+#&gt;   seqinfo: 595 sequences (1 circular) from hg38 genome</div><div class='input'>          <span class='co'># complement = FALSE because extend_for_pe  already </span>
           <span class='co'># adds  reverse complements and does so in a strand-specific </span>
           <span class='co'># manner</span>
 
@@ -253,58 +374,106 @@
 <span class='co'>#-------------</span>
     <span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Mmusculus.UCSC.mm10</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Mmusculus.UCSC.mm10/man/package.html'>BSgenome.Mmusculus.UCSC.mm10</a></span>
     <span class='no'>bedfile</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata/SRF.bed'</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>'multicrispr'</span>)
-    <span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='st'>'mm10'</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='up_flank.html'>extend</a></span>()</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='find_spacers-4.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>find_spacers</span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>		3948 ranges after adding inverse strands</span></div><div class='img'><img src='find_spacers-5.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10159 ranges and 8 metadata columns:
-#&gt;             seqnames            ranges strand |         name     score
-#&gt;                &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;character&gt; &lt;numeric&gt;
-#&gt;   T0001_r_5     chr1   4712619-4712638      - | SRF_MA0083.3  10.49542
-#&gt;   T0001_r_4     chr1   4712620-4712639      - | SRF_MA0083.3  10.49542
-#&gt;   T0001_r_3     chr1   4712627-4712646      - | SRF_MA0083.3  10.49542
-#&gt;   T0001_r_2     chr1   4712633-4712652      - | SRF_MA0083.3  10.49542
-#&gt;   T0001_r_1     chr1   4712634-4712653      - | SRF_MA0083.3  10.49542
-#&gt;         ...      ...               ...    ... .          ...       ...
-#&gt;   T1974_r_3     chrY 89126492-89126511      - | SRF_MA0083.3   4.54393
-#&gt;   T1974_f_3     chrY 89126496-89126515      + | SRF_MA0083.3   4.54393
-#&gt;   T1974_r_2     chrY 89126499-89126518      - | SRF_MA0083.3   4.54393
-#&gt;   T1974_r_1     chrY 89126500-89126519      - | SRF_MA0083.3   4.54393
-#&gt;   T1974_f_4     chrY 89126501-89126520      + | SRF_MA0083.3   4.54393
-#&gt;              targetname targetstart targetend  crisprname         crisprspacer
-#&gt;             &lt;character&gt;   &lt;integer&gt; &lt;integer&gt; &lt;character&gt;          &lt;character&gt;
-#&gt;   T0001_r_5       T0001     4712628   4712643   T0001_r_5 ATATAAGGGCATTGGAAGAA
-#&gt;   T0001_r_4       T0001     4712628   4712643   T0001_r_4 AATATAAGGGCATTGGAAGA
-#&gt;   T0001_r_3       T0001     4712628   4712643   T0001_r_3 TGGAGACAATATAAGGGCAT
-#&gt;   T0001_r_2       T0001     4712628   4712643   T0001_r_2 TTCTGCTGGAGACAATATAA
-#&gt;   T0001_r_1       T0001     4712628   4712643   T0001_r_1 CTTCTGCTGGAGACAATATA
-#&gt;         ...         ...         ...       ...         ...                  ...
-#&gt;   T1974_r_3       T1974    89126494  89126509   T1974_r_3 TTTGCCCATACTAGGGAGAG
-#&gt;   T1974_f_3       T1974    89126494  89126509   T1974_f_3 CCCTAGTATGGGCAAATATA
-#&gt;   T1974_r_2       T1974    89126494  89126509   T1974_r_2 CCATATATTTGCCCATACTA
-#&gt;   T1974_r_1       T1974    89126494  89126509   T1974_r_1 TCCATATATTTGCCCATACT
-#&gt;   T1974_f_4       T1974    89126494  89126509   T1974_f_4 GTATGGGCAAATATATGGAA
-#&gt;               crisprpam
-#&gt;             &lt;character&gt;
-#&gt;   T0001_r_5         GGG
-#&gt;   T0001_r_4         AGG
-#&gt;   T0001_r_3         TGG
-#&gt;   T0001_r_2         GGG
-#&gt;   T0001_r_1         AGG
-#&gt;         ...         ...
-#&gt;   T1974_r_3         CGG
-#&gt;   T1974_f_3         TGG
-#&gt;   T1974_r_2         GGG
-#&gt;   T1974_r_1         AGG
-#&gt;   T1974_f_4         TGG
+    <span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='st'>'mm10'</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='up_flank.html'>extend</a></span>()</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='find_spacers-4.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='no'>gr</span> <span class='kw'>%&lt;&gt;%</span> <span class='fu'><a href='https://rdrr.io/pkg/magrittr/man/aliases.html'>extract</a></span>(<span class='fl'>1</span>:<span class='fl'>100</span>)
+    <span class='fu'>find_spacers</span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>, <span class='kw'>subtract_targets</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='message'>Find spacers in 100 targets</span></div><div class='output co'>#&gt; <span class='message'>	Retain 200 unique target ranges after adding inverse strands</span></div><div class='output co'>#&gt; <span class='message'>	Found 517 spacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 2 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Mmusculus.UCSC.mm10.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 1033855 hits with max 2 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 357793 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 334703 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 313299 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 313299 after removing more than 2 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>	Index target sequences</span></div><div class='output co'>#&gt; <span class='message'>		200 target ranges</span></div><div class='output co'>#&gt; <span class='message'>		200 ranges after merging overlaps</span></div><div class='output co'>#&gt; <span class='message'>		Write seqs  to ~/multicrisprout/targets.fa</span></div><div class='output co'>#&gt; <span class='message'>		Write index to ~/multicrisprout/targets</span></div><div class='output co'>#&gt; <span class='message'>		Count target cross-(mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_targets.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 7451 hits with max 2 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 2177 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 2167 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 2010 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 2010 after removing more than 2 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       109 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>		        94 are off1 free</span></div><div class='output co'>#&gt; <span class='message'>		        57 are off2 free</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='img'><img src='find_spacers-5.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 517 ranges and 19 metadata columns:
+#&gt;                                  seqnames              ranges strand |
+#&gt;                                     &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |
+#&gt;       chr1:4712628-4712643:-_r_5     chr1     4712619-4712638      - |
+#&gt;       chr1:4712628-4712643:-_r_4     chr1     4712620-4712639      - |
+#&gt;       chr1:4712628-4712643:-_r_3     chr1     4712627-4712646      - |
+#&gt;       chr1:4712628-4712643:-_r_2     chr1     4712633-4712652      - |
+#&gt;       chr1:4712628-4712643:-_r_1     chr1     4712634-4712653      - |
+#&gt;                              ...      ...                 ...    ... .
+#&gt;     chr1:113368495-113368510:+_r     chr1 113368487-113368506      - |
+#&gt;   chr1:113368495-113368510:+_f_1     chr1 113368485-113368504      + |
+#&gt;   chr1:113368495-113368510:+_f_2     chr1 113368492-113368511      + |
+#&gt;   chr1:113368495-113368510:+_f_3     chr1 113368499-113368518      + |
+#&gt;   chr1:113368495-113368510:+_f_4     chr1 113368500-113368519      + |
+#&gt;                                                  targetname targetstart
+#&gt;                                                 &lt;character&gt;   &lt;integer&gt;
+#&gt;       chr1:4712628-4712643:-_r_5     chr1:4712628-4712643:-     4712628
+#&gt;       chr1:4712628-4712643:-_r_4     chr1:4712628-4712643:-     4712628
+#&gt;       chr1:4712628-4712643:-_r_3     chr1:4712628-4712643:-     4712628
+#&gt;       chr1:4712628-4712643:-_r_2     chr1:4712628-4712643:-     4712628
+#&gt;       chr1:4712628-4712643:-_r_1     chr1:4712628-4712643:-     4712628
+#&gt;                              ...                        ...         ...
+#&gt;     chr1:113368495-113368510:+_r chr1:113368495-113368510:+   113368495
+#&gt;   chr1:113368495-113368510:+_f_1 chr1:113368495-113368510:+   113368495
+#&gt;   chr1:113368495-113368510:+_f_2 chr1:113368495-113368510:+   113368495
+#&gt;   chr1:113368495-113368510:+_f_3 chr1:113368495-113368510:+   113368495
+#&gt;   chr1:113368495-113368510:+_f_4 chr1:113368495-113368510:+   113368495
+#&gt;                                  targetend                     crisprname
+#&gt;                                  &lt;integer&gt;                    &lt;character&gt;
+#&gt;       chr1:4712628-4712643:-_r_5   4712643     chr1:4712628-4712643:-_r_5
+#&gt;       chr1:4712628-4712643:-_r_4   4712643     chr1:4712628-4712643:-_r_4
+#&gt;       chr1:4712628-4712643:-_r_3   4712643     chr1:4712628-4712643:-_r_3
+#&gt;       chr1:4712628-4712643:-_r_2   4712643     chr1:4712628-4712643:-_r_2
+#&gt;       chr1:4712628-4712643:-_r_1   4712643     chr1:4712628-4712643:-_r_1
+#&gt;                              ...       ...                            ...
+#&gt;     chr1:113368495-113368510:+_r 113368510   chr1:113368495-113368510:+_r
+#&gt;   chr1:113368495-113368510:+_f_1 113368510 chr1:113368495-113368510:+_f_1
+#&gt;   chr1:113368495-113368510:+_f_2 113368510 chr1:113368495-113368510:+_f_2
+#&gt;   chr1:113368495-113368510:+_f_3 113368510 chr1:113368495-113368510:+_f_3
+#&gt;   chr1:113368495-113368510:+_f_4 113368510 chr1:113368495-113368510:+_f_4
+#&gt;                                          crisprspacer   crisprpam         name
+#&gt;                                           &lt;character&gt; &lt;character&gt;  &lt;character&gt;
+#&gt;       chr1:4712628-4712643:-_r_5 ATATAAGGGCATTGGAAGAA         GGG SRF_MA0083.3
+#&gt;       chr1:4712628-4712643:-_r_4 AATATAAGGGCATTGGAAGA         AGG SRF_MA0083.3
+#&gt;       chr1:4712628-4712643:-_r_3 TGGAGACAATATAAGGGCAT         TGG SRF_MA0083.3
+#&gt;       chr1:4712628-4712643:-_r_2 TTCTGCTGGAGACAATATAA         GGG SRF_MA0083.3
+#&gt;       chr1:4712628-4712643:-_r_1 CTTCTGCTGGAGACAATATA         AGG SRF_MA0083.3
+#&gt;                              ...                  ...         ...          ...
+#&gt;     chr1:113368495-113368510:+_r CTTATATTGTCTCCAGCAGA         AGG SRF_MA0083.3
+#&gt;   chr1:113368495-113368510:+_f_1 CTTCTGCTGGAGACAATATA         AGG SRF_MA0083.3
+#&gt;   chr1:113368495-113368510:+_f_2 TGGAGACAATATAAGGACAT         TGG SRF_MA0083.3
+#&gt;   chr1:113368495-113368510:+_f_3 AATATAAGGACATTGGAAGA         AGG SRF_MA0083.3
+#&gt;   chr1:113368495-113368510:+_f_4 ATATAAGGACATTGGAAGAA         GGG SRF_MA0083.3
+#&gt;                                      score        G0        G1        G2
+#&gt;                                  &lt;numeric&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+#&gt;       chr1:4712628-4712643:-_r_5   10.4954         7      2473       356
+#&gt;       chr1:4712628-4712643:-_r_4   10.4954         7      2328       512
+#&gt;       chr1:4712628-4712643:-_r_3   10.4954         7      2358       392
+#&gt;       chr1:4712628-4712643:-_r_2   10.4954         8         4         5
+#&gt;       chr1:4712628-4712643:-_r_1   10.4954      1678      1083       198
+#&gt;                              ...       ...       ...       ...       ...
+#&gt;     chr1:113368495-113368510:+_r    9.7378      1652      1069       204
+#&gt;   chr1:113368495-113368510:+_f_1    9.7378      1678      1083       198
+#&gt;   chr1:113368495-113368510:+_f_2    9.7378      2353       393       199
+#&gt;   chr1:113368495-113368510:+_f_3    9.7378      2324       492       622
+#&gt;   chr1:113368495-113368510:+_f_4    9.7378      2468       350        97
+#&gt;                                         T0        T1        T2       off
+#&gt;                                  &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+#&gt;       chr1:4712628-4712643:-_r_5         1        49         3      2783
+#&gt;       chr1:4712628-4712643:-_r_4         1        47         4      2795
+#&gt;       chr1:4712628-4712643:-_r_3         1        49         2      2705
+#&gt;       chr1:4712628-4712643:-_r_2         1         0         0        16
+#&gt;       chr1:4712628-4712643:-_r_1        44         9         2      2904
+#&gt;                              ...       ...       ...       ...       ...
+#&gt;     chr1:113368495-113368510:+_r        44         9         1      2871
+#&gt;   chr1:113368495-113368510:+_f_1        44         9         2      2904
+#&gt;   chr1:113368495-113368510:+_f_2        49         3         2      2891
+#&gt;   chr1:113368495-113368510:+_f_3        47         5         0      3386
+#&gt;   chr1:113368495-113368510:+_f_4        49         4         0      2862
+#&gt;                                       off0      off1      off2 Doench2014
+#&gt;                                  &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;  &lt;numeric&gt;
+#&gt;       chr1:4712628-4712643:-_r_5         6      2424       353 0.16491179
+#&gt;       chr1:4712628-4712643:-_r_4         6      2281       508 0.00721485
+#&gt;       chr1:4712628-4712643:-_r_3         6      2309       390 0.12161212
+#&gt;       chr1:4712628-4712643:-_r_2         7         4         5 0.16315246
+#&gt;       chr1:4712628-4712643:-_r_1      1634      1074       196 0.07629138
+#&gt;                              ...       ...       ...       ...        ...
+#&gt;     chr1:113368495-113368510:+_r      1608      1060       203  0.0872713
+#&gt;   chr1:113368495-113368510:+_f_1      1634      1074       196  0.1412653
+#&gt;   chr1:113368495-113368510:+_f_2      2304       390       197  0.1200911
+#&gt;   chr1:113368495-113368510:+_f_3      2277       487       622  0.0139888
+#&gt;   chr1:113368495-113368510:+_f_4      2419       346        97  0.4236408
 #&gt;   -------
 #&gt;   seqinfo: 66 sequences (1 circular) from mm10 genome</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -315,7 +484,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

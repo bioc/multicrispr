@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Convert geneids into GRanges — genes_to_granges" />
 <meta property="og:description" content="Convert geneids into GRanges" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.23</span>
       </span>
     </div>
 
@@ -92,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
+      <a href="../articles/genome_arithmetics.html">Genome arithmetics with multicrispr</a>
+    </li>
+    <li>
+      <a href="../articles/grna_design.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -169,7 +175,11 @@
     <span class='no'>geneids</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/read.table.html'>read.table</a></span>(<span class='no'>genefile</span>)<span class='kw'>[[</span><span class='fl'>1</span>]])
     <span class='no'>txdb</span>     <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/getFromNamespace.html'>getFromNamespace</a></span>(<span class='st'>'TxDb.Mmusculus.UCSC.mm10.knownGene'</span>,
                              <span class='st'>'TxDb.Mmusculus.UCSC.mm10.knownGene'</span>)
-    (<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>genes_to_granges</span>(<span class='no'>geneids</span>, <span class='no'>txdb</span>))</div><div class='output co'>#&gt; <span class='message'>		Convert 10 genes to 10 GRanges</span></div><div class='output co'>#&gt; <span class='message'>		20 ranges after adding inverse strands</span></div><div class='output co'>#&gt; GRanges object with 20 ranges and 4 metadata columns:
+    (<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>genes_to_granges</span>(<span class='no'>geneids</span>, <span class='no'>txdb</span>))</div><div class='output co'>#&gt; <span class='message'>  66 genes were dropped because they have exons located on both strands</span>
+#&gt; <span class='message'>  of the same reference sequence or on more than one reference sequence,</span>
+#&gt; <span class='message'>  so cannot be represented by a single genomic range.</span>
+#&gt; <span class='message'>  Use 'single.strand.genes.only=FALSE' to get all the genes in a</span>
+#&gt; <span class='message'>  GRangesList object, or use suppressMessages() to suppress this message.</span></div><div class='output co'>#&gt; <span class='message'>		Convert 10 genes to 10 GRanges</span></div><div class='output co'>#&gt; <span class='message'>	Retain 20 unique target ranges after adding inverse strands</span></div><div class='output co'>#&gt; GRanges object with 20 ranges and 4 metadata columns:
 #&gt;               seqnames              ranges strand |     gene_id  targetname
 #&gt;                  &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt;
 #&gt;       27392_r     chr1 105518422-105663677      - |       27392     27392_r
@@ -197,7 +207,11 @@
 #&gt;       52662_f    67933257  68268630
 #&gt;       52662_r    67933257  68268630
 #&gt;   -------
-#&gt;   seqinfo: 66 sequences (1 circular) from mm10 genome</div><div class='input'>    (<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>genefile_to_granges</span>(<span class='no'>genefile</span>, <span class='no'>txdb</span>))</div><div class='output co'>#&gt; <span class='message'>		Convert 10 genes to 10 GRanges</span></div><div class='output co'>#&gt; <span class='message'>		20 ranges after adding inverse strands</span></div><div class='img'><img src='genes_to_granges-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 20 ranges and 4 metadata columns:
+#&gt;   seqinfo: 66 sequences (1 circular) from mm10 genome</div><div class='input'>    (<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>genefile_to_granges</span>(<span class='no'>genefile</span>, <span class='no'>txdb</span>))</div><div class='output co'>#&gt; <span class='message'>  66 genes were dropped because they have exons located on both strands</span>
+#&gt; <span class='message'>  of the same reference sequence or on more than one reference sequence,</span>
+#&gt; <span class='message'>  so cannot be represented by a single genomic range.</span>
+#&gt; <span class='message'>  Use 'single.strand.genes.only=FALSE' to get all the genes in a</span>
+#&gt; <span class='message'>  GRangesList object, or use suppressMessages() to suppress this message.</span></div><div class='output co'>#&gt; <span class='message'>		Convert 10 genes to 10 GRanges</span></div><div class='output co'>#&gt; <span class='message'>	Retain 20 unique target ranges after adding inverse strands</span></div><div class='img'><img src='genes_to_granges-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 20 ranges and 4 metadata columns:
 #&gt;               seqnames              ranges strand |     gene_id  targetname
 #&gt;                  &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt;
 #&gt;       27392_r     chr1 105518422-105663677      - |       27392     27392_r
@@ -226,155 +240,19 @@
 #&gt;       52662_r    67933257  68268630
 #&gt;   -------
 #&gt;   seqinfo: 66 sequences (1 circular) from mm10 genome</div><div class='input'>
-<span class='co'># Ensembl</span>
-<span class='co'>#--------</span>
-    <span class='no'>txdb</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='EnsDb.Mmusculus.v98.html'>EnsDb.Mmusculus.v98</a></span>()</div><div class='output co'>#&gt; <span class='message'>snapshotDate(): 2019-10-29</span></div><div class='output co'>#&gt; <span class='message'>loading from cache</span></div><div class='input'>    <span class='no'>genefile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata/SRF.ensembl'</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>'multicrispr'</span>)
-    <span class='no'>geneids</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/read.table.html'>read.table</a></span>(<span class='no'>genefile</span>)<span class='kw'>[[</span><span class='fl'>1</span>]])
-    (<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>genes_to_granges</span>(<span class='no'>geneids</span>, <span class='no'>txdb</span>))</div><div class='output co'>#&gt; <span class='message'>		Convert 10 genes to 10 GRanges</span></div><div class='output co'>#&gt; <span class='message'>		20 ranges after adding inverse strands</span></div><div class='img'><img src='genes_to_granges-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 20 ranges and 11 metadata columns:
-#&gt;                        seqnames              ranges strand |            gene_id
-#&gt;                           &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |        &lt;character&gt;
-#&gt;   ENSMUSG00000056536_r        1 105518422-105663677      - | ENSMUSG00000056536
-#&gt;   ENSMUSG00000056536_f        1 105518422-105663677      + | ENSMUSG00000056536
-#&gt;   ENSMUSG00000074813_r        2 128178319-128502765      - | ENSMUSG00000074813
-#&gt;   ENSMUSG00000074813_f        2 128178319-128502765      + | ENSMUSG00000074813
-#&gt;   ENSMUSG00000036885_f        3   62338344-62462221      + | ENSMUSG00000036885
-#&gt;                    ...      ...                 ...    ... .                ...
-#&gt;   ENSMUSG00000055538_f       14   25711642-25769039      + | ENSMUSG00000055538
-#&gt;   ENSMUSG00000038418_f       18   34859823-34864984      + | ENSMUSG00000038418
-#&gt;   ENSMUSG00000038418_r       18   34859823-34864984      - | ENSMUSG00000038418
-#&gt;   ENSMUSG00000024544_f       18   67933257-68268630      + | ENSMUSG00000024544
-#&gt;   ENSMUSG00000024544_r       18   67933257-68268630      - | ENSMUSG00000024544
-#&gt;                          gene_name   gene_biotype seq_coord_system
-#&gt;                        &lt;character&gt;    &lt;character&gt;      &lt;character&gt;
-#&gt;   ENSMUSG00000056536_r        Pign protein_coding       chromosome
-#&gt;   ENSMUSG00000056536_f        Pign protein_coding       chromosome
-#&gt;   ENSMUSG00000074813_r     Morrbid         lncRNA       chromosome
-#&gt;   ENSMUSG00000074813_f     Morrbid         lncRNA       chromosome
-#&gt;   ENSMUSG00000036885_f    Arhgef26 protein_coding       chromosome
-#&gt;                    ...         ...            ...              ...
-#&gt;   ENSMUSG00000055538_f     Zcchc24 protein_coding       chromosome
-#&gt;   ENSMUSG00000038418_f        Egr1 protein_coding       chromosome
-#&gt;   ENSMUSG00000038418_r        Egr1 protein_coding       chromosome
-#&gt;   ENSMUSG00000024544_f     Ldlrad4 protein_coding       chromosome
-#&gt;   ENSMUSG00000024544_r     Ldlrad4 protein_coding       chromosome
-#&gt;                                                                                                             description
-#&gt;                                                                                                             &lt;character&gt;
-#&gt;   ENSMUSG00000056536_r     phosphatidylinositol glycan anchor biosynthesis, class N [Source:MGI Symbol;Acc:MGI:1351629]
-#&gt;   ENSMUSG00000056536_f     phosphatidylinositol glycan anchor biosynthesis, class N [Source:MGI Symbol;Acc:MGI:1351629]
-#&gt;   ENSMUSG00000074813_r          myeloid RNA regulator of BCL2L11 induced cell death [Source:MGI Symbol;Acc:MGI:3652191]
-#&gt;   ENSMUSG00000074813_f          myeloid RNA regulator of BCL2L11 induced cell death [Source:MGI Symbol;Acc:MGI:3652191]
-#&gt;   ENSMUSG00000036885_f              Rho guanine nucleotide exchange factor (GEF) 26 [Source:MGI Symbol;Acc:MGI:1918053]
-#&gt;                    ...                                                                                              ...
-#&gt;   ENSMUSG00000055538_f                       zinc finger, CCHC domain containing 24 [Source:MGI Symbol;Acc:MGI:1919168]
-#&gt;   ENSMUSG00000038418_f                                        early growth response 1 [Source:MGI Symbol;Acc:MGI:95295]
-#&gt;   ENSMUSG00000038418_r                                        early growth response 1 [Source:MGI Symbol;Acc:MGI:95295]
-#&gt;   ENSMUSG00000024544_f low density lipoprotein receptor class A domain containing 4 [Source:MGI Symbol;Acc:MGI:1277150]
-#&gt;   ENSMUSG00000024544_r low density lipoprotein receptor class A domain containing 4 [Source:MGI Symbol;Acc:MGI:1277150]
-#&gt;                              gene_id_version      symbol entrezid
-#&gt;                                  &lt;character&gt; &lt;character&gt;   &lt;list&gt;
-#&gt;   ENSMUSG00000056536_r ENSMUSG00000056536.14        Pign    27392
-#&gt;   ENSMUSG00000056536_f ENSMUSG00000056536.14        Pign    27392
-#&gt;   ENSMUSG00000074813_r ENSMUSG00000074813.13     Morrbid       NA
-#&gt;   ENSMUSG00000074813_f ENSMUSG00000074813.13     Morrbid       NA
-#&gt;   ENSMUSG00000036885_f ENSMUSG00000036885.14    Arhgef26   622434
-#&gt;                    ...                   ...         ...      ...
-#&gt;   ENSMUSG00000055538_f  ENSMUSG00000055538.7     Zcchc24    71918
-#&gt;   ENSMUSG00000038418_f  ENSMUSG00000038418.7        Egr1    13653
-#&gt;   ENSMUSG00000038418_r  ENSMUSG00000038418.7        Egr1    13653
-#&gt;   ENSMUSG00000024544_f  ENSMUSG00000024544.9     Ldlrad4    52662
-#&gt;   ENSMUSG00000024544_r  ENSMUSG00000024544.9     Ldlrad4    52662
-#&gt;                                  targetname targetstart targetend
-#&gt;                                 &lt;character&gt;   &lt;integer&gt; &lt;integer&gt;
-#&gt;   ENSMUSG00000056536_r ENSMUSG00000056536_r   105518422 105663677
-#&gt;   ENSMUSG00000056536_f ENSMUSG00000056536_f   105518422 105663677
-#&gt;   ENSMUSG00000074813_r ENSMUSG00000074813_r   128178319 128502765
-#&gt;   ENSMUSG00000074813_f ENSMUSG00000074813_f   128178319 128502765
-#&gt;   ENSMUSG00000036885_f ENSMUSG00000036885_f    62338344  62462221
-#&gt;                    ...                  ...         ...       ...
-#&gt;   ENSMUSG00000055538_f ENSMUSG00000055538_f    25711642  25769039
-#&gt;   ENSMUSG00000038418_f ENSMUSG00000038418_f    34859823  34864984
-#&gt;   ENSMUSG00000038418_r ENSMUSG00000038418_r    34859823  34864984
-#&gt;   ENSMUSG00000024544_f ENSMUSG00000024544_f    67933257  68268630
-#&gt;   ENSMUSG00000024544_r ENSMUSG00000024544_r    67933257  68268630
-#&gt;   -------
-#&gt;   seqinfo: 118 sequences from GRCm38 genome</div><div class='input'>    (<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>genefile_to_granges</span>(<span class='no'>genefile</span>, <span class='no'>txdb</span>))</div><div class='output co'>#&gt; <span class='message'>		Convert 10 genes to 10 GRanges</span></div><div class='output co'>#&gt; <span class='message'>		20 ranges after adding inverse strands</span></div><div class='output co'>#&gt; GRanges object with 20 ranges and 11 metadata columns:
-#&gt;                        seqnames              ranges strand |            gene_id
-#&gt;                           &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |        &lt;character&gt;
-#&gt;   ENSMUSG00000056536_r        1 105518422-105663677      - | ENSMUSG00000056536
-#&gt;   ENSMUSG00000056536_f        1 105518422-105663677      + | ENSMUSG00000056536
-#&gt;   ENSMUSG00000074813_r        2 128178319-128502765      - | ENSMUSG00000074813
-#&gt;   ENSMUSG00000074813_f        2 128178319-128502765      + | ENSMUSG00000074813
-#&gt;   ENSMUSG00000036885_f        3   62338344-62462221      + | ENSMUSG00000036885
-#&gt;                    ...      ...                 ...    ... .                ...
-#&gt;   ENSMUSG00000055538_f       14   25711642-25769039      + | ENSMUSG00000055538
-#&gt;   ENSMUSG00000038418_f       18   34859823-34864984      + | ENSMUSG00000038418
-#&gt;   ENSMUSG00000038418_r       18   34859823-34864984      - | ENSMUSG00000038418
-#&gt;   ENSMUSG00000024544_f       18   67933257-68268630      + | ENSMUSG00000024544
-#&gt;   ENSMUSG00000024544_r       18   67933257-68268630      - | ENSMUSG00000024544
-#&gt;                          gene_name   gene_biotype seq_coord_system
-#&gt;                        &lt;character&gt;    &lt;character&gt;      &lt;character&gt;
-#&gt;   ENSMUSG00000056536_r        Pign protein_coding       chromosome
-#&gt;   ENSMUSG00000056536_f        Pign protein_coding       chromosome
-#&gt;   ENSMUSG00000074813_r     Morrbid         lncRNA       chromosome
-#&gt;   ENSMUSG00000074813_f     Morrbid         lncRNA       chromosome
-#&gt;   ENSMUSG00000036885_f    Arhgef26 protein_coding       chromosome
-#&gt;                    ...         ...            ...              ...
-#&gt;   ENSMUSG00000055538_f     Zcchc24 protein_coding       chromosome
-#&gt;   ENSMUSG00000038418_f        Egr1 protein_coding       chromosome
-#&gt;   ENSMUSG00000038418_r        Egr1 protein_coding       chromosome
-#&gt;   ENSMUSG00000024544_f     Ldlrad4 protein_coding       chromosome
-#&gt;   ENSMUSG00000024544_r     Ldlrad4 protein_coding       chromosome
-#&gt;                                                                                                             description
-#&gt;                                                                                                             &lt;character&gt;
-#&gt;   ENSMUSG00000056536_r     phosphatidylinositol glycan anchor biosynthesis, class N [Source:MGI Symbol;Acc:MGI:1351629]
-#&gt;   ENSMUSG00000056536_f     phosphatidylinositol glycan anchor biosynthesis, class N [Source:MGI Symbol;Acc:MGI:1351629]
-#&gt;   ENSMUSG00000074813_r          myeloid RNA regulator of BCL2L11 induced cell death [Source:MGI Symbol;Acc:MGI:3652191]
-#&gt;   ENSMUSG00000074813_f          myeloid RNA regulator of BCL2L11 induced cell death [Source:MGI Symbol;Acc:MGI:3652191]
-#&gt;   ENSMUSG00000036885_f              Rho guanine nucleotide exchange factor (GEF) 26 [Source:MGI Symbol;Acc:MGI:1918053]
-#&gt;                    ...                                                                                              ...
-#&gt;   ENSMUSG00000055538_f                       zinc finger, CCHC domain containing 24 [Source:MGI Symbol;Acc:MGI:1919168]
-#&gt;   ENSMUSG00000038418_f                                        early growth response 1 [Source:MGI Symbol;Acc:MGI:95295]
-#&gt;   ENSMUSG00000038418_r                                        early growth response 1 [Source:MGI Symbol;Acc:MGI:95295]
-#&gt;   ENSMUSG00000024544_f low density lipoprotein receptor class A domain containing 4 [Source:MGI Symbol;Acc:MGI:1277150]
-#&gt;   ENSMUSG00000024544_r low density lipoprotein receptor class A domain containing 4 [Source:MGI Symbol;Acc:MGI:1277150]
-#&gt;                              gene_id_version      symbol entrezid
-#&gt;                                  &lt;character&gt; &lt;character&gt;   &lt;list&gt;
-#&gt;   ENSMUSG00000056536_r ENSMUSG00000056536.14        Pign    27392
-#&gt;   ENSMUSG00000056536_f ENSMUSG00000056536.14        Pign    27392
-#&gt;   ENSMUSG00000074813_r ENSMUSG00000074813.13     Morrbid       NA
-#&gt;   ENSMUSG00000074813_f ENSMUSG00000074813.13     Morrbid       NA
-#&gt;   ENSMUSG00000036885_f ENSMUSG00000036885.14    Arhgef26   622434
-#&gt;                    ...                   ...         ...      ...
-#&gt;   ENSMUSG00000055538_f  ENSMUSG00000055538.7     Zcchc24    71918
-#&gt;   ENSMUSG00000038418_f  ENSMUSG00000038418.7        Egr1    13653
-#&gt;   ENSMUSG00000038418_r  ENSMUSG00000038418.7        Egr1    13653
-#&gt;   ENSMUSG00000024544_f  ENSMUSG00000024544.9     Ldlrad4    52662
-#&gt;   ENSMUSG00000024544_r  ENSMUSG00000024544.9     Ldlrad4    52662
-#&gt;                                  targetname targetstart targetend
-#&gt;                                 &lt;character&gt;   &lt;integer&gt; &lt;integer&gt;
-#&gt;   ENSMUSG00000056536_r ENSMUSG00000056536_r   105518422 105663677
-#&gt;   ENSMUSG00000056536_f ENSMUSG00000056536_f   105518422 105663677
-#&gt;   ENSMUSG00000074813_r ENSMUSG00000074813_r   128178319 128502765
-#&gt;   ENSMUSG00000074813_f ENSMUSG00000074813_f   128178319 128502765
-#&gt;   ENSMUSG00000036885_f ENSMUSG00000036885_f    62338344  62462221
-#&gt;                    ...                  ...         ...       ...
-#&gt;   ENSMUSG00000055538_f ENSMUSG00000055538_f    25711642  25769039
-#&gt;   ENSMUSG00000038418_f ENSMUSG00000038418_f    34859823  34864984
-#&gt;   ENSMUSG00000038418_r ENSMUSG00000038418_r    34859823  34864984
-#&gt;   ENSMUSG00000024544_f ENSMUSG00000024544_f    67933257  68268630
-#&gt;   ENSMUSG00000024544_r ENSMUSG00000024544_r    67933257  68268630
-#&gt;   -------
-#&gt;   seqinfo: 118 sequences from GRCm38 genome</div></pre>
+# Ensembl
+#--------
+    # txdb &lt;- AnnotationHub::AnnotationHub()[["AH75036"]]
+    # genefile &lt;- system.file('extdata/SRF.ensembl', package='multicrispr')
+    # geneids &lt;- as.character(read.table(genefile)[[1]])
+    # (gr &lt;- genes_to_granges(geneids, txdb))
+    # (gr &lt;- genefile_to_granges(genefile, txdb))
+</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -385,7 +263,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

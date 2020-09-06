@@ -9,14 +9,13 @@ gr <- char_to_granges(c(PRNP = 'chr20:4699600:+',             # snp
                         CFTR = 'chr7:117559593-117559595:+'), # ins
                        bsgenome)
 spacers <- find_primespacers(gr, bsgenome)
-spacers$targetlocus <- c(rep('chr7 : 117 559 593', 2), 
-                        rep('chr11 : 5 227 002',  2),
-                        rep('chr15 : 72 346 580',  2),
-                        rep('chr20 : 4 699 600',  4))
-
+spacers$targetlocus <- c(rep('chr7  : 117559593-5', 2), 
+                        rep( 'chr11 : 5227002',     2),
+                        rep( 'chr15 : 72346580-3',  2),
+                        rep( 'chr20 : 4699600',     4))
 plot_intervals(spacers, alpha_var = NULL, facet_var = c('targetname', 'targetlocus'), size_var = NULL) + 
 ggplot2::guides(color=FALSE, linetype = FALSE, size=FALSE, alpha=FALSE)
-ggplot2::ggsave('../graphs/pe_spacers.pdf', width =6, height = 4, device = grDevices::cairo_pdf)
+ggplot2::ggsave('../graphs/primespacers.pdf', width = 7, height = 3.5, device = grDevices::cairo_pdf)
 
 # Matching spacers only (without pam)
 (bowtie_results <- multicrispr:::bowtie_count(spacers$crisprspacer, index_genome(bsgenome), norc=FALSE, mismatches = 3))

@@ -1,6 +1,3 @@
-<center> <h1> multicrispr </h1> </center>
-
-[![Build Status](https://travis-ci.com/bhagwataditya/multicrispr.svg?branch=master)](https://travis-ci.com/bhagwataditya/multicrispr)
 
 ### Installation
 
@@ -17,3 +14,9 @@
         BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')
         index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
         index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
+
+
+### Overview
+   
+![](https://gitlab.gwdg.de/loosolab/software/multicrispr/-/wikis/uploads/cdf31586bcf776a7a40acaaaf5172e10/overview.png)
+

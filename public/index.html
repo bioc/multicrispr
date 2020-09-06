@@ -5,20 +5,24 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-locus multi-purpose Crispr/Cas design • multicrispr</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Multi-locus multi-purpose Crispr/Cas design">
-<meta property="og:description" content="Contains functions to facilitate the design of a multi-locus Crispr/Cas library.">
-<meta name="twitter:card" content="summary">
+<title>Multi-locus multi-purpose Crispr/Cas design  • multicrispr</title>
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script><meta property="og:title" content="Multi-locus multi-purpose Crispr/Cas design ">
+<meta property="og:description" content="This package is for designing Crispr/Cas9 and Prime Editing experiments.
+             It contains functions to (1) define and transform genomic targets, (2) find spacers
+             (4) count offtarget (mis)matches, and (5) compute Doench2016/2014 targeting efficiency. 
+             Care has been taken for multicrispr to scale well towards large target sets, 
+             enabling the design of large Crispr/Cas9 libraries.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.23</span>
       </span>
     </div>
 
@@ -54,7 +58,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
+      <a href="articles/genome_arithmetics.html">Genome arithmetics with multicrispr</a>
+    </li>
+    <li>
+      <a href="articles/grna_design.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -72,33 +79,45 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<center> <div class="page-header"><h1> multicrispr </h1></div> </center>
-<p><img src="inst/extdata/readme_portrait.png"></p>
 <div id="installation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># Install multicrispr</span></a>
-<a class="sourceLine" id="cb1-2" title="2">    remotes<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/remotes/man/install_git.html">install_git</a></span>(<span class="st">'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'</span>, </a>
-<a class="sourceLine" id="cb1-3" title="3">                    <span class="dt">repos =</span> BiocManager<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/BiocManager/man/repositories.html">repositories</a></span>())</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="co"># Install azimuth</span></a>
-<a class="sourceLine" id="cb1-5" title="5">    <span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">'reticulate'</span>)</a>
-<a class="sourceLine" id="cb1-6" title="6">    reticulate<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/reticulate/man/conda-tools.html">conda_create</a></span>(<span class="st">'azienv'</span>, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'python=2.7'</span>))</a>
-<a class="sourceLine" id="cb1-7" title="7">    reticulate<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/reticulate/man/use_python.html">use_condaenv</a></span>(<span class="st">'azienv'</span>)</a>
-<a class="sourceLine" id="cb1-8" title="8">    reticulate<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/reticulate/man/py_install.html">py_install</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'azimuth'</span>, <span class="st">'scikit-learn==0.17.1'</span>), <span class="st">'azienv'</span>, <span class="dt">pip =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="co"># Index mm10 and hg38</span></a>
-<a class="sourceLine" id="cb1-10" title="10">    BiocManager<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'BSgenome.Mmusculus.UCSC.mm10'</span>)</a>
-<a class="sourceLine" id="cb1-11" title="11">    BiocManager<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'BSgenome.Hsapiens.UCSC.hg38'</span>)</a>
-<a class="sourceLine" id="cb1-12" title="12">    <span class="kw"><a href="reference/index_genome.html">index_genome</a></span>(BSgenome.Mmusculus.UCSC.mm10<span class="op">::</span>BSgenome.Mmusculus.UCSC.mm10)</a>
-<a class="sourceLine" id="cb1-13" title="13">    <span class="kw"><a href="reference/index_genome.html">index_genome</a></span>(BSgenome.Hsapiens.UCSC.hg38<span class="op">::</span>BSgenome.Hsapiens.UCSC.hg38)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Install multicrispr</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>    remotes<span class="op">::</span><span class="kw">install_git</span>(<span class="st">'https://gitlab.gwdg.de/loosolab/software/multicrispr.git'</span>, </span>
+<span id="cb1-3"><a href="#cb1-3"></a>                    <span class="dt">repos =</span> BiocManager<span class="op">::</span><span class="kw">repositories</span>())</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Install azimuth</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>    <span class="kw">install.packages</span>(<span class="st">'reticulate'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    reticulate<span class="op">::</span><span class="kw">conda_create</span>(<span class="st">'azienv'</span>, <span class="kw">c</span>(<span class="st">'python=2.7'</span>))</span>
+<span id="cb1-7"><a href="#cb1-7"></a>    reticulate<span class="op">::</span><span class="kw">use_condaenv</span>(<span class="st">'azienv'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>    reticulate<span class="op">::</span><span class="kw">py_install</span>(<span class="kw">c</span>(<span class="st">'azimuth'</span>, <span class="st">'scikit-learn==0.17.1'</span>), <span class="st">'azienv'</span>, <span class="dt">pip =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># Index mm10 and hg38</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>    BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">'BSgenome.Mmusculus.UCSC.mm10'</span>)</span>
+<span id="cb1-11"><a href="#cb1-11"></a>    BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">'BSgenome.Hsapiens.UCSC.hg38'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="kw">index_genome</span>(BSgenome.Mmusculus.UCSC.mm10<span class="op">::</span>BSgenome.Mmusculus.UCSC.mm10)</span>
+<span id="cb1-13"><a href="#cb1-13"></a>    <span class="kw">index_genome</span>(BSgenome.Hsapiens.UCSC.hg38<span class="op">::</span>BSgenome.Hsapiens.UCSC.hg38)</span></code></pre></div>
+</div>
+<div id="overview" class="section level3">
+<h3 class="hasAnchor">
+<a href="#overview" class="anchor"></a>Overview</h3>
+<p><img src="https://gitlab.gwdg.de/loosolab/software/multicrispr/-/wikis/uploads/cdf31586bcf776a7a40acaaaf5172e10/overview.png"></p>
 </div>
 
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div class="license">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <div class="links">
+<h2>Links</h2>
+<ul class="list-unstyled">
+<li>Download from BIOC at <br><a href="https://www.bioconductor.org/packages/multicrispr">https://​www.bioconductor.org/​packages/​multicrispr</a>
+</li>
+<li>Report a bug at <br><a href="https://gitlab.gwdg.de/loosolab/software/multicrispr/-/issues">https://​gitlab.gwdg.de/​loosolab/​software/​multicrispr/​-/​issues</a>
+</li>
+</ul>
+</div>
+<div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li>GPL</li>
+<li><a href="https://www.r-project.org/Licenses/GPL-2">GPL-2</a></li>
 </ul>
 </div>
 <div class="developers">
@@ -118,7 +137,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

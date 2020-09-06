@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Extend ranges for prime editing — extend_for_pe" />
 <meta property="og:description" content="Extend target ranges to span in which to look for spacer-pam seqs" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.23</span>
       </span>
     </div>
 
@@ -92,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
+      <a href="../articles/genome_arithmetics.html">Genome arithmetics with multicrispr</a>
+    </li>
+    <li>
+      <a href="../articles/grna_design.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -174,7 +180,7 @@
                          <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,   <span class='co'># del</span>
                          <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>), <span class='co'># ins</span>
                      <span class='kw'>bsgenome</span> <span class='kw'>=</span> <span class='no'>bsgenome</span>)
-<span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='extend_for_pe-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 9 metadata columns:
+<span class='fu'><a href='find_primespacers.html'>find_primespacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='output co'>#&gt; <span class='message'>Find primespacers for 4 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 10 primespacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 0 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 53 hits with max 1 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 11 after removing more than 0 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       9 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='output co'>#&gt; <span class='message'>Find nickspacers</span></div><div class='output co'>#&gt; <span class='message'>Find spacers in 10 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 32 spacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 2 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 91 hits with max 2 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 37 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 36 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 33 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 33 after removing more than 2 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       30 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>		       32 are off1 free</span></div><div class='output co'>#&gt; <span class='message'>		       24 are off2 free</span></div><div class='output co'>#&gt; <span class='message'>	Filter for best offtarget counts</span></div><div class='output co'>#&gt; <span class='message'>		Retain 32 with best off0 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>		Retain 32 with best off1 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>		Retain 24 with best off2 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 34 rows containing missing values (geom_point).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 34 rows containing missing values (geom_point).</span></div><div class='img'><img src='extend_for_pe-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 21 metadata columns:
 #&gt;          seqnames              ranges strand |  targetname targetstart
 #&gt;             &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;   CFTR_1     chr7 117559575-117559594      + |        CFTR   117559593
@@ -187,7 +193,7 @@
 #&gt;   PRNP_2    chr20     4699569-4699588      + |        PRNP     4699600
 #&gt;   PRNP_3    chr20     4699575-4699594      + |        PRNP     4699600
 #&gt;   PRNP_4    chr20     4699578-4699597      + |        PRNP     4699600
-#&gt;          targetend  crisprname         crisprspacer   crisprpam        primer
+#&gt;          targetend  crisprname         crisprspacer   crisprpam  crisprprimer
 #&gt;          &lt;integer&gt; &lt;character&gt;          &lt;character&gt; &lt;character&gt;   &lt;character&gt;
 #&gt;   CFTR_1 117559595      CFTR_1 ATTAAAGAAAATATCATCTT         TGG AAGAAAATATCAT
 #&gt;   CFTR_2 117559595      CFTR_2 TCTGTATCTATATTCATCAT         AGG TATCTATATTCAT
@@ -199,7 +205,7 @@
 #&gt;   PRNP_2   4699600      PRNP_2 GCAGCTGGGGCAGTGGTGGG         GGG CTGGGGCAGTGGT
 #&gt;   PRNP_3   4699600      PRNP_3 GGGGCAGTGGTGGGGGGCCT         TGG CAGTGGTGGGGGG
 #&gt;   PRNP_4   4699600      PRNP_4 GCAGTGGTGGGGGGCCTTGG         CGG TGGTGGGGGGCCT
-#&gt;             revtranscript                     extension
+#&gt;          crisprtranscript               crisprextension
 #&gt;               &lt;character&gt;                   &lt;character&gt;
 #&gt;   CFTR_1 CTTTGGTGTTTCCTAT ATAGGAAACACCAAAGATGATATTTTCTT
 #&gt;   CFTR_2 CATAGGAAACACCAAA TTTGGTGTTTCCTATGATGAATATAGATA
@@ -211,8 +217,68 @@
 #&gt;   PRNP_2 GGGGGGCCTTGGCGGC GCCGCCAAGGCCCCCCACCACTGCCCCAG
 #&gt;   PRNP_3 CCTTGGCGGCTACATG CATGTAGCCGCCAAGGCCCCCCACCACTG
 #&gt;   PRNP_4 TGGCGGCTACATGCTG CAGCATGTAGCCGCCAAGGCCCCCCACCA
+#&gt;                      crisprextrange       off      off0 Doench2014
+#&gt;                         &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt;
+#&gt;   CFTR_1 chr7:117559579-117559607:-         0         0 0.03399990
+#&gt;   CFTR_2 chr7:117559593-117559621:+         0         0 0.22337056
+#&gt;    HBB_1    chr11:5226990-5227018:+         1         1 0.13111422
+#&gt;    HBB_2    chr11:5226988-5227016:-         0         0 0.41398065
+#&gt;   HEXA_1  chr15:72346555-72346583:-         0         0 0.10728361
+#&gt;   HEXA_2  chr15:72346562-72346590:-         0         0 0.03942528
+#&gt;   PRNP_1    chr20:4699572-4699600:-         0         0 0.00994899
+#&gt;   PRNP_2    chr20:4699573-4699601:-         0         0 0.04496627
+#&gt;   PRNP_3    chr20:4699579-4699607:-         0         0 0.00996254
+#&gt;   PRNP_4    chr20:4699582-4699610:-         0         0 0.20935863
+#&gt;                                                                                                        nickrange
+#&gt;                                                                                                      &lt;character&gt;
+#&gt;   CFTR_1                                                                              chr7:117559646-117559665:-
+#&gt;   CFTR_2                                                                              chr7:117559506-117559525:+
+#&gt;    HBB_1                                                         chr11:5226916-5226935:+;chr11:5226917-5226936:+
+#&gt;    HBB_2                                                                                                    &lt;NA&gt;
+#&gt;   HEXA_1 chr15:72346621-72346640:-;chr15:72346628-72346647:-;chr15:72346632-72346651:-;chr15:72346647-72346666:-
+#&gt;   HEXA_2 chr15:72346621-72346640:-;chr15:72346628-72346647:-;chr15:72346632-72346651:-;chr15:72346647-72346666:-
+#&gt;   PRNP_1                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;   PRNP_2                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;   PRNP_3                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;   PRNP_4                                 chr20:4699632-4699651:-;chr20:4699633-4699652:-;chr20:4699664-4699683:-
+#&gt;                                                                                   nickspacer
+#&gt;                                                                                  &lt;character&gt;
+#&gt;   CFTR_1                                                                AGTTTCTTACCTCTTCTAGT
+#&gt;   CFTR_2                                                                GAGGGTAAAATTAAGCACAG
+#&gt;    HBB_1                                           ACCTTGATACCAACCTGCCC;CCTTGATACCAACCTGCCCA
+#&gt;    HBB_2                                                                                &lt;NA&gt;
+#&gt;   HEXA_1 TGGTCACCAAGGCCGGCTTC;CTGGAACTGGTCACCAAGGC;GGAGCTGGAACTGGTCACCA;AGTGAACTATATGAAGGAGC
+#&gt;   HEXA_2 TGGTCACCAAGGCCGGCTTC;CTGGAACTGGTCACCAAGGC;GGAGCTGGAACTGGTCACCA;AGTGAACTATATGAAGGAGC
+#&gt;   PRNP_1                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;   PRNP_2                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;   PRNP_3                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;   PRNP_4                      TCACTGCCGAAATGTATGAT;GTCACTGCCGAAATGTATGA;GCATGTTTTCACGATAGTAA
+#&gt;                  nickpam     nickoff    nickoff0    nickoff1    nickoff2
+#&gt;              &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;
+#&gt;   CFTR_1             TGG           0           0           0           0
+#&gt;   CFTR_2             TGG           0           0           0           0
+#&gt;    HBB_1         AGG;GGG         1;1         1;1         0;0         0;0
+#&gt;    HBB_2            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;   HEXA_1 CGG;CGG;AGG;TGG     0;0;0;0     0;0;0;0     0;0;0;0     0;0;0;0
+#&gt;   HEXA_2 CGG;CGG;AGG;TGG     0;0;0;0     0;0;0;0     0;0;0;0     0;0;0;0
+#&gt;   PRNP_1     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;   PRNP_2     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;   PRNP_3     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;   PRNP_4     GGG;TGG;CGG       0;0;0       0;0;0       0;0;0       0;0;0
+#&gt;              nickDoench2014
+#&gt;                 &lt;character&gt;
+#&gt;   CFTR_1               0.38
+#&gt;   CFTR_2               0.49
+#&gt;    HBB_1          0.06;0.42
+#&gt;    HBB_2               &lt;NA&gt;
+#&gt;   HEXA_1 0.01;0.05;0.32;0.2
+#&gt;   HEXA_2 0.01;0.05;0.32;0.2
+#&gt;   PRNP_1     0.14;0.32;0.52
+#&gt;   PRNP_2     0.14;0.32;0.52
+#&gt;   PRNP_3     0.14;0.32;0.52
+#&gt;   PRNP_4     0.14;0.32;0.52
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>(<span class='no'>grext</span> <span class='kw'>&lt;-</span> <span class='fu'>extend_for_pe</span>(<span class='no'>gr</span>))</div><div class='output co'>#&gt; GRanges object with 8 ranges and 3 metadata columns:
+#&gt;   seqinfo: 595 sequences (1 circular) from hg38 genome</div><div class='input'>(<span class='no'>grext</span> <span class='kw'>&lt;-</span> <span class='fu'>extend_for_pe</span>(<span class='no'>gr</span>))</div><div class='output co'>#&gt; GRanges object with 8 ranges and 3 metadata columns:
 #&gt;          seqnames              ranges strand |  targetname targetstart
 #&gt;             &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;   PRNP_f    chr20     4699568-4699605      + |        PRNP     4699600
@@ -234,7 +300,7 @@
 #&gt;   HEXA_r  72346583
 #&gt;   CFTR_r 117559595
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'><span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>grext</span>, <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='img'><img src='extend_for_pe-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 6 metadata columns:
+#&gt;   seqinfo: 595 sequences (1 circular) from hg38 genome</div><div class='input'><span class='fu'><a href='find_spacers.html'>find_spacers</a></span>(<span class='no'>grext</span>, <span class='no'>bsgenome</span>, <span class='kw'>complement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Find spacers in 8 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 10 spacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 2 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 140 hits with max 2 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 80 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 77 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 71 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 71 after removing more than 2 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       9 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>		       9 are off1 free</span></div><div class='output co'>#&gt; <span class='message'>		       2 are off2 free</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='img'><img src='extend_for_pe-2.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; GRanges object with 10 ranges and 11 metadata columns:
 #&gt;            seqnames              ranges strand |  targetname targetstart
 #&gt;               &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;   &lt;integer&gt;
 #&gt;     CFTR_f     chr7 117559575-117559594      + |        CFTR   117559593
@@ -247,30 +313,37 @@
 #&gt;   PRNP_f_2    chr20     4699569-4699588      + |        PRNP     4699600
 #&gt;   PRNP_f_3    chr20     4699575-4699594      + |        PRNP     4699600
 #&gt;   PRNP_f_4    chr20     4699578-4699597      + |        PRNP     4699600
-#&gt;            targetend  crisprname         crisprspacer   crisprpam
-#&gt;            &lt;integer&gt; &lt;character&gt;          &lt;character&gt; &lt;character&gt;
-#&gt;     CFTR_f 117559595      CFTR_f ATTAAAGAAAATATCATCTT         TGG
-#&gt;     CFTR_r 117559595      CFTR_r TCTGTATCTATATTCATCAT         AGG
-#&gt;      HBB_f   5227002       HBB_f GTAACGGCAGACTTCTCCTC         AGG
-#&gt;      HBB_r   5227002       HBB_r CATGGTGCATCTGACTCCTG         AGG
-#&gt;   HEXA_f_1  72346583    HEXA_f_1 TGTAGAAATCCTTCCAGTCA         GGG
-#&gt;   HEXA_f_2  72346583    HEXA_f_2 ATCCTTCCAGTCAGGGCCAT         AGG
-#&gt;   PRNP_f_1   4699600    PRNP_f_1 AGCAGCTGGGGCAGTGGTGG         GGG
-#&gt;   PRNP_f_2   4699600    PRNP_f_2 GCAGCTGGGGCAGTGGTGGG         GGG
-#&gt;   PRNP_f_3   4699600    PRNP_f_3 GGGGCAGTGGTGGGGGGCCT         TGG
-#&gt;   PRNP_f_4   4699600    PRNP_f_4 GCAGTGGTGGGGGGCCTTGG         CGG
+#&gt;            targetend  crisprname         crisprspacer   crisprpam       off
+#&gt;            &lt;integer&gt; &lt;character&gt;          &lt;character&gt; &lt;character&gt; &lt;numeric&gt;
+#&gt;     CFTR_f 117559595      CFTR_f ATTAAAGAAAATATCATCTT         TGG         2
+#&gt;     CFTR_r 117559595      CFTR_r TCTGTATCTATATTCATCAT         AGG         1
+#&gt;      HBB_f   5227002       HBB_f GTAACGGCAGACTTCTCCTC         AGG         0
+#&gt;      HBB_r   5227002       HBB_r CATGGTGCATCTGACTCCTG         AGG         4
+#&gt;   HEXA_f_1  72346583    HEXA_f_1 TGTAGAAATCCTTCCAGTCA         GGG         1
+#&gt;   HEXA_f_2  72346583    HEXA_f_2 ATCCTTCCAGTCAGGGCCAT         AGG         0
+#&gt;   PRNP_f_1   4699600    PRNP_f_1 AGCAGCTGGGGCAGTGGTGG         GGG        11
+#&gt;   PRNP_f_2   4699600    PRNP_f_2 GCAGCTGGGGCAGTGGTGGG         GGG        27
+#&gt;   PRNP_f_3   4699600    PRNP_f_3 GGGGCAGTGGTGGGGGGCCT         TGG        11
+#&gt;   PRNP_f_4   4699600    PRNP_f_4 GCAGTGGTGGGGGGCCTTGG         CGG         4
+#&gt;                 off0      off1      off2 Doench2014
+#&gt;            &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt;
+#&gt;     CFTR_f         0         0         2 0.03399990
+#&gt;     CFTR_r         0         0         1 0.22337056
+#&gt;      HBB_f         0         0         0 0.41398065
+#&gt;      HBB_r         1         0         3 0.13111422
+#&gt;   HEXA_f_1         0         0         1 0.10728361
+#&gt;   HEXA_f_2         0         0         0 0.03942528
+#&gt;   PRNP_f_1         0         0        11 0.00994899
+#&gt;   PRNP_f_2         0         9        18 0.04496627
+#&gt;   PRNP_f_3         0         0        11 0.00996254
+#&gt;   PRNP_f_4         0         0         4 0.20935863
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div></pre>
+#&gt;   seqinfo: 595 sequences (1 circular) from hg38 genome</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -281,7 +354,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

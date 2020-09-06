@@ -1,6 +1,8 @@
-pandoc: 2.7.2
-pkgdown: 1.4.1
+pandoc: 2.7.3
+pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
-  designing_grna_libraries: designing_grna_libraries.html
+  genome_arithmetics: genome_arithmetics.html
+  grna_design: grna_design.html
+last_built: 2020-09-06T13:38Z
 

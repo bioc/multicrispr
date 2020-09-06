@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Add sequence to GRanges — add_seq" />
 <meta property="og:description" content="Add sequence to GRanges" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.23</span>
       </span>
     </div>
 
@@ -92,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
+      <a href="../articles/genome_arithmetics.html">Genome arithmetics with multicrispr</a>
+    </li>
+    <li>
+      <a href="../articles/grna_design.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -172,49 +178,58 @@
 #&gt;   HEXA        TATC
 #&gt;   CFTR         TTT
 #&gt;   -------
-#&gt;   seqinfo: 455 sequences (1 circular) from hg38 genome</div><div class='input'>
+#&gt;   seqinfo: 595 sequences (1 circular) from hg38 genome</div><div class='input'>
 <span class='co'># TFBS example</span>
 <span class='co'>#-------------</span>
     <span class='no'>bsgenome</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>BSgenome.Mmusculus.UCSC.mm10</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/BSgenome.Mmusculus.UCSC.mm10/man/package.html'>BSgenome.Mmusculus.UCSC.mm10</a></span>
     <span class='no'>bedfile</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>'extdata/SRF.bed'</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>'multicrispr'</span>)
     <span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bed_to_granges.html'>bed_to_granges</a></span>(<span class='no'>bedfile</span>, <span class='st'>'mm10'</span>)</div><div class='output co'>#&gt; <span class='message'>	Read SRF.bed into GRanges</span></div><div class='output co'>#&gt; <span class='message'>		1974 ranges on 21 chromosomes</span></div><div class='img'><img src='add_seq-1.png' alt='' width='700' height='433' /></div><div class='input'>    (<span class='no'>gr</span> <span class='kw'>%&lt;&gt;%</span> <span class='fu'>add_seq</span>(<span class='no'>bsgenome</span>))</div><div class='output co'>#&gt; GRanges object with 1974 ranges and 6 metadata columns:
-#&gt;         seqnames            ranges strand |         name     score  targetname
-#&gt;            &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;character&gt; &lt;numeric&gt; &lt;character&gt;
-#&gt;   T0001     chr1   4712628-4712643      - | SRF_MA0083.3  10.49542       T0001
-#&gt;   T0002     chr1   5250212-5250227      - | SRF_MA0083.3    9.7378       T0002
-#&gt;   T0003     chr1   5250452-5250467      - | SRF_MA0083.3   5.92033       T0003
-#&gt;   T0004     chr1   5256193-5256208      - | SRF_MA0083.3    9.7378       T0004
-#&gt;   T0005     chr1   5985728-5985743      - | SRF_MA0083.3   9.44821       T0005
-#&gt;     ...      ...               ...    ... .          ...       ...         ...
-#&gt;   T1970     chrY   6770312-6770327      + | SRF_MA0083.3    9.7378       T1970
-#&gt;   T1971     chrY 23130568-23130583      + | SRF_MA0083.3    9.7378       T1971
-#&gt;   T1972     chrY 42512400-42512415      - | SRF_MA0083.3   6.59053       T1972
-#&gt;   T1973     chrY 79048176-79048191      - | SRF_MA0083.3    9.7378       T1973
-#&gt;   T1974     chrY 89126494-89126509      - | SRF_MA0083.3   4.54393       T1974
-#&gt;         targetstart targetend              seq
-#&gt;           &lt;integer&gt; &lt;integer&gt;      &lt;character&gt;
-#&gt;   T0001     4712628   4712643 AGACAATATAAGGGCA
-#&gt;   T0002     5250212   5250227 AGACAATATAAGGACA
-#&gt;   T0003     5250452   5250467 TGACAATATTTGGAAT
-#&gt;   T0004     5256193   5256208 AGACAATATAAGGACA
-#&gt;   T0005     5985728   5985743 CCACCAAATATGGGCT
-#&gt;     ...         ...       ...              ...
-#&gt;   T1970     6770312   6770327 AGACAATATAAGGACA
-#&gt;   T1971    23130568  23130583 AGACAATATAAGGACA
-#&gt;   T1972    42512400  42512415 TGGCCAAATATGTGGA
-#&gt;   T1973    79048176  79048191 AGACAATATAAGGACA
-#&gt;   T1974    89126494  89126509 TGCCCATACTAGGGAG
+#&gt;                            seqnames            ranges strand |         name
+#&gt;                               &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;character&gt;
+#&gt;     chr1:4712628-4712643:-     chr1   4712628-4712643      - | SRF_MA0083.3
+#&gt;     chr1:5250212-5250227:-     chr1   5250212-5250227      - | SRF_MA0083.3
+#&gt;     chr1:5250452-5250467:-     chr1   5250452-5250467      - | SRF_MA0083.3
+#&gt;     chr1:5256193-5256208:-     chr1   5256193-5256208      - | SRF_MA0083.3
+#&gt;     chr1:5985728-5985743:-     chr1   5985728-5985743      - | SRF_MA0083.3
+#&gt;                        ...      ...               ...    ... .          ...
+#&gt;     chrY:6770312-6770327:+     chrY   6770312-6770327      + | SRF_MA0083.3
+#&gt;   chrY:23130568-23130583:+     chrY 23130568-23130583      + | SRF_MA0083.3
+#&gt;   chrY:42512400-42512415:-     chrY 42512400-42512415      - | SRF_MA0083.3
+#&gt;   chrY:79048176-79048191:-     chrY 79048176-79048191      - | SRF_MA0083.3
+#&gt;   chrY:89126494-89126509:-     chrY 89126494-89126509      - | SRF_MA0083.3
+#&gt;                                score               targetname targetstart
+#&gt;                            &lt;numeric&gt;              &lt;character&gt;   &lt;integer&gt;
+#&gt;     chr1:4712628-4712643:-  10.49542   chr1:4712628-4712643:-     4712628
+#&gt;     chr1:5250212-5250227:-   9.73780   chr1:5250212-5250227:-     5250212
+#&gt;     chr1:5250452-5250467:-   5.92033   chr1:5250452-5250467:-     5250452
+#&gt;     chr1:5256193-5256208:-   9.73780   chr1:5256193-5256208:-     5256193
+#&gt;     chr1:5985728-5985743:-   9.44821   chr1:5985728-5985743:-     5985728
+#&gt;                        ...       ...                      ...         ...
+#&gt;     chrY:6770312-6770327:+   9.73780   chrY:6770312-6770327:+     6770312
+#&gt;   chrY:23130568-23130583:+   9.73780 chrY:23130568-23130583:+    23130568
+#&gt;   chrY:42512400-42512415:-   6.59053 chrY:42512400-42512415:-    42512400
+#&gt;   chrY:79048176-79048191:-   9.73780 chrY:79048176-79048191:-    79048176
+#&gt;   chrY:89126494-89126509:-   4.54393 chrY:89126494-89126509:-    89126494
+#&gt;                            targetend              seq
+#&gt;                            &lt;integer&gt;      &lt;character&gt;
+#&gt;     chr1:4712628-4712643:-   4712643 AGACAATATAAGGGCA
+#&gt;     chr1:5250212-5250227:-   5250227 AGACAATATAAGGACA
+#&gt;     chr1:5250452-5250467:-   5250467 TGACAATATTTGGAAT
+#&gt;     chr1:5256193-5256208:-   5256208 AGACAATATAAGGACA
+#&gt;     chr1:5985728-5985743:-   5985743 CCACCAAATATGGGCT
+#&gt;                        ...       ...              ...
+#&gt;     chrY:6770312-6770327:+   6770327 AGACAATATAAGGACA
+#&gt;   chrY:23130568-23130583:+  23130583 AGACAATATAAGGACA
+#&gt;   chrY:42512400-42512415:-  42512415 TGGCCAAATATGTGGA
+#&gt;   chrY:79048176-79048191:-  79048191 AGACAATATAAGGACA
+#&gt;   chrY:89126494-89126509:-  89126509 TGCCCATACTAGGGAG
 #&gt;   -------
 #&gt;   seqinfo: 66 sequences (1 circular) from mm10 genome</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -225,7 +240,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Interval plot GRanges — plot_intervals" />
 <meta property="og:description" content="Interval plot GRanges" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multicrispr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.23</span>
       </span>
     </div>
 
@@ -92,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/designing_grna_libraries.html">Using multicrispr for gRNA design</a>
+      <a href="../articles/genome_arithmetics.html">Genome arithmetics with multicrispr</a>
+    </li>
+    <li>
+      <a href="../articles/grna_design.html">Using multicrispr for gRNA design</a>
     </li>
   </ul>
 </li>
@@ -124,12 +130,12 @@
     <pre class="usage"><span class='fu'>plot_intervals</span>(
   <span class='no'>gr</span>,
   <span class='kw'>xref</span> <span class='kw'>=</span> <span class='st'>"targetname"</span>,
-  <span class='kw'>y</span> <span class='kw'>=</span> <span class='st'>"names"</span>,
+  <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>default_y</span>(<span class='no'>gr</span>),
   <span class='kw'>nperchrom</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>nchrom</span> <span class='kw'>=</span> <span class='fl'>4</span>,
   <span class='kw'>color_var</span> <span class='kw'>=</span> <span class='st'>"targetname"</span>,
   <span class='kw'>facet_var</span> <span class='kw'>=</span> <span class='st'>"seqnames"</span>,
-  <span class='kw'>linetype_var</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>linetype_var</span> <span class='kw'>=</span> <span class='fu'>default_linetype</span>(<span class='no'>gr</span>),
   <span class='kw'>size_var</span> <span class='kw'>=</span> <span class='fu'>default_size_var</span>(<span class='no'>gr</span>),
   <span class='kw'>alpha_var</span> <span class='kw'>=</span> <span class='fu'>default_alpha_var</span>(<span class='no'>gr</span>),
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -210,18 +216,14 @@ shown per chromosome</p></td>
                             <span class='kw'>HEXA</span> <span class='kw'>=</span> <span class='st'>'chr15:72346580-72346583:-'</span>,
                             <span class='kw'>CFTR</span> <span class='kw'>=</span> <span class='st'>'chr7:117559593-117559595:+'</span>),
                           <span class='no'>bsgenome</span>)
-    <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_pe_spacers.html'>find_pe_spacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>)</div><div class='img'><img src='plot_intervals-2.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>plot_intervals</span>(<span class='no'>gr</span>)</div><div class='img'><img src='plot_intervals-3.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>plot_intervals</span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>))</div><div class='img'><img src='plot_intervals-4.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>plot_intervals</span>(<span class='no'>spacers</span>)</div><div class='img'><img src='plot_intervals-5.png' alt='' width='700' height='433' /></div><div class='input'>    
-</div></pre>
+    <span class='no'>spacers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='find_primespacers.html'>find_primespacers</a></span>(<span class='no'>gr</span>, <span class='no'>bsgenome</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='message'>Find primespacers for 4 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 10 primespacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 0 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 53 hits with max 1 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 20 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 11 after removing more than 0 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       9 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='output co'>#&gt; <span class='message'>Find nickspacers</span></div><div class='output co'>#&gt; <span class='message'>Find spacers in 10 targets</span></div><div class='output co'>#&gt; <span class='message'>	Found 32 spacers</span></div><div class='output co'>#&gt; <span class='message'>	Count offtargets with max 2 mismatches using bowtie</span></div><div class='output co'>#&gt; <span class='message'>		Count genome (mis)matches</span></div><div class='output co'>#&gt; <span class='message'>			Expand iupac ambiguities in pam</span></div><div class='output co'>#&gt; <span class='message'>			Write reads to ~/multicrisprout/spacers.fa</span></div><div class='output co'>#&gt; <span class='message'>			Map reads: ~/multicrisprout/spacers/spacers_to_BSgenome.Hsapiens.UCSC.hg38.txt</span></div><div class='output co'>#&gt; <span class='message'>			Load results</span></div><div class='output co'>#&gt; <span class='message'>				Read 91 hits with max 2 mismatch(es)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 37 after removing NGG 'N' mismatches (avoid double counting expanded pams)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 36 after removing NGG 'G1' mismatches(except for NGG -&gt; NAG, which is allowed)</span></div><div class='output co'>#&gt; <span class='message'>				Retain 33 after removing NGG 'G2' mismatches</span></div><div class='output co'>#&gt; <span class='message'>				Retain 33 after removing more than 2 mismatches</span></div><div class='output co'>#&gt; <span class='message'>			Count matches</span></div><div class='output co'>#&gt; <span class='message'>		Count off-targets</span></div><div class='output co'>#&gt; <span class='message'>		       30 are off0 free</span></div><div class='output co'>#&gt; <span class='message'>		       32 are off1 free</span></div><div class='output co'>#&gt; <span class='message'>		       24 are off2 free</span></div><div class='output co'>#&gt; <span class='message'>	Filter for best offtarget counts</span></div><div class='output co'>#&gt; <span class='message'>		Retain 32 with best off0 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>		Retain 32 with best off1 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>		Retain 24 with best off2 counts per pename</span></div><div class='output co'>#&gt; <span class='message'>	Score ontargets</span></div><div class='output co'>#&gt; <span class='message'>		Add (4-23-3) contextseqs</span></div><div class='output co'>#&gt; <span class='message'>		Score contextseqs with Doench2014</span></div><div class='input'>    <span class='fu'>plot_intervals</span>(<span class='no'>gr</span>)</div><div class='img'><img src='plot_intervals-2.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>plot_intervals</span>(<span class='fu'><a href='extend_for_pe.html'>extend_for_pe</a></span>(<span class='no'>gr</span>))</div><div class='img'><img src='plot_intervals-3.png' alt='' width='700' height='433' /></div><div class='input'>    <span class='fu'>plot_intervals</span>(<span class='no'>spacers</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 34 rows containing missing values (geom_point).</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 34 rows containing missing values (geom_point).</span></div><div class='img'><img src='plot_intervals-4.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Empty gr</span>
+    <span class='fu'>plot_intervals</span>(<span class='kw pkg'>GenomicRanges</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html'>GRanges</a></span>())</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -232,7 +234,7 @@ shown per chromosome</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
