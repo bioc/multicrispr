@@ -3,7 +3,6 @@
 [![](https://bioconductor.org/shields/build/devel/bioc/multicrispr.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/multicrispr/)
 [![](https://bioconductor.org/shields/availability/3.12/multicrispr.svg)](https://bioconductor.org/packages/devel/bioc/html/multicrispr.html#archives) 
 [![](https://bioconductor.org/shields/years-in-bioc/multicrispr.svg)](https://bioconductor.org/packages/devel/bioc/html/multicrispr.html#since)
-
 [![](https://img.shields.io/badge/doi-10.26508/lsa.202000757-blue.svg)](https://doi.org/10.26508/lsa.202000757)
 
 
