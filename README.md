@@ -14,7 +14,7 @@
     # Install azimuth
         install.packages('reticulate')
         reticulate::conda_create('azienv', c('python=2.7'))
-        reticulate::use_condaenv('azienv')
+        reticulate::use_condaenv('azienv', required=TRUE)
         reticulate::py_install(c('azimuth', 'scikit-learn==0.17.1', 'biopython==1.76'), 'azienv', pip = TRUE)
     # Index mm10 and hg38
         BiocManager::install('BSgenome.Mmusculus.UCSC.mm10')
