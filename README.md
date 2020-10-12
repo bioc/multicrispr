@@ -19,8 +19,8 @@
     # Index mm10 and hg38
         BiocManager::install('BSgenome.Mmusculus.UCSC.mm10')
         BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')
-        index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
-        index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
+        multicrispr::index_genome(BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10)
+        multicrispr::index_genome(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38)
 
 
 ### Overview
