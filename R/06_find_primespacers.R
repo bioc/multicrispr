@@ -146,20 +146,22 @@ add_nickspacers <- function(primespacers, bsgenome,
         mismatches = nickmatches, indexedgenomesdir = indexedgenomesdir, 
         outdir = outdir, plot=FALSE)
     nickspacers$type <- 'nickspacer'
-    mcols(nickspacers)[[ontargetmethod]] %<>% round(digits = 2)
+    #mcols(nickspacers)[[ontargetmethod]] %<>% round(digits = 2)
 # Merge
     nickdt  <-  gr2dt(nickspacers) %>% 
                 extract( , .(
                     pename     = pename,
                     nickrange  = as.character(granges(nickspacers)), 
                     nickspacer = crisprspacer, 
-                    nickpam    = crisprpam,
-                    nickoff    = off))
-    for (i in seq(0, nickmatches)){
-        nickdt[, (paste0('nickoff',i)) := mcols(nickspacers)[[paste0('off',i)]]]
-    }
-    method <- ontargetmethod
-    nickdt[, (paste0('nick', method)) := mcols(nickspacers)[[method]]]
+                    nickpam    = crisprpam))
+    if (!is.null(offtargetmethod)){
+        nickdt[, nickoff := nickspacers$off]
+        for (i in seq(0, nickmatches)){
+            offvalues <- mcols(nickspacers)[[paste0('off',i)]]
+            nickdt[, (paste0('nickoff',i)) := offvalues]}}
+    if (!is.null(ontargetmethod)){
+        method <- ontargetmethod
+        nickdt[, (paste0('nick', method)) := mcols(nickspacers)[[method]]]}
     nickdt %<>% extract( , lapply(.SD, pastelapse), by = 'pename')
 
     pedt <- gr2dt(primespacers)
