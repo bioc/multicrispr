@@ -33,6 +33,7 @@ add_target_matches(
 Add target matches
 }
 \examples{
+require(magrittr)
 file <- system.file('extdata/SRF.bed', package='multicrispr')
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 targets0 <- bed_to_granges(file, 'mm10')

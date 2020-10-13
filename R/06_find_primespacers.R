@@ -132,7 +132,7 @@ add_nickspacers <- function(primespacers, bsgenome,
     plot = TRUE, verbose = TRUE
 ){
 # Check / Initialize
-    . <- crisprname <- crisprspacer <- crisprpam <- NULL
+    . <- crisprname <- crisprspacer <- crisprpam <- nickoff <- NULL
     off0 <- off1 <- off2 <- pename <- off <- NULL
     primespacers$pename <- primespacers$crisprname
     primespacers$type <- 'pespacer'
