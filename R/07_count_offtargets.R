@@ -249,7 +249,8 @@ index_genome <- function(
         zipfile <- paste0(genomedir, '.zip')
         message('\t\tDownload pre-indexed version
                 For a fresh build instead, set download = FALSE')
-        res <- tryCatch(download.file(url, zipfile), error = function(e) 1)
+        res <- tryCatch(download.file(url, zipfile, method="curl"), 
+                        error = function(e) 1)
         if (res==0){
             message('\t\tUnzip ')
             utils::unzip(zipfile, exdir = dirname(genomedir))
