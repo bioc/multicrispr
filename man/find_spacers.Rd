@@ -33,9 +33,9 @@ find_spacers(
 
 \item{complement}{TRUE (default) or FALSE: also search in compl ranges?}
 
-\item{ontargetmethod}{'Doench2016' or 'Doench2016': on-target scoring method}
+\item{ontargetmethod}{'Doench2016','Doench2016' or NULL (no on-target score)}
 
-\item{offtargetmethod}{'bowtie' (default) or 'pdict'}
+\item{offtargetmethod}{'bowtie', 'pdict', or NULL (no offtarget analysis)}
 
 \item{offtargetfilterby}{filter for best off-target counts by this variable}
 

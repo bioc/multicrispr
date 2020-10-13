@@ -189,8 +189,8 @@ extract_matchranges <- function(gr, bsgenome, pattern, plot = FALSE){
 #' @param spacer     string: spacer pattern in extended IUPAC alphabet
 #' @param pam        string: pam pattern in extended IUPAC alphabet
 #' @param complement TRUE (default) or FALSE: also search in compl ranges?
-#' @param ontargetmethod  'Doench2016' or 'Doench2016': on-target scoring method
-#' @param offtargetmethod 'bowtie' (default) or 'pdict'
+#' @param ontargetmethod  'Doench2016','Doench2016' or NULL (no on-target score)
+#' @param offtargetmethod 'bowtie', 'pdict', or NULL (no offtarget analysis)
 #' @param offtargetfilterby filter for best off-target counts by this variable
 #' @param subtract_targets TRUE or FALSE (default): whether to subtract target 
 #'                   (mis)matches from offtarget counts

@@ -507,6 +507,23 @@ count_spacer_matches <- function(
 #==============================================================================
 
 
+#' Add target matches
+#' @param spacers     GRanges
+#' @param targets     GRanges
+#' @param bsgenome    BSgenome
+#' @param mismatches  number
+#' @param pam         string
+#' @param outdir      bowtie output directory
+#' @param verbose     TRUE (default) or FALSE
+#' @examples 
+#' file <- system.file('extdata/SRF.bed', package='multicrispr')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' targets0 <- bed_to_granges(file, 'mm10')
+#' targets <- extend(targets0)
+#' spacers <- find_spacers(targets, bsgenome, complement = FALSE, 
+#'                         ontargetmethod = NULL, offtargetmethod = NULL)
+#' spacers %<>% add_target_matches(targets, bsgenome)
+#' @export
 add_target_matches <- function(
     spacers, targets, bsgenome, mismatches = 2, pam = 'NGG', 
     outdir = OUTDIR, verbose = TRUE
@@ -542,6 +559,25 @@ add_target_matches <- function(
     
 }
 
+#' Add genome matches
+#' @param spacers            GRanges
+#' @param bsgenome           BSgenome
+#' @param mismatches         number
+#' @param pam                string
+#' @param offtargetmethod    'bowtie' or 'pdict'
+#' @param outdir             bowtie output directory
+#' @param indexedgenomesdir  directory with indexed genomes
+#' @param verbose            TRUE (default) or FALSE
+#' @examples 
+#' file <- system.file('extdata/SRF.bed', package='multicrispr')
+#' bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
+#' targets0 <- bed_to_granges(file, 'mm10')
+#' targets <- extend(targets0)
+#' spacers <- find_spacers(targets, bsgenome, complement = FALSE, 
+#'                         ontargetmethod = NULL, offtargetmethod = NULL)
+#' spacers %<>% extract(1:100)
+#' spacers %<>% add_genome_matches(bsgenome)
+#' @export
 add_genome_matches <- function(
     spacers, 
     bsgenome          = getBSgenome(genome(spacers)[1]),
@@ -745,6 +781,7 @@ count_offtargets <- function(spacers, bsgenome, targets = NULL, mismatches = 2,
     indexedgenomesdir = INDEXEDGENOMESDIR, verbose = TRUE, plot = TRUE, ...
 ){
 # First clear
+    if (is.null(offtargetmethod)) return(spacers)
     if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     if (mismatches==-1) return(spacers)
     offcols <- c(paste0('G', 0:3), paste0('T', 0:3), paste0('off', 0:3), 'off')

@@ -197,6 +197,7 @@ score_ontargets <- function(
     # Assert
     crisprcontext <- NULL
     assert_is_all_of(spacers, 'GRanges')
+    if (is.null(ontargetmethod))  return(spacers)
     assert_is_a_string(ontargetmethod)
     assert_is_subset(ontargetmethod, c('Doench2014', 'Doench2016'))
     if (ontargetmethod %in% names(mcols(spacers))){
