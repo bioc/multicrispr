@@ -333,10 +333,10 @@ plot_intervals_engine <- function(
         geom_segment(arrow = arrow(length = unit(0.1, "inches")))
 # Targets
     if (all(c('targetstart', 'targetend') %in% names(mcols(gr)))){
-        p <-p + geom_point(aes_string(
-                    x = 'xtargetstart', y = 'y'), shape = '|', size = 4) +
-                geom_point(aes_string(
-                    x = 'xtargetend',   y = 'y'), shape = '|', size = 4)}
+        p <-p + geom_point(aes_string(x = 'xtargetstart', y = 'y'), 
+                            shape = '|', size = 4, na.rm = TRUE) +
+                geom_point(aes_string(x = 'xtargetend',   y = 'y'), 
+                            shape = '|', size = 4, na.rm = TRUE)}
 # Extensions
     p <- p + theme_bw()  +  xlab(NULL)  +  ylab(NULL)  +  ggtitle(title)
 # Return
