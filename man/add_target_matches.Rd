@@ -29,6 +29,9 @@ add_target_matches(
 
 \item{verbose}{TRUE (default) or FALSE}
 }
+\value{
+GRanges
+}
 \description{
 Add target matches
 }

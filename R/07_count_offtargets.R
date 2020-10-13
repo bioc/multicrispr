@@ -515,6 +515,7 @@ count_spacer_matches <- function(
 #' @param pam         string
 #' @param outdir      bowtie output directory
 #' @param verbose     TRUE (default) or FALSE
+#' @return GRanges
 #' @examples 
 #' require(magrittr)
 #' file <- system.file('extdata/SRF.bed', package='multicrispr')
@@ -569,6 +570,7 @@ add_target_matches <- function(
 #' @param outdir             bowtie output directory
 #' @param indexedgenomesdir  directory with indexed genomes
 #' @param verbose            TRUE (default) or FALSE
+#' @return GRanges
 #' @examples 
 #' require(magrittr)
 #' file <- system.file('extdata/SRF.bed', package='multicrispr')

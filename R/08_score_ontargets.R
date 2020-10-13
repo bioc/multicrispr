@@ -130,27 +130,27 @@ doench2016 <- function(
 #' @param bsgenome \code{\link[BSgenome]{BSgenome-class}}
 #' @param ontargetmethod   'Doench2014' (default) or 'Doench2016'
 #'                 (requires non-NULL argument python, virtualenv, or condaenv)
-#' @param cutoff    value to filter on
 #' @param chunksize Doench2016 is executed in chunks of chunksize
 #' @param verbose   TRUE (default) or FALSE
 #' @param plot      TRUE (default) or FALSE
 #' @param ...       passed to \code{\link{plot_intervals}}
 #' @return numeric vector
 #' @examples
-#' 
 #' # Install azimuth 
 #' #----------------
 #'     ## With reticulate
 #'     # require(reticulate)
 #'     # conda_create('azienv', c('python=2.7'))
 #'     # use_condaenv('azienv')
-#'     # py_install(c('azimuth', 'scikit-learn==0.17.1'), 'azienv', pip = TRUE)
+#'     # py_install(c('azimuth', 'scikit-learn==0.17.1', 'biopython=='1.76'), 
+#'     #            'azienv', pip = TRUE)
 #'     
 #'     ## Directly
 #'     # conda create --name azienv python=2.7
 #'     # conda activate azienv
-#'     # pip install azimuth
 #'     # pip install scikit-learn==0.17.1
+#'     # pip install biopython==1.76
+#'     # pip install azimuth
 #'     
 #' # PE example
 #' #-----------
@@ -161,9 +161,9 @@ doench2016 <- function(
 #'                                  HEXA = 'chr15:72346580-72346583:-',   # del
 #'                                  CFTR = 'chr7:117559593-117559595:+'), # ins
 #'                                bsgenome)
-#'     spacers <- find_primespacers(targets, bsgenome)
-#'     #spacers<- find_spacers(extend_for_pe(gr), bsgenome, complement = FALSE)
-#'     (spacers %<>% score_ontargets(bsgenome, 'Doench2014'))
+#'     spacers <- find_primespacers(targets, bsgenome, ontargetmethod=NULL, 
+#'                                 offtargetmethod=NULL)
+#'     spacers %<>% score_ontargets(bsgenome, 'Doench2014')
 #'     # reticulate::use_condaenv('azienv')
 #'     # reticulate::import('azimuth')
 #'     # spacers %<>% score_ontargets(bsgenome, 'Doench2016')
@@ -173,12 +173,12 @@ doench2016 <- function(
 #'     bedfile  <- system.file('extdata/SRF.bed', package = 'multicrispr')
 #'     bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 #'     targets <- extend(bed_to_granges(bedfile, 'mm10'))
-#'     spacers <- find_spacers(targets, bsgenome)
+#'     spacers <- find_spacers(targets, bsgenome, ontargetmethod=NULL, 
+#'                             offtargetmethod=NULL)
+#'     spacers %<>% score_ontargets(bsgenome, 'Doench2014')
 #'     # reticulate::use_condaenv('azienv')
-#'     # reticulate::import('azienv')
-#'     # (spacers %<>% count_offtargets(bsgenome, targets))
-#'     # (spacers %>%  score_ontargets(bsgenome, 'Doench2014'))
-#'     # (spacers %>%  score_ontargets(bsgenome, 'Doench2016'))
+#'     # reticulate::import('azimuth')
+#'     # spacers %>%  score_ontargets(bsgenome, 'Doench2016')
 #' @references 
 #' Doench 2014, Rational design of highly active sgRNAs for 
 #' CRISPR-Cas9-mediated gene inactivation. Nature Biotechnology,
@@ -189,7 +189,7 @@ doench2016 <- function(
 #' doi: 10.1038/nbt.3437
 #' 
 #' Python module azimuth: github/MicrosoftResearch/azimuth
-#' @noRd
+#' @export
 score_ontargets <- function(
     spacers, bsgenome,  ontargetmethod= c('Doench2014', 'Doench2016')[1],
     chunksize = 10000, verbose = TRUE, plot = TRUE, ...
