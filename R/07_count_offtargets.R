@@ -594,6 +594,7 @@ add_genome_matches <- function(
     verbose           = TRUE
 ){
     assert_is_subset(offtargetmethod, c('bowtie', 'pdict'))
+    if (!has_been_indexed(bsgenome, indexedgenomesdir)) return(spacers)
     if (offtargetmethod=='bowtie'){
         add_genome_matches_bowtie(
             spacers  = spacers, bsgenome = bsgenome, mismatches = mismatches,
