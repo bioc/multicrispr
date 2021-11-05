@@ -1,4 +1,3 @@
-
 #=============================================================================
 # bed_to_granges
 #=============================================================================
@@ -95,6 +94,9 @@ bed_to_granges <- function(
     # Order
     if (do_order)  gr %<>% sort(ignore.strand = TRUE)
                     #%<>% extract( order(seqnames(.), start(.)))
+
+    # Filter duplicates
+    gr <- unique(gr)
 
     # Record    
     names(gr) <- gr$targetname  <- make_unique_names(gr, 'T')
