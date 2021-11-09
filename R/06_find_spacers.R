@@ -258,6 +258,7 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
     spacers$crisprspacer <- getSeq(bsgenome, spacers, as.character=TRUE)
     spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
     if (verbose) message('\tFound ', length(spacers), ' spacers')
+    spacers %<>% filter_N()
 # Add on/offtargets
     spacers %<>% count_offtargets(
         bsgenome, targets = if (subtract_targets) gr else NULL, 
