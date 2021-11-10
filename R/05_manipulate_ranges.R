@@ -398,4 +398,12 @@ double_flank <- function(
     newgr
 }
 
+#' Filter N
+#' 
+#' @param spacers \code{\link[GenomicRanges]{GRanges-class}}
+#' @return \code{\link[GenomicRanges]{GRanges-class}}
+filter_N <- function(spacers, col="crisprspacer"){
+    spacers <- spacers[!grepl("N",elementMetadata(spacers)[,col])]
+    spacers[!grepl("N",elementMetadata(spacers)[,"crisprpam"])]
+}
 
