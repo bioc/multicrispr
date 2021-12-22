@@ -257,8 +257,10 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
     spacers$crisprname   <- names(spacers)
     spacers$crisprspacer <- getSeq(bsgenome, spacers, as.character=TRUE)
     spacers$crisprpam    <- getSeq(bsgenome, pams,    as.character=TRUE)
+# Filter
+    spacers %<>% extract(!stri_detect_fixed(.$crisprspacer, 'N'))
+    spacers %<>% extract(!stri_detect_fixed(.$crisprpam,    'N'))
     if (verbose) message('\tFound ', length(spacers), ' spacers')
-    spacers %<>% filter_N()
 # Add on/offtargets
     spacers %<>% count_offtargets(
         bsgenome, targets = if (subtract_targets) gr else NULL, 
@@ -272,6 +274,7 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
     if (plot) print(plot_intervals(spacers, ...)) #spacers$sitename <- NULL
     spacers
 }
+
 
 #' Extend ranges for prime editing
 #' 

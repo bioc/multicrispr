@@ -43,8 +43,8 @@
 #' @importFrom  utils                 tail  read.csv  read.table
 #' @importFrom  reticulate            py_module_available
 #' @importFrom  stats                 complete.cases
-#' @importFrom  stringi               stri_detect_regex  stri_locate_all_fixed
-#' @importFrom  stringi               stri_locate_all_regex   
+#' @importFrom  stringi               stri_detect_fixed      stri_detect_regex
+#' @importFrom  stringi               stri_locate_all_fixed  stri_locate_all_regex   
 #' @importFrom  stringi               stri_replace_first_fixed
 #' @importFrom  stringi               stri_startswith_fixed
 #' @importFrom  tidyselect            starts_with

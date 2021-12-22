@@ -206,8 +206,8 @@ score_ontargets <- function(
     # Add contextseq
     if (verbose)  cmessage('\tScore ontargets')
     spacers %<>% add_context(bsgenome, verbose = verbose)
-    spacers %<>% filter_N(col="crisprcontext")
-    spacerdt  <- gr2dt(spacers)
+    spacers %<>% extract(!stri_detect_fixed(.$crisprcontext, 'N'))
+    spacerdt  <- gr2dt(spacers)  # context includes spacer + pam already
     scoredt <- data.table(crisprcontext = unique(spacerdt$crisprcontext))
     
     # Score

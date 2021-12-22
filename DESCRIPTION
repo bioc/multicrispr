@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 1.5.0
+Version: 1.5.1
 Encoding: UTF-8
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",   c("aut", "cre")),
             person( "Johannes", "Graumann",   NULL, 'johannes.graumann@mpi-bn.mpg.de',c("sad", "ctb")),
@@ -16,7 +16,7 @@ Description: This package is for designing Crispr/Cas9 and Prime Editing experim
              enabling the design of large Crispr/Cas9 libraries.
 License: GPL-2
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends:
     R (>= 4.0)
 Imports:
