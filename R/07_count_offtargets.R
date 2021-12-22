@@ -170,14 +170,15 @@ bowtie_count <- function(crisprseqs, indexdir, mismatches = 2, norc,
     readdt[crisprseqs, on = 'readseq']
 }
 
-INDEXEDGENOMESDIR <- '~/multicrisprout/indexedgenomes'
+OUTDIR <- file.path(tools::R_user_dir('multicrispr', 'cache'))
+
+INDEXEDGENOMESDIR <- file.path(OUTDIR, 'indexedgenomes')
     genome_dir <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){
         paste0(indexedgenomesdir, '/', bsgenome@pkgname)}
     
     genome_fasta <- function(indexedgenomesdir = INDEXEDGENOMESDIR, bsgenome){ 
         paste0(indexedgenomesdir, '/', bsgenome@pkgname, '.fa')}
 
-OUTDIR <- '~/multicrisprout'
     target_dir      <- function(outdir = OUTDIR){
         paste0(outdir,  '/targets') }
     
