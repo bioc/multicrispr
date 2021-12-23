@@ -1,8 +1,0 @@
-pages:
-  script:
-    - touch public
-  artifacts:
-    paths:
-      - public
-  only:
-    - master

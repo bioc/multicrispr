@@ -1,4 +1,0 @@
-language: r
-r: bioc-release
-apt_packages:
-  - libmagick++-dev
