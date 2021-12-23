@@ -3,3 +3,5 @@ inst/doc
 vignettes/*_cache
 multicrispr.Rproj
 .gitattributes
+/doc/
+/Meta/
