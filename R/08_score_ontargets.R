@@ -195,7 +195,7 @@ score_ontargets <- function(
     chunksize = 10000, verbose = TRUE, plot = TRUE, ...
 ){
     # Assert
-    crisprcontext <- NULL
+    crisprcontext <- . <- NULL
     assert_is_all_of(spacers, 'GRanges')
     if (is.null(ontargetmethod))  return(spacers)
     assert_is_a_string(ontargetmethod)

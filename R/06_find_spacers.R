@@ -246,6 +246,7 @@ find_spacers <- function(gr, bsgenome, spacer = strrep('N', 20), pam = 'NGG',
     assert_is_a_bool(complement)
     assert_is_a_bool(verbose)
     assert_is_a_bool(plot)
+    . <- NULL
 # Find
     if (verbose) message('Find spacers in ', length(gr), ' targets')
     if (complement){
