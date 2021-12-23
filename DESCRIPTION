@@ -1,14 +1,15 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 1.4.1
+Version: 1.4.2
 Encoding: UTF-8
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",   c("aut", "cre")),
-            person( "Johannes", "Graumann",   NULL, 'johannes.graumann@mpi-bn.mpg.de',c("sad", "ctb")),
+            person( "Rene",     "Wiegandt",   NULL, "rene.wiegandt@mpi-bn.mpg.de",      "ctb"),
             person( "Mette",    "Bentsen",    NULL, "mette.bentsen@mpi-bn.mpg.de",      "ctb"),
             person( "Jens",     "Preussner",  NULL, "jens.preussner@mpi-bn.mpg.de",     "ctb"),
             person( "Michael",  "Lawrence",   NULL, "lawrence.michael@gene.com",        "ctb"),
             person( "Hervé",    "Pagès",      NULL, "hpages.on.github@gmail.com",       "ctb"),
-            person( "Mario",    "Looso",      NULL, "mario.looso@mpi-bn.mpg.de",      c("sad","rth")))
+            person( "Johannes", "Graumann",   NULL, 'johannes.graumann@uni-marburg.de', c("sad", "rth")),
+            person( "Mario",    "Looso",      NULL, "mario.looso@mpi-bn.mpg.de",        c("sad","rth")))
 Description: This package is for designing Crispr/Cas9 and Prime Editing experiments.
              It contains functions to (1) define and transform genomic targets, (2) find spacers
              (4) count offtarget (mis)matches, and (5) compute Doench2016/2014 targeting efficiency. 
