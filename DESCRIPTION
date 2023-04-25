@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 1.9.0
+Version: 1.10.0
 Encoding: UTF-8
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@mpi-bn.mpg.de",   c("aut", "cre")),
             person( "Rene",     "Wiegandt",   NULL, "rene.wiegandt@mpi-bn.mpg.de",      "ctb"),
