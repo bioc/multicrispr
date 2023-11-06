@@ -123,7 +123,7 @@ plot_intervals <- function(gr, xref = 'targetname', y = default_y(gr),
     alpha_var = default_alpha_var(gr), title = NULL, scales= 'free'){
 # Assert/Initialize
     assert_is_all_of(gr, 'GRanges')
-    if (assertive::is_empty(gr)) return(invisible(NULL))
+    if (assertive.properties::is_empty(gr)) return(invisible(NULL))
     assert_is_subset(xref, names(gr2dt(gr)))
     assert_is_subset(y,    names(gr2dt(gr)))
     assert_is_a_number(nperchrom);     assert_is_a_number(nchrom)
