@@ -1,23 +1,23 @@
-#' @importFrom  assertive.files       assert_all_are_dirs
-#' @importFrom  assertive.files       assert_all_are_existing_files
 #' @importFrom  assertive.base        assert_all_are_false
-#' @importFrom  assertive.numbers     assert_all_are_less_than
-#' @importFrom  assertive.strings     assert_all_are_matching_regex 
 #' @importFrom  assertive.base        assert_all_are_true
 #' @importFrom  assertive.base        assert_are_identical
+#' @importFrom  assertive.base        is_identical_to_true
+#' @importFrom  assertive.files       assert_all_are_dirs
+#' @importFrom  assertive.files       assert_all_are_existing_files
+#' @importFrom  assertive.numbers     assert_all_are_less_than
 #' @importFrom  assertive.properties  assert_are_same_length
 #' @importFrom  assertive.properties  has_names   assert_has_names
-#' @importFrom  assertive.base        is_identical_to_true
 #' @importFrom  assertive.properties  is_scalar
+#' @importFrom  assertive.properties  assert_has_no_duplicates
+#' @importFrom  assertive.properties  assert_is_non_scalar
+#' @importFrom  assertive.properties  assert_is_scalar
 #' @importFrom  assertive.reflection  is_windows
 #' @importFrom  assertive.sets        assert_is_subset
-#' @importFrom  assertive.properties  assert_has_no_duplicates
+#' @importFrom  assertive.strings     assert_all_are_matching_regex 
 #' @importFrom  assertive.types       assert_is_all_of    assert_is_any_of  
 #' @importFrom  assertive.types       assert_is_a_bool    assert_is_a_number
 #' @importFrom  assertive.types       assert_is_a_string  assert_is_character
-#' @importFrom  assertive.properties  assert_is_non_scalar
 #' @importFrom  assertive.types       assert_is_numeric
-#' @importFrom  assertive.properties  assert_is_scalar
 #' @importFrom  Biostrings            complement  DNAStringSet   
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict
 #' @importFrom  Biostrings            writeXStringSet
