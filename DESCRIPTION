@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 1.12.0
+Version: 1.12.1
 Encoding: UTF-8
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@uni-marburg.de",   c("aut", "cre")),
             person( "Rene",     "Wiegandt",   NULL, "rene.wiegandt@mpi-bn.mpg.de",      "ctb"),
@@ -17,11 +17,18 @@ Description: This package is for designing Crispr/Cas9 and Prime Editing experim
              enabling the design of large Crispr/Cas9 libraries.
 License: GPL-2
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Depends:
     R (>= 4.0)
 Imports:
-    assertive,
+    assertive.base,
+    assertive.files,
+    assertive.numbers,
+    assertive.properties,
+    assertive.reflection,
+    assertive.sets,
+    assertive.strings,
+    assertive.types,
     BiocGenerics,
     Biostrings,
     BSgenome,
