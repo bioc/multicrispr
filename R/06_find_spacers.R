@@ -108,7 +108,7 @@ extract_subranges <- function(gr, ir, plot = FALSE){
     substart <- subwidth <- NULL
     assert_is_all_of(gr, 'GRanges')
     assert_is_all_of(ir, 'IRanges')
-    if (assertive.properties::is_empty(ir)) return(GRanges(seqinfo=seqinfo(gr)))
+    if (is_empty(ir)) return(GRanges(seqinfo=seqinfo(gr)))
     assert_has_names(gr)
     assert_has_names(ir)
     assert_is_subset(unique(names(ir)), names(gr))
