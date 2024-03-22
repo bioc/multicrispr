@@ -1,12 +1,10 @@
-#' @importFrom  assertive.base        assert_all_are_false
-#' @importFrom  assertive.base        assert_all_are_true
-#' @importFrom  assertive.base        assert_are_identical
-#' @importFrom  assertive.base        is_identical_to_true
+#' @importFrom  assertive.base        assert_engine   false   get_name_in_parent  is2
+#' @importFrom  assertive.base        assert_all_are_false   assert_all_are_true
+#' @importFrom  assertive.base        assert_are_identical   is_identical_to_true
 #' @importFrom  assertive.base        call_and_name   coerce_to   set_cause   use_first
 #' @importFrom  assertive.files       assert_all_are_dirs
 #' @importFrom  assertive.files       assert_all_are_existing_files
 #' @importFrom  assertive.numbers     assert_all_are_less_than
-#' @importFrom  assertive.reflection  is_windows
 #' @importFrom  assertive.sets        assert_is_subset
 #' @importFrom  Biostrings            complement  DNAStringSet   
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict
