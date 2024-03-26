@@ -1,7 +1,3 @@
-#' @importFrom  assertive.base        assert_engine   false   get_name_in_parent  is2
-#' @importFrom  assertive.base        assert_all_are_false   assert_all_are_true
-#' @importFrom  assertive.base        assert_are_identical   is_identical_to_true
-#' @importFrom  assertive.base        call_and_name   coerce_to   set_cause   use_first
 #' @importFrom  assertive.files       assert_all_are_dirs
 #' @importFrom  assertive.files       assert_all_are_existing_files
 #' @importFrom  assertive.numbers     assert_all_are_less_than
