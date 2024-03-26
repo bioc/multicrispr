@@ -34,7 +34,26 @@
             xname
         }
 
+        
+        cause <- function(x){
+            y <- attr(x, "cause")
+            if(is.null(y))  return(noquote(character(length(x))))
+            y
+        }
 
+                
+        `cause<-` <- function(x, value){
+            # Can't use is_scalar here due to dependency on this
+            if(length(value) != 1 && length(value) != length(x)){
+                stop(  sprintf( "The length of value should be 1 or the length of x (%d) but is %d.", 
+                                length(x),
+                                length(value) ) )
+            }
+            attr(x, "cause") <- noquote(as.character(value))
+            x
+        }
+        
+        
         false <- function(...){
             msg <- if(nargs() > 0L) sprintf(...) else ""
             x <- FALSE
@@ -79,6 +98,11 @@
             } else {
                 as.character(x)
             }
+        }
+        
+        
+        bapply <- function(x, predicate, ...){
+            vapply(x, predicate, logical(1L), ..., USE.NAMES = TRUE)
         }
         
         
@@ -184,7 +208,16 @@
             stop(sprintf("%s cannot be coerced to any of these types: %s.", 
                          .xname, toString(sQuote(target_class))))
         }
-        
+
+                
+        type_description <- function(x){
+          if(is.array(x)){           sprintf(sprintf("class '%s %s'", class(x[FALSE]), toString(class(x))))
+          } else if(is.function(x)){ sprintf(sprintf("class '%s %s'", typeof(x), toString(class(x))))
+          } else if(isS4(x)){        sprintf(sprintf("S4 class '%s'", toString(class(x))))
+          } else {                   sprintf("class '%s'", toString(class(x)))
+          }
+        }
+
 
         strip_attributes <- function(x){
             attributes(x) <- NULL
