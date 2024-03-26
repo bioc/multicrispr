@@ -22,6 +22,13 @@
     # engine
     #-------
 
+        print_and_capture <- function(x, ...){
+            # call to enc2utf8 is a workaround for
+            # https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=16539
+            enc2utf8(paste(utils::capture.output(print(x, ...)), collapse = "\n"))
+        }
+
+
         safe_deparse <- function(expr, ...){
             paste0(deparse(expr, width.cutoff = 500L, ...), collapse = "")
         }
@@ -114,13 +121,42 @@
         }
         
         
+        assertionError <- function(message, call = NULL, predicate_name = NULL){
+            aerr <- list(    message = as.character(message), 
+                                call = call,
+                      predicate_name = predicate_name )
+            class(aerr) <- c( "assertionError", "assertionCondition", 
+                              "simpleError", "error", "condition")
+            aerr
+        }
+        
+        
+        assertionWarning <- function(message, call = NULL, predicate_name = NULL){
+          awrn <- list(     message = as.character(message), 
+                               call = call,
+                     predicate_name = predicate_name)
+          class(awrn) <- c( "assertionWarning", "assertionCondition", 
+                            "simpleWarning", "warning", "condition" )
+          awrn
+        }
+        
+        
+        assertionMessage <- function(message, call = NULL, predicate_name = NULL){
+          amsg <- list(     message = as.character(message), 
+                               call = call,
+                     predicate_name = predicate_name )
+          class(amsg) <- c( "assertionMessage", "assertionCondition", 
+                            "simpleMessage", "message", "condition" )
+          amsg
+        }
+        
+        
         give_feedback <- function(handler_type, msg, predicate_name){
             handler <- match.fun(handler_type)
-            ass_condition <- switch(
-                handler_type,
-                stop = assertionError,
-                warning = assertionWarning,
-                message = assertionMessage)
+            ass_condition <- switch(  handler_type,
+                                              stop = assertionError,
+                                           warning = assertionWarning,
+                                           message = assertionMessage)
             # Throw error/warning/message
             caller <- if(sys.nframe() >= 3){  sys.call(-3)
             } else {                          NULL         }
