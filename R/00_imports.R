@@ -1,4 +1,3 @@
-#' @importFrom  assertive.sets        assert_is_subset
 #' @importFrom  Biostrings            complement  DNAStringSet   
 #' @importFrom  Biostrings            vmatchPattern  vcountPDict
 #' @importFrom  Biostrings            writeXStringSet

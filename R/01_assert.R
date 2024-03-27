@@ -772,7 +772,41 @@
         }
         
         
+#=====
+# SETS
+#=====
+
         
+        is_subset <- function(
+            x, y, strictly = FALSE, .xname = get_name_in_parent(x), .yname = get_name_in_parent(y)
+        ){
+            diffxy <- setdiff(x, y)
+            if(length(diffxy) > 0)   return( false( ngettext( length(diffxy), 
+                                                             "The element %s in %s is not in %s.", 
+                                                             "The elements %s in %s are not in %s." ),
+                                                    toString(sQuote(diffxy), width = 100),
+                                                   .xname,
+                                                   .yname ) )
+            if(strictly && length(setdiff(y, x)) == 0)   return( false( "%s and %s are set equal.", 
+                                                                        .xname, 
+                                                                        .yname))
+            TRUE
+        }
+        
+
+        assert_is_subset <- function(
+            x, y, strictly = FALSE, severity = getOption("assertive.severity", "stop")
+        ){
+            assert_engine( is_subset, 
+                                   x, 
+                                   y = y, 
+                            strictly = strictly, 
+                              .xname = get_name_in_parent(x), 
+                              .yname = get_name_in_parent(y),
+                            severity = severity ) 
+        }        
+        
+               
 #======
 # FILES
 #======
