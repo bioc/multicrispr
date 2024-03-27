@@ -739,6 +739,39 @@
             )
         }
 
+#========
+# NUMBERS
+#========
+
+
+        is_less_than <- function(
+            x, y, .xname = get_name_in_parent(x), .yname = get_name_in_parent(x)
+        ){
+            if(!is.integer(x))   x <- coerce_to(x, "numeric", .xname)
+            if(!is.integer(y))   y <- coerce_to(y, "numeric", .yname)
+            ok <- x < y
+            call_and_name(  function(x)  set_cause(ok, paste("greater than or equal to", y)), 
+                            rep_len(x, length(ok)) ) 
+        }
+        
+        
+        assert_all_are_less_than <- function(
+            x, y, na_ignore = FALSE, severity = getOption("assertive.severity", "stop")
+        ){  
+            .xname <- get_name_in_parent(x)
+            .yname <- get_name_in_parent(y)
+            msg <- gettextf( "%s are not all less than %s.", .xname, .yname )
+            assert_engine( is_less_than, 
+                                      x, 
+                                      y = y, 
+                                 .xname = .xname,
+                                 .yname = .yname,
+                                    msg = msg, 
+                              na_ignore = na_ignore,
+                               severity = severity )  
+        }
+        
+        
         
 #======
 # FILES
