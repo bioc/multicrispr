@@ -1,5 +1,3 @@
-#' @importFrom  assertive.files       assert_all_are_dirs
-#' @importFrom  assertive.files       assert_all_are_existing_files
 #' @importFrom  assertive.numbers     assert_all_are_less_than
 #' @importFrom  assertive.sets        assert_is_subset
 #' @importFrom  Biostrings            complement  DNAStringSet   
