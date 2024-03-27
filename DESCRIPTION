@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 1.13.11
+Version: 1.13.12
 Encoding: UTF-8
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@uni-marburg.de",   c("aut", "cre")),
             person( "Richie",   "´Cotton",    NULL, "richierocks@gmail.com",            "aut"),
@@ -22,7 +22,6 @@ RoxygenNote: 7.3.1
 Depends:
     R (>= 4.0)
 Imports:
-    assertive.sets,
     BiocGenerics,
     Biostrings,
     BSgenome,
