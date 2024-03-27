@@ -738,8 +738,56 @@
                                      severity = severity
             )
         }
+
+        
+#======
+# FILES
+#======
+
+        is_existing_file <- function(x, .xname = get_name_in_parent(x)){
+            x <- coerce_to(x, "character", .xname)
+            # file.exists returns FALSE under Windows when there is a trailing slash
+            x <- sub("[\\/]+$", "", x)
+            call_and_name( function(x){
+                                ok <- file.exists(x)
+                                set_cause(ok, ifelse(ok, "", "nonexistent"))
+                            }, 
+                            x )
+        }
+        
+        is_dir <- function(x, .xname = get_name_in_parent(x)){  
+            x <- coerce_to(x, "character", .xname)
+            call_and_name(  function(x){
+                                ok <- file.info(x)$isdir
+                                causes <- ifelse( is.na(ok), "nonexistent", ifelse(ok, "", "file"))
+                                ok <- is_true(ok) 
+                                set_cause(ok, causes)
+                            }, 
+                            x )
+        }
         
 
+        assert_all_are_dirs <- function(x, severity = getOption("assertive.severity", "stop")){
+            .xname <- get_name_in_parent(x)
+            msg <- gettextf("Some or all of the paths specified by %s are not directories.", .xname)
+            assert_engine( is_dir, 
+                                x, 
+                           .xname = .xname,
+                              msg = msg, 
+                             what = "any",
+                         severity = severity )
+        }
+                
+        assert_all_are_existing_files <- function(x, severity = getOption("assertive.severity", "stop")){
+            .xname <- get_name_in_parent(x)
+            msg <- gettextf("Some or all of the files specified by %s do not exist.", .xname)
+            assert_engine( is_existing_file, 
+                                          x, 
+                                     .xname = .xname,
+                                        msg = msg, 
+                                   severity = severity )
+        }
+        
 #===========
 # REFLECTION
 #===========
