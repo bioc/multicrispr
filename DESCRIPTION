@@ -1,6 +1,6 @@
 Package: multicrispr
 Title: Multi-locus multi-purpose Crispr/Cas design 
-Version: 1.19.0
+Version: 1.19.1
 Encoding: UTF-8
 Authors@R: c(person("Aditya",   "Bhagwat",    NULL, "aditya.bhagwat@uni-marburg.de",   c("aut", "cre")),
             person( "Richie",   "´Cotton",    NULL, "richierocks@gmail.com",            "aut"),
@@ -18,7 +18,7 @@ Description: This package is for designing Crispr/Cas9 and Prime Editing experim
              enabling the design of large Crispr/Cas9 libraries.
 License: GPL-2
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Depends:
     R (>= 4.0)
 Imports:
@@ -27,7 +27,7 @@ Imports:
     BSgenome,
     CRISPRseek,
     data.table,
-    GenomeInfoDb,
+    Seqinfo,
     GenomicFeatures,
     GenomicRanges,
     ggplot2,
@@ -53,6 +53,7 @@ Suggests:
     BSgenome.Scerevisiae.UCSC.sacCer1,
     ensembldb,
     IRanges,
+    GenomeInfoDb,
     knitr,
     magick,
     rmarkdown,

@@ -28,7 +28,7 @@ plot_karyogram <- function(
     assert_is_all_of(grlist, 'GRangesList')
     
     # Extract relevant chromosomes and order them
-    chroms <- union(seqlevelsInUse(grlist), standardChromosomes(grlist))
+    chroms <- union(seqlevelsInUse(grlist), GenomeInfoDb::standardChromosomes(grlist))
     stri_extract <- function(stri, pattern){
         stri %>% extract(stri_detect_regex(., pattern)) 
     }

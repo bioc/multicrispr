@@ -4,7 +4,7 @@ bsgenome <- BSgenome.Mmusculus.UCSC.mm10::BSgenome.Mmusculus.UCSC.mm10
 granges <-  GenomicRanges::GRanges(
                 'chr1', '100-200', strand = '-', targetname = 'T01',
                 seqinfo = seqinfo(bsgenome))
-chrlength <- GenomeInfoDb::seqlengths(bsgenome)[['chr1']]
+chrlength <- Seqinfo::seqlengths(bsgenome)[['chr1']]
 
 # Test
 context('up_flank and down_flank')

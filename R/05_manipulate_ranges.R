@@ -33,9 +33,11 @@ add_seq <- function(gr, bsgenome, verbose = FALSE, as.character = TRUE){
     if (verbose)  cmessage('\tAdd seq')
     
     # Align seqlevelsStyle if required
-    if (seqlevelsStyle(bsgenome)[1] != seqlevelsStyle(gr)[1]){
+    if (GenomeInfoDb::seqlevelsStyle(bsgenome)[1] !=
+        GenomeInfoDb::seqlevelsStyle(gr)[1]){
             cmessage("\t\t\tSet seqlevelStyle(bsgenome) <- seqlevelStyle(gr)")
-            seqlevelsStyle(bsgenome)[1] <- seqlevelsStyle(gr)[1]
+            GenomeInfoDb::seqlevelsStyle(bsgenome)[1] <-
+                GenomeInfoDb::seqlevelsStyle(gr)[1]
     }
     
     # Add seq

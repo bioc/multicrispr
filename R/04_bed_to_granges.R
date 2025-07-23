@@ -11,9 +11,11 @@ annotate_granges <- function(gr, txdb){
     gene_id <- NULL
 
     # Align seqlevelStyle if required
-    if (seqlevelsStyle(gr) != seqlevelsStyle(txdb)){
-        message("Setting seqlevelsStyle(txdb) <- seqlevelsStyle(gr)")
-        seqlevelsStyle(txdb) <- seqlevelsStyle(gr)
+    if (GenomeInfoDb::seqlevelsStyle(gr) !=
+        GenomeInfoDb::seqlevelsStyle(txdb)){
+            message("Setting seqlevelsStyle(txdb) <- seqlevelsStyle(gr)")
+            GenomeInfoDb::seqlevelsStyle(txdb) <-
+                GenomeInfoDb::seqlevelsStyle(gr)
     }
     
     # Drop seqinfo (to overlap smoothly)

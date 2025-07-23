@@ -4,7 +4,7 @@ granges <-  GenomicRanges::GRanges('chr1',
                     '100-200',
                     strand   = '-',
                     seqinfo  = seqinfo(bsgenome))
-chrlength <- GenomeInfoDb::seqlengths(bsgenome)[['chr1']]
+chrlength <- Seqinfo::seqlengths(bsgenome)[['chr1']]
 
 # Test
 context('extend')

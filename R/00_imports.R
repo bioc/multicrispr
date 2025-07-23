@@ -7,12 +7,6 @@
 #' @importFrom  data.table            fread   fwrite
 #' @importFrom  data.table            :=  data.table  as.data.table  setnames
 #' @importFrom  data.table            setnames  setorderv   setnafill    .SD
-#' @importFrom  GenomeInfoDb          genome
-#' @importFrom  GenomeInfoDb          seqinfo   seqinfo<-
-#' @importFrom  GenomeInfoDb          seqlevels  seqlevels<-  seqlevelsInUse
-#' @importFrom  GenomeInfoDb          seqlevelsStyle  seqlevelsStyle<- 
-#' @importFrom  GenomeInfoDb          seqnames  seqnames<-   
-#' @importFrom  GenomeInfoDb          sortSeqlevels  standardChromosomes
 #' @importFrom  GenomicRanges         granges  GRanges  mcols  mcols<-
 #' @importFrom  ggplot2               aes   aes_string
 #' @importFrom  ggplot2               facet_wrap  geom_point  geom_segment  
@@ -29,6 +23,11 @@
 #' @importFrom  utils                 tail  read.csv  read.table
 #' @importFrom  reticulate            py_module_available
 #' @importFrom  stats                 complete.cases
+#' @importFrom  Seqinfo               genome
+#' @importFrom  Seqinfo               seqinfo   seqinfo<-
+#' @importFrom  Seqinfo               seqlevels  seqlevels<-  seqlevelsInUse
+#' @importFrom  Seqinfo               seqnames  seqnames<-   
+#' @importFrom  Seqinfo               sortSeqlevels
 #' @importFrom  stringi               stri_detect_fixed      stri_detect_regex
 #' @importFrom  stringi               stri_locate_all_fixed  stri_locate_all_regex   
 #' @importFrom  stringi               stri_replace_first_fixed

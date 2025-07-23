@@ -173,7 +173,7 @@ count_genome_matches <- function(
     # Count
     pamseqs <- expand_iupac_ambiguities(pam)
     sitedt <- data.table(spacer = rep(spacerseqs, each = length(pamseqs)), 
-                        pam     = rep(pamseqs, times = length(spacerseqs))) %>% 
+                         pam    = rep(pamseqs, times = length(spacerseqs))) %>% 
               extract(, crispr := paste0(spacer, pamseqs) )
     seqdt <- data.table(crispr = unique(sitedt$crispr))
     
@@ -227,7 +227,7 @@ add_seqinfo <- function(gr, bsgenome){
 #'         sites, targets, bsgenome, 0, include = 'chrY')
 #' @export
 filter_offtargetfree_sites <- function(sites, targets, bsgenome, mismatch = 2, 
-    include = standardChromosomes(targets), plot = TRUE, verbose = TRUE){
+    include = GenomeInfoDb::standardChromosomes(targets), plot = TRUE, verbose = TRUE){
     
     # Assert. Prepare
     assert_is_all_of(sites,    'GRanges')

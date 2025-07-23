@@ -42,7 +42,7 @@
                 IRanges::IRanges(start=7, end=7) %>% set_names(ensp), 
                 ensdb) %>% 
             extract2(ensp) %>% 
-            (function(y){seqlevelsStyle(y) <- 'UCSC'; y})
+            (function(y){GenomeInfoDb::seqlevelsStyle(y) <- 'UCSC'; y})
     BSgenome::getSeq(
         bs, seqnames(gr), start = start(gr), end = end(gr), strand = '-')
     gr

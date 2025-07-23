@@ -54,7 +54,7 @@ name_uniquely <- function(gr, prefix = 'x'){
 #' 
 #' @param gr      \code{\link[GenomicRanges]{GRanges-class}}
 #' @param dt      data.table
-#' @param seqinfo \code{\link[GenomeInfoDb]{Seqinfo-class}}
+#' @param seqinfo \code{\link[Seqinfo]{Seqinfo-class}}
 #' @aliases dt2gr
 #' @return data.table (gr2dt) or GRanges (dt2gr)
 #' @examples

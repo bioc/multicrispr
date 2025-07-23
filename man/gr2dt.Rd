@@ -14,7 +14,7 @@ dt2gr(dt, seqinfo)
 
 \item{dt}{data.table}
 
-\item{seqinfo}{\code{\link[GenomeInfoDb]{Seqinfo-class}}}
+\item{seqinfo}{\code{\link[Seqinfo]{Seqinfo-class}}}
 }
 \value{
 data.table (gr2dt) or GRanges (dt2gr)

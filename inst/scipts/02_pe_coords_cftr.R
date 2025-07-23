@@ -28,7 +28,7 @@
                 IRanges::IRanges(start=508, end=508) %>% set_names(ensp), 
                 ensdb) %>% 
             extract2(ensp) %>% 
-            (function(y){seqlevelsStyle(y) <- 'UCSC'; y})
+            (function(y){GenomeInfoDb::seqlevelsStyle(y) <- 'UCSC'; y})
     bs <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
     BSgenome::getSeq(
         bs, seqnames(gr), start = start(gr), end = end(gr), strand = '+')
